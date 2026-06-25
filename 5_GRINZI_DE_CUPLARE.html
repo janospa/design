@@ -100,11 +100,11 @@ header.top{margin-bottom:16px}
 .kv b{color:var(--ink);font-weight:500;font-feature-settings:"tnum" 1}
 .kv:last-child{border-bottom:none}
 .back-nav{background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:100}
-.back-btn{display:inline-flex;align-items:center;gap:5px;font-family:'Inter',sans-serif;font-size:12px;font-weight:500;color:#8E8E93;background:transparent;border:none;cursor:pointer;padding:10px 16px;text-decoration:none;line-height:1}
-.back-btn svg{width:14px;height:14px;stroke:#8E8E93;stroke-width:2.5;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.back-btn{display:inline-flex;align-items:center;gap:5px;font-family:'Inter',sans-serif;font-size:13px;font-weight:500;color:#8E8E93;background:transparent;border:none;cursor:pointer;padding:12px 16px;text-decoration:none;line-height:1}
+.back-btn svg{width:16px;height:16px;stroke:#8E8E93;stroke-width:2.5;fill:none;stroke-linecap:round;stroke-linejoin:round}
 .back-btn:hover{color:#1C1C1E}
 .back-btn:hover svg{stroke:#1C1C1E}
-@media(max-width:680px){.wrap{padding:14px 10px 60px}.grid{grid-template-columns:1fr}.actions{flex-direction:column}.btn{width:100%;text-align:center}.row.three{grid-template-columns:1fr 1fr}}
+@media(max-width:680px){.wrap{padding:14px 10px 60px}.grid{grid-template-columns:1fr}.row{grid-template-columns:1fr}.row.three{grid-template-columns:1fr 1fr}.fld input,.fld select{font-size:16px}.report-btn{width:100%}}
 </style>
 </head>
 <body>
@@ -148,11 +148,9 @@ header.top{margin-bottom:16px}
 
       <div class="fieldset">
         <div class="fs-lbl">Clasă de ductilitate</div>
-        <div class="sel-field"><div class="sel-wrap">
-          <select id="sel-duct" onchange="ductMode=this.value;compute()">
-            <option value="DCM" selected>DCM — Ductilitate medie</option>
-            <option value="DCH">DCH — Ductilitate înaltă</option>
-          </select></div></div>
+        <div class="seg" id="seg-duct">
+          <button data-v="DCM" class="on">DCM</button><button data-v="DCH">DCH</button>
+        </div>
       </div>
 
       <div class="fieldset">
@@ -165,11 +163,9 @@ header.top{margin-bottom:16px}
 
       <div class="fieldset">
         <div class="fs-lbl">Forța tăietoare V<sub>Ed</sub></div>
-        <div class="sel-field"><div class="sel-wrap">
-          <select id="sel-ved" onchange="vedMode=this.value;document.getElementById('ved-gs').style.display=vedMode==='gs'?'block':'none';compute()">
-            <option value="cap" selected>Capacitate (M<sub>Rd,b</sub>)</option>
-            <option value="gs">Seismic (GS)</option>
-          </select></div></div>
+        <div class="seg" id="seg-ved">
+          <button data-v="cap" class="on">Capacitate (M<sub>Rd,b</sub>)</button><button data-v="gs">Seismic (GS)</button>
+        </div>
         <div class="fld" id="ved-gs" style="margin-top:10px;display:none">
           <label>V<sub>Ed,GS</sub> din combinația seismică <span class="unit">kN</span></label><input id="vgs" type="number" value="1068"></div>
         <div class="note" style="margin-top:12px">
@@ -264,7 +260,11 @@ const num=id=>parseFloat($(id).value)||0;
 const fmt=(x,d=1)=>(x==null||isNaN(x))?'—':Number(x).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
 
 let ductMode='DCM', vedMode='cap';
-// ductMode and vedMode driven by <select> onchange handlers
+document.querySelectorAll('#seg-duct button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('#seg-duct button').forEach(x=>x.classList.remove('on'));b.classList.add('on');ductMode=b.dataset.v;compute();});
+document.querySelectorAll('#seg-ved button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('#seg-ved button').forEach(x=>x.classList.remove('on'));b.classList.add('on');vedMode=b.dataset.v;
+  document.getElementById('ved-gs').style.display=vedMode==='gs'?'flex':'none';compute();});
 document.querySelectorAll('input,select').forEach(el=>el.addEventListener('input',compute));
 
 let M={};
@@ -502,6 +502,46 @@ function exportPDF(){
   doc.text('Rezultatele se verifica de inginerul proiectant. CR 2-1-1.1/2022.',14,289);
   doc.save('grinda_de_cuplare_CR2-2022.pdf');
 }
+
+// ─── Persist inputs across navigation ───
+(function(){
+  const SKEY='design_mod5';
+  function saveState(){
+    const state={};
+    document.querySelectorAll('input[id],select[id]').forEach(el=>{state[el.id]=el.value;});
+    document.querySelectorAll('input[type=checkbox][id]').forEach(el=>{state['_chk_'+el.id]=el.checked;});
+    document.querySelectorAll('.seg').forEach((seg,i)=>{
+      const on=seg.querySelector('.on');
+      if(on)state['_seg_'+i]=on.dataset.v||on.textContent;
+    });
+    try{localStorage.setItem(SKEY,JSON.stringify(state));}catch(e){}
+  }
+  function restoreState(){
+    let state;
+    try{state=JSON.parse(localStorage.getItem(SKEY));}catch(e){return;}
+    if(!state)return;
+    document.querySelectorAll('input[id],select[id]').forEach(el=>{
+      if(state[el.id]!==undefined)el.value=state[el.id];
+    });
+    document.querySelectorAll('input[type=checkbox][id]').forEach(el=>{
+      if(state['_chk_'+el.id]!==undefined)el.checked=state['_chk_'+el.id];
+    });
+    document.querySelectorAll('.seg').forEach((seg,i)=>{
+      const sv=state['_seg_'+i];
+      if(!sv)return;
+      seg.querySelectorAll('button').forEach(b=>{
+        const match=(b.dataset.v||b.textContent)===sv;
+        b.classList.toggle('on',match);
+        if(match)b.click&&b.dispatchEvent(new Event('click'));
+      });
+    });
+  }
+  restoreState();
+  document.addEventListener('input',saveState);
+  document.addEventListener('change',saveState);
+  document.addEventListener('click',e=>{if(e.target.closest('.seg'))setTimeout(saveState,50);});
+})();
+
 compute();
 </script>
 </body>
