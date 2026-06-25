@@ -1,0 +1,577 @@
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1C1E}
+
+
+
+
+
+.wrap{max-width:1080px;margin:0 auto;padding:20px 16px}
+.cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+.slabel{font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:#1C1C1E;padding:0 0 7px;margin-top:14px}
+.slabel:first-child{margin-top:0}
+.ip{background:#EFEFEF;border:1px solid #DCDCE0;border-radius:12px;overflow:hidden;margin-bottom:13px}
+.op{background:#fff;border:1px solid #DCDCE0;border-radius:12px;overflow:hidden;margin-bottom:13px}
+.ph{padding:12px 15px 0;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:#1C1C1E}
+.pb{padding:8px 15px 14px}
+.row{display:flex;align-items:center;padding:7px 0;border-bottom:1px solid #E0E0E5;gap:8px}
+.row:last-child{border-bottom:none}
+.rl{flex:1;font-size:13px;color:#1C1C1E;min-width:0}
+.rn{font-size:12px;color:#8E8E93;margin-left:4px}
+.rc{display:flex;align-items:center;gap:5px;flex-shrink:0}
+.rc input[type=number]{width:78px;padding:5px 8px;font-size:13px;border:1px solid #C7C7CC;border-radius:7px;background:#fff;color:#1C1C1E;font-family:'Inter',sans-serif;-moz-appearance:textfield;appearance:textfield;text-align:right}
+.rc input[type=number]::-webkit-inner-spin-button,.rc input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.rc input:focus{outline:none;box-shadow:0 0 0 2px rgba(0,122,255,.2);border-color:#007AFF}
+.ru{font-size:12px;color:#8E8E93;min-width:30px}
+.sel-field{margin-bottom:10px}
+.sel-field label{display:block;font-size:12px;color:#8E8E93;margin-bottom:5px;font-weight:500}
+.sel-wrap{position:relative}
+.sel-wrap::after{content:'';position:absolute;right:13px;top:50%;width:7px;height:7px;border-right:2px solid #8E8E93;border-bottom:2px solid #8E8E93;transform:translateY(-65%) rotate(45deg);pointer-events:none}
+.sel-field select{width:100%;padding:8px 34px 8px 11px;font-size:13px;border:1px solid #C7C7CC;border-radius:8px;background:#fff;color:#1C1C1E;font-family:'Inter',sans-serif;cursor:pointer;-webkit-appearance:none;appearance:none}
+.sel-field select:focus{outline:none;box-shadow:0 0 0 2px rgba(0,122,255,.2);border-color:#007AFF}
+.mat-vals{display:flex;gap:6px;padding:6px 0 2px;flex-wrap:wrap}
+.mv{flex:1;min-width:60px;text-align:center;background:#E8E8ED;border-radius:7px;padding:8px 4px}
+.mvl{font-size:11px;color:#8E8E93;margin-bottom:2px}
+.mvv{font-size:14px;font-weight:500;color:#1C1C1E}
+.mvu{font-size:10px;color:#8E8E93}
+.sub{font-size:11px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;color:#8E8E93;padding:9px 0 5px}
+.divx{height:1px;background:#E0E0E5;margin:9px 0}
+.res-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.res-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.rc2{background:#F2F2F7;border-radius:8px;padding:10px 12px}
+.rc2.hl{background:#EBF3FF;border:1px solid #B8D4F8}
+.rc2.gr{background:#EAF6EC;border:1px solid #BFE3C6}
+.rc2.rd{background:#FCECEC;border:1px solid #F2C2C2}
+.rl2{font-size:11px;color:#8E8E93;margin-bottom:3px}
+.rv{font-size:19px;font-weight:500;color:#1C1C1E;line-height:1.2}
+.rc2.hl .rv{color:#0066CC}
+.rc2.gr .rv{color:#2E7D32}
+.rc2.rd .rv{color:#C0392B}
+.ru2{font-size:11px;color:#8E8E93}
+.toggle-row{display:flex;align-items:center;gap:10px;padding:4px 0 10px}
+.toggle-row span{font-size:13px;color:#1C1C1E;flex:1}
+.seg{display:inline-flex;background:#E0E0E5;border-radius:8px;padding:2px;gap:2px}
+.seg button{padding:6px 13px;font-size:12px;font-weight:500;border:none;border-radius:6px;background:transparent;color:#8E8E93;cursor:pointer;font-family:'Inter',sans-serif;transition:all .12s}
+.seg button.on{background:#fff;color:#1C1C1E;box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.count-box{background:#EBF3FF;border:1px solid #B8D4F8;border-radius:8px;padding:8px 12px;margin-top:6px;display:flex;justify-content:space-between;font-size:12px}
+.count-box span{color:#0066CC;font-weight:500}
+.util-bar{height:10px;background:#E8E8ED;border-radius:5px;overflow:hidden;margin-top:8px}
+.util-fill{height:100%;border-radius:5px;transition:width .3s}
+.cleg{display:flex;gap:14px;margin-bottom:6px;font-size:12px;color:#1C1C1E;flex-wrap:wrap}
+.cleg span{display:flex;align-items:center;gap:4px}
+.note{font-size:12px;color:#8E8E93;line-height:1.5}
+.report-bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.report-lbl{font-size:13px;color:#1C1C1E;flex:1;min-width:120px}
+.report-btn{padding:11px 18px;font-size:14px;font-weight:500;font-family:'Inter',sans-serif;border:none;border-radius:10px;background:#1C1C1E;color:#fff;cursor:pointer;transition:opacity .15s}
+.report-btn:active{opacity:.7}
+.report-btn:disabled{opacity:.4}
+.report-status{font-size:12px;color:#8E8E93;text-align:center;padding:6px 0 0;min-height:16px}
+.conf-fields{display:none;background:#EAF6EC;border-radius:8px;padding:4px 11px;margin-top:8px}
+.conf-fields.on{display:block}
+@media(max-width:680px){.wrap{padding:14px 10px}.cols{grid-template-columns:1fr;gap:0}.report-btn{width:100%}}
+.back-btn{display:inline-flex;align-items:center;gap:5px;font-family:'Inter',sans-serif;font-size:12px;font-weight:500;color:#8E8E93;background:transparent;border:none;cursor:pointer;padding:10px 16px;text-decoration:none;line-height:1}
+.back-btn svg{width:14px;height:14px;stroke:#8E8E93;stroke-width:2.5;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.back-btn:hover{color:#1C1C1E}
+.back-btn:hover svg{stroke:#1C1C1E}
+</style>
+
+<a href="index.html" class="back-btn"><svg viewBox="0 0 16 16"><polyline points="10,3 4,8 10,13"/></svg>Toate modulele</a>
+</div>
+
+<div class="wrap">
+<div class="cols">
+<div>
+  <div class="slabel">Intrari</div>
+
+  <div class="ip">
+    <div class="ph">1. Geometrie perete</div>
+    <div class="pb">
+      <div class="row"><div class="rl">Lungimea peretelui <span class="rn">(l<sub>w</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="lw" value="2750" step="50" oninput="calc()"><span class="ru">mm</span></div></div>
+      <div class="row"><div class="rl">Grosimea inimii <span class="rn">(b<sub>w0</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="bw0" value="400" step="10" oninput="calc()"><span class="ru">mm</span></div></div>
+      <div class="sub">Bulb 1 (stanga)</div>
+      <div class="row"><div class="rl">Lungimea bulbului <span class="rn">(b<sub>f</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="bf1" value="650" step="10" oninput="calc()"><span class="ru">mm</span></div></div>
+      <div class="row"><div class="rl">Latimea bulbului <span class="rn">(l<sub>f</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="lf1" value="400" step="10" oninput="calc()"><span class="ru">mm</span></div></div>
+      <div class="sub">Bulb 2 (dreapta) &mdash; punct referinta</div>
+      <div class="row"><div class="rl">Lungimea bulbului <span class="rn">(b<sub>f</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="bf2" value="650" step="10" oninput="calc()"><span class="ru">mm</span></div></div>
+      <div class="row"><div class="rl">Latimea bulbului <span class="rn">(l<sub>f</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="lf2" value="400" step="10" oninput="calc()"><span class="ru">mm</span></div></div>
+    </div>
+  </div>
+
+  <div class="ip">
+    <div class="ph">2. Materiale</div>
+    <div class="pb">
+      <div class="sel-field"><label>Clasa beton</label><div class="sel-wrap">
+        <select id="cp" onchange="curC=this.value;updMat();calc()">
+          <option>C12/15</option><option>C16/20</option><option>C20/25</option><option>C25/30</option>
+          <option>C30/37</option><option>C35/45</option><option>C40/50</option><option>C45/55</option>
+          <option selected>C50/60</option><option>C55/67</option><option>C60/75</option>
+        </select></div></div>
+      <div class="sel-field"><label>Clasa otel</label><div class="sel-wrap">
+        <select id="sp" onchange="curS=this.value;updMat();calc()">
+          <option>S240B</option><option>S400B</option><option>S500B</option><option selected>S 500</option>
+        </select></div></div>
+      <div class="mat-vals">
+        <div class="mv"><div class="mvl">f<sub>cd</sub></div><div class="mvv" id="fcd_d">33.33</div><div class="mvu">MPa</div></div>
+        <div class="mv"><div class="mvl">f<sub>yd</sub></div><div class="mvv" id="fyd_d">434.8</div><div class="mvu">MPa</div></div>
+        <div class="mv"><div class="mvl">&epsilon;<sub>cu2</sub></div><div class="mvv" id="ecu_d">3.50</div><div class="mvu">&permil;</div></div>
+        <div class="mv"><div class="mvl">&epsilon;<sub>c2</sub></div><div class="mvv" id="ec2_d">2.00</div><div class="mvu">&permil;</div></div>
+      </div>
+      <div class="toggle-row" style="margin-top:8px;border-top:1px solid #E0E0E5;padding-top:12px">
+        <span>Beton confinat in bulbi</span>
+        <div class="seg">
+          <button id="seg-nc" class="on" onclick="setConf(false)">Neconfinat</button>
+          <button id="seg-c" onclick="setConf(true)">Confinat</button>
+        </div>
+      </div>
+      <div class="conf-fields" id="conf-fields">
+        <div class="row"><div class="rl">Rez. caract. confinata <span class="rn">(f<sub>ck,c</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="fckc" value="40.60" step="0.1" oninput="calc()"><span class="ru">MPa</span></div></div>
+        <div class="row"><div class="rl">Def. la efort max <span class="rn">(&epsilon;<sub>c2,c</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="ec2c" value="3.66" step="0.01" oninput="calc()"><span class="ru">&permil;</span></div></div>
+        <div class="row"><div class="rl">Def. ultima <span class="rn">(&epsilon;<sub>cu2,c</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="ecu2c" value="21.83" step="0.1" oninput="calc()"><span class="ru">&permil;</span></div></div>
+        <div class="note" style="padding:4px 0 6px">f<sub>cd,c</sub> = f<sub>ck,c</sub> / 1.5. Confinarea se aplica doar zonei de bulb. Lege parabola-dreptunghi.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ip">
+    <div class="ph">3. Armare longitudinala</div>
+    <div class="pb">
+      <div class="sub">Bulb 1 &mdash; bare</div>
+      <div class="row"><div class="rl">La colturi <span class="rn">(buc / &Oslash;)</span></div><div class="rc"><input type="number" inputmode="numeric" id="b1c_n" value="4" step="1" oninput="calc()" style="width:48px"><input type="number" inputmode="numeric" id="b1c_d" value="25" step="1" oninput="calc()" style="width:48px"><span class="ru">mm</span></div></div>
+      <div class="row"><div class="rl">Lateral lat. scurta <span class="rn">(buc / &Oslash;)</span></div><div class="rc"><input type="number" inputmode="numeric" id="b1s_n" value="2" step="1" oninput="calc()" style="width:48px"><input type="number" inputmode="numeric" id="b1s_d" value="25" step="1" oninput="calc()" style="width:48px"><span class="ru">mm</span></div></div>
+      <div class="row"><div class="rl">Lateral lat. lunga <span class="rn">(buc / &Oslash; / rand)</span></div><div class="rc"><input type="number" inputmode="numeric" id="b1l_n" value="9" step="1" oninput="calc()" style="width:40px"><input type="number" inputmode="numeric" id="b1l_d" value="25" step="1" oninput="calc()" style="width:40px"><input type="number" inputmode="numeric" id="b1l_r" value="3" step="1" oninput="calc()" style="width:40px"></div></div>
+      <div class="count-box"><span>Total bare Bulb 1</span><span id="cnt_b1">&mdash;</span></div>
+      <div class="sub">Bulb 2 &mdash; bare</div>
+      <div class="row"><div class="rl">La colturi <span class="rn">(buc / &Oslash;)</span></div><div class="rc"><input type="number" inputmode="numeric" id="b2c_n" value="4" step="1" oninput="calc()" style="width:48px"><input type="number" inputmode="numeric" id="b2c_d" value="25" step="1" oninput="calc()" style="width:48px"><span class="ru">mm</span></div></div>
+      <div class="row"><div class="rl">Lateral lat. scurta <span class="rn">(buc / &Oslash;)</span></div><div class="rc"><input type="number" inputmode="numeric" id="b2s_n" value="2" step="1" oninput="calc()" style="width:48px"><input type="number" inputmode="numeric" id="b2s_d" value="25" step="1" oninput="calc()" style="width:48px"><span class="ru">mm</span></div></div>
+      <div class="row"><div class="rl">Lateral lat. lunga <span class="rn">(buc / &Oslash; / rand)</span></div><div class="rc"><input type="number" inputmode="numeric" id="b2l_n" value="9" step="1" oninput="calc()" style="width:40px"><input type="number" inputmode="numeric" id="b2l_d" value="25" step="1" oninput="calc()" style="width:40px"><input type="number" inputmode="numeric" id="b2l_r" value="3" step="1" oninput="calc()" style="width:40px"></div></div>
+      <div class="count-box"><span>Total bare Bulb 2</span><span id="cnt_b2">&mdash;</span></div>
+      <div class="sub">Inima &mdash; bare longitudinale</div>
+      <div class="row"><div class="rl">Bare long. <span class="rn">(&Oslash; / s / rand)</span></div><div class="rc"><input type="number" inputmode="numeric" id="in_d" value="12" step="1" oninput="calc()" style="width:40px"><input type="number" inputmode="numeric" id="in_s" value="150" step="10" oninput="calc()" style="width:40px"><input type="number" inputmode="numeric" id="in_r" value="3" step="1" oninput="calc()" style="width:40px"></div></div>
+      <div class="count-box"><span>Total bare Inima</span><span id="cnt_web">&mdash;</span></div>
+    </div>
+  </div>
+
+  <div class="ip">
+    <div class="ph">4. Acoperire &amp; etrieri</div>
+    <div class="pb">
+      <div class="row"><div class="rl">Acoperire <span class="rn">(c<sub>nom</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="cnom" value="35" step="5" oninput="calc()"><span class="ru">mm</span></div></div>
+      <div class="row"><div class="rl">Diametru etrier <span class="rn">(&Oslash;<sub>etr</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="detr" value="10" step="2" oninput="calc()"><span class="ru">mm</span></div></div>
+    </div>
+  </div>
+
+  <div class="ip">
+    <div class="ph">5. Eforturi exterioare</div>
+    <div class="pb">
+      <div class="row"><div class="rl">Moment incovoietor <span class="rn">(M<sub>Ed</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="med" value="8643.7" step="100" oninput="calc()"><span class="ru">kNm</span></div></div>
+      <div class="row"><div class="rl">Forta axiala <span class="rn">(N<sub>Ed</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="ned" value="1294.9" step="100" oninput="calc()"><span class="ru">kN</span></div></div>
+      <div class="note" style="padding-top:6px">M<sub>Ed</sub> &gt; 0 comprima Bulb 2 (dreapta). M<sub>Ed</sub> &lt; 0 comprima Bulb 1 (stanga). N<sub>Ed</sub> &gt; 0 = compresiune.</div>
+    </div>
+  </div>
+</div>
+
+<div>
+  <div class="slabel">Rezultate</div>
+
+  <div class="op">
+    <div class="ph">Momentul capabil M<sub>Rd</sub></div>
+    <div class="pb">
+      <div class="res-grid">
+        <div class="rc2 hl"><div class="rl2">M<sub>Rd</sub></div><div class="rv" id="mrd_r">&mdash;</div><div class="ru2">kNm</div></div>
+        <div class="rc2"><div class="rl2">X (zona comprimata)</div><div class="rv" id="x_r">&mdash;</div><div class="ru2">mm</div></div>
+      </div>
+      <div style="margin-top:10px">
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:#8E8E93;margin-bottom:2px"><span>Utilizare M<sub>Ed</sub> / M<sub>Rd</sub></span><span id="util_t">&mdash;</span></div>
+        <div class="util-bar"><div class="util-fill" id="util_f" style="width:0%;background:#2E7D32"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="op">
+    <div class="ph">Sectiune transversala &amp; armare</div>
+    <div class="pb" style="padding-bottom:10px">
+      <svg id="sketch" viewBox="0 0 460 220" width="100%" style="display:block"></svg>
+    </div>
+  </div>
+
+  <div class="op">
+    <div class="ph">Diagrama de interactiune N&ndash;M</div>
+    <div class="pb">
+      <div class="cleg">
+        <span><span style="width:14px;height:2px;display:inline-block;background:#0066CC"></span> Curba capabila M<sub>Rd</sub></span>
+        <span><span style="width:9px;height:9px;display:inline-block;border-radius:50%;background:#C0392B"></span> Efort exterior</span>
+      </div>
+      <div style="position:relative;width:100%;height:300px"><canvas id="nmchart" role="img" aria-label="Diagrama de interactiune N-M">Curba de interactiune forta axiala-moment.</canvas></div>
+    </div>
+  </div>
+
+  <div class="op">
+    <div class="ph">Echilibru sectiune (la N<sub>Ed</sub>)</div>
+    <div class="pb">
+      <div class="res-grid-3">
+        <div class="rc2"><div class="rl2">N<sub>int</sub></div><div class="rv" id="nint_r">&mdash;</div><div class="ru2">kN</div></div>
+        <div class="rc2"><div class="rl2">N<sub>ext</sub></div><div class="rv" id="next_r">&mdash;</div><div class="ru2">kN</div></div>
+        <div class="rc2"><div class="rl2">Diferenta</div><div class="rv" id="diff_r">&mdash;</div><div class="ru2">kN</div></div>
+      </div>
+      <div class="res-grid" style="margin-top:8px">
+        <div class="rc2"><div class="rl2">&Sigma;F<sub>beton</sub></div><div class="rv" id="fb_r">&mdash;</div><div class="ru2">kN</div></div>
+        <div class="rc2"><div class="rl2">&Sigma;F<sub>otel</sub></div><div class="rv" id="fa_r">&mdash;</div><div class="ru2">kN</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="op">
+    <div class="ph">Capacitati axiale limita</div>
+    <div class="pb">
+      <div class="res-grid">
+        <div class="rc2"><div class="rl2">N<sub>Rd,u+</sub> (compresiune)</div><div class="rv" id="nrdc_r">&mdash;</div><div class="ru2">kN</div></div>
+        <div class="rc2"><div class="rl2">N<sub>Rd,u&minus;</sub> (intindere)</div><div class="rv" id="nrdt_r">&mdash;</div><div class="ru2">kN</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="op">
+    <div class="pb">
+      <div class="report-bar">
+        <span class="report-lbl">Export raport de calcul (PDF)</span>
+        <button class="report-btn" id="rptBtn" onclick="generatePdf()">Descarca PDF</button>
+      </div>
+      <div class="report-status" id="rptStatus"></div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
+<script>
+const CONC={'C12/15':{fck:12},'C16/20':{fck:16},'C20/25':{fck:20},'C25/30':{fck:25},'C30/37':{fck:30},'C35/45':{fck:35},'C40/50':{fck:40},'C45/55':{fck:45},'C50/60':{fck:50},'C55/67':{fck:55},'C60/75':{fck:60}};
+const STEEL={'S240B':{fyk:240},'S400B':{fyk:400},'S500B':{fyk:500},'S 500':{fyk:500}};
+let curC='C50/60',curS='S 500',confined=false,nmchart=null,lastCalc={};
+const NF=100;
+
+function gv(id){return parseFloat(document.getElementById(id)?.value)||0;}
+function updMat(){
+  const fck=CONC[curC].fck, fyk=STEEL[curS].fyk;
+  document.getElementById('fcd_d').textContent=(fck/1.5).toFixed(2);
+  document.getElementById('fyd_d').textContent=(fyk/1.15).toFixed(1);
+}
+function setConf(on){
+  confined=on;
+  document.getElementById('seg-nc').classList.toggle('on',!on);
+  document.getElementById('seg-c').classList.toggle('on',on);
+  document.getElementById('conf-fields').classList.toggle('on',on);
+  calc();
+}
+
+function buildModel(){
+  const lw=gv('lw'),bw0=gv('bw0');
+  const bf1=gv('bf1'),lf1=gv('lf1'),li1=0;
+  const bf2=gv('bf2'),lf2=gv('lf2'),li2=0;
+  const cnom=gv('cnom'),detr=gv('detr');
+  const lwi=lw-bf1-bf2-li1-li2;
+  const fck=CONC[curC].fck, fcd=fck/1.5;
+  const fckc=gv('fckc'), fcdc=fckc/1.5;
+  const fyd=STEEL[curS].fyk/1.15;
+  const Es=200000;
+  const ec2_nc=0.002, ecu_nc=0.0035;
+  const ec2_c=gv('ec2c')/1000, ecu_c=gv('ecu2c')/1000;
+  const PI=Math.PI;
+  function barA(d){return d*d*PI/4;}
+
+  const b2c_n=gv('b2c_n'),b2c_d=gv('b2c_d'),b2s_n=gv('b2s_n'),b2s_d=gv('b2s_d'),b2l_n=gv('b2l_n'),b2l_d=gv('b2l_d'),b2l_r=Math.max(1,gv('b2l_r'));
+  const b1c_n=gv('b1c_n'),b1c_d=gv('b1c_d'),b1s_n=gv('b1s_n'),b1s_d=gv('b1s_d'),b1l_n=gv('b1l_n'),b1l_d=gv('b1l_d'),b1l_r=Math.max(1,gv('b1l_r'));
+  const in_d=gv('in_d'),in_s=gv('in_s'),in_r=Math.max(0,gv('in_r'));
+
+  const nWeb=(in_r>0 && in_s>0)?Math.max(0,Math.floor(lwi/in_s)):0;
+
+  function bulbFibers(c_n,c_d,s_n,s_d,l_n,l_d,l_r,bulbLen,refStart){
+    const Acorner=barA(c_d), Ashort=barA(s_d), Along=barA(l_d);
+    const fibers=[];
+    fibers.push({A:Acorner*(c_n/2)+Ashort*(s_n/2),l:refStart});
+    fibers.push({A:Acorner*(c_n/2)+Ashort*(s_n/2),l:refStart+bulbLen});
+    const barsPerRow=Math.max(0,Math.round(l_n/l_r));
+    for(let i=0;i<barsPerRow;i++){
+      const pos=refStart + bulbLen*(i+1)/(barsPerRow+1);
+      fibers.push({A:Along*l_r,l:pos});
+    }
+    return fibers;
+  }
+  const f2=bulbFibers(b2c_n,b2c_d,b2s_n,b2s_d,b2l_n,b2l_d,b2l_r,bf2,0);
+  const Aweb_row=(in_r>0)?barA(in_d)*in_r:0;
+  const webFibers=[];
+  const webStart=bf2+li2;
+  const webStep=nWeb>0?lwi/nWeb:0;
+  for(let i=0;i<nWeb;i++){const l=webStart+(i+0.5)*webStep;webFibers.push({A:Aweb_row,l});}
+  const f1=bulbFibers(b1c_n,b1c_d,b1s_n,b1s_d,b1l_n,b1l_d,b1l_r,bf1,lw-bf1);
+  const steelFibers=[...f2,...webFibers,...f1];
+
+  const As_b1=b1c_n*barA(b1c_d)+b1s_n*barA(b1s_d)+b1l_n*barA(b1l_d);
+  const As_b2=b2c_n*barA(b2c_d)+b2s_n*barA(b2s_d)+b2l_n*barA(b2l_d);
+  const As_web=(in_r>0 && in_s>0)?barA(in_d)*in_r*nWeb:0;
+  const As_tot=As_b1+As_b2+As_web;
+  const Ac=bf1*lf1+li1*bw0 + bf2*lf2+li2*bw0 + lwi*bw0;
+
+  const cntB1 = b1c_n + b1s_n + b1l_n;
+  const cntB2 = b2c_n + b2s_n + b2l_n;
+  const cntWeb = nWeb * in_r;
+
+  return {lw,bw0,bf1,lf1,li1,bf2,lf2,li2,lwi,cnom,detr,
+    fck,fcd,fckc,fcdc,fyd,Es,ec2_nc,ecu_nc,ec2_c,ecu_c,
+    steelFibers,As_b1,As_b2,As_web,As_tot,Ac,cntB1,cntB2,cntWeb,
+    bars:{b1c_n,b1c_d,b1s_n,b1s_d,b1l_n,b1l_d,b1l_r,b2c_n,b2c_d,b2s_n,b2s_d,b2l_n,b2l_d,b2l_r,in_d,in_s,in_r,nWeb}};
+}
+
+function sigC(eps,m,zone){
+  if(eps<=0) return 0;
+  const useConf=confined&&zone==='bulb';
+  const fcd=useConf?m.fcdc:m.fcd;
+  const ec2=useConf?m.ec2_c:m.ec2_nc;
+  const ecu=useConf?m.ecu_c:m.ecu_nc;
+  if(eps>ecu) return 0;
+  const r=eps/ec2;
+  if(useConf){
+    // BETON CONFINAT: parabola-dreptunghi - parabola pana la ec2,c, apoi constant fcd,c
+    if(eps<=ec2) return fcd*(2*r-r*r);
+    return fcd;
+  }
+  // BETON NECONFINAT: parabola completa descrescatoare dupa varf (conform foii de calcul)
+  return fcd*(2*r-r*r);
+}
+function sigS(eps,m){let s=eps*m.Es;if(s>m.fyd)s=m.fyd;if(s<-m.fyd)s=-m.fyd;return s;}
+
+function widthAt(l,m){
+  const lwi=m.lwi;
+  if(l<=m.bf2) return {w:m.lf2,zone:'bulb'};
+  if(l<=m.bf2+m.li2) return {w:m.bw0,zone:'bulb'};
+  if(l<=m.bf2+m.li2+lwi) return {w:m.bw0,zone:'web'};
+  if(l<=m.bf2+m.li2+lwi+m.li1) return {w:m.bw0,zone:'bulb'};
+  return {w:m.lf1,zone:'bulb'};
+}
+
+function sectionForces(X,m,compFromRef){
+  const ecu_eff=(confined?m.ecu_c:m.ecu_nc);
+  let Fb=0,Fbl=0;
+  const dx=X/NF;
+  for(let i=0;i<NF;i++){
+    const lc=(i+0.5)*dx;
+    const eps=ecu_eff*(X-lc)/X;
+    const lpos=compFromRef?lc:(m.lw-lc);
+    const {w,zone}=widthAt(lpos,m);
+    const sig=sigC(eps,m,zone);
+    const F=sig*w*dx;
+    Fb+=F;Fbl+=F*lpos;
+  }
+  let Fa=0,Fal=0;
+  for(const sf of m.steelFibers){
+    const lc=compFromRef?sf.l:(m.lw-sf.l);
+    const eps=ecu_eff*(X-lc)/X;
+    const sig=sigS(eps,m);
+    const F=sig*sf.A;
+    Fa+=F;Fal+=F*sf.l;
+  }
+  return {Fb:Fb/1e3,Fa:Fa/1e3,Fbl,Fal,Nint:(Fb+Fa)/1e3};
+}
+function solveX(Ntarget,m,compFromRef){
+  let lo=1,hi=m.lw*1.5;
+  let flo=sectionForces(lo,m,compFromRef).Nint-Ntarget;
+  let fhi=sectionForces(hi,m,compFromRef).Nint-Ntarget;
+  if(flo*fhi>0){if(Math.abs(flo)<Math.abs(fhi))return{X:lo,...sectionForces(lo,m,compFromRef)};return{X:hi,...sectionForces(hi,m,compFromRef)};}
+  for(let it=0;it<80;it++){const mid=(lo+hi)/2;const fm=sectionForces(mid,m,compFromRef).Nint-Ntarget;if(flo*fm<=0){hi=mid;fhi=fm;}else{lo=mid;flo=fm;}}
+  const X=(lo+hi)/2;return{X,...sectionForces(X,m,compFromRef)};
+}
+function momentRd(res,m){
+  const Mfb=res.Fbl/1e6,Mfa=res.Fal/1e6,N=res.Nint;
+  return -Mfa-Mfb+N*(m.lw/1e3/2);
+}
+
+function calc(){
+  const m=buildModel();
+  document.getElementById('cnt_b1').textContent=m.cntB1+' bare';
+  document.getElementById('cnt_b2').textContent=m.cntB2+' bare';
+  document.getElementById('cnt_web').textContent=m.cntWeb+' bare';
+  const Ned=gv('ned'),Med=gv('med');
+  const compFromRef=Med>=0;
+  const res=solveX(Ned,m,compFromRef);
+  const Mrd=Math.abs(momentRd(res,m));
+  document.getElementById('mrd_r').textContent=Mrd.toFixed(1);
+  document.getElementById('x_r').textContent=res.X.toFixed(1);
+  document.getElementById('nint_r').textContent=res.Nint.toFixed(1);
+  document.getElementById('next_r').textContent=Ned.toFixed(1);
+  document.getElementById('diff_r').textContent=(Ned-res.Nint).toFixed(2);
+  document.getElementById('fb_r').textContent=res.Fb.toFixed(1);
+  document.getElementById('fa_r').textContent=res.Fa.toFixed(1);
+  const util=Math.abs(Med)/Mrd*100;
+  document.getElementById('util_t').textContent=util.toFixed(1)+' %';
+  const uf=document.getElementById('util_f');
+  uf.style.width=Math.min(100,util)+'%';
+  uf.style.background=util<=100?'#2E7D32':'#C0392B';
+  const alfacc=1;
+  const NRdc=(((m.Ac-m.As_tot)*m.fcd)*alfacc+m.As_tot*m.fyd)/1e3;
+  const NRdt=-(m.As_tot*m.fyd)/1e3;
+  document.getElementById('nrdc_r').textContent=NRdc.toFixed(0);
+  document.getElementById('nrdt_r').textContent=NRdt.toFixed(0);
+  const pts=[];pts.push({M:0,N:NRdt});
+  const nDiv=15,xStart=m.cnom,xEnd=m.lw;
+  for(let i=0;i<=nDiv;i++){const X=xStart+(xEnd-xStart)*i/nDiv;const r=sectionForces(X,m,compFromRef);pts.push({M:Math.abs(momentRd(r,m)),N:r.Nint});}
+  pts.push({M:0,N:NRdc});pts.sort((a,b)=>a.N-b.N);
+  drawSketch(m,res.X,compFromRef);
+  drawNM(pts,{M:Math.abs(Med),N:Ned},{M:Mrd,N:Ned});
+  lastCalc={m,Ned,Med,Mrd,X:res.X,Nint:res.Nint,Fb:res.Fb,Fa:res.Fa,util,NRdc,NRdt,pts,compFromRef,confined,concrete:curC,steel:curS};
+}
+
+function drawSketch(m,X,compFromRef){
+  const svg=document.getElementById('sketch');
+  const VW=460,VH=220,PL=20,PR=20,PT=46,PB=44;
+  const totL=m.lw;
+  const maxH=Math.max(m.lf1,m.lf2,m.bw0);
+  const scl=Math.min((VW-PL-PR)/totL,(VH-PT-PB)/maxH);
+  const blue='#0066CC',dark='#1C1C1E',dim='#AEAEB2',lbl='#6C6C70';
+  const ox=PL,oyC=VH/2;
+  function X2(l){return ox+l*scl;}
+  let o='';
+  const webY=oyC-(m.bw0*scl)/2;
+  o+=`<rect x="${X2(m.bf1+m.li1)}" y="${webY}" width="${(m.lw-m.bf1-m.li1-m.bf2-m.li2)*scl}" height="${m.bw0*scl}" fill="#E8E8ED" stroke="#C7C7CC" stroke-width="0.8"/>`;
+  const b1Y=oyC-(m.lf1*scl)/2, b2Y=oyC-(m.lf2*scl)/2;
+  o+=`<rect x="${X2(0)}" y="${b1Y}" width="${m.bf1*scl}" height="${m.lf1*scl}" fill="${confined?'#DDEEFF':'#E8E8ED'}" stroke="${dark}" stroke-width="1.2"/>`;
+  o+=`<rect x="${X2(m.lw-m.bf2)}" y="${b2Y}" width="${m.bf2*scl}" height="${m.lf2*scl}" fill="${confined?'#DDEEFF':'#E8E8ED'}" stroke="${dark}" stroke-width="1.2"/>`;
+  const compW=X*scl;
+  if(compFromRef){
+    o+=`<rect x="${X2(m.lw)-compW}" y="${oyC-maxH*scl/2-3}" width="${compW}" height="${maxH*scl+6}" fill="#0066CC" opacity="0.10"/>`;
+    o+=`<text x="${X2(m.lw)-compW/2}" y="${oyC-maxH*scl/2-7}" text-anchor="middle" font-size="8" fill="${blue}" font-family="Inter,sans-serif">X=${X.toFixed(0)}</text>`;
+  } else {
+    o+=`<rect x="${X2(0)}" y="${oyC-maxH*scl/2-3}" width="${compW}" height="${maxH*scl+6}" fill="#0066CC" opacity="0.10"/>`;
+    o+=`<text x="${X2(0)+compW/2}" y="${oyC-maxH*scl/2-7}" text-anchor="middle" font-size="8" fill="${blue}" font-family="Inter,sans-serif">X=${X.toFixed(0)}</text>`;
+  }
+  const bk=m.bars;
+  const inset=(m.cnom+m.detr)*scl;
+  function drawBulb(xLeft,bulbLen,bulbWid,bars,isB1){
+    const cn=bars[isB1?'b1c_n':'b2c_n'];
+    const sn=bars[isB1?'b1s_n':'b2s_n'];
+    const ln=bars[isB1?'b1l_n':'b2l_n'];
+    const lr=Math.max(1,bars[isB1?'b1l_r':'b2l_r']);
+    const x0=X2(xLeft)+inset, x1=X2(xLeft+bulbLen)-inset;
+    const yTop=oyC-(bulbWid*scl)/2+inset, yBot=oyC+(bulbWid*scl)/2-inset;
+    let s='';
+    const R=2.0;
+    const ys=[];
+    for(let r=0;r<lr;r++){ ys.push(lr===1? (yTop+yBot)/2 : yTop+(yBot-yTop)*r/(lr-1)); }
+    const barsPerRow=Math.max(0,Math.round(ln/lr));
+    ys.forEach(yy=>{
+      for(let k=0;k<barsPerRow;k++){
+        const xx = x0+(x1-x0)*(k+1)/(barsPerRow+1);
+        s+=`<circle cx="${xx}" cy="${yy}" r="${R}" fill="${dark}"/>`;
+      }
+    });
+    s+=`<circle cx="${x0}" cy="${yTop}" r="${R}" fill="${dark}"/>`;
+    s+=`<circle cx="${x1}" cy="${yTop}" r="${R}" fill="${dark}"/>`;
+    s+=`<circle cx="${x0}" cy="${yBot}" r="${R}" fill="${dark}"/>`;
+    s+=`<circle cx="${x1}" cy="${yBot}" r="${R}" fill="${dark}"/>`;
+    const perShort=Math.max(0,Math.round(sn/2));
+    for(let e=0;e<2;e++){
+      const xx=e===0?x0:x1;
+      for(let k=1;k<=perShort;k++){
+        const yy=yTop+(yBot-yTop)*k/(perShort+1);
+        s+=`<circle cx="${xx}" cy="${yy}" r="${R}" fill="${dark}"/>`;
+      }
+    }
+    return s;
+  }
+  o+=drawBulb(0,m.bf1,m.lf1,bk,true);
+  o+=drawBulb(m.lw-m.bf2,m.bf2,m.lf2,bk,false);
+  const wx0=X2(m.bf1+m.li1), wx1=X2(m.lw-m.bf2-m.li2);
+  const wyTop=webY+inset*0.6, wyBot=webY+m.bw0*scl-inset*0.6;
+  const nW=bk.nWeb;
+  const webRows=Math.max(0,bk.in_r);
+  if(nW>0 && webRows>0){
+    const ys=[];
+    if(webRows===1){ys.push((wyTop+wyBot)/2);}
+    else{for(let r=0;r<webRows;r++){ys.push(wyTop+(wyBot-wyTop)*r/(webRows-1));}}
+    for(let i=0;i<nW;i++){
+      const xx=wx0+(wx1-wx0)*(i+0.5)/nW;
+      ys.forEach(yy=>{o+=`<circle cx="${xx}" cy="${yy}" r="1.6" fill="${dark}"/>`;});
+    }
+  }
+  o+=`<text x="${X2(m.bf1/2)}" y="${b1Y-5}" text-anchor="middle" font-size="8" fill="${lbl}" font-family="Inter,sans-serif">Bulb 1 (${m.cntB1} bare)</text>`;
+  o+=`<text x="${X2(m.lw-m.bf2/2)}" y="${b2Y-5}" text-anchor="middle" font-size="8" fill="${lbl}" font-family="Inter,sans-serif">Bulb 2 ref (${m.cntB2} bare)</text>`;
+  const dy=oyC+maxH*scl/2+20;
+  o+=`<line x1="${X2(0)}" y1="${dy}" x2="${X2(m.lw)}" y2="${dy}" stroke="${dim}" stroke-width="0.7"/>`;
+  o+=`<line x1="${X2(0)}" y1="${dy-3}" x2="${X2(0)}" y2="${dy+3}" stroke="${dim}" stroke-width="0.7"/>`;
+  o+=`<line x1="${X2(m.lw)}" y1="${dy-3}" x2="${X2(m.lw)}" y2="${dy+3}" stroke="${dim}" stroke-width="0.7"/>`;
+  o+=`<text x="${X2(m.lw/2)}" y="${dy+12}" text-anchor="middle" font-size="8" fill="${lbl}" font-family="Inter,sans-serif">l_w = ${m.lw} mm</text>`;
+  svg.innerHTML=o;
+}
+
+function drawNM(pts,extPt,rdPt){
+  if(nmchart){nmchart.destroy();nmchart=null;}
+  const curve=pts.map(p=>({x:p.M,y:p.N}));
+  nmchart=new Chart(document.getElementById('nmchart'),{type:'scatter',
+    data:{datasets:[
+      {label:'Curba',data:curve,showLine:true,borderColor:'#0066CC',borderWidth:2,pointRadius:2,pointBackgroundColor:'#0066CC',tension:0,fill:false,order:2},
+      {label:'Ext',data:[{x:extPt.M,y:extPt.N}],borderColor:'#C0392B',backgroundColor:'#C0392B',pointRadius:6,pointStyle:'rectRot',showLine:false,order:1},
+      {label:'Rd',data:[{x:rdPt.M,y:rdPt.N}],borderColor:'#2E7D32',backgroundColor:'#2E7D32',pointRadius:5,pointStyle:'circle',showLine:false,order:1}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`M=${c.parsed.x.toFixed(0)} kNm, N=${c.parsed.y.toFixed(0)} kN`}}},
+      scales:{x:{type:'linear',title:{display:true,text:'M (kNm)',color:'#1C1C1E',font:{size:12,family:'Inter,sans-serif'}},grid:{color:'rgba(0,0,0,0.05)'},ticks:{color:'#8E8E93',font:{size:11}}},
+        y:{type:'linear',title:{display:true,text:'N (kN)',color:'#1C1C1E',font:{size:12,family:'Inter,sans-serif'}},grid:{color:'rgba(0,0,0,0.05)'},ticks:{color:'#8E8E93',font:{size:11}}}}}});
+}
+
+function getNMImg(){try{return nmchart.toBase64Image('image/png',1.0);}catch(e){return null;}}
+function svgToPng(cb){
+  const svg=document.getElementById('sketch');const xml=new XMLSerializer().serializeToString(svg);
+  const img=new Image();const svg64=btoa(unescape(encodeURIComponent('<?xml version="1.0"?>'+xml)));
+  img.onload=function(){const cv=document.createElement('canvas');cv.width=920;cv.height=440;const ctx=cv.getContext('2d');ctx.fillStyle='#FFFFFF';ctx.fillRect(0,0,cv.width,cv.height);ctx.drawImage(img,0,0,cv.width,cv.height);cb(cv.toDataURL('image/png'));};
+  img.onerror=function(){cb(null);};img.src='data:image/svg+xml;base64,'+svg64;
+}
+function generatePdf(){
+  const btn=document.getElementById('rptBtn');const status=document.getElementById('rptStatus');
+  if(typeof window.jspdf==='undefined'){status.textContent='Libraria PDF se incarca...';return;}
+  btn.disabled=true;btn.textContent='Se genereaza...';
+  const nmImg=getNMImg();
+  svgToPng(function(skImg){buildPdf(nmImg,skImg);btn.disabled=false;btn.textContent='Descarca PDF';status.textContent='Raport descarcat.';setTimeout(()=>status.textContent='',4000);});
+}
+function buildPdf(nmImg,skImg){
+  const{jsPDF}=window.jspdf;const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+  const d=lastCalc,m=d.m;const pW=210,ml=15,mr=15,cw=pW-ml-mr;const ds=new Date().toLocaleDateString('ro-RO');let y=0;
+  function hdr(){doc.setFillColor(28,28,30);doc.rect(0,0,210,14,'F');doc.setTextColor(255,255,255);doc.setFontSize(11);doc.setFont('helvetica','bold');doc.text('NOTA DE CALCUL - MOMENT CAPABIL PERETE',ml,9);doc.setFontSize(8);doc.setFont('helvetica','normal');doc.text('Metoda exacta - CR 2-2022 / SR EN 1992-1-1',ml,13);doc.text('Data: '+ds,pW-mr,13,{align:'right'});doc.setTextColor(0,0,0);y=20;}
+  function cy(n=10){if(y+n>275){doc.addPage();hdr();}}
+  function sT(t){cy(12);doc.setFillColor(235,243,252);doc.rect(ml,y-4,cw,8,'F');doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor(0,102,204);doc.text(t,ml+2,y+1);doc.setTextColor(0,0,0);doc.setFont('helvetica','normal');y+=8;}
+  function row(l,f,v,h){cy(6);doc.setFontSize(8.5);doc.setFont('helvetica','normal');doc.setTextColor(80,80,80);doc.text(l,ml,y);if(f){doc.setTextColor(140,140,140);doc.setFontSize(7.5);doc.text(f,ml+78,y);}doc.setFontSize(9);doc.setFont('helvetica','bold');if(h)doc.setTextColor(0,102,204);else doc.setTextColor(0,0,0);doc.text(v,pW-mr,y,{align:'right'});doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);y+=5.5;}
+  function hl(){cy(3);doc.setDrawColor(225,225,230);doc.line(ml,y,ml+cw,y);y+=3;}
+  hdr();
+  doc.setFontSize(18);doc.setFont('helvetica','bold');doc.setTextColor(28,28,30);doc.text('Moment capabil M.Rd',pW/2,46,{align:'center'});
+  doc.setFontSize(11);doc.setFont('helvetica','normal');doc.setTextColor(90,90,90);doc.text('Metoda exacta - discretizare in fibre',pW/2,56,{align:'center'});doc.text('CR 2-2022 / SR EN 1992-1-1, Anexa A',pW/2,62,{align:'center'});
+  doc.setDrawColor(0,102,204);doc.setLineWidth(0.4);doc.line(ml,70,ml+cw,70);y=80;
+  doc.setFillColor(235,243,252);doc.roundedRect(ml,y,cw,18,2,2,'F');
+  doc.setFontSize(9);doc.setTextColor(80,80,80);doc.text('Moment capabil M.Rd',ml+4,y+7);
+  doc.setFontSize(16);doc.setFont('helvetica','bold');doc.setTextColor(0,102,204);doc.text(d.Mrd.toFixed(1)+' kNm',pW-mr-4,y+11,{align:'right'});doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);y+=24;
+  sT('1. DATE DE INTRARE');
+  doc.autoTable({startY:y,head:[['Parametru','Notatie','Valoare']],body:[
+    ['Lungimea peretelui','l_w',m.lw+' mm'],['Grosimea inimii','b_w0',m.bw0+' mm'],
+    ['Bulb 1: lungime / latime','bf / lf',m.bf1+' / '+m.lf1+' mm'],
+    ['Bulb 2: lungime / latime','bf / lf',m.bf2+' / '+m.lf2+' mm'],
+    ['Total bare Bulb 1','-',m.cntB1+' bare'],['Total bare Bulb 2','-',m.cntB2+' bare'],
+    ['Clasa beton','-',d.concrete+(d.confined?' (confinat)':'')],['Clasa otel','-',d.steel],
+    ['Rezistenta de calcul beton','f_cd',m.fcd.toFixed(2)+' MPa'],['Rezistenta de calcul otel','f_yd',m.fyd.toFixed(1)+' MPa'],
+    ['Moment exterior','M_Ed',d.Med.toFixed(1)+' kNm'],['Forta axiala','N_Ed',d.Ned.toFixed(1)+' kN'],['Numar fibre beton','N_f',''+NF]],
+    margin:{left:ml,right:mr},tableWidth:cw,headStyles:{fillColor:[28,28,30],textColor:255,fontSize:8.5,fontStyle:'bold'},bodyStyles:{fontSize:8.5},alternateRowStyles:{fillColor:[245,247,250]},columnStyles:{0:{cellWidth:100},1:{cellWidth:30,fontStyle:'italic'},2:{halign:'right'}}});
+  y=doc.lastAutoTable.finalY+6;
+  if(skImg){cy(50);sT('2. SECTIUNE TRANSVERSALA');const iw=160,ih=72;doc.addImage(skImg,'PNG',(pW-iw)/2,y,iw,ih);y+=ih+6;}
+  cy(30);sT('3. ECHILIBRU SECTIUNE');
+  doc.setFontSize(7.5);doc.setTextColor(130,130,130);doc.setFont('helvetica','italic');doc.text('N = SUM(F_a)+SUM(F_b)   M_Rd = -SUM(F_a*l)-SUM(F_b*l)+N*(l_w/2)',ml,y);doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);y+=6;
+  row('Inaltimea zonei comprimate','X',d.X.toFixed(1)+' mm',true);row('Forta axiala interna','N_int',d.Nint.toFixed(1)+' kN');row('Forta axiala externa','N_ext',d.Ned.toFixed(1)+' kN');row('Diferenta','diff',(d.Ned-d.Nint).toFixed(2)+' kN');row('Suma forte beton','SUM F_b',d.Fb.toFixed(1)+' kN');row('Suma forte otel','SUM F_a',d.Fa.toFixed(1)+' kN');hl();
+  cy(20);sT('4. REZULTAT');row('Moment capabil','M_Rd',d.Mrd.toFixed(1)+' kNm',true);row('Moment exterior','M_Ed',d.Med.toFixed(1)+' kNm');row('Utilizare','M_Ed/M_Rd',d.util.toFixed(1)+' %',true);
+  const verdict=d.util<=100?'VERIFICA (M_Ed <= M_Rd)':'NU VERIFICA';cy(7);doc.setFontSize(9);doc.setFont('helvetica','bold');doc.setTextColor(d.util<=100?46:192,d.util<=100?125:57,d.util<=100?50:43);doc.text(verdict,ml,y);doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);y+=7;hl();
+  cy(18);sT('5. CAPACITATI AXIALE LIMITA');row('Compresiune centrica','N_Rd,u+',d.NRdc.toFixed(0)+' kN');row('Intindere centrica','N_Rd,u-',d.NRdt.toFixed(0)+' kN');hl();
+  if(nmImg){cy(95);sT('6. DIAGRAMA DE INTERACTIUNE N-M');const iw=160,ih=95;doc.addImage(nmImg,'PNG',(pW-iw)/2,y,iw,ih);y+=ih+4;}
+  const tp=doc.internal.getNumberOfPages();for(let i=1;i<=tp;i++){doc.setPage(i);doc.setFontSize(7.5);doc.setTextColor(150,150,150);doc.setFont('helvetica','normal');doc.line(ml,285,ml+cw,285);doc.text('CR 2-2022 / SR EN 1992-1-1',ml,289);doc.text('Pagina '+i+' din '+tp,pW-mr,289,{align:'right'});doc.text('Generat: '+ds,pW/2,289,{align:'center'});}
+  doc.save('Raport_moment_capabil.pdf');
+}
+
+updMat();calc();
+</script>

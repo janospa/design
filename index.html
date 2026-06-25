@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Calculatoare structurale</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Inter',sans-serif;background:#F5F5F7;color:#1C1C1E;min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:24px 16px}
+.wrap{max-width:480px;margin:0 auto;width:100%}
+.suite-label{font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:#8E8E93;margin-bottom:16px;text-align:center}
+.modules{display:flex;flex-direction:column;gap:10px}
+.mod{background:#fff;border:1px solid #E5E5EA;border-radius:14px;padding:14px 16px;text-decoration:none;color:inherit;display:flex;align-items:center;gap:14px;transition:box-shadow .15s,transform .12s}
+.mod:hover{box-shadow:0 4px 16px rgba(0,0,0,.08);transform:translateY(-1px)}
+.mod:active{transform:translateY(0)}
+.mod-icon{width:52px;height:40px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.mod-num{font-size:11px;font-weight:600;color:#8E8E93;flex-shrink:0;text-align:right;width:18px}
+.mod-title{font-size:14px;font-weight:500;color:#1C1C1E;flex:1}
+.mod-arrow{width:20px;height:20px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.mod-arrow svg{width:12px;height:12px;stroke:#C7C7CC;stroke-width:2.5;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.mod:hover .mod-arrow svg{stroke:#8E8E93}
+.author{text-align:center;font-size:12px;font-weight:500;color:#8E8E93;margin-top:20px;letter-spacing:.02em}
+@media(max-width:400px){.mod-title{font-size:13px}.mod-icon{width:44px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="suite-label">Pereți structurali · CR 2/2022</div>
+  <div class="modules">
+
+    <!-- 01 Predimensionare: lamellar wall with 2 bulbs, NO rebar -->
+    <a class="mod" href="1_PREDIMENSIONARE.html">
+      <span class="mod-num">01</span>
+      <div class="mod-icon">
+        <svg width="52" height="40" viewBox="0 0 52 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="1" y="6" width="11" height="28" rx="1.5" fill="#E8E8ED" stroke="#8E8E93" stroke-width="1.3"/>
+          <rect x="12" y="15" width="28" height="10" rx="1" fill="#DCDCE0" stroke="#8E8E93" stroke-width="1.3"/>
+          <rect x="40" y="6" width="11" height="28" rx="1.5" fill="#E8E8ED" stroke="#8E8E93" stroke-width="1.3"/>
+        </svg>
+      </div>
+      <span class="mod-title">Predimensionarea pereților</span>
+      <span class="mod-arrow"><svg viewBox="0 0 16 16"><polyline points="5,3 11,8 5,13"/></svg></span>
+    </a>
+
+    <!-- 02 Beton confinat: like the Mander figure — outer rect, inner stirrup, 4 corner dots + 4 mid-side dots + cross-ties, concave arching sides -->
+    <a class="mod" href="2_BETON_CONFINAT.html">
+      <span class="mod-num">02</span>
+      <div class="mod-icon">
+        <svg width="52" height="40" viewBox="0 0 52 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- outer concrete boundary -->
+          <rect x="3" y="2" width="46" height="36" rx="1.5" fill="#f0f0f0" stroke="#555" stroke-width="1.2"/>
+          <!-- arching (concave) sides of confined core — like Mander -->
+          <path d="M10,9 Q26,13 42,9" stroke="#333" stroke-width="1.1" fill="none"/>
+          <path d="M10,31 Q26,27 42,31" stroke="#333" stroke-width="1.1" fill="none"/>
+          <path d="M10,9 Q14,20 10,31" stroke="#333" stroke-width="1.1" fill="none"/>
+          <path d="M42,9 Q38,20 42,31" stroke="#333" stroke-width="1.1" fill="none"/>
+          <!-- confined core fill -->
+          <path d="M10,9 Q26,13 42,9 Q38,20 42,31 Q26,27 10,31 Q14,20 10,9 Z" fill="#d8d8d8" opacity="0.7"/>
+          <!-- outer stirrup rectangle -->
+          <rect x="10" y="9" width="32" height="22" rx="0.5" fill="none" stroke="#222" stroke-width="1.3"/>
+          <!-- corner bars -->
+          <circle cx="10" cy="9"  r="2.2" fill="#1C1C1E"/>
+          <circle cx="42" cy="9"  r="2.2" fill="#1C1C1E"/>
+          <circle cx="10" cy="31" r="2.2" fill="#1C1C1E"/>
+          <circle cx="42" cy="31" r="2.2" fill="#1C1C1E"/>
+          <!-- mid-side bars -->
+          <circle cx="26" cy="9"  r="2"   fill="#1C1C1E"/>
+          <circle cx="26" cy="31" r="2"   fill="#1C1C1E"/>
+          <circle cx="10" cy="20" r="2"   fill="#1C1C1E"/>
+          <circle cx="42" cy="20" r="2"   fill="#1C1C1E"/>
+          <!-- agrafe vertical: line through top+bottom mid bars, hooks on both ends -->
+          <line x1="26" y1="9" x2="26" y2="31" stroke="#1C1C1E" stroke-width="1.1" stroke-linecap="round"/>
+          <path d="M24,10 Q26,8 28,10" fill="none" stroke="#1C1C1E" stroke-width="1.1" stroke-linecap="round"/>
+          <path d="M24,30 Q26,32 28,30" fill="none" stroke="#1C1C1E" stroke-width="1.1" stroke-linecap="round"/>
+          <!-- agrafe orizontala: line through left+right mid bars, hooks on both ends -->
+          <line x1="10" y1="20" x2="42" y2="20" stroke="#1C1C1E" stroke-width="1.1" stroke-linecap="round"/>
+          <path d="M11,18 Q9,20 11,22" fill="none" stroke="#1C1C1E" stroke-width="1.1" stroke-linecap="round"/>
+          <path d="M41,18 Q43,20 41,22" fill="none" stroke="#1C1C1E" stroke-width="1.1" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <span class="mod-title">Beton confinat</span>
+      <span class="mod-arrow"><svg viewBox="0 0 16 16"><polyline points="5,3 11,8 5,13"/></svg></span>
+    </a>
+
+    <!-- 03 Moment capabil: N-M interaction curve like reference image — elongated rightward bulge -->
+    <a class="mod" href="3_MOMENT_CAPABIL.html">
+      <span class="mod-num">03</span>
+      <div class="mod-icon">
+        <svg width="52" height="40" viewBox="0 0 52 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- axes -->
+          <line x1="7" y1="37" x2="7" y2="2"  stroke="#C7C7CC" stroke-width="1.1" stroke-linecap="round"/>
+          <line x1="5" y1="37" x2="50" y2="37" stroke="#C7C7CC" stroke-width="1.1" stroke-linecap="round"/>
+          <!-- axis arrows -->
+          <polyline points="5,5 7,2 9,5"   stroke="#C7C7CC" stroke-width="1.1" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          <polyline points="47,35 50,37 47,39" stroke="#C7C7CC" stroke-width="1.1" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          <!-- N-M curve: starts top-left, bulges right at mid, closes back at bottom -->
+          <!-- top branch: from (7,4) sweeps right to tip at ~(46,22), bottom branch back -->
+          <path d="M7,4 C10,4 20,4 35,14 C42,18 46,20 46,22 C46,24 42,26 35,30 C20,36 10,37 7,37"
+                stroke="#7B2FBE" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+          <!-- fill -->
+          <path d="M7,4 C10,4 20,4 35,14 C42,18 46,20 46,22 C46,24 42,26 35,30 C20,36 10,37 7,37 Z"
+                fill="#F3EEFF" opacity="0.55"/>
+        </svg>
+      </div>
+      <span class="mod-title">Momentul capabil M<sub>Rd</sub></span>
+      <span class="mod-arrow"><svg viewBox="0 0 16 16"><polyline points="5,3 11,8 5,13"/></svg></span>
+    </a>
+
+    <!-- 04 Forta taietoare: wall + 45° dashed crack lines, no arrows -->
+    <a class="mod" href="4_FORTA_TAIETOARE.html">
+      <span class="mod-num">04</span>
+      <div class="mod-icon">
+        <svg width="52" height="40" viewBox="0 0 52 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- wall body -->
+          <rect x="14" y="3" width="24" height="34" rx="1.5" fill="#FFF3E0" stroke="#E65100" stroke-width="1.3"/>
+          <!-- 45° diagonal crack lines clipped to wall -->
+          <clipPath id="wall-clip">
+            <rect x="14" y="3" width="24" height="34" rx="1.5"/>
+          </clipPath>
+          <g clip-path="url(#wall-clip)">
+            <line x1="14" y1="37" x2="38" y2="13" stroke="#E65100" stroke-width="1.1" stroke-dasharray="2.5,2" stroke-linecap="round" opacity="0.7"/>
+            <line x1="14" y1="27" x2="28" y2="13" stroke="#E65100" stroke-width="1.1" stroke-dasharray="2.5,2" stroke-linecap="round" opacity="0.7"/>
+            <line x1="24" y1="37" x2="38" y2="23" stroke="#E65100" stroke-width="1.1" stroke-dasharray="2.5,2" stroke-linecap="round" opacity="0.7"/>
+          </g>
+          <!-- left shear force lines (no arrowhead) -->
+          <!-- right shear force line -->
+        </svg>
+      </div>
+      <span class="mod-title">Forța tăietoare V<sub>Rd</sub></span>
+      <span class="mod-arrow"><svg viewBox="0 0 16 16"><polyline points="5,3 11,8 5,13"/></svg></span>
+    </a>
+
+    <!-- 05 Grinzi de cuplare -->
+    <a class="mod" href="5_GRINZI_DE_CUPLARE.html">
+      <span class="mod-num">05</span>
+      <div class="mod-icon">
+        <svg width="52" height="40" viewBox="0 0 52 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="1" y="2" width="12" height="36" rx="1.5" fill="#FDECEA" stroke="#C62828" stroke-width="1.2"/>
+          <rect x="39" y="2" width="12" height="36" rx="1.5" fill="#FDECEA" stroke="#C62828" stroke-width="1.2"/>
+          <rect x="13" y="9" width="26" height="22" rx="1" fill="#FDECEA" stroke="#C62828" stroke-width="1.3"/>
+          <line x1="15" y1="29" x2="37" y2="11" stroke="#C62828" stroke-width="1.4" stroke-linecap="round"/>
+          <line x1="15" y1="11" x2="37" y2="29" stroke="#C62828" stroke-width="1.4" stroke-linecap="round"/>
+          <line x1="13" y1="13" x2="39" y2="13" stroke="#C62828" stroke-width="1" opacity="0.35"/>
+          <line x1="13" y1="27" x2="39" y2="27" stroke="#C62828" stroke-width="1" opacity="0.35"/>
+        </svg>
+      </div>
+      <span class="mod-title">Grinzi de cuplare</span>
+      <span class="mod-arrow"><svg viewBox="0 0 16 16"><polyline points="5,3 11,8 5,13"/></svg></span>
+    </a>
+
+  </div>
+  <div class="author">Janos Patrik</div>
+</div>
+</body>
+</html>

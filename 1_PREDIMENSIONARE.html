@@ -1,0 +1,542 @@
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1C1E}
+
+
+
+
+
+.wrap{max-width:1080px;margin:0 auto;padding:20px 16px}
+.cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+.slabel{font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:#1C1C1E;padding:0 0 7px;margin-top:14px}
+.slabel:first-child{margin-top:0}
+.ip{background:#EFEFEF;border:1px solid #DCDCE0;border-radius:12px;overflow:hidden;margin-bottom:13px}
+.op{background:#fff;border:1px solid #DCDCE0;border-radius:12px;overflow:hidden;margin-bottom:13px}
+.ph{padding:12px 15px 0;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:#1C1C1E}
+.pb{padding:8px 15px 14px}
+.row{display:flex;align-items:center;padding:7px 0;border-bottom:1px solid #E0E0E5;gap:8px}
+.row:last-child{border-bottom:none}
+.rl{flex:1;font-size:13px;color:#1C1C1E;min-width:0}
+.rn{font-size:12px;color:#8E8E93;margin-left:4px}
+.rc{display:flex;align-items:center;gap:5px;flex-shrink:0}
+.rc input[type=number]{width:78px;padding:5px 8px;font-size:13px;border:1px solid #C7C7CC;border-radius:7px;background:#fff;color:#1C1C1E;font-family:'Inter',sans-serif;-moz-appearance:textfield;appearance:textfield;text-align:right}
+.rc input[type=number]::-webkit-inner-spin-button,.rc input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.rc input:focus{outline:none;box-shadow:0 0 0 2px rgba(0,122,255,.2);border-color:#007AFF}
+.ru{font-size:12px;color:#8E8E93;min-width:26px}
+.sel-field{margin-bottom:10px}
+.sel-field label{display:block;font-size:12px;color:#8E8E93;margin-bottom:5px;font-weight:500}
+.sel-wrap{position:relative}
+.sel-wrap::after{content:'';position:absolute;right:13px;top:50%;width:7px;height:7px;border-right:2px solid #8E8E93;border-bottom:2px solid #8E8E93;transform:translateY(-65%) rotate(45deg);pointer-events:none}
+.sel-field select{width:100%;padding:8px 34px 8px 11px;font-size:13px;border:1px solid #C7C7CC;border-radius:8px;background:#fff;color:#1C1C1E;font-family:'Inter',sans-serif;cursor:pointer;-webkit-appearance:none;appearance:none}
+.sel-field select:focus{outline:none;box-shadow:0 0 0 2px rgba(0,122,255,.2);border-color:#007AFF}
+.mat-vals{display:flex;gap:6px;padding:6px 0 2px}
+.mv{flex:1;text-align:center;background:#E8E8ED;border-radius:7px;padding:8px 4px}
+.mvl{font-size:11px;color:#8E8E93;margin-bottom:2px}
+.mvv{font-size:15px;font-weight:500;color:#1C1C1E}
+.mvu{font-size:11px;color:#8E8E93}
+.sub{font-size:11px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;color:#8E8E93;padding:9px 0 5px}
+.res-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.rc2{background:#F2F2F7;border-radius:8px;padding:10px 12px}
+.rc2.hl{background:#EBF3FF;border:1px solid #B8D4F8}
+.rc2.gr{background:#EAF6EC;border:1px solid #BFE3C6}
+.rc2.rd{background:#FDECEA;border:1px solid #F5C6BE}
+.rl2{font-size:11px;color:#8E8E93;margin-bottom:3px}
+.rv{font-size:19px;font-weight:500;color:#1C1C1E;line-height:1.2}
+.rc2.hl .rv{color:#0066CC}
+.rc2.gr .rv{color:#2E7D32}
+.rc2.rd .rv{color:#C62828}
+.ru2{font-size:11px;color:#8E8E93}
+.ftag{display:inline-flex;align-items:center;padding:3px 11px;border-radius:20px;font-size:12px;font-weight:500;margin-bottom:9px}
+.f1{background:#E8F5E9;color:#2E7D32}.f2{background:#FFF3E0;color:#E65100}.f3{background:#FDECEA;color:#C62828}
+.toggle-row{display:flex;align-items:center;gap:10px;padding:4px 0 10px;border-bottom:1px solid #E0E0E5;margin-bottom:8px}
+.toggle-row span{font-size:12px;color:#1C1C1E;flex:1}
+.toggle-row.nb{border-bottom:none;margin-bottom:0;padding-bottom:2px}
+.seg{display:inline-flex;background:#E0E0E5;border-radius:8px;padding:2px;gap:2px}
+.seg button{padding:5px 12px;font-size:12px;font-weight:500;border:none;border-radius:6px;background:transparent;color:#8E8E93;cursor:pointer;font-family:'Inter',sans-serif;transition:all .12s}
+.seg button.on{background:#fff;color:#1C1C1E;box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.sw{position:relative;width:42px;height:25px;flex-shrink:0}
+.sw input{opacity:0;width:0;height:0;position:absolute}
+.sw .sl{position:absolute;inset:0;background:#E0E0E5;border-radius:25px;transition:.18s;cursor:pointer}
+.sw .sl::before{content:'';position:absolute;width:19px;height:19px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.18s;box-shadow:0 1px 3px rgba(0,0,0,.25)}
+.sw input:checked + .sl{background:#34C759}
+.sw input:checked + .sl::before{transform:translateX(17px)}
+.hint{font-size:11px;color:#8E8E93;padding:2px 0 8px;line-height:1.45}
+.chk{width:100%;border-collapse:collapse}
+.chk th{font-size:10px;font-weight:500;letter-spacing:.04em;text-transform:uppercase;color:#8E8E93;padding:7px 6px;border-bottom:1px solid #E5E5EA;text-align:left}
+.chk th.r{text-align:right}
+.chk td{padding:7px 6px;border-bottom:1px solid #F0F0F5;font-size:12.5px;color:#1C1C1E;vertical-align:middle}
+.chk tr:last-child td{border-bottom:none}
+.chk tr.bad td{background:#FDECEA}
+.chk td.r{text-align:right;font-variant-numeric:tabular-nums}
+.chk td.rule{font-size:11px;color:#8E8E93;white-space:nowrap}
+.chk td.art{font-size:10px;color:#AEAEB2;text-align:right;white-space:nowrap}
+.chk .nm{font-weight:500}
+.badge{display:inline-flex;align-items:center;justify-content:center;width:21px;height:21px;border-radius:50%;font-weight:600;font-size:13px}
+.badge.ok{background:#EAF6EC;color:#2E7D32}
+.badge.no{background:#FDECEA;color:#C62828}
+.badge.na{background:#EFEFEF;color:#AEAEB2;font-size:9px;font-weight:500}
+.advice{font-size:11.5px;color:#C62828;padding:2px 6px 8px 6px;line-height:1.45;background:#FDECEA}
+.advice b{font-weight:500}
+.grphd{font-size:11px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;color:#0066CC;padding:11px 6px 5px;background:#F7FAFF;border-bottom:1px solid #E5E5EA}
+.flagbox{background:#FFF3E0;border:1px solid #FFE0B2;border-radius:10px;padding:10px 13px;font-size:12px;color:#1C1C1E;margin-bottom:13px;line-height:1.5}
+.flagbox b{color:#E65100}
+.chkfoot{margin:8px 6px 2px;padding:9px 12px;background:#F7FAFF;border:1px solid #E0EAFB;border-radius:8px;font-size:11.5px;color:#3C4049;line-height:1.45}
+.chkfoot b{color:#0066CC}
+.cleg{display:flex;gap:14px;margin:0 0 8px;font-size:12px;color:#1C1C1E;flex-wrap:wrap}
+.cleg span{display:flex;align-items:center;gap:5px}
+.cleg i{width:13px;height:13px;border-radius:3px;display:inline-block}
+.report-bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.report-lbl{font-size:13px;color:#1C1C1E;flex:1;min-width:120px}
+.report-btn{padding:11px 18px;font-size:14px;font-weight:500;font-family:'Inter',sans-serif;border:none;border-radius:10px;background:#1C1C1E;color:#fff;cursor:pointer;transition:opacity .15s}
+.report-btn:active{opacity:.7}
+.report-btn:disabled{opacity:.4}
+.report-status{font-size:12px;color:#8E8E93;text-align:center;padding:6px 0 0;min-height:16px}
+@media(max-width:680px){.wrap{padding:14px 10px}.cols{grid-template-columns:1fr;gap:0}.report-btn{width:100%}}
+.back-btn{display:inline-flex;align-items:center;gap:5px;font-family:'Inter',sans-serif;font-size:12px;font-weight:500;color:#8E8E93;background:transparent;border:none;cursor:pointer;padding:10px 16px;text-decoration:none;line-height:1}
+.back-btn svg{width:14px;height:14px;stroke:#8E8E93;stroke-width:2.5;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.back-btn:hover{color:#1C1C1E}
+.back-btn:hover svg{stroke:#1C1C1E}
+</style>
+
+<a href="index.html" class="back-btn"><svg viewBox="0 0 16 16"><polyline points="10,3 4,8 10,13"/></svg>Toate modulele</a>
+</div>
+
+<div class="wrap">
+<div class="cols">
+
+<div>
+  <div class="slabel">Intrari</div>
+
+  <div class="ip">
+    <div class="ph">Clasa de ductilitate &amp; seismicitate</div>
+    <div class="pb">
+      <div class="toggle-row">
+        <span>Clasa de ductilitate</span>
+        <div class="seg" id="seg-dc">
+          <button data-v="DCL">DCL</button>
+          <button data-v="DCM" class="on">DCM</button>
+          <button data-v="DCH">DCH</button>
+        </div>
+      </div>
+      <div class="toggle-row">
+        <span>Acceleratia terenului a<sub>g</sub></span>
+        <div class="seg" id="seg-ag">
+          <button data-v="le">&le; 0,15g</button>
+          <button data-v="gt" class="on">&gt; 0,15g</button>
+        </div>
+      </div>
+      <div class="toggle-row nb">
+        <span>Zona verificata</span>
+        <div class="seg" id="seg-zone">
+          <button data-v="cr" class="on">Critica</button>
+          <button data-v="nc">Non-critica</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ip">
+    <div class="ph">Geometrie inima</div>
+    <div class="pb">
+      <div class="row"><div class="rl">Grosimea inimii <span class="rn">(b<sub>w0</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="bw0" value="300" min="100" step="10" oninput="calc()"><span class="ru">mm</span></div></div>
+      <div class="row"><div class="rl">Lungimea peretelui <span class="rn">(l<sub>w</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="lw" value="1000" min="200" step="50" oninput="calc()"><span class="ru">mm</span></div></div>
+      <div class="row"><div class="rl">Inaltimea nivelului <span class="rn">(h<sub>cl</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="hcl" value="2780" min="1500" step="10" oninput="calc()"><span class="ru">mm</span></div></div>
+    </div>
+  </div>
+
+  <div class="ip">
+    <div class="ph">Bulbi rectangulari</div>
+    <div class="pb">
+      <div class="toggle-row">
+        <span>Bulb 2 identic cu Bulb 1</span>
+        <label class="sw"><input type="checkbox" id="bulbsame" checked onchange="toggleBulb()"><span class="sl"></span></label>
+      </div>
+      <div class="hint">Activat: un singur set de valori &mdash; perete simetric (cazul uzual).</div>
+      <div class="row"><div class="rl">Lungimea bulbului <span class="rn">(l<sub>f</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="lf" value="300" min="100" step="10" oninput="syncBulb();calc()"><span class="ru">mm</span></div></div>
+      <div class="row"><div class="rl">Latimea bulbului <span class="rn">(b<sub>f</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="bf" value="300" min="100" step="10" oninput="syncBulb();calc()"><span class="ru">mm</span></div></div>
+      <div id="bulb2wrap" style="display:none">
+        <div class="row"><div class="rl">Lungimea bulbului 2 <span class="rn">(l<sub>f,2</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="lf2" value="300" min="100" step="10" oninput="calc()"><span class="ru">mm</span></div></div>
+        <div class="row"><div class="rl">Latimea bulbului 2 <span class="rn">(b<sub>f,2</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="bf2" value="300" min="100" step="10" oninput="calc()"><span class="ru">mm</span></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ip">
+    <div class="ph">Materiale</div>
+    <div class="pb">
+      <div class="sel-field"><label>Clasa beton</label><div class="sel-wrap">
+        <select id="cp" onchange="curC=this.value;updMat();calc()">
+          <option>C16/20</option><option>C20/25</option><option selected>C25/30</option>
+          <option>C30/37</option><option>C35/45</option><option>C40/50</option><option>C45/55</option><option>C50/60</option>
+        </select></div></div>
+      <div class="sel-field"><label>Clasa otel</label><div class="sel-wrap">
+        <select id="sp" onchange="curS=this.value;updMat();calc()">
+          <option>S400B</option><option>S500B</option><option selected>S 500</option>
+        </select></div></div>
+      <div class="mat-vals">
+        <div class="mv"><div class="mvl">f<sub>ck</sub></div><div class="mvv" id="fck_d">25</div><div class="mvu">MPa</div></div>
+        <div class="mv"><div class="mvl">f<sub>cd</sub></div><div class="mvv" id="fcd_d">16.67</div><div class="mvu">MPa</div></div>
+        <div class="mv"><div class="mvl">f<sub>yk</sub></div><div class="mvv" id="fyk_d">500</div><div class="mvu">MPa</div></div>
+        <div class="mv"><div class="mvl">f<sub>yd</sub></div><div class="mvv" id="fyd_d">434.8</div><div class="mvu">MPa</div></div>
+      </div>
+      <div class="row" style="border-top:1px solid #E0E0E5;margin-top:8px;padding-top:11px"><div class="rl">Forta axiala <span class="rn">(N<sub>Ed</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="ned" value="4031" step="10" oninput="calc()"><span class="ru">kN</span></div></div>
+    </div>
+  </div>
+
+  <div class="ip">
+    <div class="ph">Armare adoptata</div>
+    <div class="pb">
+      <div class="sub">Bulb</div>
+      <div class="row"><div class="rl">Diametru bare bulb <span class="rn">(&Oslash;<sub>1</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="db1" value="20" min="8" step="1" oninput="calc()"><span class="ru">mm</span></div></div>
+      <div class="row"><div class="rl">Nr. bare <span class="rn">(n<sub>1</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="nbulb" value="10" min="0" step="1" oninput="calc()"><span class="ru">buc</span></div></div>
+      <div class="row"><div class="rl">Diametru bare diferite <span class="rn">(&Oslash;<sub>2</sub>, optional)</span></div><div class="rc"><input type="number" inputmode="numeric" id="db2" value="18" min="0" step="1" oninput="calc()"><span class="ru">mm</span></div></div>
+      <div class="row"><div class="rl">Nr. bare diferite <span class="rn">(n<sub>2</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="nbulb2" value="0" min="0" step="1" oninput="calc()"><span class="ru">buc</span></div></div>
+      <div class="row"><div class="rl">Diametru etrier <span class="rn">(&Oslash;<sub>sw</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="dsw" value="8" min="6" step="1" oninput="calc()"><span class="ru">mm</span></div></div>
+      <div class="row"><div class="rl">Pas etrieri <span class="rn">(s<sub>sw</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="scr" value="100" min="40" step="10" oninput="calc()"><span class="ru">mm</span></div></div>
+      <div class="row"><div class="rl">Pas bare long. restranse <span class="rn">(s<sub>sl</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="ssl" value="150" min="50" step="10" oninput="calc()"><span class="ru">mm</span></div></div>
+      <div class="sub">Inima</div>
+      <div class="sub" style="margin-top:2px">Armare longitudinala (verticala)</div>
+      <div class="row"><div class="rl">Diametru bare <span class="rn">(&Oslash;<sub>long</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="dwl" value="10" min="6" step="1" oninput="calc()"><span class="ru">mm</span></div></div>
+      <div class="row"><div class="rl">Pas bare <span class="rn">(s<sub>long</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="swl" value="150" min="50" step="10" oninput="calc()"><span class="ru">mm</span></div></div>
+      <div class="sub">Armare transversala (orizontala)</div>
+      <div class="row"><div class="rl">Diametru bare <span class="rn">(&Oslash;<sub>transv</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="dwt" value="8" min="6" step="1" oninput="calc()"><span class="ru">mm</span></div></div>
+      <div class="row"><div class="rl">Pas bare <span class="rn">(s<sub>transv</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="swt" value="200" min="50" step="10" oninput="calc()"><span class="ru">mm</span></div></div>
+      <div class="sub">General</div>
+      <div class="row"><div class="rl">Acoperire cu beton <span class="rn">(c<sub>nom</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="cnom" value="35" min="15" step="5" oninput="calc()"><span class="ru">mm</span></div></div>
+    </div>
+  </div>
+</div>
+
+<div>
+  <div class="slabel">Rezultate</div>
+
+  <div class="op">
+    <div class="ph">Verdict</div>
+    <div class="pb">
+      <span class="ftag" id="verdict">&mdash;</span>
+      <div class="res-grid-3">
+        <div class="rc2"><div class="rl2">Geometrie</div><div class="rv" id="sc_geo">&mdash;</div><div class="ru2">conditii</div></div>
+        <div class="rc2"><div class="rl2">Armare</div><div class="rv" id="sc_rein">&mdash;</div><div class="ru2">conditii</div></div>
+        <div class="rc2 hl"><div class="rl2">&nu;<sub>d</sub> = N<sub>Ed</sub>/(A<sub>c</sub>&middot;f<sub>cd</sub>)</div><div class="rv" id="sc_vd">&mdash;</div><div class="ru2">A<sub>c</sub> = inima + bulbi</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="flagzone"></div>
+
+  <div class="op">
+    <div class="ph">Sectiunea &mdash; zona de capat (bulb + inima)</div>
+    <div class="pb">
+      <div class="cleg">
+        <span><i style="background:#C9B8E8"></i> bulb (element de capat)</span>
+        <span><i style="background:#F0D6E6"></i> inima</span>
+      </div>
+      <svg id="sketch" viewBox="0 0 460 280" width="100%" style="display:block"></svg>
+    </div>
+  </div>
+
+  <div class="op">
+    <div class="ph">Conditii minime de alcatuire &mdash; CR 2&ndash;2022 &sect;7</div>
+    <div class="pb" style="padding-left:4px;padding-right:4px">
+      <table class="chk" id="chktbl"></table>
+      <div id="chknote"></div>
+    </div>
+  </div>
+
+  <div class="op">
+    <div class="ph">Raport</div>
+    <div class="pb">
+      <div class="report-bar">
+        <span class="report-lbl">Export nota de calcul (PDF)</span>
+        <button class="report-btn" id="rptBtn" onclick="generatePdf()">Descarca PDF</button>
+      </div>
+      <div class="report-status" id="rptStatus"></div>
+    </div>
+  </div>
+</div>
+
+</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
+<script>
+const CONC={'C16/20':{fck:16,fcd:10.67},'C20/25':{fck:20,fcd:13.33},'C25/30':{fck:25,fcd:16.67},'C30/37':{fck:30,fcd:20},'C35/45':{fck:35,fcd:23.33},'C40/50':{fck:40,fcd:26.67},'C45/55':{fck:45,fcd:30},'C50/60':{fck:50,fcd:33.33}};
+const CONC_ORDER=Object.keys(CONC);
+const CRANK=c=>CONC_ORDER.indexOf(c);
+const MIN_CONC={DCL:'C16/20',DCM:'C20/25',DCH:'C20/25'};
+const STEEL={'S400B':{fyk:400,fyd:347.8},'S500B':{fyk:500,fyd:434.8},'S 500':{fyk:500,fyd:434.8}};
+let curC='C25/30',curS='S 500',DC='DCM',AG='gt',ZONE='cr';
+let lastCalc={};
+function gv(id){return parseFloat(document.getElementById(id)?.value)||0;}
+const AR=d=>Math.PI*d*d/4;
+function nf(x,d=0){return isFinite(x)?x.toLocaleString('ro-RO',{minimumFractionDigits:d,maximumFractionDigits:d}):'\u2014';}
+function updMat(){const c=CONC[curC],st=STEEL[curS];document.getElementById('fck_d').textContent=c.fck;document.getElementById('fcd_d').textContent=c.fcd.toFixed(2);document.getElementById('fyk_d').textContent=st.fyk;document.getElementById('fyd_d').textContent=st.fyd.toFixed(1);}
+function bindSeg(id,set){document.querySelectorAll('#'+id+' button').forEach(b=>{b.onclick=()=>{document.querySelectorAll('#'+id+' button').forEach(x=>x.classList.remove('on'));b.classList.add('on');set(b.dataset.v);calc();};});}
+bindSeg('seg-dc',v=>DC=v);bindSeg('seg-ag',v=>AG=v);bindSeg('seg-zone',v=>ZONE=v);
+function toggleBulb(){const same=document.getElementById('bulbsame').checked;document.getElementById('bulb2wrap').style.display=same?'none':'block';if(same)syncBulb();calc();}
+function syncBulb(){if(document.getElementById('bulbsame').checked){document.getElementById('lf2').value=document.getElementById('lf').value;document.getElementById('bf2').value=document.getElementById('bf').value;}}
+function omegaMin(zone){if(DC==='DCL')return 0.10;if(AG==='gt')return zone==='cr'?0.15:0.12;return zone==='cr'?0.12:0.10;}
+const rhoLmin=()=>DC==='DCL'?0.0025:0.005;
+const rhoWebLong=()=>AG==='gt'?0.0025:0.002;
+const rhoWebTransv=zone=>(AG==='le')?0.002:(zone==='cr'?0.0025:0.002);
+// s.sl (pas bare longitudinale restranse) art.9
+const sSlMax=()=>DC==='DCH'?150:DC==='DCM'?200:250;
+// s.sw (pas etrieri) art.11 - depends on DC, zone, dblmin, b0
+function sSwLimit(zone,dblmin,b0){
+  if(DC==='DCH'){
+    if(zone==='cr') return {v:Math.min(7*dblmin,125,b0/3), t:'min(7&Oslash;<sub>bl,min</sub>;125;b<sub>0</sub>/3)'};
+    return {v:Math.min(10*dblmin,200), t:'min(10&Oslash;<sub>bl,min</sub>;200)'};
+  }
+  if(DC==='DCM'){
+    if(zone==='cr') return {v:Math.min(8*dblmin,175,b0/2), t:'min(8&Oslash;<sub>bl,min</sub>;175;b<sub>0</sub>/2)'};
+    return {v:Math.min(12*dblmin,200), t:'min(12&Oslash;<sub>bl,min</sub>;200)'};
+  }
+  return {v:Math.min(12*dblmin,250), t:'min(12&Oslash;<sub>bl,min</sub>;250)'}; // DCL orice zona
+}
+// Ø.sw.min art.13
+const dSwMinF=dblmax=>DC==='DCH'?Math.max(dblmax/3,8):Math.max(dblmax/4,8);
+function calc(){
+  const bw0=gv('bw0'),lw=gv('lw'),hcl=gv('hcl');
+  const lf=gv('lf'),bf=gv('bf'),lf2=gv('lf2'),bf2=gv('bf2');
+  const c=CONC[curC],st=STEEL[curS];
+  const fck=c.fck,fcd=c.fcd,fyk=st.fyk,fyd=st.fyd;
+  const ned=gv('ned');
+  const db1=gv('db1'),nbulb=gv('nbulb'),db2=gv('db2'),nbulb2=gv('nbulb2'),dsw=gv('dsw');
+  const dwl=gv('dwl'),swl=gv('swl'),dwt=gv('dwt'),swt=gv('swt');
+  const ssl=gv('ssl');
+  const scr=gv('scr'),cnom=gv('cnom');
+  // bulb bars: two independent sets, simply added (no subtraction)
+  const n1=nbulb, n2=(db2>0)?nbulb2:0;
+  const dias=[]; if(n1>0)dias.push(db1); if(n2>0)dias.push(db2);
+  const dbulbmin=dias.length?Math.min(...dias):db1;
+  const dbulbmax=dias.length?Math.max(...dias):db1;
+  const nbulbTot=n1+n2;
+  const Af=lf*bf,Af2=lf2*bf2,Aweb=bw0*lw,Ac=Aweb+Af+Af2;
+  const Asl_bulb=n1*AR(db1)+n2*AR(db2);
+  const Asl_bulb2=Asl_bulb;
+  const Asl_web=(swl>0)?AR(dwl)*Math.max(2,Math.round(Math.max(lw-lf-lf2,0)/swl)+1)*2:0;
+  const rho_l_end=Asl_bulb/Af;
+  const omega_l_end=(Asl_bulb*fyd)/(Af*fcd);
+  const vd=ned*1e3/(Ac*fcd);
+  const b0=bw0-2*cnom;
+  const G=[];
+  const zlabel = ZONE==='cr' ? 'zona critica' : 'in afara zonei critice';
+  const bw0min=Math.max(150,hcl/20);
+  G.push({g:'Geometrie generala & materiale'});
+  G.push({nm:'Clasa beton minima',rule:'\u2265 '+MIN_CONC[DC],art:'7.1(1)',cur:curC,lim:MIN_CONC[DC],txt:1,ok:CRANK(curC)>=CRANK(MIN_CONC[DC]),adv:`Pentru ${DC} se cere minim <b>${MIN_CONC[DC]}</b>.`});
+  G.push({nm:'b<sub>w0</sub> &ge; max{150; h<sub>cl</sub>/20}',rule:'b.w0 \u2265 max(150;h.cl/20)',art:'7.2.1.1(1)',cur:bw0,lim:bw0min,u:'mm',ok:bw0>=bw0min,adv:`Grosimea inimii insuficienta. Minim <b>b<sub>w0</sub> = ${nf(bw0min)} mm</b> = max(150; h<sub>cl</sub>/20).`});
+  if(ZONE==='cr'){
+    const lfcr=Math.max(200,hcl/10);
+    G.push({g:'Geometrie bulb \u2014 zona critica'});
+    G.push({nm:'l<sub>f</sub> &ge; max{200; h<sub>cl</sub>/10}',rule:'l.f \u2265 max(200;h.cl/10)',art:'4',cur:lf,lim:lfcr,u:'mm',ok:lf>=lfcr,adv:`Lungimea bulbului insuficienta. Minim <b>l<sub>f</sub> = ${nf(lfcr)} mm</b> = max(200; h<sub>cl</sub>/10).`});
+    G.push({nm:'A<sub>f</sub> &ge; 0,01&middot;h<sub>cl</sub>&middot;l<sub>w</sub>',rule:'A.f \u2265 0.01\u00b7h.cl\u00b7l.w',art:'5',cur:Af,lim:0.01*hcl*lw,u:'mm\u00b2',ok:Af>=0.01*hcl*lw,adv:`Aria bulbului insuficienta. Minim <b>${nf(0.01*hcl*lw)} mm&sup2;</b>.`});
+    G.push({nm:'b<sub>f</sub> &ge; h<sub>cl</sub>/15',rule:'b.f \u2265 h.cl/15',art:'5',cur:bf,lim:hcl/15,u:'mm',ok:bf>=hcl/15,adv:`Minim <b>b<sub>f</sub> = ${nf(hcl/15)} mm</b>.`});
+    G.push({nm:'l<sub>f</sub> &ge; h<sub>cl</sub>/10',rule:'l.f \u2265 h.cl/10',art:'5',cur:lf,lim:hcl/10,u:'mm',ok:lf>=hcl/10,adv:`Minim <b>l<sub>f</sub> = ${nf(hcl/10)} mm</b>.`});
+    G.push({nm:'b<sub>f</sub> &ge; b<sub>w0</sub>',rule:'b.f \u2265 b.w0',art:'5',cur:bf,lim:bw0,u:'mm',ok:bf>=bw0,adv:`Minim <b>b<sub>f</sub> = ${nf(bw0)} mm</b>.`});
+    G.push({nm:'l<sub>f</sub> &ge; b<sub>w0</sub>',rule:'l.f \u2265 b.w0',art:'5',cur:lf,lim:bw0,u:'mm',ok:lf>=bw0,adv:`Minim <b>l<sub>f</sub> = ${nf(bw0)} mm</b>.`});
+  } else {
+    const lfnc=Math.max(150,hcl/15);
+    G.push({g:'Geometrie bulb \u2014 in afara zonei critice'});
+    G.push({nm:'l<sub>f</sub> &ge; max{150; h<sub>cl</sub>/15}',rule:'l.f \u2265 max(150;h.cl/15)',art:'6',cur:lf,lim:lfnc,u:'mm',ok:lf>=lfnc,adv:`Lungimea bulbului insuficienta. Minim <b>l<sub>f</sub> = ${nf(lfnc)} mm</b> = max(150; h<sub>cl</sub>/15).`});
+    G.push({nm:'A<sub>f</sub> &ge; 0,0067&middot;h<sub>cl</sub>&middot;l<sub>w</sub>',rule:'A.f \u2265 0.0067\u00b7h.cl\u00b7l.w',art:'6',cur:Af,lim:0.0067*hcl*lw,u:'mm\u00b2',ok:Af>=0.0067*hcl*lw,adv:`In afara zonei critice: minim <b>${nf(0.0067*hcl*lw)} mm&sup2;</b>.`});
+    G.push({nm:'b<sub>f</sub> &ge; h<sub>cl</sub>/15',rule:'b.f \u2265 h.cl/15',art:'6',cur:bf,lim:hcl/15,u:'mm',ok:bf>=hcl/15,adv:`Minim <b>b<sub>f</sub> = ${nf(hcl/15)} mm</b>.`});
+    G.push({nm:'l<sub>f</sub> &ge; h<sub>cl</sub>/15',rule:'l.f \u2265 h.cl/15',art:'6',cur:lf,lim:hcl/15,u:'mm',ok:lf>=hcl/15,adv:`Minim <b>l<sub>f</sub> = ${nf(hcl/15)} mm</b>.`});
+    G.push({nm:'b<sub>f</sub> &ge; b<sub>w0</sub>',rule:'b.f \u2265 b.w0',art:'6',cur:bf,lim:bw0,u:'mm',ok:bf>=bw0,adv:`Minim <b>b<sub>f</sub> = ${nf(bw0)} mm</b>.`});
+    G.push({nm:'l<sub>f</sub> &ge; b<sub>w0</sub>',rule:'l.f \u2265 b.w0',art:'6',cur:lf,lim:bw0,u:'mm',ok:lf>=bw0,adv:`Minim <b>l<sub>f</sub> = ${nf(bw0)} mm</b>.`});
+  }
+  const omZone=omegaMin(ZONE),rlMin=rhoLmin();
+  const dSwMin=dSwMinF(dbulbmax);
+  const ssw=sSwLimit(ZONE,dbulbmin,b0);
+  const sslMax=sSlMax();
+  const rhoLong=(swl>0)?2*AR(dwl)/(bw0*swl):0;      // vertical bars, both faces
+  const rhoTransv=(swt>0)?2*AR(dwt)/(bw0*swt):0;     // horizontal bars, both faces
+  const rhoTrZone=rhoWebTransv(ZONE);
+  const R=[];
+  R.push({g:'Armare bulb \u2014 '+zlabel});
+  R.push({nm:`&omega;<sub>l,min</sub> (${ZONE==='cr'?'critic':'non-critic'})`,rule:'\u03c9.l \u2265 \u03c9.min',art:'5',cur:omega_l_end,lim:omZone,d:3,ok:omega_l_end>=omZone,adv:`Confinare insuficienta. Necesar &omega;=<b>${nf(omZone,3)}</b> &rarr; A<sub>s,nec</sub>&asymp;<b>${nf(omZone*Af*fcd/fyd)} mm&sup2;</b>.`});
+  R.push({nm:'&rho;<sub>l,min</sub> bulb',rule:'\u03c1.l \u2265 \u03c1.min',art:'7',cur:rho_l_end,lim:rlMin,d:4,ok:rho_l_end>=rlMin,adv:`Procent longitudinal mic. Necesar &rho;=<b>${nf(rlMin*100,2)}%</b> &rarr; A<sub>s,nec</sub>&asymp;<b>${nf(rlMin*Af)} mm&sup2;</b>.`});
+  R.push({nm:'&Oslash;<sub>sl,min</sub> bara bulb',rule:'\u00d8.bl \u2265 12 (14 colt)',art:'8',cur:dbulbmin,lim:12,u:'mm',ok:dbulbmin>=12,adv:`Diametru minim in zonele de capat <b>12 mm</b>, respectiv <b>14 mm</b> la coltul carcaselor.`});
+  R.push({nm:'s<sub>sl</sub> bare long. restranse',rule:'s.sl \u2264 '+sslMax,art:'9',cur:ssl,lim:sslMax,u:'mm',inv:1,ok:ssl<=sslMax,adv:`Pas bare longitudinale prea mare. Maxim <b>${nf(sslMax)} mm</b> (${DC}).`});
+  R.push({nm:`s<sub>sw</sub> etrieri (${ZONE==='cr'?'critic':'non-critic'})`,rule:'s.sw \u2264 '+ssw.t,art:'11',cur:scr,lim:ssw.v,u:'mm',inv:1,ok:scr<=ssw.v,adv:`Pas etrieri prea mare. Maxim <b>${nf(ssw.v)} mm</b> = ${ssw.t}.`});
+  R.push({nm:'&Oslash;<sub>sw,min</sub> etrier',rule:'\u00d8.sw \u2265 '+(DC==='DCH'?'max(\u00d8.bl,max/3;8)':'max(\u00d8.bl,max/4;8)'),art:'13',cur:dsw,lim:dSwMin,u:'mm',ok:dsw>=dSwMin,adv:`Diametru etrier insuficient. Minim <b>${nf(dSwMin)} mm</b>.`});
+  R.push({g:'Armare inima'});
+  R.push({nm:`&rho;<sub>long,min</sub> inima (a<sub>g</sub>${AG==='gt'?'&gt;':'&le;'}0,15g)`,rule:'\u03c1.long \u2265 \u03c1.min',art:'inima',cur:rhoLong,lim:rhoWebLong(),d:4,ok:rhoLong>=rhoWebLong(),adv:`Armare longitudinala (verticala) inima mica. Necesar &rho;=<b>${nf(rhoWebLong()*100,2)}%</b>.`});
+  R.push({nm:`&rho;<sub>transv,min</sub> inima (${ZONE==='cr'?'2&times;l.critic':'non-critic'})`,rule:'\u03c1.tr \u2265 \u03c1.min',art:'inima',cur:rhoTransv,lim:rhoTrZone,d:4,ok:rhoTransv>=rhoTrZone,adv:`Armare transversala (orizontala) inima mica. Necesar &rho;=<b>${nf(rhoTrZone*100,2)}%</b>.`});
+  R.push({nm:'&Oslash;<sub>long,min</sub> inima',rule:'\u00d8.long \u2265 10',art:'inima',cur:dwl,lim:10,u:'mm',ok:dwl>=10,adv:`Diametru minim bare longitudinale inima <b>10 mm</b>.`});
+  R.push({nm:'&Oslash;<sub>transv,min</sub> inima',rule:'\u00d8.transv \u2265 8',art:'inima',cur:dwt,lim:8,u:'mm',ok:dwt>=8,adv:`Diametru minim bare transversale inima <b>8 mm</b>.`});
+  R.push({nm:'s<sub>long</sub> inima',rule:'s.long \u2264 350',art:'inima',cur:swl,lim:350,u:'mm',inv:1,ok:swl<=350,adv:`Pas bare longitudinale inima prea mare. Maxim <b>350 mm</b>.`});
+  R.push({nm:'s<sub>transv</sub> inima',rule:'s.transv \u2264 250',art:'inima',cur:swt,lim:250,u:'mm',inv:1,ok:swt<=250,adv:`Pas bare transversale inima prea mare. Maxim <b>250 mm</b>.`});
+  renderChecklist(G,R);renderVerdict(G,R,vd,DC);renderFlags(vd,DC);drawSketch(bw0,lw,lf,bf,lf2,bf2,Asl_bulb,Asl_bulb2,Asl_web);
+  lastCalc={bw0,lw,hcl,lf,bf,lf2,bf2,same:document.getElementById('bulbsame').checked,concrete:curC,fck,fcd,steel:curS,fyk,fyd,ned,db1,nbulb,db2,nbulb2,n1,n2,dbulbmin,dbulbmax,dwl,swl,dwt,swt,dsw,scr,ssl,cnom,DC,AG,ZONE,Af,Af2,Aweb,Ac,Asl_bulb,rho_l_end,omega_l_end,vd,b0,omZone,rlMin,dSwMin,ssw,rhoLong,rhoTransv,G,R};
+}
+function tally(arr){let ok=0,bad=0,tot=0;arr.forEach(o=>{if(o.g||o.ok===null)return;tot++;o.ok?ok++:bad++;});return{ok,bad,tot};}
+function renderVerdict(G,R,vd,DC){
+  const tg=tally(G),tr=tally(R);
+  document.getElementById('sc_geo').textContent=`${tg.ok}/${tg.tot}`;
+  document.getElementById('sc_rein').textContent=`${tr.ok}/${tr.tot}`;
+  const vlim=DC==='DCH'?0.35:DC==='DCM'?0.40:1.0;
+  const vdEl=document.getElementById('sc_vd');vdEl.textContent=nf(vd,3);
+  vdEl.closest('.rc2').className='rc2 '+(vd<=vlim?'gr':'rd');
+  const bad=tg.bad+tr.bad,v=document.getElementById('verdict');
+  if(bad===0){v.textContent='CONFORM';v.className='ftag f1';}else{v.textContent='NECONFORM \u2014 '+bad+' conditii';v.className='ftag f3';}
+}
+function renderFlags(vd,DC){
+  const z=document.getElementById('flagzone');const vlim=DC==='DCH'?0.35:DC==='DCM'?0.40:null;
+  if(vlim&&vd>vlim){z.innerHTML=`<div class="flagbox"><b>Atentie:</b> forta axiala normalizata &nu;<sub>d</sub> = ${nf(vd,3)} depaseste limita ${nf(vlim,2)} pentru ${DC} (&sect;7.2). Sectiunea trebuie marita sau clasa de beton sporita.</div>`;}else z.innerHTML='';
+}
+function renderChecklist(G,R){
+  const all=[...G,...R];
+  let h=`<thead><tr><th style="width:30px"></th><th>Conditie</th><th>Regula</th><th class="r">Valoare</th><th class="r">Limita</th><th class="r">Art.</th></tr></thead><tbody>`;
+  all.forEach(o=>{
+    if(o.g){h+=`<tr><td colspan="6" class="grphd">${o.g}</td></tr>`;return;}
+    const st=o.ok===null?'na':(o.ok?'ok':'no');
+    const badge=st==='ok'?'<span class="badge ok">&check;</span>':st==='no'?'<span class="badge no">&times;</span>':'<span class="badge na">n/a</span>';
+    const fmtv=v=>o.txt?v:(o.u==='mm\u00b2'?nf(v):(o.d!==undefined?nf(v,o.d):nf(v)));
+    const u=o.u?' '+o.u:'';
+    h+=`<tr class="${st==='no'?'bad':''}"><td>${badge}</td><td class="nm">${o.nm}</td><td class="rule">${o.rule}</td><td class="r">${fmtv(o.cur)}${o.txt?'':u}</td><td class="r">${o.inv?'&le; ':'&ge; '}${fmtv(o.lim)}${o.txt?'':u}</td><td class="art">${o.art}</td></tr>`;
+    if(st==='no'&&o.adv)h+=`<tr><td></td><td colspan="5" class="advice">&rarr; ${o.adv}</td></tr>`;
+  });
+  document.getElementById('chktbl').innerHTML=h+'</tbody>';
+  const note=document.getElementById('chknote');
+  if((DC==='DCH'||DC==='DCM')&&AG==='gt'){
+    note.innerHTML=`<div class="chkfoot"><b>Cond. (14):</b> Pentru ${DC}, a<sub>g</sub> &gt; 0,15g &mdash; restrictionarea flambajului barelor longitudinale comprimate se asigura pe toata lungimea talpii (bulbului).</div>`;
+  } else note.innerHTML='';
+}
+function drawSketch(bw0,lw,lf,bf,lf2,bf2,AsBulb1,AsBulb2,AsWeb){
+  const svg=document.getElementById('sketch');
+  const VW=460,VH=280;
+  const webLen=Math.max(lw-lf-lf2,0);
+  const totLen=lf+webLen+lf2;
+  const maxH=Math.max(bf,bf2,bw0);
+  const PL=46,PR=46,PT=64,PB=74;
+  const scl=Math.min((VW-PL-PR)/totLen,(VH-PT-PB)/maxH);
+  const ox=(VW-totLen*scl)/2, cyMid=PT+(VH-PT-PB)/2;
+  const purple='#C9B8E8',pStroke='#9B7FD4',pInk='#6B4FA0',pink='#F0D6E6',pStrokeW='#D89BC0',pInkW='#9E5C82',dim='#AEAEB2',lbl='#6C6C70';
+  const b1={x:ox, w:lf*scl, h:bf*scl};
+  const wb={x:ox+lf*scl, w:webLen*scl, h:bw0*scl};
+  const b2={x:ox+lf*scl+webLen*scl, w:lf2*scl, h:bf2*scl};
+  const yT=v=>cyMid-v/2, yB=v=>cyMid+v/2;
+  let o='';
+  if(webLen>0) o+=`<rect x="${wb.x}" y="${yT(wb.h)}" width="${wb.w}" height="${wb.h}" fill="${pink}" stroke="${pStrokeW}" stroke-width="1"/>`;
+  o+=`<rect x="${b1.x}" y="${yT(b1.h)}" width="${b1.w}" height="${b1.h}" fill="${purple}" stroke="${pStroke}" stroke-width="1.4" rx="1.5"/>`;
+  o+=`<rect x="${b2.x}" y="${yT(b2.h)}" width="${b2.w}" height="${b2.h}" fill="${purple}" stroke="${pStroke}" stroke-width="1.4" rx="1.5"/>`;
+  function lab(cx,cy,t1,t2,ink){
+    return `<text x="${cx}" y="${cy-2}" text-anchor="middle" font-size="9" font-weight="500" fill="${ink}" font-family="Inter,sans-serif">${t1}</text>`+
+           `<text x="${cx}" y="${cy+9}" text-anchor="middle" font-size="8" fill="${ink}" font-family="Inter,sans-serif">${t2}</text>`;
+  }
+  o+=lab(b1.x+b1.w/2, cyMid, 'A_s,bulb', nf(AsBulb1)+' mm\u00b2', pInk);
+  o+=lab(b2.x+b2.w/2, cyMid, 'A_s,bulb', nf(AsBulb2)+' mm\u00b2', pInk);
+  if(webLen>0 && wb.w>54) o+=lab(wb.x+wb.w/2, cyMid, 'A_s,inima', nf(AsWeb)+' mm\u00b2', pInkW);
+  else if(webLen>0) o+=`<text x="${wb.x+wb.w/2}" y="${cyMid+3}" text-anchor="middle" font-size="7.5" fill="${pInkW}" font-family="Inter,sans-serif">inima</text>`;
+  // TOP dimensions: bulb lengths
+  const dY=yT(maxH)-20;
+  function dimSeg(x1,x2,y,col,txt){
+    let s=`<line x1="${x1}" y1="${y}" x2="${x2}" y2="${y}" stroke="${col}" stroke-width="0.7"/>`;
+    s+=`<line x1="${x1}" y1="${y-3}" x2="${x1}" y2="${y+3}" stroke="${col}" stroke-width="0.7"/>`;
+    s+=`<line x1="${x2}" y1="${y-3}" x2="${x2}" y2="${y+3}" stroke="${col}" stroke-width="0.7"/>`;
+    s+=`<text x="${(x1+x2)/2}" y="${y-4}" text-anchor="middle" font-size="8.5" font-weight="500" fill="${col}" font-family="Inter,sans-serif">${txt}</text>`;
+    return s;
+  }
+  o+=dimSeg(b1.x, b1.x+b1.w, dY, pInk, 'l_f = '+lf);
+  o+=dimSeg(b2.x, b2.x+b2.w, dY, pInk, 'l_f2 = '+lf2);
+  // BOTTOM dimension: total wall length (offset lower so it never overlaps the top one)
+  const dB=yB(maxH)+22;
+  o+=`<line x1="${ox}" y1="${yB(maxH)+4}" x2="${ox}" y2="${dB+4}" stroke="${dim}" stroke-width="0.4" opacity="0.6"/>`;
+  o+=`<line x1="${ox+totLen*scl}" y1="${yB(maxH)+4}" x2="${ox+totLen*scl}" y2="${dB+4}" stroke="${dim}" stroke-width="0.4" opacity="0.6"/>`;
+  o+=dimSeg(ox, ox+totLen*scl, dB, lbl, 'l_w = '+lw);
+  // LEFT vertical: b_f
+  const lX=b1.x-14;
+  o+=`<line x1="${lX}" y1="${yT(b1.h)}" x2="${lX}" y2="${yB(b1.h)}" stroke="${dim}" stroke-width="0.7"/>`;
+  o+=`<line x1="${lX-3}" y1="${yT(b1.h)}" x2="${lX+3}" y2="${yT(b1.h)}" stroke="${dim}" stroke-width="0.7"/>`;
+  o+=`<line x1="${lX-3}" y1="${yB(b1.h)}" x2="${lX+3}" y2="${yB(b1.h)}" stroke="${dim}" stroke-width="0.7"/>`;
+  o+=`<text x="${lX-6}" y="${cyMid}" text-anchor="middle" font-size="8.5" fill="${lbl}" font-family="Inter,sans-serif" transform="rotate(-90,${lX-6},${cyMid})">b_f = ${bf}</text>`;
+  // RIGHT vertical: b_w0
+  if(webLen>0){
+    const rX=b2.x+b2.w+14;
+    o+=`<line x1="${rX}" y1="${cyMid-wb.h/2}" x2="${rX}" y2="${cyMid+wb.h/2}" stroke="${pStrokeW}" stroke-width="0.7"/>`;
+    o+=`<line x1="${rX-3}" y1="${cyMid-wb.h/2}" x2="${rX+3}" y2="${cyMid-wb.h/2}" stroke="${pStrokeW}" stroke-width="0.7"/>`;
+    o+=`<line x1="${rX-3}" y1="${cyMid+wb.h/2}" x2="${rX+3}" y2="${cyMid+wb.h/2}" stroke="${pStrokeW}" stroke-width="0.7"/>`;
+    o+=`<text x="${rX+7}" y="${cyMid}" text-anchor="middle" font-size="8" fill="${pInkW}" font-family="Inter,sans-serif" transform="rotate(-90,${rX+7},${cyMid})">b_w0 = ${bw0}</text>`;
+  }
+  o+=`<text x="${b1.x+b1.w/2}" y="${dB+14}" text-anchor="middle" font-size="8" fill="${pStroke}" font-family="Inter,sans-serif">bulb 1</text>`;
+  o+=`<text x="${b2.x+b2.w/2}" y="${dB+14}" text-anchor="middle" font-size="8" fill="${pStroke}" font-family="Inter,sans-serif">bulb 2</text>`;
+  svg.innerHTML=o;
+}
+function svgToPng(cb){
+  const svg=document.getElementById('sketch');
+  const xml=new XMLSerializer().serializeToString(svg);
+  const img=new Image();
+  const svg64=btoa(unescape(encodeURIComponent('<?xml version="1.0"?>'+xml)));
+  img.onload=function(){const cv=document.createElement('canvas');cv.width=920;cv.height=460;const ctx=cv.getContext('2d');ctx.fillStyle='#FFFFFF';ctx.fillRect(0,0,cv.width,cv.height);ctx.drawImage(img,0,0,cv.width,cv.height);cb(cv.toDataURL('image/png'));};
+  img.onerror=function(){cb(null);};
+  img.src='data:image/svg+xml;base64,'+svg64;
+}
+function generatePdf(){
+  const btn=document.getElementById('rptBtn'),status=document.getElementById('rptStatus');
+  if(typeof window.jspdf==='undefined'){status.textContent='Libraria PDF se incarca... incearca din nou.';return;}
+  btn.disabled=true;btn.textContent='Se genereaza...';
+  svgToPng(function(sk){buildPdf(sk);btn.disabled=false;btn.textContent='Descarca PDF';status.textContent='Raport descarcat.';setTimeout(()=>status.textContent='',4000);});
+}
+function plain(s){return s.replace(/<sub>/g,'').replace(/<\/sub>/g,'').replace(/<b>/g,'').replace(/<\/b>/g,'').replace(/&middot;/g,'\u00b7').replace(/&ge;/g,'>=').replace(/&le;/g,'<=').replace(/&Oslash;/g,'O').replace(/&omega;/g,'w').replace(/&rho;/g,'p').replace(/&nu;/g,'v').replace(/&rarr;/g,'->').replace(/&asymp;/g,'~').replace(/&sup2;/g,'2').replace(/\u00b2/g,'2').replace(/&amp;/g,'&').replace(/\u00d8/g,'O').replace(/\u03c9/g,'w').replace(/\u03c1/g,'p').replace(/\u2265/g,'>=').replace(/\u2264/g,'<=').replace(/\u00b7/g,'*');}
+function buildPdf(sk){
+  const{jsPDF}=window.jspdf;
+  const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+  const d=lastCalc,pW=210,ml=15,mr=15,cw=pW-ml-mr,ds=new Date().toLocaleDateString('ro-RO');let y=0;
+  function hdr(){doc.setFillColor(28,28,30);doc.rect(0,0,210,14,'F');doc.setTextColor(255,255,255);doc.setFontSize(11);doc.setFont('helvetica','bold');doc.text('NOTA DE CALCUL - PREDIMENSIONARE PERETI',ml,9);doc.setFontSize(8);doc.setFont('helvetica','normal');doc.text('CR 2-1-1.1/2022',ml,13);doc.text('Data: '+ds,pW-mr,13,{align:'right'});doc.setTextColor(0,0,0);y=20;}
+  function cyf(n){n=n||10;if(y+n>275){doc.addPage();hdr();}}
+  function sT(t){cyf(12);doc.setFillColor(235,243,252);doc.rect(ml,y-4,cw,8,'F');doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor(0,102,204);doc.text(t,ml+2,y+1);doc.setTextColor(0,0,0);doc.setFont('helvetica','normal');y+=8;}
+  hdr();
+  doc.setFontSize(18);doc.setFont('helvetica','bold');doc.setTextColor(28,28,30);doc.text('Conditii minime de alcatuire',pW/2,46,{align:'center'});
+  doc.setFontSize(11);doc.setFont('helvetica','normal');doc.setTextColor(90,90,90);doc.text('Pereti structurali din beton armat cu bulbi - CR 2-1-1.1/2022 cap. 7',pW/2,55,{align:'center'});
+  doc.setDrawColor(0,102,204);doc.setLineWidth(0.4);doc.line(ml,62,ml+cw,62);y=72;
+  sT('1. DATE DE INTRARE');
+  const bulbTxt=d.same?'Bulb 2 identic cu Bulb 1':'Bulbi diferiti';
+  doc.autoTable({startY:y,head:[['Parametru','Notatie','Valoare']],body:[
+    ['Clasa de ductilitate','-',d.DC],['Acceleratia terenului','a_g',d.AG==='gt'?'> 0,15g':'<= 0,15g'],['Zona verificata','-',d.ZONE==='cr'?'Critica':'Non-critica'],
+    ['Grosimea inimii','b_w0',d.bw0+' mm'],['Lungimea peretelui','l_w',d.lw+' mm'],['Inaltimea nivelului','h_cl',d.hcl+' mm'],
+    ['Configuratie bulbi','-',bulbTxt],['Lungimea bulbului','l_f',d.lf+' mm'],['Latimea bulbului','b_f',d.bf+' mm'],
+    ['Clasa beton','-',d.concrete],['Rezistenta beton','f_cd',d.fcd.toFixed(2)+' MPa'],['Clasa otel','-',d.steel],['Rezistenta otel','f_yd',d.fyd.toFixed(2)+' MPa'],
+    ['Forta axiala','N_Ed',d.ned+' kN'],['Bare bulb','-',(d.n1>0?d.n1+' O'+d.db1:'')+(d.n2>0?' + '+d.n2+' O'+d.db2:'')+' mm'],['Inima long.','-','O'+d.dwl+'/'+d.swl+' mm'],['Inima transv.','-','O'+d.dwt+'/'+d.swt+' mm'],['Etrieri','O_sw',d.dsw+' mm'],
+    ['Pas etrieri','s_sw',d.scr+' mm'],['Pas bare long. restranse','s_sl',d.ssl+' mm'],['Acoperire','c_nom',d.cnom+' mm'],
+  ],margin:{left:ml,right:mr},tableWidth:cw,headStyles:{fillColor:[28,28,30],textColor:255,fontSize:8.5,fontStyle:'bold'},bodyStyles:{fontSize:8.5},alternateRowStyles:{fillColor:[245,247,250]},columnStyles:{0:{cellWidth:95},1:{cellWidth:35,fontStyle:'italic'},2:{halign:'right'}}});
+  y=doc.lastAutoTable.finalY+6;
+  if(sk){cyf(60);sT('2. SECTIUNE - ZONA DE CAPAT');const iw=150,ih=75;doc.addImage(sk,'PNG',(pW-iw)/2,y,iw,ih);y+=ih+6;}
+  cyf(20);sT('3. FORTA AXIALA NORMALIZATA');
+  doc.setFontSize(8);doc.setTextColor(130,130,130);doc.setFont('helvetica','italic');doc.text('v_d = N_Ed / (A_c * f_cd),  A_c = aria inimii + ambii bulbi',ml,y);doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);y+=6;
+  const vlim=d.DC==='DCH'?'0.35':d.DC==='DCM'?'0.40':'-';
+  doc.autoTable({startY:y,head:[['Marime','Notatie','Valoare']],body:[
+    ['Aria inimii','A_web',nf(d.Aweb)+' mm2'],['Aria bulb 1','A_f',nf(d.Af)+' mm2'],['Aria bulb 2','A_f2',nf(d.Af2)+' mm2'],['Aria totala','A_c',nf(d.Ac)+' mm2'],['Forta axiala normalizata','v_d',nf(d.vd,3)],['Limita ('+d.DC+')','v_d,lim',vlim],
+  ],margin:{left:ml,right:mr},tableWidth:cw,headStyles:{fillColor:[28,28,30],textColor:255,fontSize:8.5,fontStyle:'bold'},bodyStyles:{fontSize:8.5},alternateRowStyles:{fillColor:[245,247,250]},columnStyles:{0:{cellWidth:95},1:{cellWidth:35,fontStyle:'italic'},2:{halign:'right'}}});
+  y=doc.lastAutoTable.finalY+6;
+  function condTable(title,arr){
+    cyf(16);sT(title);const body=[];
+    arr.forEach(o=>{
+      if(o.g){body.push([{content:plain(o.g),colSpan:5,styles:{fillColor:[235,243,252],textColor:[0,102,204],fontStyle:'bold',fontSize:8.5}}]);return;}
+      const stat=o.ok===null?'n/a':(o.ok?'OK':'X');
+      const fmtv=v=>o.txt?v:(o.u==='mm\u00b2'?nf(v):(o.d!==undefined?nf(v,o.d):nf(v)));
+      const u=o.u&&!o.txt?(' '+o.u.replace('\u00b2','2')):'';
+      body.push([stat,plain(o.nm),plain(o.rule),fmtv(o.cur)+u,(o.inv?'<= ':'>= ')+fmtv(o.lim)+u]);
+    });
+    doc.autoTable({startY:y,head:[['','Conditie','Regula','Valoare','Limita']],body,margin:{left:ml,right:mr},tableWidth:cw,
+      headStyles:{fillColor:[28,28,30],textColor:255,fontSize:8,fontStyle:'bold'},bodyStyles:{fontSize:8},
+      columnStyles:{0:{cellWidth:12,halign:'center',fontStyle:'bold'},1:{cellWidth:60},2:{cellWidth:46},3:{cellWidth:30,halign:'right'},4:{cellWidth:32,halign:'right'}},
+      didParseCell:function(h){if(h.section==='body'&&h.column.index===0){if(h.cell.raw==='X'){h.cell.styles.textColor=[198,40,40];}else if(h.cell.raw==='OK'){h.cell.styles.textColor=[46,125,50];}else{h.cell.styles.textColor=[174,174,178];}}}});
+    y=doc.lastAutoTable.finalY+6;
+  }
+  condTable('4. CONDITII GEOMETRICE',d.G);
+  condTable('5. CONDITII DE ARMARE',d.R);
+  const tg=tally(d.G),tr=tally(d.R),bad=tg.bad+tr.bad;
+  cyf(16);sT('6. CONCLUZIE');
+  doc.setFontSize(10);doc.setFont('helvetica','bold');
+  if(bad===0){doc.setTextColor(46,125,50);doc.text('CONFORM - toate conditiile minime sunt indeplinite.',ml,y+1);}else{doc.setTextColor(198,40,40);doc.text('NECONFORM - '+bad+' conditii neindeplinite (vezi randurile X).',ml,y+1);}
+  doc.setTextColor(0,0,0);doc.setFont('helvetica','normal');y+=8;
+  const tp=doc.internal.getNumberOfPages();
+  for(let i=1;i<=tp;i++){doc.setPage(i);doc.setFontSize(7.5);doc.setTextColor(150,150,150);doc.setFont('helvetica','normal');doc.line(ml,285,ml+cw,285);doc.text('CR 2-1-1.1/2022',ml,289);doc.text('Pagina '+i+' din '+tp,pW-mr,289,{align:'right'});doc.text('Generat: '+ds,pW/2,289,{align:'center'});}
+  doc.save('Raport_predimensionare_pereti.pdf');
+}
+updMat();calc();
+</script>

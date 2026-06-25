@@ -1,0 +1,522 @@
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1C1E}
+
+
+
+
+
+.wrap{max-width:1080px;margin:0 auto;padding:20px 16px}
+.cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+.slabel{font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:#1C1C1E;padding:0 0 7px;margin-top:14px}
+.slabel:first-child{margin-top:0}
+.ip{background:#EFEFEF;border:1px solid #DCDCE0;border-radius:12px;overflow:hidden;margin-bottom:13px}
+.op{background:#fff;border:1px solid #DCDCE0;border-radius:12px;overflow:hidden;margin-bottom:13px}
+.ph{padding:12px 15px 0;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:#1C1C1E}
+.pb{padding:8px 15px 14px}
+.row{display:flex;align-items:center;padding:7px 0;border-bottom:1px solid #E0E0E5;gap:8px}
+.row:last-child{border-bottom:none}
+.rl{flex:1;font-size:13px;color:#1C1C1E;min-width:0}
+.rn{font-size:12px;color:#8E8E93;margin-left:4px}
+.rc{display:flex;align-items:center;gap:5px;flex-shrink:0}
+.rc input[type=number]{width:78px;padding:5px 8px;font-size:13px;border:1px solid #C7C7CC;border-radius:7px;background:#fff;color:#1C1C1E;font-family:'Inter',sans-serif;-moz-appearance:textfield;appearance:textfield;text-align:right}
+.rc input[type=number]::-webkit-inner-spin-button,.rc input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.rc input:focus{outline:none;box-shadow:0 0 0 2px rgba(0,122,255,.2);border-color:#007AFF}
+.ru{font-size:12px;color:#8E8E93;min-width:26px}
+.sel-field{margin-bottom:10px}
+.sel-field label{display:block;font-size:12px;color:#8E8E93;margin-bottom:5px;font-weight:500}
+.sel-wrap{position:relative}
+.sel-wrap::after{content:'';position:absolute;right:13px;top:50%;width:7px;height:7px;border-right:2px solid #8E8E93;border-bottom:2px solid #8E8E93;transform:translateY(-65%) rotate(45deg);pointer-events:none}
+.sel-field select{width:100%;padding:8px 34px 8px 11px;font-size:13px;border:1px solid #C7C7CC;border-radius:8px;background:#fff;color:#1C1C1E;font-family:'Inter',sans-serif;cursor:pointer;-webkit-appearance:none;appearance:none}
+.sel-field select:focus{outline:none;box-shadow:0 0 0 2px rgba(0,122,255,.2);border-color:#007AFF}
+.mat-vals{display:flex;gap:6px;padding:6px 0 2px}
+.mv{flex:1;text-align:center;background:#E8E8ED;border-radius:7px;padding:8px 4px}
+.mvl{font-size:11px;color:#8E8E93;margin-bottom:2px}
+.mvv{font-size:15px;font-weight:500;color:#1C1C1E}
+.mvu{font-size:11px;color:#8E8E93}
+.sub{font-size:11px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;color:#8E8E93;padding:9px 0 5px}
+.res-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.res-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.rc2{background:#F2F2F7;border-radius:8px;padding:10px 12px}
+.rc2.hl{background:#EBF3FF;border:1px solid #B8D4F8}
+.rc2.gr{background:#EAF6EC;border:1px solid #BFE3C6}
+.rc2.rd{background:#FDECEC;border:1px solid #F5C6C6}
+.rl2{font-size:11px;color:#8E8E93;margin-bottom:3px}
+.rv{font-size:19px;font-weight:500;color:#1C1C1E;line-height:1.2}
+.rc2.hl .rv{color:#0066CC}
+.rc2.gr .rv{color:#2E7D32}
+.rc2.rd .rv{color:#C0392B}
+.ru2{font-size:11px;color:#8E8E93}
+.zhead{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.zbadge{display:inline-flex;align-items:center;padding:3px 11px;border-radius:20px;font-size:12px;font-weight:500}
+.zA{background:#EBF3FF;color:#0066CC}.zB{background:#FFF3E0;color:#E65100}
+.alfa-box{background:#F2F2F7;border-radius:8px;padding:10px 13px}
+.ar{display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:13px;border-bottom:1px solid #E5E5EA}
+.ar:last-child{border-bottom:none}
+.al{color:#8E8E93}
+.av{font-weight:500;font-size:14px;color:#1C1C1E}
+.ar.tot .al{color:#1C1C1E;font-weight:500;font-size:14px}
+.ar.tot .av{font-size:17px;color:#0066CC;font-weight:500}
+.chk{display:flex;justify-content:space-between;align-items:center;padding:8px 11px;border-radius:8px;font-size:13px;margin-top:8px}
+.chk.ok{background:#EAF6EC;color:#2E7D32}
+.chk.no{background:#FDECEC;color:#C0392B}
+.chk .cv{font-weight:500}
+.toggle-row{display:flex;align-items:center;gap:10px;padding:4px 0 10px;border-bottom:1px solid #E0E0E5;margin-bottom:8px}
+.toggle-row:last-child{border-bottom:none;margin-bottom:0;padding-bottom:4px}
+.toggle-row span{font-size:12px;color:#1C1C1E;flex:1}
+.seg{display:inline-flex;background:#E0E0E5;border-radius:8px;padding:2px;gap:2px}
+.seg button{padding:5px 12px;font-size:12px;font-weight:500;border:none;border-radius:6px;background:transparent;color:#8E8E93;cursor:pointer;font-family:'Inter',sans-serif;transition:all .12s}
+.seg button.on{background:#fff;color:#1C1C1E;box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.fnote{font-size:11px;color:#8E8E93;padding:8px 0 2px;line-height:1.5}
+.fnote b{color:#1C1C1E;font-weight:500}
+.report-bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.report-lbl{font-size:13px;color:#1C1C1E;flex:1;min-width:120px}
+.report-btn{padding:11px 18px;font-size:14px;font-weight:500;font-family:'Inter',sans-serif;border:none;border-radius:10px;background:#1C1C1E;color:#fff;cursor:pointer;transition:opacity .15s}
+.report-btn:active{opacity:.7}
+.report-btn:disabled{opacity:.4}
+.report-status{font-size:12px;color:#8E8E93;text-align:center;padding:6px 0 0;min-height:16px}
+@media(max-width:680px){.wrap{padding:14px 10px}.cols{grid-template-columns:1fr;gap:0}.report-btn{width:100%}}
+.back-btn{display:inline-flex;align-items:center;gap:5px;font-family:'Inter',sans-serif;font-size:12px;font-weight:500;color:#8E8E93;background:transparent;border:none;cursor:pointer;padding:10px 16px;text-decoration:none;line-height:1}
+.back-btn svg{width:14px;height:14px;stroke:#8E8E93;stroke-width:2.5;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.back-btn:hover{color:#1C1C1E}
+.back-btn:hover svg{stroke:#1C1C1E}
+</style>
+
+<a href="index.html" class="back-btn"><svg viewBox="0 0 16 16"><polyline points="10,3 4,8 10,13"/></svg>Toate modulele</a>
+</div>
+
+<div class="wrap">
+<div class="cols">
+<div>
+  <div class="slabel">Intrari</div>
+
+  <div class="ip">
+    <div class="ph">Tip perete &amp; zona</div>
+    <div class="pb">
+      <div class="toggle-row">
+        <span>Tip perete</span>
+        <div class="seg">
+          <button id="seg-bulb" class="on" onclick="setWall('Bulb')">Bulb</button>
+          <button id="seg-bulbinima" onclick="setWall('Bulb+inima')">Bulb+inima</button>
+        </div>
+      </div>
+      <div class="toggle-row">
+        <span>Suprafata rost de turnare</span>
+        <div class="seg">
+          <button id="seg-rug" class="on" onclick="setSurf(0.7)">Rugoasa</button>
+          <button id="seg-net" onclick="setSurf(0.6)">Neteda</button>
+        </div>
+      </div>
+      <div class="fnote" id="walltip"></div>
+    </div>
+  </div>
+
+  <div class="ip">
+    <div class="ph">Geometrie</div>
+    <div class="pb">
+      <div class="row"><div class="rl">Lungimea peretelui <span class="rn">(l<sub>w</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="lw" value="2400" min="100" step="50" oninput="calc()"><span class="ru">mm</span></div></div>
+      <div class="row"><div class="rl">Grosimea inimii <span class="rn">(b<sub>w0</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="bw0" value="300" min="50" step="10" oninput="calc()"><span class="ru">mm</span></div></div>
+      <div class="row"><div class="rl">Lungimea bulbului <span class="rn">(b<sub>f</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="bf" value="500" min="0" step="10" oninput="calc()"><span class="ru">mm</span></div></div>
+      <div class="row"><div class="rl">Acoperire cu beton <span class="rn">(c<sub>nom</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="cnom" value="35" min="10" step="5" oninput="calc()"><span class="ru">mm</span></div></div>
+    </div>
+  </div>
+
+  <div class="ip">
+    <div class="ph">Materiale</div>
+    <div class="pb">
+      <div class="sel-field"><label>Clasa beton</label><div class="sel-wrap">
+        <select id="cp" onchange="curC=this.value;updMat();calc()">
+          <option>C12/15</option><option>C16/20</option><option>C20/25</option><option>C25/30</option>
+          <option selected>C30/37</option><option>C35/45</option><option>C40/50</option><option>C45/55</option>
+          <option>C50/60</option><option>C55/67</option><option>C60/75</option>
+        </select></div></div>
+      <div class="sel-field"><label>Clasa otel</label><div class="sel-wrap">
+        <select id="sp" onchange="curS=this.value;updMat();calc()">
+          <option>S 235</option><option>S 255</option><option>S 345</option><option>S 355</option>
+          <option>S 405</option><option>S 420</option><option selected>S 500</option>
+        </select></div></div>
+      <div class="mat-vals">
+        <div class="mv"><div class="mvl">f<sub>ck</sub></div><div class="mvv" id="fck_d">30</div><div class="mvu">MPa</div></div>
+        <div class="mv"><div class="mvl">f<sub>cd</sub></div><div class="mvv" id="fcd_d">20.00</div><div class="mvu">MPa</div></div>
+        <div class="mv"><div class="mvl">f<sub>yk</sub></div><div class="mvv" id="fyk_d">500</div><div class="mvu">MPa</div></div>
+        <div class="mv"><div class="mvl">f<sub>yd</sub></div><div class="mvv" id="fyd_d">434.8</div><div class="mvu">MPa</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ARMARE ORIZONTALA INIMA (numai Bulb+inima) -->
+  <div class="ip" id="ip-web">
+    <div class="ph">Armare orizontala inima</div>
+    <div class="pb">
+      <div class="row"><div class="rl">Diametru armatura orizontala <span class="rn">(&Oslash;<sub>h</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="oh" value="10" min="4" step="2" oninput="calc()"><span class="ru">mm</span></div></div>
+      <div class="row"><div class="rl">Pas armatura orizontala <span class="rn">(s<sub>h</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="sh" value="100" min="30" step="10" oninput="calc()"><span class="ru">mm</span></div></div>
+      <div class="row"><div class="rl">Nr. randuri (straturi) <span class="rn">(n<sub>r</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="nr" value="2" min="1" step="1" oninput="calc()"></div></div>
+    </div>
+  </div>
+
+  <!-- ETRIERI CAPAT (numai Bulb) -->
+  <div class="ip" id="ip-stir">
+    <div class="ph">Etrieri zona de capat (bulb)</div>
+    <div class="pb">
+      <div class="row"><div class="rl">Pas etrieri <span class="rn">(s)</span></div><div class="rc"><input type="number" inputmode="numeric" id="ss" value="100" min="30" step="10" oninput="calc()"><span class="ru">mm</span></div></div>
+      <div class="sub">Etrier perimetral</div>
+      <div class="row"><div class="rl">Diametru <span class="rn">(&Oslash;<sub>sw,p</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="oswp" value="8" min="4" step="2" oninput="calc()"><span class="ru">mm</span></div></div>
+      <div class="row"><div class="rl">Nr. ramuri taietoare <span class="rn">(n<sub>p</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="nswp" value="2" min="1" step="1" oninput="calc()"></div></div>
+      <div class="row"><div class="rl">Lungime ramura <span class="rn">(l<sub>&Oslash;sw,p</sub> = l<sub>w</sub>&minus;2c<sub>nom</sub>&minus;2&Oslash;<sub>sw,p</sub>)</span></div><div class="rc"><span class="av" id="loswp_r" style="color:#0066CC">&mdash;</span><span class="ru">mm</span></div></div>
+      <div class="sub">Etrieri intermediari</div>
+      <div class="row"><div class="rl">Diametru <span class="rn">(&Oslash;<sub>sw</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="oswi" value="8" min="4" step="2" oninput="calc()"><span class="ru">mm</span></div></div>
+      <div class="row"><div class="rl">Lungime ramura <span class="rn">(l<sub>&Oslash;sw,i</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="loswi" value="190" min="10" step="10" oninput="calc()"><span class="ru">mm</span></div></div>
+      <div class="row"><div class="rl">Nr. etrieri intermediari <span class="rn">(buc)</span></div><div class="rc"><input type="number" inputmode="numeric" id="nei" value="1" min="0" step="1" oninput="calc()"></div></div>
+      <div class="row"><div class="rl">Nr. ramuri taietoare / etrier <span class="rn">(n<sub>i</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="nswi" value="2" min="1" step="1" oninput="calc()"></div></div>
+    </div>
+  </div>
+
+  <div class="ip">
+    <div class="ph">Armare verticala (lunecare)</div>
+    <div class="pb">
+      <div class="sub">Inima</div>
+      <div class="row"><div class="rl">Diametru armatura verticala <span class="rn">(&Oslash;<sub>l</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="ol" value="10" min="4" step="2" oninput="calc()"><span class="ru">mm</span></div></div>
+      <div class="row"><div class="rl">Pas armatura verticala <span class="rn">(s<sub>l</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="sl" value="150" min="30" step="10" oninput="calc()"><span class="ru">mm</span></div></div>
+      <div class="row"><div class="rl">Nr. randuri (straturi) <span class="rn">(n<sub>rl</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="nrl" value="2" min="1" step="1" oninput="calc()"></div></div>
+      <div class="sub">Bulb intins</div>
+      <div class="row"><div class="rl">Diametru bare bulb <span class="rn">(&Oslash;<sub>b</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="obb" value="14" min="4" step="2" oninput="calc()"><span class="ru">mm</span></div></div>
+      <div class="row"><div class="rl">Nr. bare bulb <span class="rn">(buc)</span></div><div class="rc"><input type="number" inputmode="numeric" id="nbb" value="8" min="0" step="1" oninput="calc()"></div></div>
+    </div>
+  </div>
+
+  <div class="ip">
+    <div class="ph">Forte de calcul</div>
+    <div class="pb">
+      <div class="row"><div class="rl">Forta taietoare <span class="rn">(V<sub>Ed</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="ved" value="500" min="0" step="10" oninput="calc()"><span class="ru">kN</span></div></div>
+      <div class="row"><div class="rl">Forta axiala <span class="rn">(N<sub>Ed</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="ned" value="500" min="0" step="10" oninput="calc()"><span class="ru">kN</span></div></div>
+    </div>
+  </div>
+</div>
+
+<div>
+  <div class="slabel">Rezultate</div>
+
+  <div class="op">
+    <div class="ph">Marimi de baza</div>
+    <div class="pb">
+      <div class="res-grid">
+        <div class="rc2"><div class="rl2">A<sub>cw</sub></div><div class="rv" id="acw_r">&mdash;</div><div class="ru2">mm&sup2;</div></div>
+        <div class="rc2"><div class="rl2">l<sub>web</sub></div><div class="rv" id="lweb_r">&mdash;</div><div class="ru2">mm</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="op">
+    <div class="ph">V<sub>Rd,max</sub> &mdash; Rezistenta maxima a sectiunii</div>
+    <div class="pb">
+      <div class="res-grid">
+        <div class="rc2 hl"><div class="rl2"><span class="zbadge zA" style="font-size:10px;padding:1px 7px">Critic</span></div><div class="rv" id="vrdmaxA_r">&mdash;</div><div class="ru2">kN</div></div>
+        <div class="rc2 hl"><div class="rl2"><span class="zbadge zB" style="font-size:10px;padding:1px 7px">Non-critic</span></div><div class="rv" id="vrdmaxB_r">&mdash;</div><div class="ru2">kN</div></div>
+      </div>
+      <div class="chk" id="chk_vmaxA"><span>V<sub>Ed</sub> &le; V<sub>Rd,max</sub> (critic)</span><span class="cv" id="chk_vmaxA_v">&mdash;</span></div>
+      <div class="chk" id="chk_vmaxB"><span>V<sub>Ed</sub> &le; V<sub>Rd,max</sub> (non-critic)</span><span class="cv" id="chk_vmaxB_v">&mdash;</span></div>
+    </div>
+  </div>
+
+  <div class="op">
+    <div class="ph">V<sub>Rd,s</sub> &mdash; Rezistenta data de armatura orizontala</div>
+    <div class="pb">
+      <div class="zhead"><span class="zbadge zA">Critic</span></div>
+      <div class="alfa-box" style="margin-bottom:10px" id="vsA-box"></div>
+      <div class="chk" id="chk_vsA"><span>V<sub>Ed</sub> &le; V<sub>Rd,s</sub> (critic)</span><span class="cv" id="chk_vsA_v">&mdash;</span></div>
+
+      <div class="zhead" style="margin-top:14px"><span class="zbadge zB">Non-critic</span></div>
+      <div class="alfa-box" style="margin-bottom:10px">
+        <div class="ar"><span class="al">Contributie beton (0,5&middot;&sigma;<sub>cp</sub>&middot;A<sub>cw</sub>)</span><span class="av" id="vsB1_r">&mdash;</span></div>
+        <div class="ar"><span class="al">Contributie armatura (&Sigma;A<sub>sh</sub>&middot;f<sub>yd,h</sub>)</span><span class="av" id="vsB2_r">&mdash;</span></div>
+        <div class="ar tot"><span class="al">V<sub>Rd,s</sub> (non-critic)</span><span class="av" id="vrdsB_r">&mdash;</span></div>
+      </div>
+      <div class="chk" id="chk_vsB"><span>V<sub>Ed</sub> &le; V<sub>Rd,s</sub> (non-critic)</span><span class="cv" id="chk_vsB_v">&mdash;</span></div>
+    </div>
+  </div>
+
+  <div class="op">
+    <div class="ph">V<sub>Rd,i</sub> &mdash; Rezistenta la lunecare in rostul de turnare</div>
+    <div class="pb">
+      <div class="alfa-box" style="margin-bottom:10px">
+        <div class="ar"><span class="al">A<sub>sv,web</sub> (armatura verticala inima)</span><span class="av" id="asvweb_r">&mdash;</span></div>
+        <div class="ar"><span class="al">A<sub>sv,bulb</sub> (bulb intins)</span><span class="av" id="asvbulb_r">&mdash;</span></div>
+        <div class="ar"><span class="al">&mu;<sub>f</sub></span><span class="av" id="muf_r">&mdash;</span></div>
+      </div>
+      <div class="res-grid">
+        <div class="rc2"><div class="rl2">V<sub>Rd,i</sub> (numai inima)</div><div class="rv" id="vrdiweb_r">&mdash;</div><div class="ru2">kN</div></div>
+        <div class="rc2 hl"><div class="rl2">V<sub>Rd,i</sub> (inima + bulb intins)</div><div class="rv" id="vrdibulb_r">&mdash;</div><div class="ru2">kN</div></div>
+      </div>
+      <div class="chk" id="chk_vi"><span>V<sub>Ed</sub> &le; V<sub>Rd,i</sub></span><span class="cv" id="chk_vi_v">&mdash;</span></div>
+    </div>
+  </div>
+
+  <div class="op">
+    <div class="ph">Verdict capacitate la forfecare</div>
+    <div class="pb">
+      <div class="res-grid">
+        <div class="rc2" id="verA_r"><div class="rl2">Critic</div><div class="rv" id="verAv_r">&mdash;</div><div class="ru2" id="verAg_r">V<sub>Rd</sub> guvernant</div></div>
+        <div class="rc2" id="verB_r"><div class="rl2">Non-critic</div><div class="rv" id="verBv_r">&mdash;</div><div class="ru2" id="verBg_r">V<sub>Rd</sub> guvernant</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="op">
+    <div class="pb">
+      <div class="report-bar">
+        <span class="report-lbl">Export raport de calcul (PDF)</span>
+        <button class="report-btn" id="rptBtn" onclick="generatePdf()">Descarca PDF</button>
+      </div>
+      <div class="report-status" id="rptStatus"></div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
+<script>
+const CONC={'C12/15':{fck:12,fcd:8},'C16/20':{fck:16,fcd:10.67},'C20/25':{fck:20,fcd:13.33},'C25/30':{fck:25,fcd:16.67},'C30/37':{fck:30,fcd:20},'C35/45':{fck:35,fcd:23.33},'C40/50':{fck:40,fcd:26.67},'C45/55':{fck:45,fcd:30},'C50/60':{fck:50,fcd:33.33},'C55/67':{fck:55,fcd:36.67},'C60/75':{fck:60,fcd:40}};
+const STEEL={'S 235':{fyk:235,fyd:204.3},'S 255':{fyk:255,fyd:221.7},'S 345':{fyk:345,fyd:300.0},'S 355':{fyk:355,fyd:308.7},'S 405':{fyk:405,fyd:352.2},'S 420':{fyk:420,fyd:365.2},'S 500':{fyk:500,fyd:434.8}};
+let curC='C30/37',curS='S 500',wallType='Bulb',muf=0.7,lastCalc={};
+const A=(d)=>d*d*Math.PI/4;
+
+function updMat(){
+  const c=CONC[curC],s=STEEL[curS];
+  document.getElementById('fck_d').textContent=c.fck;
+  document.getElementById('fcd_d').textContent=c.fcd.toFixed(2);
+  document.getElementById('fyk_d').textContent=s.fyk;
+  document.getElementById('fyd_d').textContent=s.fyd.toFixed(1);
+}
+function gv(id){return parseFloat(document.getElementById(id)?.value)||0;}
+
+function setWall(w){
+  wallType=w;
+  document.getElementById('seg-bulb').classList.toggle('on',w==='Bulb');
+  document.getElementById('seg-bulbinima').classList.toggle('on',w==='Bulb+inima');
+  document.getElementById('ip-web').style.display=(w==='Bulb+inima')?'':'none';
+  document.getElementById('ip-stir').style.display=(w==='Bulb')?'':'none';
+  document.getElementById('walltip').innerHTML=(w==='Bulb')
+    ? 'Perete <b>lamelar scurt</b>, fara inima: V<sub>Rd,s</sub> este dat de <b>etrierii taiati de fisura</b> (perimetral + intermediari).'
+    : 'Perete <b>cu inima</b>: V<sub>Rd,s</sub> este dat <b>numai de armatura orizontala a inimii</b>; etrierii nu se adauga.';
+  calc();
+}
+function setSurf(m){
+  muf=m;
+  document.getElementById('seg-rug').classList.toggle('on',m===0.7);
+  document.getElementById('seg-net').classList.toggle('on',m===0.6);
+  calc();
+}
+function setChk(id,vid,ratio){
+  const el=document.getElementById(id),vel=document.getElementById(vid);
+  const ok=ratio<=1;
+  el.className='chk '+(ok?'ok':'no');
+  vel.textContent=(ratio*100).toFixed(1)+' %';
+}
+
+function calc(){
+  const c=CONC[curC],s=STEEL[curS];
+  const fcd=c.fcd,fyd=s.fyd,sq=Math.sqrt(fcd);
+  const lw=gv('lw'),bw0=gv('bw0'),bf=gv('bf'),cnom=gv('cnom');
+  const ved=gv('ved'),ned=gv('ned');
+
+  const Acw=lw*bw0;
+  const scp=Acw>0?(ned*1e3)/Acw:0;
+
+  // V.Rd.max
+  const vRdmaxA=(0.67*Acw*sq)/1e3;
+  const vRdmaxB=(0.80*Acw*sq)/1e3;
+
+  // ---- V.Rd.s ----
+  let Ash=0, vsRows='';
+  if(wallType==='Bulb+inima'){
+    // only horizontal web reinforcement cut by 45deg crack
+    const oh=gv('oh'),sh=gv('sh'),nr=gv('nr');
+    const barsCut=sh>0?(nr*lw/sh):0;
+    const AshWeb=barsCut*A(oh);
+    Ash=AshWeb;
+    vsRows=
+      '<div class="ar"><span class="al">Bare orizontale taiate de fisura</span><span class="av">'+barsCut.toFixed(1)+' buc</span></div>'+
+      '<div class="ar"><span class="al">A<sub>sh,web</sub> = n&middot;&Oslash;<sub>h</sub>&sup2;&pi;/4</span><span class="av">'+AshWeb.toFixed(1)+' mm\u00B2</span></div>';
+    lastCalc.vsDetail={mode:'web',barsCut,AshWeb};
+  }else{
+    // Bulb: stirrups cut by crack — perimeter + intermediate
+    const ss=gv('ss');
+    const oswp=gv('oswp'),nswp=gv('nswp');
+    const oswi=gv('oswi'),loswi=gv('loswi'),nei=gv('nei'),nswi=gv('nswi');
+    // perimeter leg length is fixed: straight portion along l_w
+    const loswp=Math.max(lw-2*cnom-2*oswp,0);
+    document.getElementById('loswp_r').textContent=loswp.toFixed(0);
+    // legs cut = (n_legs * leg_length / spacing) per stirrup type
+    const cutP=ss>0?(nswp*loswp/ss):0;         // perimeter legs cut
+    const cutI=ss>0?(nei*nswi*loswi/ss):0;     // intermediate legs cut
+    const AshP=cutP*A(oswp);
+    const AshI=cutI*A(oswi);
+    Ash=AshP+AshI;
+    vsRows=
+      '<div class="ar"><span class="al">Etrier perimetral &mdash; ramuri taiate</span><span class="av">'+cutP.toFixed(1)+' buc</span></div>'+
+      '<div class="ar"><span class="al">A<sub>sh,perim</sub></span><span class="av">'+AshP.toFixed(1)+' mm\u00B2</span></div>'+
+      '<div class="ar"><span class="al">Etrieri interm. &mdash; ramuri taiate</span><span class="av">'+cutI.toFixed(1)+' buc</span></div>'+
+      '<div class="ar"><span class="al">A<sub>sh,interm</sub></span><span class="av">'+AshI.toFixed(1)+' mm\u00B2</span></div>';
+    lastCalc.vsDetail={mode:'stir',loswp,cutP,AshP,loswi,cutI,AshI};
+  }
+  const vRdsA=(Ash*fyd)/1e3;
+  document.getElementById('vsA-box').innerHTML=vsRows+
+    '<div class="ar tot"><span class="al">V<sub>Rd,s</sub> (critic)</span><span class="av">'+vRdsA.toFixed(1)+' kN</span></div>';
+
+  const vsB1=(0.5*scp*Acw)/1e3;
+  const vsB2=(Ash*fyd)/1e3;
+  const vRdsB=vsB1+vsB2;
+
+  // ---- Slip resistance ----
+  const ol=gv('ol'),sl=gv('sl'),nrl=gv('nrl');
+  const obb=gv('obb'),nbb=gv('nbb');
+  const asvb=nbb*A(obb);
+  const lweb=(wallType==='Bulb')?0:Math.max(lw-bf-bf-4*cnom,0);
+  const AsvWeb=sl>0?nrl*((lweb/sl)*A(ol)):0;
+  const vRdiWeb=(muf*(AsvWeb*fyd+ned*1e3))/1e3;
+  const vRdiBulb=(muf*((AsvWeb+asvb)*fyd+ned*1e3))/1e3;
+
+  const govA=Math.min(vRdmaxA,vRdsA,vRdiBulb);
+  const govB=Math.min(vRdmaxB,vRdsB,vRdiBulb);
+
+  // render
+  document.getElementById('acw_r').textContent=Acw.toLocaleString('ro-RO');
+  document.getElementById('lweb_r').textContent=lweb.toFixed(0);
+
+  document.getElementById('vrdmaxA_r').textContent=vRdmaxA.toFixed(1);
+  document.getElementById('vrdmaxB_r').textContent=vRdmaxB.toFixed(1);
+  setChk('chk_vmaxA','chk_vmaxA_v',vRdmaxA>0?ved/vRdmaxA:99);
+  setChk('chk_vmaxB','chk_vmaxB_v',vRdmaxB>0?ved/vRdmaxB:99);
+
+  setChk('chk_vsA','chk_vsA_v',vRdsA>0?ved/vRdsA:99);
+  document.getElementById('vsB1_r').textContent=vsB1.toFixed(1)+' kN';
+  document.getElementById('vsB2_r').textContent=vsB2.toFixed(1)+' kN';
+  document.getElementById('vrdsB_r').textContent=vRdsB.toFixed(1)+' kN';
+  setChk('chk_vsB','chk_vsB_v',vRdsB>0?ved/vRdsB:99);
+
+  document.getElementById('asvweb_r').textContent=AsvWeb.toFixed(1)+' mm\u00B2';
+  document.getElementById('asvbulb_r').innerHTML=asvb.toFixed(1)+' mm\u00B2 ('+nbb+'\u00D8'+obb+')';
+  document.getElementById('muf_r').textContent=muf.toFixed(1);
+  document.getElementById('vrdiweb_r').textContent=vRdiWeb.toFixed(1);
+  document.getElementById('vrdibulb_r').textContent=vRdiBulb.toFixed(1);
+  setChk('chk_vi','chk_vi_v',vRdiBulb>0?ved/vRdiBulb:99);
+
+  const verdict=(elBox,elV,elG,gov)=>{
+    document.getElementById(elV).textContent=gov.toFixed(1)+' kN';
+    const ok=ved<=gov;
+    document.getElementById(elBox).className='rc2 '+(ok?'gr':'rd');
+    document.getElementById(elG).innerHTML=(ok?'VERIFICAT':'INSUFICIENT')+' \u2022 V<sub>Ed</sub>='+ved+' kN';
+  };
+  verdict('verA_r','verAv_r','verAg_r',govA);
+  verdict('verB_r','verBv_r','verBg_r',govB);
+
+  Object.assign(lastCalc,{curC,curS,fck:c.fck,fcd,fyk:s.fyk,fyd,sq,wallType,muf,
+    lw,bw0,bf,cnom,ved,ned,Acw,scp,vRdmaxA,vRdmaxB,Ash,vRdsA,vsB1,vsB2,vRdsB,
+    asvb,nbb,obb,lweb,AsvWeb,vRdiWeb,vRdiBulb,govA,govB,
+    oh:gv('oh'),sh:gv('sh'),nr:gv('nr'),ss:gv('ss'),loswi:gv('loswi'),
+    oswp:gv('oswp'),nswp:gv('nswp'),oswi:gv('oswi'),nei:gv('nei'),nswi:gv('nswi'),
+    ol:gv('ol'),sl:gv('sl'),nrl:gv('nrl')});
+}
+
+function generatePdf(){
+  const btn=document.getElementById('rptBtn'),status=document.getElementById('rptStatus');
+  if(typeof window.jspdf==='undefined'){status.textContent='Libraria PDF se incarca... incearca din nou.';return;}
+  btn.disabled=true;btn.textContent='Se genereaza...';
+  try{buildPdf();status.textContent='Raport descarcat.';}catch(e){status.textContent='Eroare la generare.';console.error(e);}
+  btn.disabled=false;btn.textContent='Descarca PDF';setTimeout(()=>status.textContent='',4000);
+}
+function buildPdf(){
+  const{jsPDF}=window.jspdf;const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+  const d=lastCalc;const pW=210,ml=15,mr=15,cw=pW-ml-mr;
+  const ds=new Date().toLocaleDateString('ro-RO');let y=0;
+  function hdr(){doc.setFillColor(28,28,30);doc.rect(0,0,210,14,'F');doc.setTextColor(255,255,255);doc.setFontSize(11);doc.setFont('helvetica','bold');doc.text('NOTA DE CALCUL - FORTA TAIETOARE',ml,9);doc.setFontSize(8);doc.setFont('helvetica','normal');doc.text('CR 2-1-1.1/2022 / SR EN 1992-1-1',ml,13);doc.text('Data: '+ds,pW-mr,13,{align:'right'});doc.setTextColor(0,0,0);y=20;}
+  function cy(n=10){if(y+n>275){doc.addPage();hdr();}}
+  function sT(t){cy(12);doc.setFillColor(235,243,252);doc.rect(ml,y-4,cw,8,'F');doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor(0,102,204);doc.text(t,ml+2,y+1);doc.setTextColor(0,0,0);doc.setFont('helvetica','normal');y+=8;}
+  function row(l,f,v,h){cy(6);doc.setFontSize(8.5);doc.setFont('helvetica','normal');doc.setTextColor(80,80,80);doc.text(l,ml,y);if(f){doc.setTextColor(140,140,140);doc.setFontSize(7.5);doc.text(f,ml+78,y);}doc.setFontSize(9);doc.setFont('helvetica','bold');if(h)doc.setTextColor(0,102,204);else doc.setTextColor(0,0,0);doc.text(v,pW-mr,y,{align:'right'});doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);y+=5.5;}
+  function hl(){cy(3);doc.setDrawColor(225,225,230);doc.line(ml,y,ml+cw,y);y+=3;}
+  hdr();
+  doc.setFontSize(18);doc.setFont('helvetica','bold');doc.setTextColor(28,28,30);doc.text('Capacitatea la forta taietoare',pW/2,46,{align:'center'});
+  doc.setFontSize(11);doc.setFont('helvetica','normal');doc.setTextColor(90,90,90);doc.text('Verificarea capacitatii la forfecare a peretilor structurali',pW/2,56,{align:'center'});doc.text('conform CR 2-1-1.1/2022 si SR EN 1992-1-1',pW/2,62,{align:'center'});
+  doc.setDrawColor(0,102,204);doc.setLineWidth(0.4);doc.line(ml,70,ml+cw,70);y=80;
+
+  const body=[
+    ['Tip perete','-',d.wallType],['Lungimea peretelui','l_w',d.lw+' mm'],['Grosimea inimii','b_w0',d.bw0+' mm'],
+    ['Lungimea bulbului','b_f',d.bf+' mm'],['Acoperire cu beton','c_nom',d.cnom+' mm'],
+    ['Clasa beton','-',d.curC],['Rezistenta de calcul beton','f_cd',d.fcd.toFixed(2)+' MPa'],
+    ['Clasa otel','-',d.curS],['Rezistenta de calcul otel','f_yd',d.fyd.toFixed(1)+' MPa']];
+  if(d.wallType==='Bulb+inima'){
+    body.push(['Diametru armatura orizontala','O_h',d.oh+' mm'],['Pas armatura orizontala','s_h',d.sh+' mm'],['Nr. randuri orizontale','n_r',''+d.nr]);
+  }else{
+    body.push(['Pas etrieri capat','s',d.ss+' mm'],
+      ['Diametru etrier perimetral','O_sw,p',d.oswp+' mm'],['Nr. ramuri perimetral','n_p',''+d.nswp],['Lungime ramura perimetral','l_Osw,p',d.vsDetail.loswp.toFixed(0)+' mm'],
+      ['Diametru etrier intermediar','O_sw',d.oswi+' mm'],['Lungime ramura intermediar','l_Osw,i',d.loswi+' mm'],['Nr. etrieri intermediari','buc',''+d.nei],['Nr. ramuri / etrier interm','n_i',''+d.nswi]);
+  }
+  body.push(['Diametru armatura verticala','O_l',d.ol+' mm'],['Pas armatura verticala','s_l',d.sl+' mm'],['Nr. randuri verticale','n_rl',''+d.nrl],
+    ['Diametru bare bulb','O_b',d.obb+' mm'],['Nr. bare bulb','buc',''+d.nbb],
+    ['Coeficient de frecare','mu_f',d.muf.toFixed(1)],['Forta taietoare','V_Ed',d.ved+' kN'],['Forta axiala','N_Ed',d.ned+' kN']);
+
+  sT('1. DATE DE INTRARE');
+  doc.autoTable({startY:y,head:[['Parametru','Notatie','Valoare']],body,margin:{left:ml,right:mr},tableWidth:cw,headStyles:{fillColor:[28,28,30],textColor:255,fontSize:8.5,fontStyle:'bold'},bodyStyles:{fontSize:8.5},alternateRowStyles:{fillColor:[245,247,250]},columnStyles:{0:{cellWidth:95},1:{cellWidth:35,fontStyle:'italic'},2:{halign:'right'}}});
+  y=doc.lastAutoTable.finalY+6;
+
+  cy(16);sT('2. MARIMI DE BAZA');
+  row('Aria inimii','A_cw = l_w * b_w0',d.Acw.toLocaleString('ro-RO')+' mm2',true);
+  row('Tensiunea medie de compresiune','sigma_cp = N_Ed/A_cw',d.scp.toFixed(3)+' MPa');
+  if(d.wallType!=='Bulb')row('Lungimea inimii','l_web',d.lweb.toFixed(0)+' mm');hl();
+
+  cy(22);sT('3. V.Rd.max - REZISTENTA MAXIMA A SECTIUNII');doc.setFontSize(8);doc.setTextColor(130,130,130);doc.setFont('helvetica','italic');doc.text('Zona A: 0.67*A_cw*sqrt(f_cd)     Zona B: 0.80*A_cw*sqrt(f_cd)',ml,y);doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);y+=6;
+  row('V_Rd.max - Zona A (critica)','',d.vRdmaxA.toFixed(1)+' kN',true);
+  row('V_Rd.max - Zona B (non-critica)','',d.vRdmaxB.toFixed(1)+' kN',true);
+  row('Verificare V_Ed/V_Rd.max - Zona A','',(d.ved/d.vRdmaxA*100).toFixed(1)+' %');
+  row('Verificare V_Ed/V_Rd.max - Zona B','',(d.ved/d.vRdmaxB*100).toFixed(1)+' %');hl();
+
+  cy(30);sT('4. V.Rd.s - REZISTENTA DATA DE ARMATURA ORIZONTALA');
+  const vd=d.vsDetail;
+  doc.setFontSize(8);doc.setTextColor(130,130,130);doc.setFont('helvetica','italic');
+  doc.text(d.wallType==='Bulb'?'Zona A: V_Rd.s = (A_sh,perim + A_sh,interm) * f_yd,h':'Zona A: V_Rd.s = A_sh,web * f_yd,h',ml,y);
+  doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);y+=6;
+  if(vd.mode==='web'){
+    row('Bare orizontale taiate','n = n_r*l_w/s_h',vd.barsCut.toFixed(1)+' buc');
+    row('Aria barelor taiate','A_sh,web',vd.AshWeb.toFixed(1)+' mm2');
+  }else{
+    row('Etrier perimetral - ramuri taiate','n_p*l_Osw,p/s',vd.cutP.toFixed(1)+' buc');
+    row('Aria perimetral','A_sh,perim',vd.AshP.toFixed(1)+' mm2');
+    row('Etrieri interm - ramuri taiate','buc*n_i*l_Osw,i/s',vd.cutI.toFixed(1)+' buc');
+    row('Aria intermediari','A_sh,interm',vd.AshI.toFixed(1)+' mm2');
+  }
+  row('Aria totala armatura orizontala','A_sh',d.Ash.toFixed(1)+' mm2');
+  row('V_Rd.s - Zona A','',d.vRdsA.toFixed(1)+' kN',true);
+  row('Verificare V_Ed/V_Rd.s - Zona A','',(d.ved/d.vRdsA*100).toFixed(1)+' %');hl();
+  doc.setFontSize(8);doc.setTextColor(130,130,130);doc.setFont('helvetica','italic');doc.text('Zona B: V_Rd.s = 0.5*sigma_cp*A_cw + Sum(A_sh)*f_yd,h',ml,y);doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);y+=6;
+  row('Contributie beton','0.5*sigma_cp*A_cw',d.vsB1.toFixed(1)+' kN');
+  row('Contributie armatura','Sum(A_sh)*f_yd',d.vsB2.toFixed(1)+' kN');
+  row('V_Rd.s - Zona B','',d.vRdsB.toFixed(1)+' kN',true);
+  row('Verificare V_Ed/V_Rd.s - Zona B','',(d.ved/d.vRdsB*100).toFixed(1)+' %');hl();
+
+  cy(26);sT('5. V.Rd.i - REZISTENTA LA LUNECARE IN ROST');doc.setFontSize(8);doc.setTextColor(130,130,130);doc.setFont('helvetica','italic');doc.text('V_Rd = mu_f * (Sum A_sv * f_yd,v + N_Ed)',ml,y);doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);y+=6;
+  row('Aria armatura verticala inima','A_sv,web',d.AsvWeb.toFixed(1)+' mm2');
+  row('Aria armatura verticala bulb','A_sv,bulb ('+d.nbb+'O'+d.obb+')',d.asvb.toFixed(1)+' mm2');
+  row('Coeficient de frecare','mu_f',d.muf.toFixed(1));
+  row('V_Rd.i (numai inima)','',d.vRdiWeb.toFixed(1)+' kN');
+  row('V_Rd.i (inima + bulb intins)','',d.vRdiBulb.toFixed(1)+' kN',true);
+  row('Verificare V_Ed/V_Rd.i','',(d.ved/d.vRdiBulb*100).toFixed(1)+' %');hl();
+
+  cy(20);sT('6. VERDICT CAPACITATE LA FORFECARE');
+  row('V_Rd guvernant - Zona A','min(V_Rd.max, V_Rd.s, V_Rd.i)',d.govA.toFixed(1)+' kN',true);
+  row('Stare - Zona A','',d.ved<=d.govA?'VERIFICAT':'INSUFICIENT');
+  row('V_Rd guvernant - Zona B','min(V_Rd.max, V_Rd.s, V_Rd.i)',d.govB.toFixed(1)+' kN',true);
+  row('Stare - Zona B','',d.ved<=d.govB?'VERIFICAT':'INSUFICIENT');hl();
+
+  const tp=doc.internal.getNumberOfPages();
+  for(let i=1;i<=tp;i++){doc.setPage(i);doc.setFontSize(7.5);doc.setTextColor(150,150,150);doc.setFont('helvetica','normal');doc.line(ml,285,ml+cw,285);doc.text('CR 2-1-1.1/2022 / SR EN 1992-1-1',ml,289);doc.text('Pagina '+i+' din '+tp,pW-mr,289,{align:'right'});doc.text('Generat: '+ds,pW/2,289,{align:'center'});}
+  doc.save('Raport_forta_taietoare.pdf');
+}
+
+updMat();setWall('Bulb');
+</script>

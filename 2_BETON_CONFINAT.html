@@ -1,0 +1,593 @@
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1C1E}
+
+
+
+
+
+.wrap{max-width:1080px;margin:0 auto;padding:20px 16px}
+.cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+.slabel{font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:#1C1C1E;padding:0 0 7px;margin-top:14px}
+.slabel:first-child{margin-top:0}
+.ip{background:#EFEFEF;border:1px solid #DCDCE0;border-radius:12px;overflow:hidden;margin-bottom:13px}
+.op{background:#fff;border:1px solid #DCDCE0;border-radius:12px;overflow:hidden;margin-bottom:13px}
+.ph{padding:12px 15px 0;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:#1C1C1E}
+.pb{padding:8px 15px 14px}
+.row{display:flex;align-items:center;padding:7px 0;border-bottom:1px solid #E0E0E5;gap:8px}
+.row:last-child{border-bottom:none}
+.rl{flex:1;font-size:13px;color:#1C1C1E;min-width:0}
+.rn{font-size:12px;color:#8E8E93;margin-left:4px}
+.rc{display:flex;align-items:center;gap:5px;flex-shrink:0}
+.rc input[type=number]{width:78px;padding:5px 8px;font-size:13px;border:1px solid #C7C7CC;border-radius:7px;background:#fff;color:#1C1C1E;font-family:'Inter',sans-serif;-moz-appearance:textfield;appearance:textfield;text-align:right}
+.rc input[type=number]::-webkit-inner-spin-button,.rc input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.rc input:focus{outline:none;box-shadow:0 0 0 2px rgba(0,122,255,.2);border-color:#007AFF}
+.ru{font-size:12px;color:#8E8E93;min-width:26px}
+.sel-field{margin-bottom:10px}
+.sel-field label{display:block;font-size:12px;color:#8E8E93;margin-bottom:5px;font-weight:500}
+.sel-wrap{position:relative}
+.sel-wrap::after{content:'';position:absolute;right:13px;top:50%;width:7px;height:7px;border-right:2px solid #8E8E93;border-bottom:2px solid #8E8E93;transform:translateY(-65%) rotate(45deg);pointer-events:none}
+.sel-field select{width:100%;padding:8px 34px 8px 11px;font-size:13px;border:1px solid #C7C7CC;border-radius:8px;background:#fff;color:#1C1C1E;font-family:'Inter',sans-serif;cursor:pointer;-webkit-appearance:none;appearance:none}
+.sel-field select:focus{outline:none;box-shadow:0 0 0 2px rgba(0,122,255,.2);border-color:#007AFF}
+.mat-vals{display:flex;gap:6px;padding:6px 0 2px}
+.mv{flex:1;text-align:center;background:#E8E8ED;border-radius:7px;padding:8px 4px}
+.mvl{font-size:11px;color:#8E8E93;margin-bottom:2px}
+.mvv{font-size:15px;font-weight:500;color:#1C1C1E}
+.mvu{font-size:11px;color:#8E8E93}
+.sub{font-size:11px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;color:#8E8E93;padding:9px 0 5px}
+.divx{height:1px;background:#E0E0E5;margin:9px 0}
+.res-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.res-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.rc2{background:#F2F2F7;border-radius:8px;padding:10px 12px}
+.rc2.hl{background:#EBF3FF;border:1px solid #B8D4F8}
+.rc2.gr{background:#EAF6EC;border:1px solid #BFE3C6}
+.rl2{font-size:11px;color:#8E8E93;margin-bottom:3px}
+.rv{font-size:19px;font-weight:500;color:#1C1C1E;line-height:1.2}
+.rc2.hl .rv{color:#0066CC}
+.rc2.gr .rv{color:#2E7D32}
+.ru2{font-size:11px;color:#8E8E93}
+.ftag{display:inline-flex;align-items:center;padding:3px 11px;border-radius:20px;font-size:12px;font-weight:500;margin-bottom:9px}
+.f1{background:#E8F5E9;color:#2E7D32}.f2{background:#FFF3E0;color:#E65100}
+.alfa-box{background:#F2F2F7;border-radius:8px;padding:10px 13px}
+.ar{display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:13px;border-bottom:1px solid #E5E5EA}
+.ar:last-child{border-bottom:none}
+.al{color:#8E8E93}
+.av{font-weight:500;font-size:14px;color:#1C1C1E}
+.ar.tot .al{color:#1C1C1E;font-weight:500;font-size:14px}
+.ar.tot .av{font-size:17px;color:#0066CC;font-weight:500}
+.bi-info{background:#F2F2F7;border-radius:8px;padding:10px 13px;font-size:12px;color:#8E8E93}
+.bi-info table{width:100%;border-collapse:collapse;margin-top:6px}
+.bi-info td{padding:2px 4px;font-size:12px;color:#1C1C1E}
+.bi-info td:first-child{color:#8E8E93;width:36px}
+.bi-info td:last-child{text-align:right;color:#8E8E93}
+.toggle-row{display:flex;align-items:center;gap:10px;padding:4px 0 10px;border-bottom:1px solid #E0E0E5;margin-bottom:8px}
+.toggle-row span{font-size:12px;color:#1C1C1E;flex:1}
+.seg{display:inline-flex;background:#E0E0E5;border-radius:8px;padding:2px;gap:2px}
+.seg button{padding:5px 12px;font-size:12px;font-weight:500;border:none;border-radius:6px;background:transparent;color:#8E8E93;cursor:pointer;font-family:'Inter',sans-serif;transition:all .12s}
+.seg button.on{background:#fff;color:#1C1C1E;box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.man-tbl{width:100%;border-collapse:collapse;margin-top:4px}
+.man-tbl th{font-size:10px;font-weight:500;letter-spacing:.04em;text-transform:uppercase;color:#8E8E93;padding:4px 5px;border-bottom:1px solid #E5E5EA;text-align:left}
+.man-tbl th:nth-child(n+2){text-align:right}
+.man-tbl td{padding:3px 4px;border-bottom:1px solid #F0F0F5;font-size:12px;color:#1C1C1E}
+.man-tbl tr:last-child td{border-bottom:none}
+.man-tbl td.sym{font-style:italic;color:#8E8E93;padding-left:5px}
+.man-tbl td:nth-child(n+2){text-align:right}
+.man-tbl input{width:64px;padding:5px 7px;font-size:13px;border:1px solid #C7C7CC;border-radius:5px;background:#fff;color:#1C1C1E;font-family:'Inter',sans-serif;-moz-appearance:textfield;appearance:textfield;text-align:right}
+.man-tbl input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.man-tbl input:focus{outline:none;box-shadow:0 0 0 2px rgba(0,122,255,.2);border-color:#007AFF}
+.man-tbl .mono{font-family:ui-monospace,monospace;color:#8E8E93}
+.bi-sel-wrap{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.bi-sel-wrap label{font-size:11px;color:#8E8E93}
+.bi-sel-wrap select{padding:5px 8px;font-size:13px;border:1px solid #C7C7CC;border-radius:6px;background:#fff;color:#1C1C1E;font-family:'Inter',sans-serif;cursor:pointer}
+.cleg{display:flex;gap:14px;margin-bottom:6px;font-size:12px;color:#1C1C1E;flex-wrap:wrap}
+.cleg span{display:flex;align-items:center;gap:4px}
+.report-bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.report-lbl{font-size:13px;color:#1C1C1E;flex:1;min-width:120px}
+.report-btn{padding:11px 18px;font-size:14px;font-weight:500;font-family:'Inter',sans-serif;border:none;border-radius:10px;background:#1C1C1E;color:#fff;cursor:pointer;transition:opacity .15s}
+.report-btn:active{opacity:.7}
+.report-btn:disabled{opacity:.4}
+.report-status{font-size:12px;color:#8E8E93;text-align:center;padding:6px 0 0;min-height:16px}
+@media(max-width:680px){.wrap{padding:14px 10px}.cols{grid-template-columns:1fr;gap:0}.report-btn{width:100%}}
+.back-btn{display:inline-flex;align-items:center;gap:5px;font-family:'Inter',sans-serif;font-size:12px;font-weight:500;color:#8E8E93;background:transparent;border:none;cursor:pointer;padding:10px 16px;text-decoration:none;line-height:1}
+.back-btn svg{width:14px;height:14px;stroke:#8E8E93;stroke-width:2.5;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.back-btn:hover{color:#1C1C1E}
+.back-btn:hover svg{stroke:#1C1C1E}
+</style>
+
+<a href="index.html" class="back-btn"><svg viewBox="0 0 16 16"><polyline points="10,3 4,8 10,13"/></svg>Toate modulele</a>
+</div>
+
+<div class="wrap">
+<div class="cols">
+<div>
+  <div class="slabel">Intrari</div>
+
+  <div class="ip">
+    <div class="ph">Geometrie</div>
+    <div class="pb">
+      <div class="row"><div class="rl">Lungimea peretelui <span class="rn">(b)</span></div><div class="rc"><input type="number" inputmode="numeric" id="b" value="1300" min="100" step="10" oninput="calc()"><span class="ru">mm</span></div></div>
+      <div class="row"><div class="rl">Grosimea peretelui <span class="rn">(h)</span></div><div class="rc"><input type="number" inputmode="numeric" id="h" value="300" min="50" step="10" oninput="calc()"><span class="ru">mm</span></div></div>
+      <div class="row"><div class="rl">Acoperire cu beton <span class="rn">(c<sub>nom</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="cnom" value="25" min="10" step="5" oninput="calc()"><span class="ru">mm</span></div></div>
+      <div class="row"><div class="rl">Pas etrieri <span class="rn">(s)</span></div><div class="rc"><input type="number" inputmode="numeric" id="s" value="100" min="50" step="10" oninput="calc()"><span class="ru">mm</span></div></div>
+    </div>
+  </div>
+
+  <div class="ip">
+    <div class="ph">Materiale</div>
+    <div class="pb">
+      <div class="sel-field"><label>Clasa beton</label><div class="sel-wrap">
+        <select id="cp" onchange="curC=this.value;updMat();calc()">
+          <option>C12/15</option><option>C16/20</option><option>C20/25</option><option>C25/30</option>
+          <option selected>C30/37</option><option>C35/45</option><option>C40/50</option><option>C45/55</option>
+          <option>C50/60</option><option>C55/67</option><option>C60/75</option>
+        </select></div></div>
+      <div class="sel-field"><label>Clasa otel</label><div class="sel-wrap">
+        <select id="sp" onchange="curS=this.value;updMat();calc()">
+          <option>S240B</option><option>S400B</option><option>S500B</option><option selected>S 500</option>
+        </select></div></div>
+      <div class="mat-vals">
+        <div class="mv"><div class="mvl">f<sub>ck</sub></div><div class="mvv" id="fck_d">30</div><div class="mvu">MPa</div></div>
+        <div class="mv"><div class="mvl">f<sub>cd</sub></div><div class="mvv" id="fcd_d">20.00</div><div class="mvu">MPa</div></div>
+        <div class="mv"><div class="mvl">f<sub>yk</sub></div><div class="mvv" id="fyk_d">500</div><div class="mvu">MPa</div></div>
+        <div class="mv"><div class="mvl">f<sub>yd</sub></div><div class="mvv" id="fyd_d">434.8</div><div class="mvu">MPa</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ip">
+    <div class="ph">Armare transversala - directia X (lungul b)</div>
+    <div class="pb">
+      <div class="sub">Etrieri perimetrali</div>
+      <div class="row"><div class="rl">Diametru <span class="rn">(&Oslash;<sub>sw,p</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="xpd" value="10" min="4" step="2" oninput="calc()"><span class="ru">mm</span></div></div>
+      <div class="row"><div class="rl">Nr. ramuri <span class="rn">(n<sub>p</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="xpn" value="2" min="2" oninput="calc()"></div></div>
+      <div class="sub">Etrieri intermediari</div>
+      <div class="row"><div class="rl">Diametru <span class="rn">(&Oslash;<sub>sw</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="xmd" value="8" min="4" step="2" oninput="calc()"><span class="ru">mm</span></div></div>
+      <div class="row"><div class="rl">Nr. ramuri <span class="rn">(n)</span></div><div class="rc"><input type="number" inputmode="numeric" id="xmn" value="6" min="0" oninput="calc()"></div></div>
+    </div>
+  </div>
+
+  <div class="ip">
+    <div class="ph">Armare transversala - directia Y (lungul h)</div>
+    <div class="pb">
+      <div class="sub">Etrieri perimetrali</div>
+      <div class="row"><div class="rl">Diametru <span class="rn">(&Oslash;<sub>sw,p</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="ypd" value="10" min="4" step="2" oninput="calc()"><span class="ru">mm</span></div></div>
+      <div class="row"><div class="rl">Nr. ramuri <span class="rn">(n<sub>p</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="ypn" value="2" min="2" oninput="calc()"></div></div>
+      <div class="sub">Etrieri intermediari</div>
+      <div class="row"><div class="rl">Diametru <span class="rn">(&Oslash;<sub>sw</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="ymd" value="8" min="4" step="2" oninput="calc()"><span class="ru">mm</span></div></div>
+      <div class="row"><div class="rl">Nr. ramuri <span class="rn">(n)</span></div><div class="rc"><input type="number" inputmode="numeric" id="ymn" value="0" min="0" oninput="calc()"></div></div>
+    </div>
+  </div>
+
+  <div class="ip">
+    <div class="ph">Distante b<sub>i</sub></div>
+    <div class="pb">
+      <div class="toggle-row">
+        <span>Mod de calcul al distantelor</span>
+        <div class="seg">
+          <button id="seg-auto" class="on" onclick="setMode('auto')">Automat</button>
+          <button id="seg-man" onclick="setMode('manual')">Manual</button>
+        </div>
+      </div>
+      <div id="auto-note" style="font-size:12px;color:#8E8E93">Distante egale, calculate automat din numarul de ramuri.</div>
+      <div id="man-x" style="display:none"></div>
+      <div id="man-y" style="display:none;margin-top:10px"></div>
+    </div>
+  </div>
+</div>
+
+<div>
+  <div class="slabel">Rezultate</div>
+
+  <div class="op">
+    <div class="ph">Geometria miezului confinat</div>
+    <div class="pb">
+      <div class="res-grid">
+        <div class="rc2"><div class="rl2">b<sub>0</sub></div><div class="rv" id="b0_r">&mdash;</div><div class="ru2">mm</div></div>
+        <div class="rc2"><div class="rl2">h<sub>0</sub></div><div class="rv" id="h0_r">&mdash;</div><div class="ru2">mm</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="op">
+    <div class="ph">Schita sectiune confinata</div>
+    <div class="pb" style="padding-bottom:10px">
+      <svg id="sketch" viewBox="0 0 420 240" width="100%" style="display:block"></svg>
+    </div>
+  </div>
+
+  <div class="op">
+    <div class="ph">Distante b<sub>i</sub></div>
+    <div class="pb">
+      <div class="res-grid" style="margin-bottom:8px">
+        <div class="rc2"><div class="rl2">b<sub>i</sub> (dir. X)</div><div class="rv" id="bix_r">&mdash;</div><div class="ru2">mm</div></div>
+        <div class="rc2"><div class="rl2">b<sub>i</sub> (dir. Y)</div><div class="rv" id="biy_r">&mdash;</div><div class="ru2">mm</div></div>
+      </div>
+      <div id="bi-detail-x" class="bi-info" style="margin-bottom:8px"></div>
+      <div id="bi-detail-y" class="bi-info"></div>
+    </div>
+  </div>
+
+  <div class="op">
+    <div class="ph">Arii armatura &amp; armare volumetrica</div>
+    <div class="pb">
+      <div class="res-grid" style="margin-bottom:8px">
+        <div class="rc2"><div class="rl2">A<sub>st,perim</sub></div><div class="rv" id="Ap_r">&mdash;</div><div class="ru2">mm&sup2;</div></div>
+        <div class="rc2"><div class="rl2">A<sub>st,interm</sub></div><div class="rv" id="Am_r">&mdash;</div><div class="ru2">mm&sup2;</div></div>
+      </div>
+      <div class="res-grid">
+        <div class="rc2"><div class="rl2">&omega;<sub>wk</sub></div><div class="rv" id="wwk_r">&mdash;</div><div class="ru2">&mdash;</div></div>
+        <div class="rc2"><div class="rl2">&sigma;<sub>2,b</sub></div><div class="rv" id="s2b_r">&mdash;</div><div class="ru2">MPa</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="op">
+    <div class="ph">Factor de eficienta &alpha;</div>
+    <div class="pb">
+      <div class="alfa-box">
+        <div class="ar"><span class="al">&Sigma;(J &middot; b<sub>i</sub>&sup2;)</span><span class="av" id="sumb_r">&mdash;</span></div>
+        <div class="ar"><span class="al">&alpha;<sub>s</sub></span><span class="av" id="alfas_r">&mdash;</span></div>
+        <div class="ar"><span class="al">&alpha;<sub>n</sub></span><span class="av" id="alfan_r">&mdash;</span></div>
+        <div class="ar tot"><span class="al">&alpha; = &alpha;<sub>s</sub> &middot; &alpha;<sub>n</sub></span><span class="av" id="alfa_r">&mdash;</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="op">
+    <div class="ph">Rezistenta betonului confinat</div>
+    <div class="pb">
+      <div id="ftag" class="ftag f2">Formula 2</div>
+      <div class="res-grid-3">
+        <div class="rc2"><div class="rl2">0.05 &middot; f<sub>ck</sub></div><div class="rv" id="chk_r">&mdash;</div><div class="ru2">MPa</div></div>
+        <div class="rc2 hl"><div class="rl2">f<sub>ck,c</sub></div><div class="rv" id="fckc_r">&mdash;</div><div class="ru2">MPa</div></div>
+        <div class="rc2 hl"><div class="rl2">f<sub>cd,c</sub></div><div class="rv" id="fcdc_r">&mdash;</div><div class="ru2">MPa</div></div>
+      </div>
+      <div class="res-grid" style="margin-top:8px">
+        <div class="rc2 gr"><div class="rl2">Crestere f<sub>ck,c</sub> vs f<sub>ck</sub></div><div class="rv" id="inc_r">&mdash;</div><div class="ru2">%</div></div>
+        <div class="rc2"><div class="rl2">f<sub>ck</sub> neconfinat</div><div class="rv" id="fckref_r">&mdash;</div><div class="ru2">MPa</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="op">
+    <div class="ph">Deformatii specifice</div>
+    <div class="pb">
+      <div class="res-grid" style="margin-bottom:8px">
+        <div class="rc2"><div class="rl2">&epsilon;<sub>c2,c</sub> (confinat)</div><div class="rv" id="ec2c_r">&mdash;</div><div class="ru2">&permil;</div></div>
+        <div class="rc2"><div class="rl2">&epsilon;<sub>cu2,c</sub> (confinat)</div><div class="rv" id="ecu2c_r">&mdash;</div><div class="ru2">&permil;</div></div>
+      </div>
+      <div class="res-grid" style="margin-bottom:8px">
+        <div class="rc2"><div class="rl2">&epsilon;<sub>c2</sub> (neconfinat)</div><div class="rv" id="ec2_r">&mdash;</div><div class="ru2">&permil;</div></div>
+        <div class="rc2"><div class="rl2">&epsilon;<sub>cu2</sub> (neconfinat)</div><div class="rv" id="ecu2_r">3.50</div><div class="ru2">&permil;</div></div>
+      </div>
+      <div class="res-grid">
+        <div class="rc2 gr"><div class="rl2">Crestere &epsilon;<sub>c2,c</sub></div><div class="rv" id="inc_ec2_r">&mdash;</div><div class="ru2">%</div></div>
+        <div class="rc2 gr"><div class="rl2">Crestere &epsilon;<sub>cu2,c</sub> (ductilitate)</div><div class="rv" id="inc_ecu2_r">&mdash;</div><div class="ru2">&times;</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="op">
+    <div class="ph">Diagrama &sigma;&ndash;&epsilon;</div>
+    <div class="pb">
+      <div class="cleg" id="cleg"></div>
+      <div style="position:relative;width:100%;height:230px"><canvas id="sc"></canvas></div>
+    </div>
+  </div>
+
+  <div class="op">
+    <div class="pb">
+      <div class="report-bar">
+        <span class="report-lbl">Export raport de calcul (PDF)</span>
+        <button class="report-btn" id="rptBtn" onclick="generatePdf()">Descarca PDF</button>
+      </div>
+      <div class="report-status" id="rptStatus"></div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
+<script>
+const CONC={'C12/15':{fck:12,fcd:8,ec2:0.002},'C16/20':{fck:16,fcd:10.67,ec2:0.002},'C20/25':{fck:20,fcd:13.33,ec2:0.002},'C25/30':{fck:25,fcd:16.67,ec2:0.002},'C30/37':{fck:30,fcd:20,ec2:0.002},'C35/45':{fck:35,fcd:23.33,ec2:0.002},'C40/50':{fck:40,fcd:26.67,ec2:0.002},'C45/55':{fck:45,fcd:30,ec2:0.002},'C50/60':{fck:50,fcd:33.33,ec2:0.002},'C55/67':{fck:55,fcd:36.67,ec2:0.0022},'C60/75':{fck:60,fcd:40,ec2:0.0023}};
+const STEEL={'S240B':{fyk:240,fyd:208.7},'S400B':{fyk:400,fyd:347.8},'S500B':{fyk:500,fyd:434.8},'S 500':{fyk:500,fyd:434.8}};
+let curC='C30/37',curS='S 500',chart=null,lastCalc={},biMode='auto';
+let manX={n:7,vals:[]},manY={n:0,vals:[]};
+
+function updMat(){
+  const c=CONC[curC],s=STEEL[curS];
+  document.getElementById('fck_d').textContent=c.fck;
+  document.getElementById('fcd_d').textContent=c.fcd.toFixed(2);
+  document.getElementById('fyk_d').textContent=s.fyk;
+  document.getElementById('fyd_d').textContent=s.fyd.toFixed(1);
+}
+function gv(id){return parseFloat(document.getElementById(id)?.value)||0;}
+
+function setMode(m){
+  biMode=m;
+  document.getElementById('seg-auto').classList.toggle('on',m==='auto');
+  document.getElementById('seg-man').classList.toggle('on',m==='manual');
+  document.getElementById('auto-note').style.display=m==='auto'?'block':'none';
+  document.getElementById('man-x').style.display=m==='manual'?'block':'none';
+  document.getElementById('man-y').style.display=m==='manual'?'block':'none';
+  if(m==='manual') buildManual();
+  calc();
+}
+
+function buildManual(){
+  const b=gv('b'),h=gv('h'),cnom=gv('cnom'),xpd=gv('xpd'),ypd=gv('ypd');
+  const b0=b-2*cnom-xpd,h0=h-2*cnom-ypd;
+  const nX=gv('xpn')+gv('xmn'), nY=gv('ypn')+gv('ymn');
+  const ndX=nX>1?nX-1:1, ndY=nY>1?nY-1:1;
+  if(!manX.vals.length||manX.n!==ndX){manX.n=ndX;manX.vals=Array(ndX).fill(+(b0/ndX).toFixed(1));}
+  if(!manY.vals.length||manY.n!==ndY){manY.n=ndY;manY.vals=nY>1?Array(ndY).fill(+(h0/ndY).toFixed(1)):[];}
+  renderManual('x',manX,'X');
+  renderManual('y',manY,'Y');
+}
+
+// Rebuild table structure ONLY (when count changes). Does not run on keystroke.
+function renderManual(dir,obj,letter){
+  const el=document.getElementById('man-'+dir);
+  const maxN=dir==='x'?10:6;
+  let h=`<div class="bi-sel-wrap"><label>Distante b<sub>i</sub> directia ${letter}</label><select onchange="setN('${dir}',this.value)">`;
+  for(let i=0;i<=maxN;i++) h+=`<option value="${i}" ${i===obj.n?'selected':''}>${i}</option>`;
+  h+=`</select></div>`;
+  if(obj.n>0){
+    h+=`<table class="man-tbl"><thead><tr><th></th><th>b<sub>i</sub> (mm)</th><th>J</th><th>J&middot;b<sub>i</sub>&sup2;</th></tr></thead><tbody>`;
+    for(let i=0;i<obj.n;i++){
+      const v=obj.vals[i]!==undefined?obj.vals[i]:0;
+      h+=`<tr><td class="sym">b<sub>${i+1}</sub></td><td><input type="number" inputmode="numeric" id="man_${dir}_${i}" value="${v}" oninput="setVal('${dir}',${i},this.value)"></td><td>2</td><td class="mono" id="sq_${dir}_${i}">${(2*v*v).toFixed(0)}</td></tr>`;
+    }
+    h+=`</tbody></table>`;
+  }
+  el.innerHTML=h;
+}
+function setN(dir,n){
+  n=parseInt(n)||0;
+  const obj=dir==='x'?manX:manY;
+  const old=obj.vals.slice();
+  obj.n=n;obj.vals=Array(n).fill(0).map((_,i)=>old[i]!==undefined?old[i]:0);
+  renderManual(dir,obj,dir==='x'?'X':'Y');
+  calc();
+}
+// KEY FIX: on typing, only update the data + the J*bi2 cell. NO table rebuild.
+function setVal(dir,i,v){
+  const obj=dir==='x'?manX:manY;
+  obj.vals[i]=parseFloat(v)||0;
+  const sqEl=document.getElementById(`sq_${dir}_${i}`);
+  if(sqEl) sqEl.textContent=(2*obj.vals[i]*obj.vals[i]).toFixed(0);
+  calc();
+}
+
+function drawSketch(b,h,cnom,xpd,ypd,b0,h0,biX,biY){
+  const svg=document.getElementById('sketch');
+  const VW=420,VH=240,PL=58,PR=58,PT=54,PB=34;
+  const scl=Math.min((VW-PL-PR)/b,(VH-PT-PB)/h);
+  const rw=b*scl,rh=h*scl;
+  const ox=(VW-rw)/2,oy=PT;
+  const blue='#0066CC',dark='#1C1C1E',dim='#AEAEB2',lbl='#6C6C70';
+  const barR=3.2;
+  const axaX=(cnom+xpd/2)*scl,axaY=(cnom+ypd/2)*scl;
+  const ex=ox+axaX,ey=oy+axaY,ew=rw-2*axaX,eh=rh-2*axaY;
+  let o='';
+  o+=`<rect x="${ox}" y="${oy}" width="${rw}" height="${rh}" fill="#E8E8ED" stroke="#C7C7CC" stroke-width="0.8" rx="1"/>`;
+  o+=`<rect x="${ex}" y="${ey}" width="${ew}" height="${eh}" fill="#DDEEFF" stroke="${dark}" stroke-width="1.8" rx="1"/>`;
+  const totX=biX.reduce((a,v)=>a+v,0)||1;
+  const posX=[ex];let cum=0;
+  for(let i=0;i<biX.length-1;i++){cum+=biX[i];posX.push(ex+(cum/totX)*ew);}
+  posX.push(ex+ew);
+  posX.forEach((xp,i)=>{
+    o+=`<circle cx="${xp}" cy="${ey}" r="${barR}" fill="${blue}" stroke="#fff" stroke-width="0.8"/>`;
+    o+=`<circle cx="${xp}" cy="${ey+eh}" r="${barR}" fill="${blue}" stroke="#fff" stroke-width="0.8"/>`;
+    if(i>0&&i<posX.length-1) o+=`<line x1="${xp}" y1="${ey}" x2="${xp}" y2="${ey+eh}" stroke="${dark}" stroke-width="0.8" stroke-dasharray="3,2.5" opacity="0.4"/>`;
+  });
+  biX.forEach((dd,i)=>{
+    const mx=(posX[i]+posX[i+1])/2;
+    o+=`<line x1="${posX[i]+1}" y1="${ey-13}" x2="${posX[i+1]-1}" y2="${ey-13}" stroke="${dim}" stroke-width="0.5"/>`;
+    o+=`<line x1="${posX[i]+1}" y1="${ey-15}" x2="${posX[i]+1}" y2="${ey-11}" stroke="${dim}" stroke-width="0.5"/>`;
+    o+=`<line x1="${posX[i+1]-1}" y1="${ey-15}" x2="${posX[i+1]-1}" y2="${ey-11}" stroke="${dim}" stroke-width="0.5"/>`;
+    o+=`<text x="${mx}" y="${ey-17}" text-anchor="middle" font-size="8" fill="${lbl}" font-family="Inter,sans-serif">b${i+1}</text>`;
+  });
+  const totY=biY.reduce((a,v)=>a+v,0)||1;
+  const posY=[ey];let cumY=0;
+  for(let i=0;i<biY.length-1;i++){cumY+=biY[i];posY.push(ey+(cumY/totY)*eh);}
+  posY.push(ey+eh);
+  posY.forEach((yp,i)=>{
+    o+=`<circle cx="${ex}" cy="${yp}" r="${barR}" fill="${blue}" stroke="#fff" stroke-width="0.8"/>`;
+    o+=`<circle cx="${ex+ew}" cy="${yp}" r="${barR}" fill="${blue}" stroke="#fff" stroke-width="0.8"/>`;
+    if(i>0&&i<posY.length-1) o+=`<line x1="${ex}" y1="${yp}" x2="${ex+ew}" y2="${yp}" stroke="${dark}" stroke-width="0.8" stroke-dasharray="3,2.5" opacity="0.4"/>`;
+  });
+  if(biY.length>1){
+    biY.forEach((dd,i)=>{
+      const my=(posY[i]+posY[i+1])/2;
+      o+=`<text x="${ex+ew+14}" y="${my}" text-anchor="middle" font-size="8" fill="${lbl}" font-family="Inter,sans-serif" transform="rotate(-90,${ex+ew+14},${my})">b${i+1}</text>`;
+    });
+  }
+  o+=`<line x1="${ox}" y1="${oy+rh+15}" x2="${ox+rw}" y2="${oy+rh+15}" stroke="${dim}" stroke-width="0.7"/>`;
+  o+=`<line x1="${ox}" y1="${oy+rh+13}" x2="${ox}" y2="${oy+rh+17}" stroke="${dim}" stroke-width="0.7"/>`;
+  o+=`<line x1="${ox+rw}" y1="${oy+rh+13}" x2="${ox+rw}" y2="${oy+rh+17}" stroke="${dim}" stroke-width="0.7"/>`;
+  o+=`<text x="${ox+rw/2}" y="${oy+rh+26}" text-anchor="middle" font-size="8" fill="${lbl}" font-family="Inter,sans-serif">b = ${b} mm</text>`;
+  o+=`<line x1="${ox-16}" y1="${oy}" x2="${ox-16}" y2="${oy+rh}" stroke="${dim}" stroke-width="0.7"/>`;
+  o+=`<line x1="${ox-18}" y1="${oy}" x2="${ox-14}" y2="${oy}" stroke="${dim}" stroke-width="0.7"/>`;
+  o+=`<line x1="${ox-18}" y1="${oy+rh}" x2="${ox-14}" y2="${oy+rh}" stroke="${dim}" stroke-width="0.7"/>`;
+  o+=`<text x="${ox-28}" y="${oy+rh/2}" text-anchor="middle" font-size="8" fill="${lbl}" font-family="Inter,sans-serif" transform="rotate(-90,${ox-28},${oy+rh/2})">h = ${h} mm</text>`;
+  const b0y=oy-26;
+  o+=`<line x1="${ex}" y1="${b0y}" x2="${ex+ew}" y2="${b0y}" stroke="${blue}" stroke-width="0.8"/>`;
+  o+=`<line x1="${ex}" y1="${b0y-3}" x2="${ex}" y2="${b0y+3}" stroke="${blue}" stroke-width="0.8"/>`;
+  o+=`<line x1="${ex+ew}" y1="${b0y-3}" x2="${ex+ew}" y2="${b0y+3}" stroke="${blue}" stroke-width="0.8"/>`;
+  o+=`<text x="${ex+ew/2}" y="${b0y-4}" text-anchor="middle" font-size="8.5" fill="${blue}" font-family="Inter,sans-serif" font-weight="500">b0 = ${b0} mm</text>`;
+  const h0x=ex+ew+(biY.length>1?30:16);
+  o+=`<line x1="${h0x}" y1="${ey}" x2="${h0x}" y2="${ey+eh}" stroke="${blue}" stroke-width="0.8"/>`;
+  o+=`<line x1="${h0x-3}" y1="${ey}" x2="${h0x+3}" y2="${ey}" stroke="${blue}" stroke-width="0.8"/>`;
+  o+=`<line x1="${h0x-3}" y1="${ey+eh}" x2="${h0x+3}" y2="${ey+eh}" stroke="${blue}" stroke-width="0.8"/>`;
+  o+=`<text x="${h0x+9}" y="${ey+eh/2}" text-anchor="middle" font-size="8.5" fill="${blue}" font-family="Inter,sans-serif" font-weight="500" transform="rotate(-90,${h0x+9},${ey+eh/2})">h0 = ${h0} mm</text>`;
+  svg.innerHTML=o;
+}
+
+function calc(){
+  const b=gv('b'),h=gv('h'),cnom=gv('cnom'),s=gv('s');
+  const c=CONC[curC],st=STEEL[curS];
+  const fck=c.fck,fcd=c.fcd,ec2=c.ec2,fyk=st.fyk,fyd=st.fyd;
+  const xpd=gv('xpd'),xpn=gv('xpn'),xmd=gv('xmd'),xmn=gv('xmn');
+  const ypd=gv('ypd'),ypn=gv('ypn'),ymd=gv('ymd'),ymn=gv('ymn');
+  const b0=b-2*cnom-xpd, h0=h-2*cnom-ypd;
+  document.getElementById('b0_r').textContent=b0.toFixed(0);
+  document.getElementById('h0_r').textContent=h0.toFixed(0);
+  const nX=xpn+xmn, nY=ypn+ymn;
+  let biX,biY;
+  if(biMode==='auto'){
+    const biX_val=nX>1?b0/(nX-1):b0;
+    const biY_val=nY>1?h0/(nY-1):h0;
+    biX=Array(nX>1?nX-1:1).fill(biX_val);
+    biY=nY>1?Array(nY-1).fill(biY_val):[];
+    document.getElementById('bix_r').textContent=biX_val.toFixed(1);
+    document.getElementById('biy_r').textContent=nY>1?biY_val.toFixed(1):'\u2014';
+  } else {
+    biX=manX.vals.slice(0,manX.n).map(v=>v||0);
+    biY=manY.vals.slice(0,manY.n).map(v=>v||0);
+    document.getElementById('bix_r').textContent=biX.length?'man.':'\u2014';
+    document.getElementById('biy_r').textContent=biY.length?'man.':'\u2014';
+  }
+  let tbx=`<div style="font-size:11px;color:#8E8E93;margin-bottom:4px">Directia X &mdash; ${biX.length} distante${biMode==='auto'?' egale':' (manual)'}</div><table>`;
+  biX.forEach((v,i)=>tbx+=`<tr><td>b<sub>${i+1}</sub></td><td>${v.toFixed(1)} mm</td><td>J = 2</td></tr>`);
+  document.getElementById('bi-detail-x').innerHTML=tbx+`</table>`;
+  const dyEl=document.getElementById('bi-detail-y');
+  if(biY.length){
+    let tby=`<div style="font-size:11px;color:#8E8E93;margin-bottom:4px">Directia Y &mdash; ${biY.length} distante${biMode==='auto'?' egale':' (manual)'}</div><table>`;
+    biY.forEach((v,i)=>tby+=`<tr><td>b<sub>${i+1}</sub></td><td>${v.toFixed(1)} mm</td><td>J = 2</td></tr>`);
+    dyEl.innerHTML=tby+`</table>`;
+  } else dyEl.innerHTML='<div style="font-size:11px;color:#8E8E93">Directia Y &mdash; fara ramuri intermediare</div>';
+
+  const sumb=biX.reduce((a,v)=>a+2*v*v,0)+biY.reduce((a,v)=>a+2*v*v,0);
+  document.getElementById('sumb_r').textContent=sumb.toFixed(0)+' mm\u00B2';
+  const Ap=Math.PI*xpd*xpd/4, Am=Math.PI*xmd*xmd/4;
+  const Ayp=Math.PI*ypd*ypd/4, Aym=Math.PI*ymd*ymd/4;
+  document.getElementById('Ap_r').textContent=Ap.toFixed(2);
+  document.getElementById('Am_r').textContent=Am.toFixed(2);
+  const wwk=(((xpn*Ap+xmn*Am)*b0+(ypn*Ayp+ymn*Aym)*h0)/(s*b0*h0))*(fyk/fck);
+  document.getElementById('wwk_r').textContent=wwk.toFixed(4);
+  const alfa_s=(1-s/(2*b0))*(1-s/(2*h0));
+  const alfa_n=1-sumb/(6*b0*h0);
+  const alfa=alfa_s*alfa_n;
+  document.getElementById('alfas_r').textContent=alfa_s.toFixed(4);
+  document.getElementById('alfan_r').textContent=alfa_n.toFixed(4);
+  document.getElementById('alfa_r').textContent=alfa.toFixed(4);
+  const s2b=0.5*alfa*wwk*fck,chk05=0.05*fck;
+  document.getElementById('s2b_r').textContent=s2b.toFixed(4);
+  document.getElementById('chk_r').textContent=chk05.toFixed(2);
+  const f1=s2b<=chk05;
+  const ft=document.getElementById('ftag');
+  ft.textContent=f1?'Formula 1':'Formula 2';ft.className='ftag '+(f1?'f1':'f2');
+  const fckc=f1?fck*(1+5*(s2b/fck)):fck*(1.125+2.5*(s2b/fck));
+  const fcdc=fckc/1.5,inc=(fckc/fck-1)*100;
+  const ec2c=ec2*(fckc/fck)*(fckc/fck),ecu2c=0.0035+0.2*(s2b/fck);
+  document.getElementById('fckc_r').textContent=fckc.toFixed(2);
+  document.getElementById('fcdc_r').textContent=fcdc.toFixed(2);
+  document.getElementById('inc_r').textContent='+'+inc.toFixed(2);
+  document.getElementById('fckref_r').textContent=fck.toFixed(2);
+  document.getElementById('ec2c_r').textContent=(ec2c*1000).toFixed(4);
+  document.getElementById('ecu2c_r').textContent=(ecu2c*1000).toFixed(4);
+  document.getElementById('ec2_r').textContent=(ec2*1000).toFixed(2);
+  const incEc2=(ec2c/ec2-1)*100;
+  const ratioEcu2=ecu2c/0.0035;
+  document.getElementById('inc_ec2_r').textContent='+'+incEc2.toFixed(1);
+  document.getElementById('inc_ecu2_r').textContent=ratioEcu2.toFixed(2);
+  document.getElementById('cleg').innerHTML=`
+    <span><span style="width:14px;height:0;display:inline-block;border-top:2px dashed #AEAEB2"></span> Neconfinat &mdash; f<sub>ck</sub>=${fck} MPa</span>
+    <span><span style="width:14px;height:2px;display:inline-block;background:#0066CC"></span> Confinat &mdash; f<sub>ck,c</sub>=${fckc.toFixed(2)} MPa</span>`;
+  drawSketch(b,h,cnom,xpd,ypd,b0,h0,biX.length?biX:[b0],biY);
+  drawChart(fck,ec2,fckc,ec2c,ecu2c);
+  lastCalc={b,h,cnom,s,concrete:curC,fck,fcd,ec2,steel:curS,fyk,fyd,
+    xpd,xpn,xmd,xmn,ypd,ypn,ymd,ymn,b0,h0,nX,nY,biMode,biX,biY,
+    sumb,Ast_perim:Ap,Ast_mid:Am,wwk,alfa_s,alfa_n,alfa,s2b,fckc,fcdc,inc,ec2c,ecu2c,incEc2,ratioEcu2,f1};
+}
+
+function sigPts(fck,ec2,ecu2,n){
+  return Array.from({length:n+1},(_,i)=>{const e=i/n*ecu2;return{x:parseFloat((e*1000).toFixed(4)),y:parseFloat((e<=ec2?fck*(1-(1-e/ec2)**2):fck).toFixed(3))};});
+}
+function drawChart(fck,ec2,fckc,ec2c,ecu2c){
+  if(chart){chart.destroy();chart=null;}
+  chart=new Chart(document.getElementById('sc'),{type:'line',
+    data:{datasets:[
+      {label:'Neconfinat',data:sigPts(fck,ec2,0.0035,60),borderColor:'#AEAEB2',borderWidth:1.5,pointRadius:0,tension:0.3,borderDash:[5,4],fill:false},
+      {label:'Confinat',data:sigPts(fckc,ec2c,ecu2c,80),borderColor:'#0066CC',borderWidth:2,pointRadius:0,tension:0.3,fill:false}]},
+    options:{responsive:true,maintainAspectRatio:false,parsing:{xAxisKey:'x',yAxisKey:'y'},
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`${c.dataset.label}: \u03C3=${c.parsed.y.toFixed(1)} MPa, \u03B5=${c.parsed.x.toFixed(2)}\u2030`}}},
+      scales:{x:{type:'linear',title:{display:true,text:'\u03B5 (\u2030)',color:'#1C1C1E',font:{size:12,family:'Inter,sans-serif'}},grid:{color:'rgba(0,0,0,0.05)'},ticks:{color:'#8E8E93',font:{size:11}}},
+        y:{min:0,title:{display:true,text:'\u03C3 (MPa)',color:'#1C1C1E',font:{size:12,family:'Inter,sans-serif'}},grid:{color:'rgba(0,0,0,0.05)'},ticks:{color:'#8E8E93',font:{size:11}}}}}});
+}
+
+function getChartImg(){try{return chart.toBase64Image('image/png',1.0);}catch(e){return null;}}
+function svgToPng(cb){
+  const svg=document.getElementById('sketch');
+  const xml=new XMLSerializer().serializeToString(svg);
+  const img=new Image();
+  const svg64=btoa(unescape(encodeURIComponent('<?xml version="1.0"?>'+xml)));
+  img.onload=function(){const cv=document.createElement('canvas');cv.width=840;cv.height=480;const ctx=cv.getContext('2d');ctx.fillStyle='#FFFFFF';ctx.fillRect(0,0,cv.width,cv.height);ctx.drawImage(img,0,0,cv.width,cv.height);cb(cv.toDataURL('image/png'));};
+  img.onerror=function(){cb(null);};
+  img.src='data:image/svg+xml;base64,'+svg64;
+}
+function generatePdf(){
+  const btn=document.getElementById('rptBtn');const status=document.getElementById('rptStatus');
+  if(typeof window.jspdf==='undefined'){status.textContent='Libraria PDF se incarca... incearca din nou.';return;}
+  btn.disabled=true;btn.textContent='Se genereaza...';
+  const chartImg=getChartImg();
+  svgToPng(function(sketchImg){buildPdf(chartImg,sketchImg);btn.disabled=false;btn.textContent='Descarca PDF';status.textContent='Raport descarcat.';setTimeout(()=>status.textContent='',4000);});
+}
+function buildPdf(chartImg,sketchImg){
+  const{jsPDF}=window.jspdf;
+  const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+  const d=lastCalc;const pW=210,ml=15,mr=15,cw=pW-ml-mr;
+  const ds=new Date().toLocaleDateString('ro-RO');let y=0;
+  function hdr(){doc.setFillColor(28,28,30);doc.rect(0,0,210,14,'F');doc.setTextColor(255,255,255);doc.setFontSize(11);doc.setFont('helvetica','bold');doc.text('NOTA DE CALCUL - BETON CONFINAT',ml,9);doc.setFontSize(8);doc.setFont('helvetica','normal');doc.text('CR 2-2022 / SR EN 1992-1-1',ml,13);doc.text('Data: '+ds,pW-mr,13,{align:'right'});doc.setTextColor(0,0,0);y=20;}
+  function cy(n=10){if(y+n>275){doc.addPage();hdr();}}
+  function sT(t){cy(12);doc.setFillColor(235,243,252);doc.rect(ml,y-4,cw,8,'F');doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor(0,102,204);doc.text(t,ml+2,y+1);doc.setTextColor(0,0,0);doc.setFont('helvetica','normal');y+=8;}
+  function row(l,f,v,hl){cy(6);doc.setFontSize(8.5);doc.setFont('helvetica','normal');doc.setTextColor(80,80,80);doc.text(l,ml,y);if(f){doc.setTextColor(140,140,140);doc.setFontSize(7.5);doc.text(f,ml+70,y);}doc.setFontSize(9);doc.setFont('helvetica','bold');if(hl)doc.setTextColor(0,102,204);else doc.setTextColor(0,0,0);doc.text(v,pW-mr,y,{align:'right'});doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);y+=5.5;}
+  function hl(){cy(3);doc.setDrawColor(225,225,230);doc.line(ml,y,ml+cw,y);y+=3;}
+  hdr();
+  doc.setFontSize(18);doc.setFont('helvetica','bold');doc.setTextColor(28,28,30);doc.text('Rezistenta betonului confinat',pW/2,46,{align:'center'});
+  doc.setFontSize(11);doc.setFont('helvetica','normal');doc.setTextColor(90,90,90);doc.text('Determinarea rezistentei si deformatiilor betonului confinat',pW/2,56,{align:'center'});doc.text('conform CR 2-2022 si SR EN 1992-1-1 cap. 3',pW/2,62,{align:'center'});
+  doc.setDrawColor(0,102,204);doc.setLineWidth(0.4);doc.line(ml,70,ml+cw,70);y=80;
+  sT('1. DATE DE INTRARE');
+  doc.autoTable({startY:y,head:[['Parametru','Notatie','Valoare']],body:[['Lungimea peretelui','b',d.b+' mm'],['Grosimea peretelui','h',d.h+' mm'],['Acoperire cu beton','c_nom',d.cnom+' mm'],['Pas etrieri','s',d.s+' mm'],['Clasa beton','-',d.concrete],['Rezistenta caracteristica beton','f_ck',d.fck+' MPa'],['Rezistenta de calcul beton','f_cd',d.fcd.toFixed(2)+' MPa'],['Clasa otel','-',d.steel],['Rezistenta caracteristica otel','f_yk',d.fyk+' MPa'],['Rezistenta de calcul otel','f_yd',d.fyd.toFixed(2)+' MPa'],['Diametru etrier perimetral','O_sw,p',d.xpd+' mm'],['Nr. ramuri perimetrale','n_p',''+d.xpn],['Diametru etrier intermediar','O_sw',d.xmd+' mm'],['Nr. ramuri intermediare (X)','n',''+d.xmn],['Nr. ramuri intermediare (Y)','n',''+d.ymn],['Mod distante bi','-',d.biMode==='auto'?'Automat (egale)':'Manual']],margin:{left:ml,right:mr},tableWidth:cw,headStyles:{fillColor:[28,28,30],textColor:255,fontSize:8.5,fontStyle:'bold'},bodyStyles:{fontSize:8.5},alternateRowStyles:{fillColor:[245,247,250]},columnStyles:{0:{cellWidth:95},1:{cellWidth:35,fontStyle:'italic'},2:{halign:'right'}}});
+  y=doc.lastAutoTable.finalY+6;
+  if(sketchImg){cy(64);sT('2. SECTIUNE CONFINATA');const iw=140,ih=80;doc.addImage(sketchImg,'PNG',(pW-iw)/2,y,iw,ih);y+=ih+6;}
+  cy(30);sT('3. GEOMETRIA MIEZULUI CONFINAT');doc.setFontSize(8);doc.setTextColor(130,130,130);doc.setFont('helvetica','italic');doc.text('b_0 = b - 2*c_nom - O_sw,p     h_0 = h - 2*c_nom - O_sw,p',ml,y);doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);y+=6;
+  row('Latimea miezului confinat','b_0',d.b0+' mm',true);row('Inaltimea miezului confinat','h_0',d.h0+' mm',true);hl();
+  cy(20);sT('4. ARII DE ARMATURA');doc.setFontSize(8);doc.setTextColor(130,130,130);doc.setFont('helvetica','italic');doc.text('A_st = O^2 * pi / 4',ml,y);doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);y+=6;
+  row('Aria etrier perimetral','A_st,perim',d.Ast_perim.toFixed(2)+' mm2');row('Aria etrier intermediar','A_st',d.Ast_mid.toFixed(2)+' mm2');hl();
+  cy(24);sT('5. DISTANTE bi ('+(d.biMode==='auto'?'egale':'manual')+')');
+  if(d.biMode==='auto'){doc.setFontSize(8);doc.setTextColor(130,130,130);doc.setFont('helvetica','italic');doc.text('bi = b_0 / (n_total - 1)',ml,y);doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);y+=6;}
+  d.biX.forEach((v,i)=>row('bi,X #'+(i+1),'',v.toFixed(1)+' mm'));
+  if(d.biY.length) d.biY.forEach((v,i)=>row('bi,Y #'+(i+1),'',v.toFixed(1)+' mm'));
+  row('Suma J*bi^2','S(J*bi2)',d.sumb.toFixed(0)+' mm2',true);hl();
+  cy(18);sT('6. COEFICIENT DE ARMARE VOLUMETRICA');doc.setFontSize(7.5);doc.setTextColor(130,130,130);doc.setFont('helvetica','italic');doc.text('w_wk = [(n_p*A_p + n*A_st)*b_0 + (n_p*A_p)*h_0] / (s*b_0*h_0) * f_yk/f_ck',ml,y);doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);y+=6;
+  row('Coeficient volumetric','w_wk',d.wwk.toFixed(4),true);hl();
+  cy(24);sT('7. FACTOR DE EFICIENTA AL CONFINARII');doc.setFontSize(7.5);doc.setTextColor(130,130,130);doc.setFont('helvetica','italic');doc.text('alfa = (1 - s/2b_0)(1 - s/2h_0)(1 - S bi2 / 6h_0 b_0)',ml,y);doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);y+=6;
+  row('Factor pas etrieri','alfa_s',d.alfa_s.toFixed(4));row('Factor distributie bare','alfa_n',d.alfa_n.toFixed(4));row('Factor de eficienta','alfa',d.alfa.toFixed(4),true);hl();
+  cy(18);sT('8. EFORT EFECTIV DE COMPRESIUNE LATERALA');doc.setFontSize(8);doc.setTextColor(130,130,130);doc.setFont('helvetica','italic');doc.text('sigma_2,b = 0.5 * alfa * w_wk * f_ck',ml,y);doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);y+=6;
+  row('Compresiune laterala efectiva','sigma_2,b',d.s2b.toFixed(4)+' MPa',true);row('Limita 0.05*f_ck','-',(0.05*d.fck).toFixed(2)+' MPa');hl();
+  cy(22);sT('9. REZISTENTA BETONULUI CONFINAT - '+(d.f1?'FORMULA 1':'FORMULA 2'));doc.setFontSize(8);doc.setTextColor(130,130,130);doc.setFont('helvetica','italic');doc.text(d.f1?'f_ck,c = f_ck * (1 + 5 * sigma2/f_ck)':'f_ck,c = f_ck * (1.125 + 2.5 * sigma2/f_ck)',ml,y);doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);y+=6;
+  row('Rezistenta caracteristica confinata','f_ck,c',d.fckc.toFixed(2)+' MPa',true);row('Rezistenta de calcul confinata','f_cd,c',d.fcdc.toFixed(2)+' MPa',true);row('Crestere f_ck,c vs f_ck','-','+'+d.inc.toFixed(2)+' %',true);hl();
+  cy(24);sT('10. DEFORMATII SPECIFICE SI DUCTILITATE');doc.setFontSize(7.5);doc.setTextColor(130,130,130);doc.setFont('helvetica','italic');doc.text('e_c2,c = e_c2 * (f_ck,c/f_ck)^2     e_cu2,c = 0.0035 + 0.2*sigma2/f_ck',ml,y);doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);y+=6;
+  row('Def. la efort maxim (confinat)','e_c2,c',(d.ec2c*1000).toFixed(4)+' promile',true);
+  row('Def. la efort maxim (neconfinat)','e_c2',(d.ec2*1000).toFixed(2)+' promile');
+  row('Crestere e_c2,c','-','+'+d.incEc2.toFixed(1)+' %',true);
+  row('Def. ultima (confinat)','e_cu2,c',(d.ecu2c*1000).toFixed(4)+' promile',true);
+  row('Def. ultima (neconfinat)','e_cu2','3.50 promile');
+  row('Cap. de deformare (ductilitate)','e_cu2,c/e_cu2','x '+d.ratioEcu2.toFixed(2),true);hl();
+  if(chartImg){cy(80);sT('11. DIAGRAMA TENSIUNE-DEFORMATIE');const iw=150,ih=75;doc.addImage(chartImg,'PNG',(pW-iw)/2,y,iw,ih);y+=ih+4;}
+  const tp=doc.internal.getNumberOfPages();
+  for(let i=1;i<=tp;i++){doc.setPage(i);doc.setFontSize(7.5);doc.setTextColor(150,150,150);doc.setFont('helvetica','normal');doc.line(ml,285,ml+cw,285);doc.text('CR 2-2022 / SR EN 1992-1-1',ml,289);doc.text('Pagina '+i+' din '+tp,pW-mr,289,{align:'right'});doc.text('Generat: '+ds,pW/2,289,{align:'center'});}
+  doc.save('Raport_beton_confinat.pdf');
+}
+
+updMat();calc();
+</script>
