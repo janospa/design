@@ -91,9 +91,9 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
 .report-btn:active{opacity:.7}
 .report-btn:disabled{opacity:.4}
 .report-status{font-size:12px;color:#8E8E93;text-align:center;padding:6px 0 0;min-height:16px}
-@media(max-width:680px){.wrap{padding:14px 10px}.cols{grid-template-columns:1fr;gap:0}.report-btn{width:100%}}
-.back-btn{display:inline-flex;align-items:center;gap:5px;font-family:'Inter',sans-serif;font-size:12px;font-weight:500;color:#8E8E93;background:transparent;border:none;cursor:pointer;padding:10px 16px;text-decoration:none;line-height:1}
-.back-btn svg{width:14px;height:14px;stroke:#8E8E93;stroke-width:2.5;fill:none;stroke-linecap:round;stroke-linejoin:round}
+@media(max-width:680px){.wrap{padding:14px 10px}.cols{grid-template-columns:1fr;gap:0}.report-btn{width:100%}.rc input[type=number],.sel-field select{font-size:16px}}
+.back-btn{display:inline-flex;align-items:center;gap:5px;font-family:'Inter',sans-serif;font-size:13px;font-weight:500;color:#8E8E93;background:transparent;border:none;cursor:pointer;padding:12px 16px;text-decoration:none;line-height:1}
+.back-btn svg{width:16px;height:16px;stroke:#8E8E93;stroke-width:2.5;fill:none;stroke-linecap:round;stroke-linejoin:round}
 .back-btn:hover{color:#1C1C1E}
 .back-btn:hover svg{stroke:#1C1C1E}
 </style>
@@ -588,6 +588,46 @@ function buildPdf(chartImg,sketchImg){
   for(let i=1;i<=tp;i++){doc.setPage(i);doc.setFontSize(7.5);doc.setTextColor(150,150,150);doc.setFont('helvetica','normal');doc.line(ml,285,ml+cw,285);doc.text('CR 2-2022 / SR EN 1992-1-1',ml,289);doc.text('Pagina '+i+' din '+tp,pW-mr,289,{align:'right'});doc.text('Generat: '+ds,pW/2,289,{align:'center'});}
   doc.save('Raport_beton_confinat.pdf');
 }
+
+
+// ─── Persist inputs across navigation ───
+(function(){
+  const SKEY='design_mod2';
+  function saveState(){
+    const state={};
+    document.querySelectorAll('input[id],select[id]').forEach(el=>{state[el.id]=el.value;});
+    document.querySelectorAll('input[type=checkbox][id]').forEach(el=>{state['_chk_'+el.id]=el.checked;});
+    document.querySelectorAll('.seg').forEach((seg,i)=>{
+      const on=seg.querySelector('.on');
+      if(on)state['_seg_'+i]=on.dataset.v||on.textContent;
+    });
+    try{localStorage.setItem(SKEY,JSON.stringify(state));}catch(e){}
+  }
+  function restoreState(){
+    let state;
+    try{state=JSON.parse(localStorage.getItem(SKEY));}catch(e){return;}
+    if(!state)return;
+    document.querySelectorAll('input[id],select[id]').forEach(el=>{
+      if(state[el.id]!==undefined)el.value=state[el.id];
+    });
+    document.querySelectorAll('input[type=checkbox][id]').forEach(el=>{
+      if(state['_chk_'+el.id]!==undefined)el.checked=state['_chk_'+el.id];
+    });
+    document.querySelectorAll('.seg').forEach((seg,i)=>{
+      const sv=state['_seg_'+i];
+      if(!sv)return;
+      seg.querySelectorAll('button').forEach(b=>{
+        const match=(b.dataset.v||b.textContent)===sv;
+        b.classList.toggle('on',match);
+        if(match)b.click&&b.dispatchEvent(new Event('click'));
+      });
+    });
+  }
+  restoreState();
+  document.addEventListener('input',saveState);
+  document.addEventListener('change',saveState);
+  document.addEventListener('click',e=>{if(e.target.closest('.seg'))setTimeout(saveState,50);});
+})();
 
 updMat();calc();
 </script>

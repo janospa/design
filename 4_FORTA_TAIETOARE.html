@@ -65,6 +65,10 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
 .chk.ok{background:#EAF6EC;color:#2E7D32}
 .chk.no{background:#FDECEC;color:#C0392B}
 .chk .cv{font-weight:500}
+.chk .util-wrap{display:flex;align-items:center;gap:8px;margin-left:auto}
+.chk .util-track{width:60px;height:7px;background:rgba(0,0,0,.08);border-radius:4px;overflow:hidden}
+.chk .util-fill{height:100%;border-radius:4px;transition:width .3s}
+.chk .util-pct{font-size:11px;font-weight:500;min-width:42px;text-align:right;font-feature-settings:"tnum" 1}
 .toggle-row{display:flex;align-items:center;gap:10px;padding:4px 0 10px;border-bottom:1px solid #E0E0E5;margin-bottom:8px}
 .toggle-row:last-child{border-bottom:none;margin-bottom:0;padding-bottom:4px}
 .toggle-row span{font-size:12px;color:#1C1C1E;flex:1}
@@ -79,9 +83,9 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
 .report-btn:active{opacity:.7}
 .report-btn:disabled{opacity:.4}
 .report-status{font-size:12px;color:#8E8E93;text-align:center;padding:6px 0 0;min-height:16px}
-@media(max-width:680px){.wrap{padding:14px 10px}.cols{grid-template-columns:1fr;gap:0}.report-btn{width:100%}}
-.back-btn{display:inline-flex;align-items:center;gap:5px;font-family:'Inter',sans-serif;font-size:12px;font-weight:500;color:#8E8E93;background:transparent;border:none;cursor:pointer;padding:10px 16px;text-decoration:none;line-height:1}
-.back-btn svg{width:14px;height:14px;stroke:#8E8E93;stroke-width:2.5;fill:none;stroke-linecap:round;stroke-linejoin:round}
+@media(max-width:680px){.wrap{padding:14px 10px}.cols{grid-template-columns:1fr;gap:0}.report-btn{width:100%}.rc input[type=number],.sel-field select{font-size:16px}}
+.back-btn{display:inline-flex;align-items:center;gap:5px;font-family:'Inter',sans-serif;font-size:13px;font-weight:500;color:#8E8E93;background:transparent;border:none;cursor:pointer;padding:12px 16px;text-decoration:none;line-height:1}
+.back-btn svg{width:16px;height:16px;stroke:#8E8E93;stroke-width:2.5;fill:none;stroke-linecap:round;stroke-linejoin:round}
 .back-btn:hover{color:#1C1C1E}
 .back-btn:hover svg{stroke:#1C1C1E}
 </style>
@@ -217,8 +221,8 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
         <div class="rc2 hl"><div class="rl2"><span class="zbadge zA" style="font-size:10px;padding:1px 7px">Critic</span></div><div class="rv" id="vrdmaxA_r">&mdash;</div><div class="ru2">kN</div></div>
         <div class="rc2 hl"><div class="rl2"><span class="zbadge zB" style="font-size:10px;padding:1px 7px">Non-critic</span></div><div class="rv" id="vrdmaxB_r">&mdash;</div><div class="ru2">kN</div></div>
       </div>
-      <div class="chk" id="chk_vmaxA"><span>V<sub>Ed</sub> &le; V<sub>Rd,max</sub> (critic)</span><span class="cv" id="chk_vmaxA_v">&mdash;</span></div>
-      <div class="chk" id="chk_vmaxB"><span>V<sub>Ed</sub> &le; V<sub>Rd,max</sub> (non-critic)</span><span class="cv" id="chk_vmaxB_v">&mdash;</span></div>
+      <div class="chk" id="chk_vmaxA"><span>V<sub>Ed</sub> &le; V<sub>Rd,max</sub> (critic)</span><div class="util-wrap"><div class="util-track"><div class="util-fill" id="ub_vmaxA"></div></div><span class="util-pct cv" id="chk_vmaxA_v">&mdash;</span></div></div>
+      <div class="chk" id="chk_vmaxB"><span>V<sub>Ed</sub> &le; V<sub>Rd,max</sub> (non-critic)</span><div class="util-wrap"><div class="util-track"><div class="util-fill" id="ub_vmaxB"></div></div><span class="util-pct cv" id="chk_vmaxB_v">&mdash;</span></div></div>
     </div>
   </div>
 
@@ -227,7 +231,7 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
     <div class="pb">
       <div class="zhead"><span class="zbadge zA">Critic</span></div>
       <div class="alfa-box" style="margin-bottom:10px" id="vsA-box"></div>
-      <div class="chk" id="chk_vsA"><span>V<sub>Ed</sub> &le; V<sub>Rd,s</sub> (critic)</span><span class="cv" id="chk_vsA_v">&mdash;</span></div>
+      <div class="chk" id="chk_vsA"><span>V<sub>Ed</sub> &le; V<sub>Rd,s</sub> (critic)</span><div class="util-wrap"><div class="util-track"><div class="util-fill" id="ub_vsA"></div></div><span class="util-pct cv" id="chk_vsA_v">&mdash;</span></div></div>
 
       <div class="zhead" style="margin-top:14px"><span class="zbadge zB">Non-critic</span></div>
       <div class="alfa-box" style="margin-bottom:10px">
@@ -235,7 +239,7 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
         <div class="ar"><span class="al">Contributie armatura (&Sigma;A<sub>sh</sub>&middot;f<sub>yd,h</sub>)</span><span class="av" id="vsB2_r">&mdash;</span></div>
         <div class="ar tot"><span class="al">V<sub>Rd,s</sub> (non-critic)</span><span class="av" id="vrdsB_r">&mdash;</span></div>
       </div>
-      <div class="chk" id="chk_vsB"><span>V<sub>Ed</sub> &le; V<sub>Rd,s</sub> (non-critic)</span><span class="cv" id="chk_vsB_v">&mdash;</span></div>
+      <div class="chk" id="chk_vsB"><span>V<sub>Ed</sub> &le; V<sub>Rd,s</sub> (non-critic)</span><div class="util-wrap"><div class="util-track"><div class="util-fill" id="ub_vsB"></div></div><span class="util-pct cv" id="chk_vsB_v">&mdash;</span></div></div>
     </div>
   </div>
 
@@ -251,7 +255,7 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
         <div class="rc2"><div class="rl2">V<sub>Rd,i</sub> (numai inima)</div><div class="rv" id="vrdiweb_r">&mdash;</div><div class="ru2">kN</div></div>
         <div class="rc2 hl"><div class="rl2">V<sub>Rd,i</sub> (inima + bulb intins)</div><div class="rv" id="vrdibulb_r">&mdash;</div><div class="ru2">kN</div></div>
       </div>
-      <div class="chk" id="chk_vi"><span>V<sub>Ed</sub> &le; V<sub>Rd,i</sub></span><span class="cv" id="chk_vi_v">&mdash;</span></div>
+      <div class="chk" id="chk_vi"><span>V<sub>Ed</sub> &le; V<sub>Rd,i</sub></span><div class="util-wrap"><div class="util-track"><div class="util-fill" id="ub_vi"></div></div><span class="util-pct cv" id="chk_vi_v">&mdash;</span></div></div>
     </div>
   </div>
 
@@ -312,11 +316,12 @@ function setSurf(m){
   document.getElementById('seg-net').classList.toggle('on',m===0.6);
   calc();
 }
-function setChk(id,vid,ratio){
+function setChk(id,vid,ratio,ubid){
   const el=document.getElementById(id),vel=document.getElementById(vid);
   const ok=ratio<=1;
   el.className='chk '+(ok?'ok':'no');
   vel.textContent=(ratio*100).toFixed(1)+' %';
+  if(ubid){const bar=document.getElementById(ubid);if(bar){bar.style.width=Math.min(100,ratio*100)+'%';bar.style.background=ok?'#2E7D32':'#C0392B';}}
 }
 
 function calc(){
@@ -391,21 +396,21 @@ function calc(){
 
   document.getElementById('vrdmaxA_r').textContent=vRdmaxA.toFixed(1);
   document.getElementById('vrdmaxB_r').textContent=vRdmaxB.toFixed(1);
-  setChk('chk_vmaxA','chk_vmaxA_v',vRdmaxA>0?ved/vRdmaxA:99);
-  setChk('chk_vmaxB','chk_vmaxB_v',vRdmaxB>0?ved/vRdmaxB:99);
+  setChk('chk_vmaxA','chk_vmaxA_v',vRdmaxA>0?ved/vRdmaxA:99,'ub_vmaxA');
+  setChk('chk_vmaxB','chk_vmaxB_v',vRdmaxB>0?ved/vRdmaxB:99,'ub_vmaxB');
 
-  setChk('chk_vsA','chk_vsA_v',vRdsA>0?ved/vRdsA:99);
+  setChk('chk_vsA','chk_vsA_v',vRdsA>0?ved/vRdsA:99,'ub_vsA');
   document.getElementById('vsB1_r').textContent=vsB1.toFixed(1)+' kN';
   document.getElementById('vsB2_r').textContent=vsB2.toFixed(1)+' kN';
   document.getElementById('vrdsB_r').textContent=vRdsB.toFixed(1)+' kN';
-  setChk('chk_vsB','chk_vsB_v',vRdsB>0?ved/vRdsB:99);
+  setChk('chk_vsB','chk_vsB_v',vRdsB>0?ved/vRdsB:99,'ub_vsB');
 
   document.getElementById('asvweb_r').textContent=AsvWeb.toFixed(1)+' mm\u00B2';
   document.getElementById('asvbulb_r').innerHTML=asvb.toFixed(1)+' mm\u00B2 ('+nbb+'\u00D8'+obb+')';
   document.getElementById('muf_r').textContent=muf.toFixed(1);
   document.getElementById('vrdiweb_r').textContent=vRdiWeb.toFixed(1);
   document.getElementById('vrdibulb_r').textContent=vRdiBulb.toFixed(1);
-  setChk('chk_vi','chk_vi_v',vRdiBulb>0?ved/vRdiBulb:99);
+  setChk('chk_vi','chk_vi_v',vRdiBulb>0?ved/vRdiBulb:99,'ub_vi');
 
   const verdict=(elBox,elV,elG,gov)=>{
     document.getElementById(elV).textContent=gov.toFixed(1)+' kN';
@@ -517,6 +522,46 @@ function buildPdf(){
   for(let i=1;i<=tp;i++){doc.setPage(i);doc.setFontSize(7.5);doc.setTextColor(150,150,150);doc.setFont('helvetica','normal');doc.line(ml,285,ml+cw,285);doc.text('CR 2-1-1.1/2022 / SR EN 1992-1-1',ml,289);doc.text('Pagina '+i+' din '+tp,pW-mr,289,{align:'right'});doc.text('Generat: '+ds,pW/2,289,{align:'center'});}
   doc.save('Raport_forta_taietoare.pdf');
 }
+
+
+// ─── Persist inputs across navigation ───
+(function(){
+  const SKEY='design_mod4';
+  function saveState(){
+    const state={};
+    document.querySelectorAll('input[id],select[id]').forEach(el=>{state[el.id]=el.value;});
+    document.querySelectorAll('input[type=checkbox][id]').forEach(el=>{state['_chk_'+el.id]=el.checked;});
+    document.querySelectorAll('.seg').forEach((seg,i)=>{
+      const on=seg.querySelector('.on');
+      if(on)state['_seg_'+i]=on.dataset.v||on.textContent;
+    });
+    try{localStorage.setItem(SKEY,JSON.stringify(state));}catch(e){}
+  }
+  function restoreState(){
+    let state;
+    try{state=JSON.parse(localStorage.getItem(SKEY));}catch(e){return;}
+    if(!state)return;
+    document.querySelectorAll('input[id],select[id]').forEach(el=>{
+      if(state[el.id]!==undefined)el.value=state[el.id];
+    });
+    document.querySelectorAll('input[type=checkbox][id]').forEach(el=>{
+      if(state['_chk_'+el.id]!==undefined)el.checked=state['_chk_'+el.id];
+    });
+    document.querySelectorAll('.seg').forEach((seg,i)=>{
+      const sv=state['_seg_'+i];
+      if(!sv)return;
+      seg.querySelectorAll('button').forEach(b=>{
+        const match=(b.dataset.v||b.textContent)===sv;
+        b.classList.toggle('on',match);
+        if(match)b.click&&b.dispatchEvent(new Event('click'));
+      });
+    });
+  }
+  restoreState();
+  document.addEventListener('input',saveState);
+  document.addEventListener('change',saveState);
+  document.addEventListener('click',e=>{if(e.target.closest('.seg'))setTimeout(saveState,50);});
+})();
 
 updMat();setWall('Bulb');
 </script>
