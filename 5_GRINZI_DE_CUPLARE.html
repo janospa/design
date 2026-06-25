@@ -29,31 +29,29 @@ header.top{margin-bottom:16px}
 .sel-wrap::after{content:'';position:absolute;right:13px;top:50%;width:7px;height:7px;border-right:2px solid #8E8E93;border-bottom:2px solid #8E8E93;transform:translateY(-65%) rotate(45deg);pointer-events:none}
 .sel-field select{width:100%;padding:8px 34px 8px 11px;font-size:13px;border:1px solid #C7C7CC;border-radius:8px;background:#fff;color:#1C1C1E;font-family:'Inter',sans-serif;cursor:pointer;-webkit-appearance:none;appearance:none}
 .sel-field select:focus{outline:none;box-shadow:0 0 0 2px rgba(0,122,255,.2);border-color:#007AFF}
-.ph{padding:12px 15px 0;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:#1C1C1E}
-.pb,.ip-body,.op-body{padding:8px 15px 14px}
+.ph{padding:10px 15px 0;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:#1C1C1E}
+.pb{padding:6px 15px 14px}
 @media(max-width:680px){.grid{grid-template-columns:1fr}}
-.ip,.op{background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-bottom:13px}
-.ip h2,.op h2{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.08em;
-  color:var(--ink);padding:12px 15px 0;margin-bottom:8px;display:flex;align-items:center;gap:8px}
-.ip h2 .n,.op h2 .n{display:inline-flex;width:18px;height:18px;border-radius:50%;
-  background:var(--ink);color:#fff;font-size:10px;align-items:center;justify-content:center;font-weight:600}
+.slabel{font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:#1C1C1E;padding:0 0 7px;margin-top:14px}
+.slabel:first-child{margin-top:0}
+.ip,.op{background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-bottom:10px}
 .ip-body,.op-body{padding:0 15px 14px}
-.fieldset{margin-bottom:16px}.fieldset:last-child{margin-bottom:0}
-.fs-lbl{font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--ink);
-  padding:0 0 7px;margin-top:14px;display:flex;align-items:center;gap:7px}
-.fs-lbl:first-child{margin-top:0}
+.fieldset{margin-bottom:0}.fieldset:last-child{margin-bottom:0}
+.fs-lbl{font-size:11px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:#8E8E93;padding:12px 0 2px;display:flex;align-items:center;gap:7px}
+.fs-lbl:first-child{padding-top:0}
 .fs-lbl .mini{font-size:10px;color:var(--ok);background:var(--ok-bg);padding:1px 6px;border-radius:10px;font-weight:600;letter-spacing:0;text-transform:none}
 .fs-lbl .mini.bad{color:var(--bad);background:var(--bad-bg)}
-.row{display:grid;grid-template-columns:1fr 1fr;gap:8px 12px}
-.row.three{grid-template-columns:1fr 1fr 1fr}
-.fld{display:flex;flex-direction:column;gap:4px}
-.fld label{font-size:12px;color:var(--sub);font-weight:500}
-.fld label b{color:var(--ink);font-weight:500}
-.fld input,.fld select{font-family:inherit;font-size:13px;font-weight:400;color:var(--ink);
-  background:#fff;border:1px solid #C7C7CC;border-radius:7px;padding:5px 8px;width:100%;
-  transition:border .15s,box-shadow .15s;font-feature-settings:"tnum" 1}
-.fld input:focus,.fld select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 2px rgba(0,122,255,.2)}
-.fld .unit{font-size:11px;color:var(--sub)}
+.row{display:flex;align-items:center;padding:7px 0;border-bottom:1px solid #E0E0E5;gap:8px}
+.row:last-child{border-bottom:none}
+.rl{flex:1;font-size:13px;color:#1C1C1E;min-width:0}
+.rn{font-size:12px;color:#8E8E93;margin-left:4px}
+.rc{display:flex;align-items:center;gap:5px}
+.rc input[type=number]{width:78px;padding:5px 8px;font-size:13px;border:1px solid #C7C7CC;border-radius:7px;background:#fff;color:#1C1C1E;font-family:'Inter',sans-serif;-moz-appearance:textfield;appearance:textfield;text-align:right;font-feature-settings:"tnum" 1}
+.rc input[type=number]::-webkit-inner-spin-button,.rc input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.rc input:focus{outline:none;box-shadow:0 0 0 2px rgba(0,122,255,.2);border-color:#007AFF}
+.ru{font-size:11px;color:#8E8E93}
+.sub{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;color:#8E8E93;padding:12px 0 2px;margin-top:2px}
+.sub:first-child{padding-top:0}
 .seg{display:inline-flex;background:#E0E0E5;border-radius:8px;padding:2px;gap:2px}
 .seg button{font-family:inherit;font-size:12px;font-weight:500;color:var(--sub);
   border:none;background:transparent;padding:5px 12px;border-radius:6px;cursor:pointer;transition:all .12s}
@@ -104,7 +102,7 @@ header.top{margin-bottom:16px}
 .back-btn svg{width:16px;height:16px;stroke:#8E8E93;stroke-width:2.5;fill:none;stroke-linecap:round;stroke-linejoin:round}
 .back-btn:hover{color:#1C1C1E}
 .back-btn:hover svg{stroke:#1C1C1E}
-@media(max-width:680px){.wrap{padding:14px 10px 60px}.grid{grid-template-columns:1fr}.row{grid-template-columns:1fr}.row.three{grid-template-columns:1fr 1fr}.fld input,.fld select{font-size:16px}.report-btn{width:100%}}
+@media(max-width:680px){.wrap{padding:14px 10px 60px}.grid{grid-template-columns:1fr}.rc input[type=number]{font-size:16px}.sel-field select{font-size:16px}.rl{font-size:14px}.ph{font-size:12px}.report-btn{font-size:15px;padding:13px 18px}}
 </style>
 </head>
 <body>
@@ -113,41 +111,40 @@ header.top{margin-bottom:16px}
 
   <div class="grid">
     <!-- INPUTS -->
+    <div>
+    <div class="slabel">Intrări</div>
     <div class="ip">
-      <div class="ph">Date de intrare</div>
-      <div class="ip-body">
-      <div class="fieldset">
-        <div class="fs-lbl">Geometrie</div>
-        <div class="row three">
-          <div class="fld"><label><b>b<sub>w</sub></b> <span class="unit">mm</span></label><input id="bw" type="number" value="300"></div>
-          <div class="fld"><label><b>h<sub>w</sub></b> <span class="unit">mm</span></label><input id="hw" type="number" value="600"></div>
-          <div class="fld"><label><b>l<sub>cl</sub></b> <span class="unit">mm</span></label><input id="lcl" type="number" value="1100"></div>
-        </div>
-        <div class="row" style="margin-top:10px">
-          <div class="fld"><label>c<sub>nom</sub> <span class="unit">mm</span></label><input id="cnom" type="number" value="45"></div>
-          <div class="fld"><label>Ø etrier <span class="unit">mm</span></label><input id="dsw" type="number" value="12"></div>
-        </div>
+      <div class="ph">1. Geometrie</div>
+      <div class="pb">
+        <div class="row"><div class="rl">Lățimea grinzii <span class="rn">(b<sub>w</sub>)</span></div><div class="rc"><input type="number" id="bw" value="300"><span class="ru">mm</span></div></div>
+        <div class="row"><div class="rl">Înălțimea grinzii <span class="rn">(h<sub>w</sub>)</span></div><div class="rc"><input type="number" id="hw" value="600"><span class="ru">mm</span></div></div>
+        <div class="row"><div class="rl">Lungimea libera <span class="rn">(l<sub>cl</sub>)</span></div><div class="rc"><input type="number" id="lcl" value="1100"><span class="ru">mm</span></div></div>
+        <div class="row"><div class="rl">Acoperire nominala <span class="rn">(c<sub>nom</sub>)</span></div><div class="rc"><input type="number" id="cnom" value="45"><span class="ru">mm</span></div></div>
+        <div class="row"><div class="rl">Diametru etrier <span class="rn">(Ø<sub>sw</sub>)</span></div><div class="rc"><input type="number" id="dsw" value="12"><span class="ru">mm</span></div></div>
       </div>
+    </div>
 
-      <div class="fieldset">
-        <div class="fs-lbl">Materiale</div>
-        <div class="row">
-          <div class="fld"><label>Clasa beton</label>
-            <select id="conc">
-              <option>C12/15</option><option>C16/20</option><option>C20/25</option>
-              <option>C25/30</option><option selected>C30/37</option><option>C35/45</option>
-              <option>C40/50</option><option>C45/55</option><option>C50/60</option></select></div>
-          <div class="fld"><label>Clasa oțel</label>
-            <select id="steel">
-              <option>OB37 (S 235)</option><option>OB37 (S 255)</option>
-              <option>PC50 (S 345)</option><option>PC50 (S 355)</option>
-              <option>PC60 (S 405)</option><option>PC60 (S 420)</option>
-              <option selected>Bst 500S (S 500)</option></select></div>
-        </div>
+    <div class="ip">
+      <div class="ph">2. Materiale</div>
+      <div class="pb">
+        <div class="sel-field"><label>Clasa beton</label><div class="sel-wrap">
+          <select id="conc">
+            <option>C12/15</option><option>C16/20</option><option>C20/25</option>
+            <option>C25/30</option><option selected>C30/37</option><option>C35/45</option>
+            <option>C40/50</option><option>C45/55</option><option>C50/60</option></select></div></div>
+        <div class="sel-field"><label>Clasa oțel</label><div class="sel-wrap">
+          <select id="steel">
+            <option>OB37 (S 235)</option><option>OB37 (S 255)</option>
+            <option>PC50 (S 345)</option><option>PC50 (S 355)</option>
+            <option>PC60 (S 405)</option><option>PC60 (S 420)</option>
+            <option selected>Bst 500S (S 500)</option></select></div></div>
       </div>
+    </div>
 
-      <div class="fieldset">
-        <div class="fs-lbl">Clasă de ductilitate</div>
+    <div class="ip">
+      <div class="ph">3. Ductilitate și eforturi</div>
+      <div class="pb">
+      <div class="fs-lbl">Clasă de ductilitate</div>
         <div class="seg" id="seg-duct">
           <button data-v="DCM" class="on">DCM</button><button data-v="DCH">DCH</button>
         </div>
@@ -155,10 +152,8 @@ header.top{margin-bottom:16px}
 
       <div class="fieldset">
         <div class="fs-lbl">Armare longitudinală sus / jos <span class="mini" id="m-long">min</span></div>
-        <div class="row">
-          <div class="fld"><label>bare <b>buc</b></label><input id="nlong" type="number" value="3"></div>
-          <div class="fld"><label>Ø <span class="unit">mm</span></label><input id="dlong" type="number" value="16"></div>
-        </div>
+        <div class="row"><div class="rl">Număr bare</div><div class="rc"><input type="number" id="nlong" value="3"><span class="ru">buc</span></div></div>
+        <div class="row"><div class="rl">Diametru bare <span class="rn">(Ø)</span></div><div class="rc"><input type="number" id="dlong" value="16"><span class="ru">mm</span></div></div>
       </div>
 
       <div class="fieldset">
@@ -166,67 +161,63 @@ header.top{margin-bottom:16px}
         <div class="seg" id="seg-ved">
           <button data-v="cap" class="on">Capacitate (M<sub>Rd,b</sub>)</button><button data-v="gs">Seismic (GS)</button>
         </div>
-        <div class="fld" id="ved-gs" style="margin-top:10px;display:none">
-          <label>V<sub>Ed,GS</sub> din combinația seismică <span class="unit">kN</span></label><input id="vgs" type="number" value="1068"></div>
+        <div id="ved-gs" style="margin-top:4px;display:none">
+          <div class="row"><div class="rl">V<sub>Ed,GS</sub> din combinația seismică</div><div class="rc"><input type="number" id="vgs" value="1068"><span class="ru">kN</span></div></div>
+        </div>
         <div class="note" style="margin-top:12px">
           V<sub>Ed</sub> = 1.25·(M<sub>Rd,b</sub><sup>l</sup>+M<sub>Rd,b</sub><sup>r</sup>)/l<sub>cl</sub>. La carcasă diagonală, V<sub>Ed</sub> se ia automat din combinația seismică (GS).
         </div>
       </div>
+    </div>
 
+    <div class="ip">
+      <div class="ph">4. Armare transversală</div>
+      <div class="pb">
       <!-- ORTHOGONAL CASING inputs -->
-      <div class="fieldset" id="ortho-inputs">
+      <div id="ortho-inputs">
         <div class="fs-lbl">Carcasă ortogonală — etrieri <span class="mini" id="m-stir">min</span></div>
-        <div class="row three">
-          <div class="fld"><label>Ø <span class="unit">mm</span></label><input id="dstir" type="number" value="12"></div>
-          <div class="fld"><label>ramuri</label><input id="nleg" type="number" value="2"></div>
-          <div class="fld"><label>pas s <span class="unit">mm</span></label><input id="sstir" type="number" value="100"></div>
-        </div>
-        <div class="fs-lbl" style="margin-top:14px">Armare intermediară orizontală <span class="mini" id="m-int">min</span></div>
-        <div class="row three">
-          <div class="fld"><label>bare <b>buc</b></label><input id="nint" type="number" value="2"></div>
-          <div class="fld"><label>Ø <span class="unit">mm</span></label><input id="dint" type="number" value="14"></div>
-          <div class="fld"><label>pas s <span class="unit">mm</span></label><input id="sint" type="number" value="200"></div>
-        </div>
+        <div class="row"><div class="rl">Diametru etrieri <span class="rn">(Ø)</span></div><div class="rc"><input type="number" id="dstir" value="12"><span class="ru">mm</span></div></div>
+        <div class="row"><div class="rl">Ramuri etrieri</div><div class="rc"><input type="number" id="nleg" value="2"><span class="ru">buc</span></div></div>
+        <div class="row"><div class="rl">Pas etrieri <span class="rn">(s)</span></div><div class="rc"><input type="number" id="sstir" value="100"><span class="ru">mm</span></div></div>
+        <div class="fs-lbl">Armare intermediară orizontală <span class="mini" id="m-int">min</span></div>
+        <div class="row"><div class="rl">Număr bare</div><div class="rc"><input type="number" id="nint" value="2"><span class="ru">buc</span></div></div>
+        <div class="row"><div class="rl">Diametru bare <span class="rn">(Ø)</span></div><div class="rc"><input type="number" id="dint" value="14"><span class="ru">mm</span></div></div>
+        <div class="row"><div class="rl">Pas bare <span class="rn">(s)</span></div><div class="rc"><input type="number" id="sint" value="200"><span class="ru">mm</span></div></div>
       </div>
 
       <!-- DIAGONAL CASING inputs (appear when needed) -->
       <div class="fieldset hidden" id="diag-inputs">
         <div class="fs-lbl" style="color:var(--bad)">Bare diagonale</div>
-        <div class="row three">
-          <div class="fld"><label>bare / dir.</label><input id="ndiag" type="number" value="4"></div>
-          <div class="fld"><label>Ø <span class="unit">mm</span></label><input id="ddiag" type="number" value="28"></div>
-          <div class="fld"><label>α <span class="unit">°</span></label><input id="alpha" type="number" value="29.5"></div>
-        </div>
-
-        <div class="fs-lbl" style="margin-top:14px">Bare longitudinale perimetrale <span class="mini" id="m-dlong">min</span></div>
-        <div class="row three">
-          <div class="fld"><label>bare <b>buc</b></label><input id="d_plong_n" type="number" value="12"></div>
-          <div class="fld"><label>Ø <span class="unit">mm</span></label><input id="d_plong_dia" type="number" value="12"></div>
-          <div class="fld"><label>pas max s <span class="unit">mm</span></label><input id="d_plong_s" type="number" value="150"></div>
-        </div>
-
-        <div class="fs-lbl" style="margin-top:14px">Etrieri perimetrali <span class="mini" id="m-dstir">min</span></div>
-        <div class="row three">
-          <div class="fld"><label>Ø <span class="unit">mm</span></label><input id="d_estir_dia" type="number" value="10"></div>
-          <div class="fld"><label>ramuri</label><input id="d_estir_n" type="number" value="2"></div>
-          <div class="fld"><label>pas s <span class="unit">mm</span></label><input id="d_estir_s" type="number" value="100"></div>
-        </div>
-        <div class="note" style="margin-top:12px">
-          La carcasă diagonală: bare longitudinale pe perimetrul secțiunii (Ø + pas) <b>și separat</b> etrieri perimetrali (Ø + pas). Efortul tăietor e preluat de barele diagonale.
+        <div class="row"><div class="rl">Bare per direcție</div><div class="rc"><input type="number" id="ndiag" value="4"><span class="ru">buc</span></div></div>
+        <div class="row"><div class="rl">Diametru bare <span class="rn">(Ø)</span></div><div class="rc"><input type="number" id="ddiag" value="28"><span class="ru">mm</span></div></div>
+        <div class="row"><div class="rl">Unghi înclinare <span class="rn">(α)</span></div><div class="rc"><input type="number" id="alpha" value="29.5"><span class="ru">°</span></div></div>
+        <div class="fs-lbl">Bare longitudinale perimetrale <span class="mini" id="m-dlong">min</span></div>
+        <div class="row"><div class="rl">Număr bare</div><div class="rc"><input type="number" id="d_plong_n" value="12"><span class="ru">buc</span></div></div>
+        <div class="row"><div class="rl">Diametru bare <span class="rn">(Ø)</span></div><div class="rc"><input type="number" id="d_plong_dia" value="12"><span class="ru">mm</span></div></div>
+        <div class="row"><div class="rl">Pas maxim <span class="rn">(s)</span></div><div class="rc"><input type="number" id="d_plong_s" value="150"><span class="ru">mm</span></div></div>
+        <div class="fs-lbl">Etrieri perimetrali <span class="mini" id="m-dstir">min</span></div>
+        <div class="row"><div class="rl">Diametru etrieri <span class="rn">(Ø)</span></div><div class="rc"><input type="number" id="d_estir_dia" value="10"><span class="ru">mm</span></div></div>
+        <div class="row"><div class="rl">Ramuri etrieri</div><div class="rc"><input type="number" id="d_estir_n" value="2"><span class="ru">buc</span></div></div>
+        <div class="row"><div class="rl">Pas etrieri <span class="rn">(s)</span></div><div class="rc"><input type="number" id="d_estir_s" value="100"><span class="ru">mm</span></div></div>
+        <div class="note" style="margin-top:8px">
+          Efortul tăietor e preluat de barele diagonale.
         </div>
       </div>
-      </div><!-- /ip-body -->
+      </div>
+    </div>
     </div>
 
     <!-- OUTPUTS -->
+    <div>
+    <div class="slabel">Rezultate</div>
     <div class="op">
-      <div class="ph">Rezultate</div>
-      <div class="op-body">
+      <div class="pb">
       <div id="verdict"></div>
       <div id="results"></div>
       <div style="padding:8px 0 4px">
         <button class="report-btn" onclick="exportPDF()">Descarcă PDF</button>
-      </div><!-- /op-body -->
+      </div>
+    </div>
     </div>
   </div>
 

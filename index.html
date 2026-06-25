@@ -26,7 +26,7 @@ body{font-family:'Inter',sans-serif;background:#F5F5F7;color:#1C1C1E;min-height:
 </head>
 <body>
 <div class="wrap">
-  <div class="suite-label">Pereți structurali · CR 2/2022</div>
+  <div class="suite-label">SW Design · CR 2/2022</div>
   <div class="modules">
 
     <!-- 01 Predimensionare: lamellar wall with 2 bulbs, NO rebar -->
@@ -50,30 +50,34 @@ body{font-family:'Inter',sans-serif;background:#F5F5F7;color:#1C1C1E;min-height:
         <svg width="52" height="40" viewBox="0 0 52 40" fill="none" xmlns="http://www.w3.org/2000/svg">
           <!-- outer concrete boundary -->
           <rect x="3" y="2" width="46" height="36" rx="1.5" fill="#f0f0f0" stroke="#555" stroke-width="1.2"/>
-          <!-- arching (concave) sides of confined core — like Mander -->
-          <path d="M10,9 Q26,13 42,9" stroke="#333" stroke-width="1.1" fill="none"/>
-          <path d="M10,31 Q26,27 42,31" stroke="#333" stroke-width="1.1" fill="none"/>
-          <path d="M10,9 Q14,20 10,31" stroke="#333" stroke-width="1.1" fill="none"/>
-          <path d="M42,9 Q38,20 42,31" stroke="#333" stroke-width="1.1" fill="none"/>
-          <!-- confined core fill -->
-          <path d="M10,9 Q26,13 42,9 Q38,20 42,31 Q26,27 10,31 Q14,20 10,9 Z" fill="#d8d8d8" opacity="0.7"/>
-          <!-- outer stirrup rectangle -->
+          <!-- arching: corner→mid (concave between restrained bars) -->
+          <path d="M10,9 Q18,12 26,9" stroke="#333" stroke-width="1" fill="none"/>
+          <path d="M26,9 Q34,12 42,9" stroke="#333" stroke-width="1" fill="none"/>
+          <path d="M10,31 Q18,28 26,31" stroke="#333" stroke-width="1" fill="none"/>
+          <path d="M26,31 Q34,28 42,31" stroke="#333" stroke-width="1" fill="none"/>
+          <path d="M10,9 Q13,14.5 10,20" stroke="#333" stroke-width="1" fill="none"/>
+          <path d="M10,20 Q13,25.5 10,31" stroke="#333" stroke-width="1" fill="none"/>
+          <path d="M42,9 Q39,14.5 42,20" stroke="#333" stroke-width="1" fill="none"/>
+          <path d="M42,20 Q39,25.5 42,31" stroke="#333" stroke-width="1" fill="none"/>
+          <!-- confined core fill (simplified) -->
+          <path d="M10,9 Q18,12 26,9 Q34,12 42,9 Q39,14.5 42,20 Q39,25.5 42,31 Q34,28 26,31 Q18,28 10,31 Q13,25.5 10,20 Q13,14.5 10,9 Z" fill="#d8d8d8" opacity="0.6"/>
+          <!-- outer stirrup -->
           <rect x="10" y="9" width="32" height="22" rx="0.5" fill="none" stroke="#222" stroke-width="1.3"/>
           <!-- corner bars -->
-          <circle cx="10" cy="9"  r="2.2" fill="#1C1C1E"/>
-          <circle cx="42" cy="9"  r="2.2" fill="#1C1C1E"/>
+          <circle cx="10" cy="9" r="2.2" fill="#1C1C1E"/>
+          <circle cx="42" cy="9" r="2.2" fill="#1C1C1E"/>
           <circle cx="10" cy="31" r="2.2" fill="#1C1C1E"/>
           <circle cx="42" cy="31" r="2.2" fill="#1C1C1E"/>
           <!-- mid-side bars -->
-          <circle cx="26" cy="9"  r="2"   fill="#1C1C1E"/>
-          <circle cx="26" cy="31" r="2"   fill="#1C1C1E"/>
-          <circle cx="10" cy="20" r="2"   fill="#1C1C1E"/>
-          <circle cx="42" cy="20" r="2"   fill="#1C1C1E"/>
-          <!-- agrafe vertical: line through top+bottom mid bars, hooks on both ends -->
+          <circle cx="26" cy="9" r="2" fill="#1C1C1E"/>
+          <circle cx="26" cy="31" r="2" fill="#1C1C1E"/>
+          <circle cx="10" cy="20" r="2" fill="#1C1C1E"/>
+          <circle cx="42" cy="20" r="2" fill="#1C1C1E"/>
+          <!-- agrafe vertical -->
           <line x1="26" y1="9" x2="26" y2="31" stroke="#1C1C1E" stroke-width="1.1" stroke-linecap="round"/>
           <path d="M24,10 Q26,8 28,10" fill="none" stroke="#1C1C1E" stroke-width="1.1" stroke-linecap="round"/>
           <path d="M24,30 Q26,32 28,30" fill="none" stroke="#1C1C1E" stroke-width="1.1" stroke-linecap="round"/>
-          <!-- agrafe orizontala: line through left+right mid bars, hooks on both ends -->
+          <!-- agrafe orizontala -->
           <line x1="10" y1="20" x2="42" y2="20" stroke="#1C1C1E" stroke-width="1.1" stroke-linecap="round"/>
           <path d="M11,18 Q9,20 11,22" fill="none" stroke="#1C1C1E" stroke-width="1.1" stroke-linecap="round"/>
           <path d="M41,18 Q43,20 41,22" fill="none" stroke="#1C1C1E" stroke-width="1.1" stroke-linecap="round"/>
@@ -150,8 +154,7 @@ body{font-family:'Inter',sans-serif;background:#F5F5F7;color:#1C1C1E;min-height:
     </a>
 
   </div>
-  <div class="author">Aplicație dezvoltată în cadrul lucrării de disertație<br>
-    Janos Patrik</div>
+  <div class="author">Aplicație dezvoltată în cadrul lucrării de disertație — Janos Patrik</div>
 </div>
 </body>
 </html>
