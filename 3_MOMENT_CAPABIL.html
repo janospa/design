@@ -76,6 +76,8 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
 .report-status{font-size:12px;color:#8E8E93;text-align:center;padding:6px 0 0;min-height:16px}
 .conf-fields{display:none;background:#EAF6EC;border-radius:8px;padding:4px 11px;margin-top:8px}
 .conf-fields.on{display:block}
+.conf-web-fields{display:none}
+.conf-web-fields.on{display:block}
 @media(max-width:680px){.wrap{padding:14px 10px}.cols{grid-template-columns:1fr;gap:0}.report-btn{width:100%}.rc input[type=number],.sel-field select{font-size:16px}.rl{font-size:14px}.ph{font-size:12px}.report-btn{font-size:15px;padding:13px 18px}}
 .back-btn{display:inline-flex;align-items:center;gap:5px;font-family:'Inter',sans-serif;font-size:13px;font-weight:500;color:#8E8E93;background:transparent;border:none;cursor:pointer;padding:12px 16px;text-decoration:none;line-height:1}
 .back-btn svg{width:16px;height:16px;stroke:#8E8E93;stroke-width:2.5;fill:none;stroke-linecap:round;stroke-linejoin:round}
@@ -125,17 +127,25 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
         <div class="mv"><div class="mvl">&epsilon;<sub>c2</sub></div><div class="mvv" id="ec2_d">2.00</div><div class="mvu">&permil;</div></div>
       </div>
       <div class="toggle-row" style="margin-top:8px;border-top:1px solid #E0E0E5;padding-top:12px">
-        <span>Beton confinat in bulbi</span>
+        <span>Beton confinat</span>
         <div class="seg">
-          <button id="seg-nc" class="on" onclick="setConf(false)">Neconfinat</button>
-          <button id="seg-c" onclick="setConf(true)">Confinat</button>
+          <button id="seg-nc" class="on" onclick="setConf('none')">Neconfinat</button>
+          <button id="seg-cb" onclick="setConf('bulb')">Bulbi</button>
+          <button id="seg-ca" onclick="setConf('all')">Bulbi+inimă</button>
         </div>
       </div>
       <div class="conf-fields" id="conf-fields">
-        <div class="row"><div class="rl">Rez. caract. confinata <span class="rn">(f<sub>ck,c</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="fckc" value="40.60" step="0.1" oninput="calc()"><span class="ru">MPa</span></div></div>
-        <div class="row"><div class="rl">Def. la efort max <span class="rn">(&epsilon;<sub>c2,c</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="ec2c" value="3.66" step="0.01" oninput="calc()"><span class="ru">&permil;</span></div></div>
-        <div class="row"><div class="rl">Def. ultima <span class="rn">(&epsilon;<sub>cu2,c</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="ecu2c" value="21.83" step="0.1" oninput="calc()"><span class="ru">&permil;</span></div></div>
-        <div class="note" style="padding:4px 0 6px">f<sub>cd,c</sub> = f<sub>ck,c</sub> / 1.5. Confinarea se aplica doar zonei de bulb. Lege parabola-dreptunghi.</div>
+        <div class="sub" id="conf-bulb-lbl">Bulbi confinati</div>
+        <div class="row"><div class="rl">Rez. caract. confinata <span class="rn">(f<sub>ck,c</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="fckc" value="59.31" step="0.1" oninput="calc()"><span class="ru">MPa</span></div></div>
+        <div class="row"><div class="rl">Def. la efort max <span class="rn">(&epsilon;<sub>c2,c</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="ec2c" value="2.81" step="0.01" oninput="calc()"><span class="ru">&permil;</span></div></div>
+        <div class="row"><div class="rl">Def. ultima <span class="rn">(&epsilon;<sub>cu2,c</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="ecu2c" value="10.95" step="0.1" oninput="calc()"><span class="ru">&permil;</span></div></div>
+        <div class="conf-web-fields" id="conf-web-fields">
+          <div class="sub">Inima confinata</div>
+          <div class="row"><div class="rl">Rez. caract. confinata <span class="rn">(f<sub>ck,c,w</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="fckcw" value="55" step="0.1" oninput="calc()"><span class="ru">MPa</span></div></div>
+          <div class="row"><div class="rl">Def. la efort max <span class="rn">(&epsilon;<sub>c2,c,w</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="ec2cw" value="2.48" step="0.01" oninput="calc()"><span class="ru">&permil;</span></div></div>
+          <div class="row"><div class="rl">Def. ultima <span class="rn">(&epsilon;<sub>cu2,c,w</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="ecu2cw" value="8.08" step="0.1" oninput="calc()"><span class="ru">&permil;</span></div></div>
+        </div>
+        <div class="note" style="padding:4px 0 6px">f<sub>cd,c</sub> = f<sub>ck,c</sub> / 1.5. Lege parabola-dreptunghi. La &bdquo;Bulbi+inimă&rdquo; se confineaza si inima cu proprietati separate.</div>
       </div>
     </div>
   </div>
@@ -170,8 +180,8 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
   <div class="ip">
     <div class="ph">5. Eforturi exterioare</div>
     <div class="pb">
-      <div class="row"><div class="rl">Moment incovoietor <span class="rn">(M<sub>Ed</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="med" value="8643.7" step="100" oninput="calc()"><span class="ru">kNm</span></div></div>
-      <div class="row"><div class="rl">Forta axiala <span class="rn">(N<sub>Ed</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="ned" value="1294.9" step="100" oninput="calc()"><span class="ru">kN</span></div></div>
+      <div class="row"><div class="rl">Moment incovoietor <span class="rn">(M<sub>Ed</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="med" value="15000" step="100" oninput="calc()"><span class="ru">kNm</span></div></div>
+      <div class="row"><div class="rl">Forta axiala <span class="rn">(N<sub>Ed</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="ned" value="20000" step="100" oninput="calc()"><span class="ru">kN</span></div></div>
       <div class="note" style="padding-top:6px">M<sub>Ed</sub> &gt; 0 comprima Bulb 2 (dreapta). M<sub>Ed</sub> &lt; 0 comprima Bulb 1 (stanga). N<sub>Ed</sub> &gt; 0 = compresiune.</div>
     </div>
   </div>
@@ -237,6 +247,16 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
   </div>
 
   <div class="op">
+    <div class="ph">Capacitati de deformatie ultima</div>
+    <div class="pb">
+      <div class="res-grid">
+        <div class="rc2"><div class="rl2">&epsilon;<sub>cu2</sub> (inima, neconfinat)</div><div class="rv" id="ecu_web_r">&mdash;</div><div class="ru2">&permil;</div></div>
+        <div class="rc2"><div class="rl2">&epsilon;<sub>cu2,c</sub> (bulb, confinat)</div><div class="rv" id="ecu_bulb_r">&mdash;</div><div class="ru2">&permil;</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="op">
     <div class="pb">
       <div class="report-bar">
         <span class="report-lbl">Export raport de calcul (PDF)</span>
@@ -255,7 +275,7 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
 <script>
 const CONC={'C12/15':{fck:12},'C16/20':{fck:16},'C20/25':{fck:20},'C25/30':{fck:25},'C30/37':{fck:30},'C35/45':{fck:35},'C40/50':{fck:40},'C45/55':{fck:45},'C50/60':{fck:50},'C55/67':{fck:55},'C60/75':{fck:60}};
 const STEEL={'S240B':{fyk:240},'S400B':{fyk:400},'S500B':{fyk:500},'S 500':{fyk:500}};
-let curC='C50/60',curS='S 500',confined=false,nmchart=null,lastCalc={};
+let curC='C50/60',curS='S 500',confMode='none',nmchart=null,lastCalc={};
 const NF=100;
 
 function gv(id){return parseFloat(document.getElementById(id)?.value)||0;}
@@ -264,11 +284,13 @@ function updMat(){
   document.getElementById('fcd_d').textContent=(fck/1.5).toFixed(2);
   document.getElementById('fyd_d').textContent=(fyk/1.15).toFixed(1);
 }
-function setConf(on){
-  confined=on;
-  document.getElementById('seg-nc').classList.toggle('on',!on);
-  document.getElementById('seg-c').classList.toggle('on',on);
-  document.getElementById('conf-fields').classList.toggle('on',on);
+function setConf(mode){
+  confMode=mode;
+  document.getElementById('seg-nc').classList.toggle('on',mode==='none');
+  document.getElementById('seg-cb').classList.toggle('on',mode==='bulb');
+  document.getElementById('seg-ca').classList.toggle('on',mode==='all');
+  document.getElementById('conf-fields').classList.toggle('on',mode!=='none');
+  document.getElementById('conf-web-fields').classList.toggle('on',mode==='all');
   calc();
 }
 
@@ -284,6 +306,8 @@ function buildModel(){
   const Es=200000;
   const ec2_nc=0.002, ecu_nc=0.0035;
   const ec2_c=gv('ec2c')/1000, ecu_c=gv('ecu2c')/1000;
+  const fckcw=gv('fckcw'), fcdcw=fckcw/1.5;
+  const ec2_cw=gv('ec2cw')/1000, ecu_cw=gv('ecu2cw')/1000;
   const PI=Math.PI;
   function barA(d){return d*d*PI/4;}
 
@@ -325,26 +349,26 @@ function buildModel(){
   const cntWeb = nWeb * in_r;
 
   return {lw,bw0,bf1,lf1,li1,bf2,lf2,li2,lwi,cnom,detr,
-    fck,fcd,fckc,fcdc,fyd,Es,ec2_nc,ecu_nc,ec2_c,ecu_c,
+    fck,fcd,fckc,fcdc,fyd,Es,ec2_nc,ecu_nc,ec2_c,ecu_c,fckcw,fcdcw,ec2_cw,ecu_cw,
     steelFibers,As_b1,As_b2,As_web,As_tot,Ac,cntB1,cntB2,cntWeb,
     bars:{b1c_n,b1c_d,b1s_n,b1s_d,b1l_n,b1l_d,b1l_r,b2c_n,b2c_d,b2s_n,b2s_d,b2l_n,b2l_d,b2l_r,in_d,in_s,in_r,nWeb}};
 }
 
 function sigC(eps,m,zone){
   if(eps<=0) return 0;
-  const useConf=confined&&zone==='bulb';
-  const fcd=useConf?m.fcdc:m.fcd;
-  const ec2=useConf?m.ec2_c:m.ec2_nc;
-  const ecu=useConf?m.ecu_c:m.ecu_nc;
+  // Determine if THIS zone is confined under the current mode, and pick props.
+  let fcd,ec2,ecu;
+  const bulbConf=(confMode==='bulb'||confMode==='all');
+  const webConf=(confMode==='all');
+  if(zone==='bulb'&&bulbConf){ fcd=m.fcdc; ec2=m.ec2_c; ecu=m.ecu_c; }
+  else if(zone==='web'&&webConf){ fcd=m.fcdcw; ec2=m.ec2_cw; ecu=m.ecu_cw; }
+  else { fcd=m.fcd; ec2=(zone==='bulb')?m.ec2_nc:m.ec2_nc; ecu=m.ecu_nc; }
   if(eps>ecu) return 0;
   const r=eps/ec2;
-  if(useConf){
-    // BETON CONFINAT: parabola-dreptunghi - parabola pana la ec2,c, apoi constant fcd,c
-    if(eps<=ec2) return fcd*(2*r-r*r);
-    return fcd;
-  }
-  // BETON NECONFINAT: parabola completa descrescatoare dupa varf (conform foii de calcul)
-  return fcd*(2*r-r*r);
+  // Lege parabola-dreptunghi (SR EN 1992-1-1:2004 / Encipedia Anexa A):
+  // parabola pana la ec2, apoi palier constant la fcd pana la ecu.
+  if(eps<=ec2) return fcd*(2*r-r*r);
+  return fcd;
 }
 function sigS(eps,m){let s=eps*m.Es;if(s>m.fyd)s=m.fyd;if(s<-m.fyd)s=-m.fyd;return s;}
 
@@ -357,14 +381,41 @@ function widthAt(l,m){
   return {w:m.lf1,zone:'bulb'};
 }
 
+// EN 1992 strain-plane forces at neutral-axis depth X (mm from compressed edge).
+// True pivot construction (monotonic, no cusp):
+//  - Bending (X <= L): compressed edge pinned at its zone ecu; linear to N.A.
+//  - Compression (X > L): plane rotates about the fixed pivot at depth
+//    c = (1 - ec2/ecu)*L from the compressed edge, where strain = ec2.
+// Strain-controlled section forces at neutral-axis depth X (mm from the most
+// compressed edge). With the parabola-rectangle law (flat plateau f_cd from
+// ec2 to ecu) the diagram closes smoothly: the limiting fiber sits at its
+// zone's ecu, the strain plane is linear eps(lc)=epsEdge*(X-lc)/X, and as X
+// grows the whole section reaches the plateau -> N approaches Ac*fcd squash.
 function sectionForces(X,m,compFromRef){
-  const ecu_eff=(confined?m.ecu_c:m.ecu_nc);
-  let Fb=0,Fbl=0;
-  const dx=X/NF;
+  const L=m.lw;
+  const dx=L/NF;
+  const bulbConf=(confMode==='bulb'||confMode==='all');
+  const webConf=(confMode==='all');
+  const ecuB=bulbConf?m.ecu_c:m.ecu_nc;
+  const ecuW=webConf?m.ecu_cw:m.ecu_nc;
+  // Pin curvature so the binding zone is exactly at its ultimate strain.
+  let epsEdge=Infinity;          // strain at compressed edge (lc=0)
   for(let i=0;i<NF;i++){
     const lc=(i+0.5)*dx;
-    const eps=ecu_eff*(X-lc)/X;
-    const lpos=compFromRef?lc:(m.lw-lc);
+    const shp=(X-lc)/X;
+    if(shp<=0) continue;
+    const lpos=compFromRef?lc:(L-lc);
+    const {zone}=widthAt(lpos,m);
+    const ecuZ=(zone==='bulb')?ecuB:ecuW;
+    const e=ecuZ/shp;            // edge strain that brings THIS fiber to its ecu
+    if(e<epsEdge) epsEdge=e;     // tightest governs
+  }
+  if(!isFinite(epsEdge)) epsEdge=0;
+  let Fb=0,Fbl=0;
+  for(let i=0;i<NF;i++){
+    const lc=(i+0.5)*dx;
+    const eps=epsEdge*(X-lc)/X;
+    const lpos=compFromRef?lc:(L-lc);
     const {w,zone}=widthAt(lpos,m);
     const sig=sigC(eps,m,zone);
     const F=sig*w*dx;
@@ -372,16 +423,16 @@ function sectionForces(X,m,compFromRef){
   }
   let Fa=0,Fal=0;
   for(const sf of m.steelFibers){
-    const lc=compFromRef?sf.l:(m.lw-sf.l);
-    const eps=ecu_eff*(X-lc)/X;
+    const lc=compFromRef?sf.l:(L-sf.l);
+    const eps=epsEdge*(X-lc)/X;
     const sig=sigS(eps,m);
     const F=sig*sf.A;
     Fa+=F;Fal+=F*sf.l;
   }
-  return {Fb:Fb/1e3,Fa:Fa/1e3,Fbl,Fal,Nint:(Fb+Fa)/1e3};
+  return {Fb:Fb/1e3,Fa:Fa/1e3,Fbl,Fal,Nint:(Fb+Fa)/1e3,epsEdge};
 }
 function solveX(Ntarget,m,compFromRef){
-  let lo=1,hi=m.lw*1.5;
+  let lo=1,hi=m.lw*6;
   let flo=sectionForces(lo,m,compFromRef).Nint-Ntarget;
   let fhi=sectionForces(hi,m,compFromRef).Nint-Ntarget;
   if(flo*fhi>0){if(Math.abs(flo)<Math.abs(fhi))return{X:lo,...sectionForces(lo,m,compFromRef)};return{X:hi,...sectionForces(hi,m,compFromRef)};}
@@ -415,25 +466,60 @@ function calc(){
   uf.style.width=Math.min(100,util)+'%';
   uf.style.background=util<=100?'#2E7D32':'#C0392B';
   document.getElementById('util_chk').className='chk '+(util<=100?'ok':'no');
-  const alfacc=0.85;
-  let NRdc;
-  if(confined){
-    const Ab=m.bf1*m.lf1+m.li1*m.bw0+m.bf2*m.lf2+m.li2*m.bw0;
-    const Aw=m.Ac-Ab;
-    NRdc=((Aw*m.fcd+Ab*m.fcdc-m.As_tot*m.fcd)*alfacc+m.As_tot*m.fyd)/1e3;
-  }else{
-    NRdc=(((m.Ac-m.As_tot)*m.fcd)*alfacc+m.As_tot*m.fyd)/1e3;
-  }
   const NRdt=-(m.As_tot*m.fyd)/1e3;
+  // ── N-M envelope: single strain-controlled sweep of neutral-axis depth X ──
+  // sectionForces() already pins the curvature to whichever zone (bulb ecu_c
+  // or web ecu_nc) crushes first. Sweeping X from small (bending) to large
+  // (compression) traces the whole envelope; as X grows the section tends to
+  // uniform strain and N approaches the squash apex naturally.
+  const pts=[];
+  pts.push({M:0,N:NRdt});
+  const nDiv=34,xStart=m.cnom*1.2,xEnd=m.lw*4;
+  for(let side=0;side<=1;side++){
+    const cfr=(side===0);
+    for(let i=1;i<=nDiv;i++){
+      // geometric spacing so points cluster where curvature changes fastest
+      const f=i/nDiv;
+      const X=xStart*Math.pow(xEnd/xStart,f);
+      const r=sectionForces(X,m,cfr);
+      pts.push({M:Math.abs(momentRd(r,m)),N:r.Nint});
+    }
+  }
+  // Apex N_Rd,c = squash load with the parabola-rectangle plateau: each zone
+  // at its own f_cd plateau + steel at yield.
+  let NRdc;
+  {
+    const Ab=m.bf1*m.lf1+m.bf2*m.lf2;
+    const Aw=m.Ac-Ab;
+    const bulbConf=(confMode==='bulb'||confMode==='all');
+    const webConf=(confMode==='all');
+    const fbulb=bulbConf?m.fcdc:m.fcd;
+    const fweb=webConf?m.fcdcw:m.fcd;
+    NRdc=(Aw*fweb + Ab*fbulb + m.As_tot*m.fyd)/1e3;
+  }
   document.getElementById('nrdc_r').textContent=NRdc.toFixed(0);
   document.getElementById('nrdt_r').textContent=NRdt.toFixed(0);
-  const pts=[];pts.push({M:0,N:NRdt});
-  const nDiv=20,xStart=m.cnom,xEnd=m.lw;
-  for(let i=0;i<=nDiv;i++){const X=xStart+(xEnd-xStart)*i/nDiv;const r=sectionForces(X,m,compFromRef);pts.push({M:Math.abs(momentRd(r,m)),N:r.Nint});}
-  pts.push({M:0,N:NRdc});pts.sort((a,b)=>a.N-b.N);
+  // strain capacities display
+  const webConfD=(confMode==='all'), bulbConfD=(confMode==='bulb'||confMode==='all');
+  document.getElementById('ecu_web_r').textContent=((webConfD?m.ecu_cw:m.ecu_nc)*1000).toFixed(2);
+  document.getElementById('ecu_bulb_r').textContent=((bulbConfD?m.ecu_c:m.ecu_nc)*1000).toFixed(2);
+  pts.push({M:0,N:NRdc});
+  // single-valued in N: keep highest M per N-band
+  pts.sort((a,b)=>a.N-b.N);
+  const bands={};
+  for(const p of pts){
+    const key=Math.round(p.N/600);
+    if(!bands[key]||p.M>bands[key].M) bands[key]=p;
+  }
+  const ptsClean=Object.values(bands).sort((a,b)=>a.N-b.N);
+  // light monotone cleanup each side of the balance point (max M)
+  let bi=0;
+  for(let i=1;i<ptsClean.length;i++) if(ptsClean[i].M>ptsClean[bi].M) bi=i;
+  for(let i=bi+1;i<ptsClean.length;i++) if(ptsClean[i].M>ptsClean[i-1].M) ptsClean[i].M=ptsClean[i-1].M;
+  for(let i=bi-1;i>=0;i--) if(ptsClean[i].M>ptsClean[i+1].M) ptsClean[i].M=ptsClean[i+1].M;
   drawSketch(m,res.X,compFromRef);
-  drawNM(pts,{M:Math.abs(Med),N:Ned},{M:Mrd,N:Ned});
-  lastCalc={m,Ned,Med,Mrd,X:res.X,Nint:res.Nint,Fb:res.Fb,Fa:res.Fa,util,NRdc,NRdt,pts,compFromRef,confined,concrete:curC,steel:curS};
+  drawNM(ptsClean,{M:Math.abs(Med),N:Ned},{M:Mrd,N:Ned});
+  lastCalc={m,Ned,Med,Mrd,X:res.X,Nint:res.Nint,Fb:res.Fb,Fa:res.Fa,util,NRdc,NRdt,pts:ptsClean,compFromRef,confMode,concrete:curC,steel:curS};
 }
 
 function drawSketch(m,X,compFromRef){
@@ -447,10 +533,12 @@ function drawSketch(m,X,compFromRef){
   function X2(l){return ox+l*scl;}
   let o='';
   const webY=oyC-(m.bw0*scl)/2;
-  o+=`<rect x="${X2(m.bf1+m.li1)}" y="${webY}" width="${(m.lw-m.bf1-m.li1-m.bf2-m.li2)*scl}" height="${m.bw0*scl}" fill="#E8E8ED" stroke="#C7C7CC" stroke-width="0.8"/>`;
+  const webConfFill=(confMode==='all')?'#DDEEFF':'#E8E8ED';
+  const bulbConfFill=(confMode==='bulb'||confMode==='all')?'#DDEEFF':'#E8E8ED';
+  o+=`<rect x="${X2(m.bf1+m.li1)}" y="${webY}" width="${(m.lw-m.bf1-m.li1-m.bf2-m.li2)*scl}" height="${m.bw0*scl}" fill="${webConfFill}" stroke="#C7C7CC" stroke-width="0.8"/>`;
   const b1Y=oyC-(m.lf1*scl)/2, b2Y=oyC-(m.lf2*scl)/2;
-  o+=`<rect x="${X2(0)}" y="${b1Y}" width="${m.bf1*scl}" height="${m.lf1*scl}" fill="${confined?'#DDEEFF':'#E8E8ED'}" stroke="${dark}" stroke-width="1.2"/>`;
-  o+=`<rect x="${X2(m.lw-m.bf2)}" y="${b2Y}" width="${m.bf2*scl}" height="${m.lf2*scl}" fill="${confined?'#DDEEFF':'#E8E8ED'}" stroke="${dark}" stroke-width="1.2"/>`;
+  o+=`<rect x="${X2(0)}" y="${b1Y}" width="${m.bf1*scl}" height="${m.lf1*scl}" fill="${bulbConfFill}" stroke="${dark}" stroke-width="1.2"/>`;
+  o+=`<rect x="${X2(m.lw-m.bf2)}" y="${b2Y}" width="${m.bf2*scl}" height="${m.lf2*scl}" fill="${bulbConfFill}" stroke="${dark}" stroke-width="1.2"/>`;
   const compW=X*scl;
   if(compFromRef){
     o+=`<rect x="${X2(m.lw)-compW}" y="${oyC-maxH*scl/2-3}" width="${compW}" height="${maxH*scl+6}" fill="#0066CC" opacity="0.10"/>`;
@@ -568,7 +656,7 @@ function buildPdf(nmImg,skImg){
     ['Bulb 1: lungime / latime','bf / lf',m.bf1+' / '+m.lf1+' mm'],
     ['Bulb 2: lungime / latime','bf / lf',m.bf2+' / '+m.lf2+' mm'],
     ['Total bare Bulb 1','-',m.cntB1+' bare'],['Total bare Bulb 2','-',m.cntB2+' bare'],
-    ['Clasa beton','-',d.concrete+(d.confined?' (confinat)':'')],['Clasa otel','-',d.steel],
+    ['Clasa beton','-',d.concrete+(d.confMode==='bulb'?' (bulbi confinati)':d.confMode==='all'?' (confinat integral)':'')],['Clasa otel','-',d.steel],
     ['Rezistenta de calcul beton','f_cd',m.fcd.toFixed(2)+' MPa'],['Rezistenta de calcul otel','f_yd',m.fyd.toFixed(1)+' MPa'],
     ['Moment exterior','M_Ed',d.Med.toFixed(1)+' kNm'],['Forta axiala','N_Ed',d.Ned.toFixed(1)+' kN'],['Numar fibre beton','N_f',''+NF]],
     margin:{left:ml,right:mr},tableWidth:cw,headStyles:{fillColor:[28,28,30],textColor:255,fontSize:8.5,fontStyle:'bold'},bodyStyles:{fontSize:8.5},alternateRowStyles:{fillColor:[245,247,250]},columnStyles:{0:{cellWidth:100},1:{cellWidth:30,fontStyle:'italic'},2:{halign:'right'}}});
@@ -579,7 +667,7 @@ function buildPdf(nmImg,skImg){
   row('Inaltimea zonei comprimate','X',d.X.toFixed(1)+' mm',true);row('Forta axiala interna','N_int',d.Nint.toFixed(1)+' kN');row('Forta axiala externa','N_ext',d.Ned.toFixed(1)+' kN');row('Diferenta','diff',(d.Ned-d.Nint).toFixed(2)+' kN');row('Suma forte beton','SUM F_b',d.Fb.toFixed(1)+' kN');row('Suma forte otel','SUM F_a',d.Fa.toFixed(1)+' kN');hl();
   cy(20);sT('4. REZULTAT');row('Moment capabil','M_Rd',d.Mrd.toFixed(1)+' kNm',true);row('Moment exterior','M_Ed',d.Med.toFixed(1)+' kNm');row('Utilizare','M_Ed/M_Rd',d.util.toFixed(1)+' %',true);
   const verdict=d.util<=100?'VERIFICA (M_Ed <= M_Rd)':'NU VERIFICA';cy(7);doc.setFontSize(9);doc.setFont('helvetica','bold');doc.setTextColor(d.util<=100?46:192,d.util<=100?125:57,d.util<=100?50:43);doc.text(verdict,ml,y);doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);y+=7;hl();
-  cy(18);sT('5. CAPACITATI AXIALE LIMITA');row('Compresiune centrica','N_Rd,u+',d.NRdc.toFixed(0)+' kN');row('Intindere centrica','N_Rd,u-',d.NRdt.toFixed(0)+' kN');hl();
+  cy(18);sT('5. CAPACITATI AXIALE LIMITA');row('Compresiune centrica','N_Rd,u+',d.NRdc.toFixed(0)+' kN');row('Intindere centrica','N_Rd,u-',d.NRdt.toFixed(0)+' kN');row('Def. ultima inima','eps_cu2',((d.confMode==='all'?d.m.ecu_cw:d.m.ecu_nc)*1000).toFixed(2)+' permil');row('Def. ultima bulb',(d.confMode==='bulb'||d.confMode==='all')?'eps_cu2,c':'eps_cu2',(((d.confMode==='bulb'||d.confMode==='all')?d.m.ecu_c:d.m.ecu_nc)*1000).toFixed(2)+' permil');hl();
   if(nmImg){cy(95);sT('6. DIAGRAMA DE INTERACTIUNE N-M');const iw=160,ih=95;doc.addImage(nmImg,'PNG',(pW-iw)/2,y,iw,ih);y+=ih+4;}
   const tp=doc.internal.getNumberOfPages();for(let i=1;i<=tp;i++){doc.setPage(i);doc.setFontSize(7.5);doc.setTextColor(150,150,150);doc.setFont('helvetica','normal');doc.line(ml,285,ml+cw,285);doc.text('CR 2-2022 / SR EN 1992-1-1',ml,289);doc.text('Pagina '+i+' din '+tp,pW-mr,289,{align:'right'});doc.text('Generat: '+ds,pW/2,289,{align:'center'});}
   doc.save('Raport_moment_capabil.pdf');
@@ -625,5 +713,6 @@ function buildPdf(nmImg,skImg){
   document.addEventListener('click',e=>{if(e.target.closest('.seg'))setTimeout(saveState,50);});
 })();
 
+setConf(confMode);
 updMat();calc();
 </script>
