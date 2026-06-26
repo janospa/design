@@ -164,7 +164,7 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
       <div class="row"><div class="rl">Lateral lat. lunga <span class="rn">(buc / &Oslash; / rand)</span></div><div class="rc"><input type="number" inputmode="numeric" id="b2l_n" value="9" step="1" oninput="calc()" style="width:40px"><input type="number" inputmode="numeric" id="b2l_d" value="25" step="1" oninput="calc()" style="width:40px"><input type="number" inputmode="numeric" id="b2l_r" value="3" step="1" oninput="calc()" style="width:40px"></div></div>
       <div class="count-box"><span>Total bare Bulb 2</span><span id="cnt_b2">&mdash;</span></div>
       <div class="sub">Inima &mdash; bare longitudinale</div>
-      <div class="row"><div class="rl">Bare long. <span class="rn">(&Oslash; / s / rand)</span></div><div class="rc"><input type="number" inputmode="numeric" id="in_d" value="12" step="1" oninput="calc()" style="width:40px"><input type="number" inputmode="numeric" id="in_s" value="150" step="10" oninput="calc()" style="width:40px"><input type="number" inputmode="numeric" id="in_r" value="3" step="1" oninput="calc()" style="width:40px"></div></div>
+      <div class="row"><div class="rl">Bare long. <span class="rn">(&Oslash; / s / rand)</span></div><div class="rc"><input type="number" inputmode="numeric" id="in_d" value="12" step="1" oninput="calc()" style="width:40px"><input type="number" inputmode="numeric" id="in_s" value="150" step="10" oninput="calc()" style="width:40px"><input type="number" inputmode="numeric" id="in_r" value="2" step="1" oninput="calc()" style="width:40px"></div></div>
       <div class="count-box"><span>Total bare Inima</span><span id="cnt_web">&mdash;</span></div>
     </div>
   </div>
@@ -250,8 +250,8 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
     <div class="ph">Capacitati de deformatie ultima</div>
     <div class="pb">
       <div class="res-grid">
-        <div class="rc2"><div class="rl2">&epsilon;<sub>cu2</sub> (inima, neconfinat)</div><div class="rv" id="ecu_web_r">&mdash;</div><div class="ru2">&permil;</div></div>
-        <div class="rc2"><div class="rl2">&epsilon;<sub>cu2,c</sub> (bulb, confinat)</div><div class="rv" id="ecu_bulb_r">&mdash;</div><div class="ru2">&permil;</div></div>
+        <div class="rc2"><div class="rl2"><span id="ecu_web_lbl">&epsilon;<sub>cu2</sub> (inima, neconfinat)</span></div><div class="rv" id="ecu_web_r">&mdash;</div><div class="ru2">&permil;</div></div>
+        <div class="rc2"><div class="rl2"><span id="ecu_bulb_lbl">&epsilon;<sub>cu2</sub> (bulb, neconfinat)</span></div><div class="rv" id="ecu_bulb_r">&mdash;</div><div class="ru2">&permil;</div></div>
       </div>
     </div>
   </div>
@@ -503,6 +503,12 @@ function calc(){
   const webConfD=(confMode==='all'), bulbConfD=(confMode==='bulb'||confMode==='all');
   document.getElementById('ecu_web_r').textContent=((webConfD?m.ecu_cw:m.ecu_nc)*1000).toFixed(2);
   document.getElementById('ecu_bulb_r').textContent=((bulbConfD?m.ecu_c:m.ecu_nc)*1000).toFixed(2);
+  document.getElementById('ecu_web_lbl').innerHTML=webConfD
+    ? '&epsilon;<sub>cu2,c</sub> (inima, confinat)'
+    : '&epsilon;<sub>cu2</sub> (inima, neconfinat)';
+  document.getElementById('ecu_bulb_lbl').innerHTML=bulbConfD
+    ? '&epsilon;<sub>cu2,c</sub> (bulb, confinat)'
+    : '&epsilon;<sub>cu2</sub> (bulb, neconfinat)';
   pts.push({M:0,N:NRdc});
   // single-valued in N: keep highest M per N-band
   pts.sort((a,b)=>a.N-b.N);
