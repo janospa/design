@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#F5F5F7">
+<meta name="description" content="Aplicație de calcul pentru pereți structurali din beton armat cu bulbi — CR 2-1-1.1/2022">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='2' y='4' width='8' height='24' rx='1.5' fill='%238E8E93'/><rect x='10' y='11' width='12' height='10' rx='1' fill='%23C7C7CC'/><rect x='22' y='4' width='8' height='24' rx='1.5' fill='%238E8E93'/></svg>">
 <title>SW Design</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -16,12 +19,14 @@ body{font-family:'Inter',sans-serif;background:#F5F5F7;color:#1C1C1E;min-height:
 .mod:active{transform:translateY(0)}
 .mod-icon{width:52px;height:40px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
 .mod-num{font-size:11px;font-weight:600;color:#8E8E93;flex-shrink:0;text-align:right;width:18px}
-.mod-title{font-size:14px;font-weight:500;color:#1C1C1E;flex:1}
+.mod-text{flex:1;min-width:0}
+.mod-title{font-size:14px;font-weight:500;color:#1C1C1E}
+.mod-desc{font-size:11px;color:#8E8E93;margin-top:2px;line-height:1.35}
 .mod-arrow{width:20px;height:20px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
 .mod-arrow svg{width:12px;height:12px;stroke:#C7C7CC;stroke-width:2.5;fill:none;stroke-linecap:round;stroke-linejoin:round}
 .mod:hover .mod-arrow svg{stroke:#8E8E93}
 .author{text-align:center;font-size:12px;font-weight:500;color:#8E8E93;margin-top:20px;letter-spacing:.02em}
-@media(max-width:400px){.mod-title{font-size:13px}.mod-icon{width:44px}}
+@media(max-width:400px){.mod-title{font-size:13px}.mod-desc{font-size:10px}.mod-icon{width:44px}}
 </style>
 </head>
 <body>
@@ -39,7 +44,10 @@ body{font-family:'Inter',sans-serif;background:#F5F5F7;color:#1C1C1E;min-height:
           <rect x="40" y="6" width="11" height="28" rx="1.5" fill="#E8E8ED" stroke="#8E8E93" stroke-width="1.3"/>
         </svg>
       </div>
-      <span class="mod-title">Predimensionarea pereților</span>
+      <div class="mod-text">
+        <span class="mod-title">Predimensionarea pereților</span>
+        <div class="mod-desc">Condiții minime geometrie și armare — CR 2/2022 §7</div>
+      </div>
       <span class="mod-arrow"><svg viewBox="0 0 16 16"><polyline points="5,3 11,8 5,13"/></svg></span>
     </a>
 
@@ -83,7 +91,10 @@ body{font-family:'Inter',sans-serif;background:#F5F5F7;color:#1C1C1E;min-height:
           <path d="M41,18 Q43,20 41,22" fill="none" stroke="#1C1C1E" stroke-width="1.1" stroke-linecap="round"/>
         </svg>
       </div>
-      <span class="mod-title">Beton confinat</span>
+      <div class="mod-text">
+        <span class="mod-title">Beton confinat</span>
+        <div class="mod-desc">Parametri beton confinat — model Mander, CR 2/2022</div>
+      </div>
       <span class="mod-arrow"><svg viewBox="0 0 16 16"><polyline points="5,3 11,8 5,13"/></svg></span>
     </a>
 
@@ -107,7 +118,10 @@ body{font-family:'Inter',sans-serif;background:#F5F5F7;color:#1C1C1E;min-height:
                 fill="#F3EEFF" opacity="0.55"/>
         </svg>
       </div>
-      <span class="mod-title">Momentul capabil M<sub>Rd</sub></span>
+      <div class="mod-text">
+        <span class="mod-title">Momentul capabil M<sub>Rd</sub></span>
+        <div class="mod-desc">Diagramă de interacțiune N-M — metoda fibrelor</div>
+      </div>
       <span class="mod-arrow"><svg viewBox="0 0 16 16"><polyline points="5,3 11,8 5,13"/></svg></span>
     </a>
 
@@ -131,7 +145,10 @@ body{font-family:'Inter',sans-serif;background:#F5F5F7;color:#1C1C1E;min-height:
           <!-- right shear force line -->
         </svg>
       </div>
-      <span class="mod-title">Forța tăietoare V<sub>Rd</sub></span>
+      <div class="mod-text">
+        <span class="mod-title">Forța tăietoare V<sub>Rd</sub></span>
+        <div class="mod-desc">V<sub>Rd,max</sub>, V<sub>Rd,s</sub>, V<sub>Rd,i</sub> — zone critice și non-critice</div>
+      </div>
       <span class="mod-arrow"><svg viewBox="0 0 16 16"><polyline points="5,3 11,8 5,13"/></svg></span>
     </a>
 
@@ -149,12 +166,15 @@ body{font-family:'Inter',sans-serif;background:#F5F5F7;color:#1C1C1E;min-height:
           <line x1="13" y1="27" x2="39" y2="27" stroke="#C62828" stroke-width="1" opacity="0.35"/>
         </svg>
       </div>
-      <span class="mod-title">Grinzi de cuplare</span>
+      <div class="mod-text">
+        <span class="mod-title">Grinzi de cuplare</span>
+        <div class="mod-desc">Verificare moment și forță tăietoare grinzi scurte</div>
+      </div>
       <span class="mod-arrow"><svg viewBox="0 0 16 16"><polyline points="5,3 11,8 5,13"/></svg></span>
     </a>
 
   </div>
-  <div class="author">Aplicație dezvoltată în cadrul lucrării de disertație — Janos Patrik</div>
+  <div class="author">Lucrare de disertație — Janos Patrik · UTCN · Facultatea de Construcții · 2026</div>
 </div>
 </body>
 </html>

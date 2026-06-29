@@ -1,6 +1,12 @@
-
+<!DOCTYPE html>
+<html lang="ro">
+<head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#F5F5F7">
+<meta name="description" content="Parametri beton confinat — model Mander, CR 2-1-1.1/2022">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='2' y='4' width='8' height='24' rx='1.5' fill='%238E8E93'/><rect x='10' y='11' width='12' height='10' rx='1' fill='%23C7C7CC'/><rect x='22' y='4' width='8' height='24' rx='1.5' fill='%238E8E93'/></svg>">
+<title>Beton confinat — SW Design</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -91,14 +97,48 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
 .report-btn:active{opacity:.7}
 .report-btn:disabled{opacity:.4}
 .report-status{font-size:12px;color:#8E8E93;text-align:center;padding:6px 0 0;min-height:16px}
-@media(max-width:680px){.wrap{padding:14px 10px}.cols{grid-template-columns:1fr;gap:0}.report-btn{width:100%}.rc input[type=number],.sel-field select{font-size:16px}.rl{font-size:14px}.ph{font-size:12px}.report-btn{font-size:15px;padding:13px 18px}}
+@media(max-width:680px){.wrap{padding:14px 10px}.cols{grid-template-columns:1fr;gap:0}.report-btn{width:100%}.rc input[type=number],.sel-field select,.preset-bar select{font-size:16px}.rl{font-size:14px}.ph{font-size:12px}.report-btn{font-size:15px;padding:13px 18px}}
 .back-btn{display:inline-flex;align-items:center;gap:5px;font-family:'Inter',sans-serif;font-size:13px;font-weight:500;color:#8E8E93;background:transparent;border:none;cursor:pointer;padding:12px 16px;text-decoration:none;line-height:1}
 .back-btn svg{width:16px;height:16px;stroke:#8E8E93;stroke-width:2.5;fill:none;stroke-linecap:round;stroke-linejoin:round}
 .back-btn:hover{color:#1C1C1E}
 .back-btn:hover svg{stroke:#1C1C1E}
+.preset-bar{display:flex;align-items:center;gap:10px;padding:0 16px 10px}
+.preset-bar label{font-size:12px;font-weight:500;color:#8E8E93}
+.preset-bar select{padding:6px 28px 6px 10px;font-size:13px;border:1px solid #C7C7CC;border-radius:8px;background:#fff;color:#1C1C1E;font-family:'Inter',sans-serif;-webkit-appearance:none;appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238E8E93'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
+.preset-bar select:focus{outline:none;box-shadow:0 0 0 2px rgba(0,122,255,.2);border-color:#007AFF}
+.author-footer{text-align:center;font-size:11px;font-weight:500;color:#8E8E93;padding:16px 16px 24px;letter-spacing:.02em}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:1000;align-items:center;justify-content:center}
+.modal-overlay.show{display:flex}
+.modal{background:#fff;border-radius:16px;padding:24px;max-width:340px;width:90%;box-shadow:0 16px 48px rgba(0,0,0,.2)}
+.modal h3{font-size:15px;font-weight:600;color:#1C1C1E;margin-bottom:14px}
+.modal-presets{display:flex;flex-direction:column;gap:8px;margin-bottom:18px}
+.modal-preset{display:flex;align-items:center;gap:10px;padding:10px 12px;background:#F5F5F7;border-radius:10px;cursor:pointer;border:2px solid transparent;transition:all .12s;user-select:none}
+.modal-preset.sel{border-color:#007AFF;background:#EBF3FF}
+.modal-preset .mp-check{width:20px;height:20px;border-radius:6px;border:2px solid #C7C7CC;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .12s}
+.modal-preset.sel .mp-check{border-color:#007AFF;background:#007AFF}
+.modal-preset.sel .mp-check::after{content:'';width:6px;height:10px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg);margin-top:-2px}
+.modal-preset .mp-name{font-size:13px;font-weight:500;color:#1C1C1E}
+.modal-preset .mp-info{font-size:11px;color:#8E8E93;margin-left:auto}
+.modal-preset.empty{opacity:.45}
+.modal-btns{display:flex;gap:8px}
+.modal-btns button{flex:1;padding:11px;font-size:14px;font-weight:500;font-family:'Inter',sans-serif;border:none;border-radius:10px;cursor:pointer;transition:opacity .15s}
+.modal-btns .m-cancel{background:#E5E5EA;color:#1C1C1E}
+.modal-btns .m-export{background:#1C1C1E;color:#fff}
+.modal-btns .m-export:disabled{opacity:.35}
 </style>
+</head>
+<body>
 
 <a href="index.html" class="back-btn"><svg viewBox="0 0 16 16"><polyline points="10,3 4,8 10,13"/></svg>Toate modulele</a>
+<div class="preset-bar">
+  <label>Perete:</label>
+  <select id="presetSel" onchange="switchPreset(this.value)">
+    <option value="P1">P1</option>
+    <option value="P2">P2</option>
+    <option value="P3">P3</option>
+    <option value="P4">P4</option>
+    <option value="P5">P5</option>
+  </select>
 </div>
 
 <div class="wrap">
@@ -290,6 +330,18 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
   </div>
 </div>
 </div>
+</div>
+<div class="author-footer">Lucrare de disertație — Janos Patrik · UTCN · Facultatea de Construcții · 2026</div>
+
+<div class="modal-overlay" id="exportModal">
+  <div class="modal">
+    <h3>Export PDF — selecteaza peretii</h3>
+    <div class="modal-presets" id="modalPresets"></div>
+    <div class="modal-btns">
+      <button class="m-cancel" onclick="closeExportModal()">Anuleaza</button>
+      <button class="m-export" id="modalExportBtn" onclick="exportSelected()">Exporta</button>
+    </div>
+  </div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
@@ -535,48 +587,120 @@ function svgToPng(cb){
   img.src='data:image/svg+xml;base64,'+svg64;
 }
 function generatePdf(){
-  const btn=document.getElementById('rptBtn');const status=document.getElementById('rptStatus');
+  saveCurrentPreset();
+  const container=document.getElementById('modalPresets');
+  let html='';
+  ['P1','P2','P3','P4','P5'].forEach(p=>{
+    const saved=loadPreset(p);
+    const hasData=!!saved;
+    const info=hasData?describePreset(saved):'(gol)';
+    html+=`<div class="modal-preset${p===currentPreset?' sel':''}${!hasData?' empty':''}" data-p="${p}" onclick="toggleModalPreset(this)">
+      <div class="mp-check"></div>
+      <span class="mp-name">${p}</span>
+      <span class="mp-info">${info}</span>
+    </div>`;
+  });
+  container.innerHTML=html;
+  document.getElementById('exportModal').classList.add('show');
+  updModalBtn();
+}
+function describePreset(s){
+  if(!s)return '';
+  const b=s.b||'?', h=s.h||'?', c=s.cp||'C30/37';
+  return b+'\u00d7'+h+' '+c;
+}
+function toggleModalPreset(el){
+  if(el.classList.contains('empty')&&!el.classList.contains('sel'))return;
+  el.classList.toggle('sel');
+  updModalBtn();
+}
+function updModalBtn(){
+  const sel=document.querySelectorAll('.modal-preset.sel:not(.empty)');
+  document.getElementById('modalExportBtn').disabled=sel.length===0;
+}
+function closeExportModal(){document.getElementById('exportModal').classList.remove('show');}
+function exportSelected(){
+  const selected=[...document.querySelectorAll('.modal-preset.sel:not(.empty)')].map(el=>el.dataset.p);
+  if(!selected.length)return;
+  closeExportModal();
+  const btn=document.getElementById('rptBtn'),status=document.getElementById('rptStatus');
   if(typeof window.jspdf==='undefined'){status.textContent='Libraria PDF se incarca... incearca din nou.';return;}
   btn.disabled=true;btn.textContent='Se genereaza...';
-  const chartImg=getChartImg();
-  svgToPng(function(sketchImg){buildPdf(chartImg,sketchImg);btn.disabled=false;btn.textContent='Descarca PDF';status.textContent='Raport descarcat.';setTimeout(()=>status.textContent='',4000);});
-}
-function buildPdf(chartImg,sketchImg){
+  const origPreset=currentPreset;
   const{jsPDF}=window.jspdf;
   const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+  let isFirst=true;
+  let queue=[...selected];
+  function processNext(){
+    if(queue.length===0){
+      const pW=210,ml=15,mr=15,cw=pW-ml-mr,ds=new Date().toLocaleDateString('ro-RO');
+      const tp=doc.internal.getNumberOfPages();
+      for(let i=1;i<=tp;i++){doc.setPage(i);doc.setFontSize(7.5);doc.setTextColor(0,0,0);doc.setDrawColor(40,80,140);doc.setFont('helvetica','normal');doc.line(ml,285,ml+cw,285);doc.text('CR 2-1-1.1/2022 / SR EN 1992-1-1',ml,289);doc.text('Pagina '+i+' din '+tp,pW-mr,289,{align:'right'});doc.text('Generat: '+ds,pW/2,289,{align:'center'});}
+      const fname=selected.length===1?'Raport_beton_confinat_'+selected[0]+'.pdf':'Raport_beton_confinat_'+selected.join('_')+'.pdf';
+      doc.save(fname);
+      switchPreset(origPreset);
+      btn.disabled=false;btn.textContent='Descarca PDF';
+      status.textContent='Raport descarcat ('+selected.length+' perete/pereti).';
+      setTimeout(()=>status.textContent='',4000);
+      return;
+    }
+    const p=queue.shift();
+    switchPreset(p);
+    const chartImg=getChartImg();
+    svgToPng(function(sketchImg){
+      if(!isFirst)doc.addPage();
+      isFirst=false;
+      buildPdfPage(doc,chartImg,sketchImg,p);
+      processNext();
+    });
+  }
+  processNext();
+}
+function buildPdfPage(doc,chartImg,sketchImg,pName){
+  pName=pName||currentPreset;
   const d=lastCalc;const pW=210,ml=15,mr=15,cw=pW-ml-mr;
   const ds=new Date().toLocaleDateString('ro-RO');let y=0;
-  function hdr(){doc.setFillColor(28,28,30);doc.rect(0,0,210,14,'F');doc.setTextColor(255,255,255);doc.setFontSize(11);doc.setFont('helvetica','bold');doc.text('NOTA DE CALCUL - BETON CONFINAT',ml,9);doc.setFontSize(8);doc.setFont('helvetica','normal');doc.text('CR 2-2022 / SR EN 1992-1-1',ml,13);doc.text('Data: '+ds,pW-mr,13,{align:'right'});doc.setTextColor(0,0,0);y=20;}
+  function hdr(){doc.setFillColor(40,80,140);doc.rect(0,0,210,14,'F');doc.setTextColor(255,255,255);doc.setFontSize(11);doc.setFont('helvetica','bold');doc.text('NOTA DE CALCUL \u2014 BETON CONFINAT',ml,9);doc.setFontSize(8);doc.setFont('helvetica','normal');doc.text('CR 2-2022 / SR EN 1992-1-1',ml,13);doc.text('Perete: '+pName+'  |  Data: '+ds,pW-mr,9,{align:'right'});doc.setTextColor(0,0,0);y=20;}
   function cy(n=10){if(y+n>275){doc.addPage();hdr();}}
-  function sT(t){cy(12);doc.setFillColor(235,243,252);doc.rect(ml,y-4,cw,8,'F');doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor(0,102,204);doc.text(t,ml+2,y+1);doc.setTextColor(0,0,0);doc.setFont('helvetica','normal');y+=8;}
-  function row(l,f,v,hl){cy(6);doc.setFontSize(8.5);doc.setFont('helvetica','normal');doc.setTextColor(80,80,80);doc.text(l,ml,y);if(f){doc.setTextColor(140,140,140);doc.setFontSize(7.5);doc.text(f,ml+70,y);}doc.setFontSize(9);doc.setFont('helvetica','bold');if(hl)doc.setTextColor(0,102,204);else doc.setTextColor(0,0,0);doc.text(v,pW-mr,y,{align:'right'});doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);y+=5.5;}
-  function hl(){cy(3);doc.setDrawColor(225,225,230);doc.line(ml,y,ml+cw,y);y+=3;}
+  function sT(t){cy(12);doc.setFillColor(240,245,250);doc.rect(ml,y-4,cw,8,'F');doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor(0,102,204);doc.text(t,ml+2,y+1);doc.setTextColor(0,0,0);doc.setFont('helvetica','normal');y+=8;}
+  function row(l,f,v,hl){cy(6);doc.setFontSize(8.5);doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);doc.text(l,ml,y);if(f){doc.setTextColor(0,0,0);doc.setFontSize(7.5);doc.text(f,ml+70,y);}doc.setFontSize(9);doc.setFont('helvetica','bold');if(hl)doc.setTextColor(0,102,204);else doc.setTextColor(0,0,0);doc.text(v,pW-mr,y,{align:'right'});doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);y+=5.5;}
+  function hl(){cy(3);doc.setDrawColor(180,200,220);doc.line(ml,y,ml+cw,y);y+=3;}
   hdr();
-  doc.setFontSize(18);doc.setFont('helvetica','bold');doc.setTextColor(28,28,30);doc.text('Rezistenta betonului confinat',pW/2,46,{align:'center'});
-  doc.setFontSize(11);doc.setFont('helvetica','normal');doc.setTextColor(90,90,90);doc.text('Determinarea rezistentei si deformatiilor betonului confinat',pW/2,56,{align:'center'});doc.text('conform CR 2-2022 si SR EN 1992-1-1 cap. 3',pW/2,62,{align:'center'});
-  doc.setDrawColor(0,102,204);doc.setLineWidth(0.4);doc.line(ml,70,ml+cw,70);y=80;
+  // Tabular header
+  doc.autoTable({startY:22,body:[
+    [{content:'REZISTENTA BETONULUI CONFINAT',colSpan:2,styles:{fontSize:14,fontStyle:'bold',halign:'center',textColor:[28,28,30],fillColor:[255,255,255],cellPadding:{top:6,bottom:2}}}],
+    [{content:'Model Mander \u2014 CR 2-1-1.1/2022 si SR EN 1992-1-1 cap. 3',colSpan:2,styles:{fontSize:9.5,halign:'center',textColor:[0,0,0],fillColor:[255,255,255],cellPadding:{top:1,bottom:2}}}],
+    [{content:'Aplicatie dezvoltata in cadrul lucrarii de disertatie \u2014 Janos Patrik',colSpan:2,styles:{fontSize:8,fontStyle:'italic',halign:'center',textColor:[0,0,0],fillColor:[255,255,255],cellPadding:{top:1,bottom:4}}}],
+    ['Perete: '+pName,'Data: '+ds],
+  ],margin:{left:ml,right:mr},tableWidth:cw,
+  theme:'plain',
+  styles:{lineColor:[0,102,204],lineWidth:0},
+  columnStyles:{0:{fontStyle:'bold',fontSize:9,textColor:[0,102,204]},1:{halign:'right',fontSize:9,textColor:[0,0,0]}},
+  didParseCell:function(data){if(data.row.index===3){data.cell.styles.lineWidth={top:0.4,bottom:0.4};data.cell.styles.lineColor=[0,102,204];}},
+  });
+  y=doc.lastAutoTable.finalY+6;
   sT('1. DATE DE INTRARE');
-  doc.autoTable({startY:y,head:[['Parametru','Notatie','Valoare']],body:[['Lungimea peretelui','b',d.b+' mm'],['Grosimea peretelui','h',d.h+' mm'],['Acoperire cu beton','c_nom',d.cnom+' mm'],['Pas etrieri','s',d.s+' mm'],['Clasa beton','-',d.concrete],['Rezistenta caracteristica beton','f_ck',d.fck+' MPa'],['Rezistenta de calcul beton','f_cd',d.fcd.toFixed(2)+' MPa'],['Clasa otel','-',d.steel],['Rezistenta caracteristica otel','f_yk',d.fyk+' MPa'],['Rezistenta de calcul otel','f_yd',d.fyd.toFixed(2)+' MPa'],['Diametru etrier perimetral','O_sw,p',d.xpd+' mm'],['Nr. ramuri perimetrale','n_p',''+d.xpn],['Diametru etrier intermediar','O_sw',d.xmd+' mm'],['Nr. ramuri intermediare (X)','n',''+d.xmn],['Nr. ramuri intermediare (Y)','n',''+d.ymn],['Mod distante bi','-',d.biMode==='auto'?'Automat (egale)':'Manual']],margin:{left:ml,right:mr},tableWidth:cw,headStyles:{fillColor:[28,28,30],textColor:255,fontSize:8.5,fontStyle:'bold'},bodyStyles:{fontSize:8.5},alternateRowStyles:{fillColor:[245,247,250]},columnStyles:{0:{cellWidth:95},1:{cellWidth:35,fontStyle:'italic'},2:{halign:'right'}}});
+  doc.autoTable({startY:y,head:[['Parametru','Notatie','Valoare']],body:[['Lungimea peretelui','b',d.b+' mm'],['Grosimea peretelui','h',d.h+' mm'],['Acoperire cu beton','c_nom',d.cnom+' mm'],['Pas etrieri','s',d.s+' mm'],['Clasa beton','-',d.concrete],['Rezistenta caracteristica beton','f_ck',d.fck+' MPa'],['Rezistenta de calcul beton','f_cd',d.fcd.toFixed(2)+' MPa'],['Clasa otel','-',d.steel],['Rezistenta caracteristica otel','f_yk',d.fyk+' MPa'],['Rezistenta de calcul otel','f_yd',d.fyd.toFixed(2)+' MPa'],['Diametru etrier perimetral','O_sw,p',d.xpd+' mm'],['Nr. ramuri perimetrale','n_p',''+d.xpn],['Diametru etrier intermediar','O_sw',d.xmd+' mm'],['Nr. ramuri intermediare (X)','n',''+d.xmn],['Nr. ramuri intermediare (Y)','n',''+d.ymn],['Mod distante bi','-',d.biMode==='auto'?'Automat (egale)':'Manual']],margin:{left:ml,right:mr},tableWidth:cw,theme:'grid',styles:{lineColor:[180,200,220],lineWidth:0.3,fontSize:8.5,textColor:[0,0,0]},headStyles:{fillColor:[200,215,235],textColor:[0,0,0],fontStyle:'bold',lineColor:[200,215,235]},alternateRowStyles:{fillColor:[240,245,252]},columnStyles:{0:{cellWidth:95},1:{cellWidth:35,fontStyle:'italic'},2:{halign:'right'}}});
   y=doc.lastAutoTable.finalY+6;
   if(sketchImg){cy(64);sT('2. SECTIUNE CONFINATA');const iw=140,ih=80;doc.addImage(sketchImg,'PNG',(pW-iw)/2,y,iw,ih);y+=ih+6;}
-  cy(30);sT('3. GEOMETRIA MIEZULUI CONFINAT');doc.setFontSize(8);doc.setTextColor(130,130,130);doc.setFont('helvetica','italic');doc.text('b_0 = b - 2*c_nom - O_sw,p     h_0 = h - 2*c_nom - O_sw,p',ml,y);doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);y+=6;
+  cy(30);sT('3. GEOMETRIA MIEZULUI CONFINAT');doc.setFontSize(8);doc.setTextColor(0,0,0);doc.setFont('helvetica','italic');doc.text('b_0 = b - 2*c_nom - O_sw,p     h_0 = h - 2*c_nom - O_sw,p',ml,y);doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);y+=6;
   row('Latimea miezului confinat','b_0',d.b0+' mm',true);row('Inaltimea miezului confinat','h_0',d.h0+' mm',true);hl();
-  cy(20);sT('4. ARII DE ARMATURA');doc.setFontSize(8);doc.setTextColor(130,130,130);doc.setFont('helvetica','italic');doc.text('A_st = O^2 * pi / 4',ml,y);doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);y+=6;
+  cy(20);sT('4. ARII DE ARMATURA');doc.setFontSize(8);doc.setTextColor(0,0,0);doc.setFont('helvetica','italic');doc.text('A_st = O^2 * pi / 4',ml,y);doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);y+=6;
   row('Aria etrier perimetral','A_st,perim',d.Ast_perim.toFixed(2)+' mm2');row('Aria etrier intermediar','A_st',d.Ast_mid.toFixed(2)+' mm2');hl();
   cy(24);sT('5. DISTANTE bi ('+(d.biMode==='auto'?'egale':'manual')+')');
-  if(d.biMode==='auto'){doc.setFontSize(8);doc.setTextColor(130,130,130);doc.setFont('helvetica','italic');doc.text('bi = b_0 / (n_total - 1)',ml,y);doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);y+=6;}
+  if(d.biMode==='auto'){doc.setFontSize(8);doc.setTextColor(0,0,0);doc.setFont('helvetica','italic');doc.text('bi = b_0 / (n_total - 1)',ml,y);doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);y+=6;}
   d.biX.forEach((v,i)=>row('bi,X #'+(i+1),'',v.toFixed(1)+' mm'));
   if(d.biY.length) d.biY.forEach((v,i)=>row('bi,Y #'+(i+1),'',v.toFixed(1)+' mm'));
   row('Suma J*bi^2','S(J*bi2)',d.sumb.toFixed(0)+' mm2',true);hl();
-  cy(18);sT('6. COEFICIENT DE ARMARE VOLUMETRICA');doc.setFontSize(7.5);doc.setTextColor(130,130,130);doc.setFont('helvetica','italic');doc.text('w_wk = [(n_p*A_p + n*A_st)*b_0 + (n_p*A_p)*h_0] / (s*b_0*h_0) * f_yk/f_ck',ml,y);doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);y+=6;
+  cy(18);sT('6. COEFICIENT DE ARMARE VOLUMETRICA');doc.setFontSize(7.5);doc.setTextColor(0,0,0);doc.setFont('helvetica','italic');doc.text('w_wk = [(n_p*A_p + n*A_st)*b_0 + (n_p*A_p)*h_0] / (s*b_0*h_0) * f_yk/f_ck',ml,y);doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);y+=6;
   row('Coeficient volumetric','w_wk',d.wwk.toFixed(4),true);hl();
-  cy(24);sT('7. FACTOR DE EFICIENTA AL CONFINARII');doc.setFontSize(7.5);doc.setTextColor(130,130,130);doc.setFont('helvetica','italic');doc.text('alfa = (1 - s/2b_0)(1 - s/2h_0)(1 - S bi2 / 6h_0 b_0)',ml,y);doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);y+=6;
+  cy(24);sT('7. FACTOR DE EFICIENTA AL CONFINARII');doc.setFontSize(7.5);doc.setTextColor(0,0,0);doc.setFont('helvetica','italic');doc.text('alfa = (1 - s/2b_0)(1 - s/2h_0)(1 - S bi2 / 6h_0 b_0)',ml,y);doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);y+=6;
   row('Factor pas etrieri','alfa_s',d.alfa_s.toFixed(4));row('Factor distributie bare','alfa_n',d.alfa_n.toFixed(4));row('Factor de eficienta','alfa',d.alfa.toFixed(4),true);hl();
-  cy(18);sT('8. EFORT EFECTIV DE COMPRESIUNE LATERALA');doc.setFontSize(8);doc.setTextColor(130,130,130);doc.setFont('helvetica','italic');doc.text('sigma_2,b = 0.5 * alfa * w_wk * f_ck',ml,y);doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);y+=6;
+  cy(18);sT('8. EFORT EFECTIV DE COMPRESIUNE LATERALA');doc.setFontSize(8);doc.setTextColor(0,0,0);doc.setFont('helvetica','italic');doc.text('sigma_2,b = 0.5 * alfa * w_wk * f_ck',ml,y);doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);y+=6;
   row('Compresiune laterala efectiva','sigma_2,b',d.s2b.toFixed(4)+' MPa',true);row('Limita 0.05*f_ck','-',(0.05*d.fck).toFixed(2)+' MPa');hl();
-  cy(22);sT('9. REZISTENTA BETONULUI CONFINAT - '+(d.f1?'FORMULA 1':'FORMULA 2'));doc.setFontSize(8);doc.setTextColor(130,130,130);doc.setFont('helvetica','italic');doc.text(d.f1?'f_ck,c = f_ck * (1 + 5 * sigma2/f_ck)':'f_ck,c = f_ck * (1.125 + 2.5 * sigma2/f_ck)',ml,y);doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);y+=6;
+  cy(22);sT('9. REZISTENTA BETONULUI CONFINAT - '+(d.f1?'FORMULA 1':'FORMULA 2'));doc.setFontSize(8);doc.setTextColor(0,0,0);doc.setFont('helvetica','italic');doc.text(d.f1?'f_ck,c = f_ck * (1 + 5 * sigma2/f_ck)':'f_ck,c = f_ck * (1.125 + 2.5 * sigma2/f_ck)',ml,y);doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);y+=6;
   row('Rezistenta caracteristica confinata','f_ck,c',d.fckc.toFixed(2)+' MPa',true);row('Rezistenta de calcul confinata','f_cd,c',d.fcdc.toFixed(2)+' MPa',true);row('Crestere f_ck,c vs f_ck','-','+'+d.inc.toFixed(2)+' %',true);hl();
-  cy(24);sT('10. DEFORMATII SPECIFICE SI DUCTILITATE');doc.setFontSize(7.5);doc.setTextColor(130,130,130);doc.setFont('helvetica','italic');doc.text('e_c2,c = e_c2 * (f_ck,c/f_ck)^2     e_cu2,c = 0.0035 + 0.2*sigma2/f_ck',ml,y);doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);y+=6;
+  cy(24);sT('10. DEFORMATII SPECIFICE SI DUCTILITATE');doc.setFontSize(7.5);doc.setTextColor(0,0,0);doc.setFont('helvetica','italic');doc.text('e_c2,c = e_c2 * (f_ck,c/f_ck)^2     e_cu2,c = 0.0035 + 0.2*sigma2/f_ck',ml,y);doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);y+=6;
   row('Def. la efort maxim (confinat)','e_c2,c',(d.ec2c*1000).toFixed(4)+' promile',true);
   row('Def. la efort maxim (neconfinat)','e_c2',(d.ec2*1000).toFixed(2)+' promile');
   row('Crestere e_c2,c','-','+'+d.incEc2.toFixed(1)+' %',true);
@@ -584,50 +708,75 @@ function buildPdf(chartImg,sketchImg){
   row('Def. ultima (neconfinat)','e_cu2','3.50 promile');
   row('Cap. de deformare (ductilitate)','e_cu2,c/e_cu2','x '+d.ratioEcu2.toFixed(2),true);hl();
   if(chartImg){cy(80);sT('11. DIAGRAMA TENSIUNE-DEFORMATIE');const iw=150,ih=75;doc.addImage(chartImg,'PNG',(pW-iw)/2,y,iw,ih);y+=ih+4;}
-  const tp=doc.internal.getNumberOfPages();
-  for(let i=1;i<=tp;i++){doc.setPage(i);doc.setFontSize(7.5);doc.setTextColor(150,150,150);doc.setFont('helvetica','normal');doc.line(ml,285,ml+cw,285);doc.text('CR 2-2022 / SR EN 1992-1-1',ml,289);doc.text('Pagina '+i+' din '+tp,pW-mr,289,{align:'right'});doc.text('Generat: '+ds,pW/2,289,{align:'center'});}
-  doc.save('Raport_beton_confinat.pdf');
+  // Disclaimer at bottom of last page
+  doc.setFontSize(7.5);doc.setFont('helvetica','italic');doc.setTextColor(0,0,0);
+  doc.text('Responsabilitatea pentru rezultatele obtinute revine in exclusivitate utilizatorului.',ml,276);
+  doc.text('Toate valorile trebuie verificate inainte de utilizare.',ml,280);
+  doc.setFont('helvetica','normal');
 }
 
 
-// ─── Persist inputs across navigation ───
+// ─── Preset system: 5 wall slots ───
+let currentPreset='P1';
+function getKey(p){return 'sw_mod2_'+p;}
+function captureState(){
+  const state={};
+  document.querySelectorAll('input[id],select[id]').forEach(el=>{if(el.id!=='presetSel')state[el.id]=el.value;});
+  document.querySelectorAll('input[type=checkbox][id]').forEach(el=>{state['_chk_'+el.id]=el.checked;});
+  document.querySelectorAll('.seg').forEach((seg,i)=>{
+    const on=seg.querySelector('.on');
+    if(on)state['_seg_'+i]=on.dataset.v||on.textContent;
+  });
+  return state;
+}
+function applyState(state){
+  if(!state)return;
+  document.querySelectorAll('input[id],select[id]').forEach(el=>{
+    if(el.id!=='presetSel'&&state[el.id]!==undefined)el.value=state[el.id];
+  });
+  document.querySelectorAll('input[type=checkbox][id]').forEach(el=>{
+    if(state['_chk_'+el.id]!==undefined)el.checked=state['_chk_'+el.id];
+  });
+  document.querySelectorAll('.seg').forEach((seg,i)=>{
+    const sv=state['_seg_'+i];
+    if(!sv)return;
+    seg.querySelectorAll('button').forEach(b=>{
+      const match=(b.dataset.v||b.textContent)===sv;
+      b.classList.toggle('on',match);
+      if(match){
+        if(seg.id==='seg-bi'){biMode=sv==='Automat'?'auto':'manual';toggleBiMode();}
+      }
+    });
+  });
+  curC=document.getElementById('cp').value;curS=document.getElementById('sp').value;
+  updMat();
+}
+function saveCurrentPreset(){
+  try{localStorage.setItem(getKey(currentPreset),JSON.stringify(captureState()));}catch(e){}
+}
+function switchPreset(p){
+  saveCurrentPreset();
+  currentPreset=p;
+  try{localStorage.setItem('sw_mod2_active',p);}catch(e){}
+  document.getElementById('presetSel').value=p;
+  const saved=loadPreset(p);
+  if(saved)applyState(saved);
+  calc();
+}
+function loadPreset(p){
+  try{const s=localStorage.getItem(getKey(p));return s?JSON.parse(s):null;}catch(e){return null;}
+}
 (function(){
-  const SKEY='design_mod2';
-  function saveState(){
-    const state={};
-    document.querySelectorAll('input[id],select[id]').forEach(el=>{state[el.id]=el.value;});
-    document.querySelectorAll('input[type=checkbox][id]').forEach(el=>{state['_chk_'+el.id]=el.checked;});
-    document.querySelectorAll('.seg').forEach((seg,i)=>{
-      const on=seg.querySelector('.on');
-      if(on)state['_seg_'+i]=on.dataset.v||on.textContent;
-    });
-    try{localStorage.setItem(SKEY,JSON.stringify(state));}catch(e){}
-  }
-  function restoreState(){
-    let state;
-    try{state=JSON.parse(localStorage.getItem(SKEY));}catch(e){return;}
-    if(!state)return;
-    document.querySelectorAll('input[id],select[id]').forEach(el=>{
-      if(state[el.id]!==undefined)el.value=state[el.id];
-    });
-    document.querySelectorAll('input[type=checkbox][id]').forEach(el=>{
-      if(state['_chk_'+el.id]!==undefined)el.checked=state['_chk_'+el.id];
-    });
-    document.querySelectorAll('.seg').forEach((seg,i)=>{
-      const sv=state['_seg_'+i];
-      if(!sv)return;
-      seg.querySelectorAll('button').forEach(b=>{
-        const match=(b.dataset.v||b.textContent)===sv;
-        b.classList.toggle('on',match);
-        if(match)b.click&&b.dispatchEvent(new Event('click'));
-      });
-    });
-  }
-  restoreState();
-  document.addEventListener('input',saveState);
-  document.addEventListener('change',saveState);
-  document.addEventListener('click',e=>{if(e.target.closest('.seg'))setTimeout(saveState,50);});
+  try{const ap=localStorage.getItem('sw_mod2_active');if(ap)currentPreset=ap;}catch(e){}
+  document.getElementById('presetSel').value=currentPreset;
+  const saved=loadPreset(currentPreset);
+  if(saved)applyState(saved);
+  document.addEventListener('input',saveCurrentPreset);
+  document.addEventListener('change',saveCurrentPreset);
+  document.addEventListener('click',e=>{if(e.target.closest('.seg'))setTimeout(saveCurrentPreset,50);});
 })();
 
 updMat();calc();
 </script>
+</body>
+</html>

@@ -1,5 +1,12 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#F5F5F7">
+<meta name="description" content="Predimensionarea pereților structurali — condiții minime geometrie și armare, CR 2-1-1.1/2022 §7">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='2' y='4' width='8' height='24' rx='1.5' fill='%238E8E93'/><rect x='10' y='11' width='12' height='10' rx='1' fill='%23C7C7CC'/><rect x='22' y='4' width='8' height='24' rx='1.5' fill='%238E8E93'/></svg>">
+<title>Predimensionare — SW Design</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -94,14 +101,48 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
 .report-btn:active{opacity:.7}
 .report-btn:disabled{opacity:.4}
 .report-status{font-size:12px;color:#8E8E93;text-align:center;padding:6px 0 0;min-height:16px}
-@media(max-width:680px){.wrap{padding:14px 10px}.cols{grid-template-columns:1fr;gap:0}.report-btn{width:100%}.rc input[type=number],.sel-field select{font-size:16px}.rl{font-size:14px}.ph{font-size:12px}.report-btn{font-size:15px;padding:13px 18px}}
+@media(max-width:680px){.wrap{padding:14px 10px}.cols{grid-template-columns:1fr;gap:0}.report-btn{width:100%}.rc input[type=number],.sel-field select,.preset-bar select{font-size:16px}.rl{font-size:14px}.ph{font-size:12px}.report-btn{font-size:15px;padding:13px 18px}}
 .back-btn{display:inline-flex;align-items:center;gap:5px;font-family:'Inter',sans-serif;font-size:13px;font-weight:500;color:#8E8E93;background:transparent;border:none;cursor:pointer;padding:12px 16px;text-decoration:none;line-height:1}
 .back-btn svg{width:16px;height:16px;stroke:#8E8E93;stroke-width:2.5;fill:none;stroke-linecap:round;stroke-linejoin:round}
 .back-btn:hover{color:#1C1C1E}
 .back-btn:hover svg{stroke:#1C1C1E}
+.preset-bar{display:flex;align-items:center;gap:10px;padding:0 16px 10px}
+.preset-bar label{font-size:12px;font-weight:500;color:#8E8E93}
+.preset-bar select{padding:6px 28px 6px 10px;font-size:13px;border:1px solid #C7C7CC;border-radius:8px;background:#fff;color:#1C1C1E;font-family:'Inter',sans-serif;-webkit-appearance:none;appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238E8E93'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
+.preset-bar select:focus{outline:none;box-shadow:0 0 0 2px rgba(0,122,255,.2);border-color:#007AFF}
+.author-footer{text-align:center;font-size:11px;font-weight:500;color:#8E8E93;padding:16px 16px 24px;letter-spacing:.02em}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:1000;align-items:center;justify-content:center}
+.modal-overlay.show{display:flex}
+.modal{background:#fff;border-radius:16px;padding:24px;max-width:340px;width:90%;box-shadow:0 16px 48px rgba(0,0,0,.2)}
+.modal h3{font-size:15px;font-weight:600;color:#1C1C1E;margin-bottom:14px}
+.modal-presets{display:flex;flex-direction:column;gap:8px;margin-bottom:18px}
+.modal-preset{display:flex;align-items:center;gap:10px;padding:10px 12px;background:#F5F5F7;border-radius:10px;cursor:pointer;border:2px solid transparent;transition:all .12s;user-select:none}
+.modal-preset.sel{border-color:#007AFF;background:#EBF3FF}
+.modal-preset .mp-check{width:20px;height:20px;border-radius:6px;border:2px solid #C7C7CC;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .12s}
+.modal-preset.sel .mp-check{border-color:#007AFF;background:#007AFF}
+.modal-preset.sel .mp-check::after{content:'';width:6px;height:10px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg);margin-top:-2px}
+.modal-preset .mp-name{font-size:13px;font-weight:500;color:#1C1C1E}
+.modal-preset .mp-info{font-size:11px;color:#8E8E93;margin-left:auto}
+.modal-preset.empty{opacity:.45}
+.modal-btns{display:flex;gap:8px}
+.modal-btns button{flex:1;padding:11px;font-size:14px;font-weight:500;font-family:'Inter',sans-serif;border:none;border-radius:10px;cursor:pointer;transition:opacity .15s}
+.modal-btns .m-cancel{background:#E5E5EA;color:#1C1C1E}
+.modal-btns .m-export{background:#1C1C1E;color:#fff}
+.modal-btns .m-export:disabled{opacity:.35}
 </style>
+</head>
+<body>
 
 <a href="index.html" class="back-btn"><svg viewBox="0 0 16 16"><polyline points="10,3 4,8 10,13"/></svg>Toate modulele</a>
+<div class="preset-bar">
+  <label>Perete:</label>
+  <select id="presetSel" onchange="switchPreset(this.value)">
+    <option value="P1">P1</option>
+    <option value="P2">P2</option>
+    <option value="P3">P3</option>
+    <option value="P4">P4</option>
+    <option value="P5">P5</option>
+  </select>
 </div>
 
 <div class="wrap">
@@ -260,6 +301,18 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
 
 </div>
 </div>
+<div class="author-footer">Lucrare de disertație — Janos Patrik · UTCN · Facultatea de Construcții · 2026</div>
+
+<div class="modal-overlay" id="exportModal">
+  <div class="modal">
+    <h3>Export PDF — selecteaza peretii</h3>
+    <div class="modal-presets" id="modalPresets"></div>
+    <div class="modal-btns">
+      <button class="m-cancel" onclick="closeExportModal()">Anuleaza</button>
+      <button class="m-export" id="modalExportBtn" onclick="exportSelected()">Exporta</button>
+    </div>
+  </div>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
@@ -390,15 +443,15 @@ function renderFlags(vd,DC){
 }
 function renderChecklist(G,R){
   const all=[...G,...R];
-  let h=`<thead><tr><th style="width:30px"></th><th>Conditie</th><th>Regula</th><th class="r">Valoare</th><th class="r">Limita</th><th class="r">Art.</th></tr></thead><tbody>`;
+  let h=`<thead><tr><th style="width:30px"></th><th>Conditie</th><th>Regula</th><th class="r">Valoare</th><th class="r">Limita</th></tr></thead><tbody>`;
   all.forEach(o=>{
-    if(o.g){h+=`<tr><td colspan="6" class="grphd">${o.g}</td></tr>`;return;}
+    if(o.g){h+=`<tr><td colspan="5" class="grphd">${o.g}</td></tr>`;return;}
     const st=o.ok===null?'na':(o.ok?'ok':'no');
     const badge=st==='ok'?'<span class="badge ok">&check;</span>':st==='no'?'<span class="badge no">&times;</span>':'<span class="badge na">n/a</span>';
     const fmtv=v=>o.txt?v:(o.u==='mm\u00b2'?nf(v):(o.d!==undefined?nf(v,o.d):nf(v)));
     const u=o.u?' '+o.u:'';
-    h+=`<tr class="${st==='no'?'bad':''}"><td>${badge}</td><td class="nm">${o.nm}</td><td class="rule">${o.rule}</td><td class="r">${fmtv(o.cur)}${o.txt?'':u}</td><td class="r">${o.inv?'&le; ':'&ge; '}${fmtv(o.lim)}${o.txt?'':u}</td><td class="art">${o.art}</td></tr>`;
-    if(st==='no'&&o.adv)h+=`<tr><td></td><td colspan="5" class="advice">&rarr; ${o.adv}</td></tr>`;
+    h+=`<tr class="${st==='no'?'bad':''}"><td>${badge}</td><td class="nm">${o.nm}</td><td class="rule">${o.rule}</td><td class="r">${fmtv(o.cur)}${o.txt?'':u}</td><td class="r">${o.inv?'&le; ':'&ge; '}${fmtv(o.lim)}${o.txt?'':u}</td></tr>`;
+    if(st==='no'&&o.adv)h+=`<tr><td></td><td colspan="4" class="advice">&rarr; ${o.adv}</td></tr>`;
   });
   document.getElementById('chktbl').innerHTML=h+'</tbody>';
   const note=document.getElementById('chknote');
@@ -476,23 +529,99 @@ function svgToPng(cb){
   img.src='data:image/svg+xml;base64,'+svg64;
 }
 function generatePdf(){
+  // Save current state first
+  saveCurrentPreset();
+  // Build modal with preset info
+  const container=document.getElementById('modalPresets');
+  let html='';
+  ['P1','P2','P3','P4','P5'].forEach(p=>{
+    const saved=loadPreset(p);
+    const hasData=!!saved;
+    const info=hasData?describePreset(saved):'(gol)';
+    html+=`<div class="modal-preset${p===currentPreset?' sel':''}${!hasData?' empty':''}" data-p="${p}" onclick="toggleModalPreset(this)">
+      <div class="mp-check"></div>
+      <span class="mp-name">${p}</span>
+      <span class="mp-info">${info}</span>
+    </div>`;
+  });
+  container.innerHTML=html;
+  document.getElementById('exportModal').classList.add('show');
+  updModalBtn();
+}
+function describePreset(s){
+  if(!s)return '';
+  const bw=s.bw0||'?', lw=s.lw||'?', c=s.cp||'C25/30';
+  return bw+'×'+lw+' '+c;
+}
+function toggleModalPreset(el){
+  if(el.classList.contains('empty')&&!el.classList.contains('sel'))return;
+  el.classList.toggle('sel');
+  updModalBtn();
+}
+function updModalBtn(){
+  const sel=document.querySelectorAll('.modal-preset.sel:not(.empty)');
+  document.getElementById('modalExportBtn').disabled=sel.length===0;
+}
+function closeExportModal(){document.getElementById('exportModal').classList.remove('show');}
+function exportSelected(){
+  const selected=[...document.querySelectorAll('.modal-preset.sel:not(.empty)')].map(el=>el.dataset.p);
+  if(!selected.length)return;
+  closeExportModal();
   const btn=document.getElementById('rptBtn'),status=document.getElementById('rptStatus');
   if(typeof window.jspdf==='undefined'){status.textContent='Libraria PDF se incarca... incearca din nou.';return;}
   btn.disabled=true;btn.textContent='Se genereaza...';
-  svgToPng(function(sk){buildPdf(sk);btn.disabled=false;btn.textContent='Descarca PDF';status.textContent='Raport descarcat.';setTimeout(()=>status.textContent='',4000);});
-}
-function plain(s){return s.replace(/<sub>/g,'').replace(/<\/sub>/g,'').replace(/<b>/g,'').replace(/<\/b>/g,'').replace(/&middot;/g,'\u00b7').replace(/&ge;/g,'>=').replace(/&le;/g,'<=').replace(/&Oslash;/g,'O').replace(/&omega;/g,'w').replace(/&rho;/g,'p').replace(/&nu;/g,'v').replace(/&rarr;/g,'->').replace(/&asymp;/g,'~').replace(/&sup2;/g,'2').replace(/\u00b2/g,'2').replace(/&amp;/g,'&').replace(/\u00d8/g,'O').replace(/\u03c9/g,'w').replace(/\u03c1/g,'p').replace(/\u2265/g,'>=').replace(/\u2264/g,'<=').replace(/\u00b7/g,'*');}
-function buildPdf(sk){
+  const origPreset=currentPreset;
   const{jsPDF}=window.jspdf;
   const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+  let isFirst=true;
+  let queue=[...selected];
+  function processNext(){
+    if(queue.length===0){
+      // Page numbering
+      const pW=210,ml=15,mr=15,cw=pW-ml-mr,ds=new Date().toLocaleDateString('ro-RO');
+      const tp=doc.internal.getNumberOfPages();
+      for(let i=1;i<=tp;i++){doc.setPage(i);doc.setFontSize(7.5);doc.setTextColor(0,0,0);doc.setDrawColor(40,80,140);doc.setFont('helvetica','normal');doc.line(ml,285,ml+cw,285);doc.text('CR 2-1-1.1/2022',ml,289);doc.text('Pagina '+i+' din '+tp,pW-mr,289,{align:'right'});doc.text('Generat: '+ds,pW/2,289,{align:'center'});}
+      const fname=selected.length===1?'Raport_predimensionare_'+selected[0]+'.pdf':'Raport_predimensionare_'+selected.join('_')+'.pdf';
+      doc.save(fname);
+      switchPreset(origPreset);
+      btn.disabled=false;btn.textContent='Descarca PDF';
+      status.textContent='Raport descarcat ('+selected.length+' perete/pereti).';
+      setTimeout(()=>status.textContent='',4000);
+      return;
+    }
+    const p=queue.shift();
+    switchPreset(p);
+    svgToPng(function(sk){
+      if(!isFirst)doc.addPage();
+      isFirst=false;
+      buildPdfPage(doc,sk,p);
+      processNext();
+    });
+  }
+  processNext();
+}
+function plain(s){return s.replace(/<sub>/g,'').replace(/<\/sub>/g,'').replace(/<b>/g,'').replace(/<\/b>/g,'').replace(/&middot;/g,'\u00b7').replace(/&ge;/g,'>=').replace(/&le;/g,'<=').replace(/&Oslash;/g,'O').replace(/&omega;/g,'w').replace(/&rho;/g,'p').replace(/&nu;/g,'v').replace(/&rarr;/g,'->').replace(/&asymp;/g,'~').replace(/&sup2;/g,'2').replace(/\u00b2/g,'2').replace(/&amp;/g,'&').replace(/\u00d8/g,'O').replace(/\u03c9/g,'w').replace(/\u03c1/g,'p').replace(/\u2265/g,'>=').replace(/\u2264/g,'<=').replace(/\u00b7/g,'*');}
+function buildPdfPage(doc,sk,pName){
+  pName=pName||currentPreset;
   const d=lastCalc,pW=210,ml=15,mr=15,cw=pW-ml-mr,ds=new Date().toLocaleDateString('ro-RO');let y=0;
-  function hdr(){doc.setFillColor(28,28,30);doc.rect(0,0,210,14,'F');doc.setTextColor(255,255,255);doc.setFontSize(11);doc.setFont('helvetica','bold');doc.text('NOTA DE CALCUL - PREDIMENSIONARE PERETI',ml,9);doc.setFontSize(8);doc.setFont('helvetica','normal');doc.text('CR 2-1-1.1/2022',ml,13);doc.text('Data: '+ds,pW-mr,13,{align:'right'});doc.setTextColor(0,0,0);y=20;}
+  // Page header bar (dark grey instead of black)
+  function hdr(){doc.setFillColor(40,80,140);doc.rect(0,0,210,14,'F');doc.setTextColor(255,255,255);doc.setFontSize(11);doc.setFont('helvetica','bold');doc.text('NOTA DE CALCUL \u2014 PREDIMENSIONARE PERETI',ml,9);doc.setFontSize(8);doc.setFont('helvetica','normal');doc.text('CR 2-1-1.1/2022',ml,13);doc.text('Perete: '+pName+'  |  Data: '+ds,pW-mr,9,{align:'right'});doc.setTextColor(0,0,0);y=20;}
   function cyf(n){n=n||10;if(y+n>275){doc.addPage();hdr();}}
   function sT(t){cyf(12);doc.setFillColor(235,243,252);doc.rect(ml,y-4,cw,8,'F');doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor(0,102,204);doc.text(t,ml+2,y+1);doc.setTextColor(0,0,0);doc.setFont('helvetica','normal');y+=8;}
   hdr();
-  doc.setFontSize(18);doc.setFont('helvetica','bold');doc.setTextColor(28,28,30);doc.text('Conditii minime de alcatuire',pW/2,46,{align:'center'});
-  doc.setFontSize(11);doc.setFont('helvetica','normal');doc.setTextColor(90,90,90);doc.text('Pereti structurali din beton armat cu bulbi - CR 2-1-1.1/2022 cap. 7',pW/2,55,{align:'center'});
-  doc.setDrawColor(0,102,204);doc.setLineWidth(0.4);doc.line(ml,62,ml+cw,62);y=72;
+  // Tabular header block
+  doc.autoTable({startY:22,body:[
+    [{content:'CONDITII MINIME DE ALCATUIRE',colSpan:2,styles:{fontSize:14,fontStyle:'bold',halign:'center',textColor:[28,28,30],fillColor:[255,255,255],cellPadding:{top:6,bottom:2}}}],
+    [{content:'Pereti structurali din beton armat cu bulbi \u2014 CR 2-1-1.1/2022 cap. 7',colSpan:2,styles:{fontSize:9.5,halign:'center',textColor:[0,0,0],fillColor:[255,255,255],cellPadding:{top:1,bottom:2}}}],
+    [{content:'Aplicatie dezvoltata in cadrul lucrarii de disertatie \u2014 Janos Patrik',colSpan:2,styles:{fontSize:8,fontStyle:'italic',halign:'center',textColor:[0,0,0],fillColor:[255,255,255],cellPadding:{top:1,bottom:4}}}],
+    ['Perete: '+pName,'Data: '+ds],
+  ],margin:{left:ml,right:mr},tableWidth:cw,
+  theme:'plain',
+  styles:{lineColor:[0,102,204],lineWidth:0},
+  columnStyles:{0:{fontStyle:'bold',fontSize:9,textColor:[0,102,204]},1:{halign:'right',fontSize:9,textColor:[0,0,0]}},
+  didParseCell:function(data){if(data.row.index===3){data.cell.styles.lineWidth={top:0.4,bottom:0.4};data.cell.styles.lineColor=[0,102,204];}},
+  });
+  y=doc.lastAutoTable.finalY+6;
   sT('1. DATE DE INTRARE');
   const bulbTxt=d.same?'Bulb 2 identic cu Bulb 1':'Bulbi diferiti';
   doc.autoTable({startY:y,head:[['Parametru','Notatie','Valoare']],body:[
@@ -502,27 +631,27 @@ function buildPdf(sk){
     ['Clasa beton','-',d.concrete],['Rezistenta beton','f_cd',d.fcd.toFixed(2)+' MPa'],['Clasa otel','-',d.steel],['Rezistenta otel','f_yd',d.fyd.toFixed(2)+' MPa'],
     ['Forta axiala','N_Ed',d.ned+' kN'],['Bare bulb','-',(d.n1>0?d.n1+' O'+d.db1:'')+(d.n2>0?' + '+d.n2+' O'+d.db2:'')+' mm'],['Inima long.','-','O'+d.dwl+'/'+d.swl+' mm'],['Inima transv.','-','O'+d.dwt+'/'+d.swt+' mm'],['Etrieri','O_sw',d.dsw+' mm'],
     ['Pas etrieri','s_sw',d.scr+' mm'],['Pas bare long. restranse','s_sl',d.ssl+' mm'],['Acoperire','c_nom',d.cnom+' mm'],
-  ],margin:{left:ml,right:mr},tableWidth:cw,headStyles:{fillColor:[28,28,30],textColor:255,fontSize:8.5,fontStyle:'bold'},bodyStyles:{fontSize:8.5},alternateRowStyles:{fillColor:[245,247,250]},columnStyles:{0:{cellWidth:95},1:{cellWidth:35,fontStyle:'italic'},2:{halign:'right'}}});
+  ],margin:{left:ml,right:mr},tableWidth:cw,theme:'grid',styles:{lineColor:[180,200,220],lineWidth:0.3,fontSize:8.5,textColor:[0,0,0]},headStyles:{fillColor:[200,215,235],textColor:[0,0,0],fontStyle:'bold',lineColor:[180,200,220]},alternateRowStyles:{fillColor:[240,245,252]},columnStyles:{0:{cellWidth:95},1:{cellWidth:35,fontStyle:'italic'},2:{halign:'right'}}});
   y=doc.lastAutoTable.finalY+6;
   if(sk){cyf(60);sT('2. SECTIUNE - ZONA DE CAPAT');const iw=150,ih=75;doc.addImage(sk,'PNG',(pW-iw)/2,y,iw,ih);y+=ih+6;}
   cyf(20);sT('3. FORTA AXIALA NORMALIZATA');
-  doc.setFontSize(8);doc.setTextColor(130,130,130);doc.setFont('helvetica','italic');doc.text('v_d = N_Ed / (A_c * f_cd),  A_c = aria inimii + ambii bulbi',ml,y);doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);y+=6;
+  doc.setFontSize(8);doc.setTextColor(0,0,0);doc.setFont('helvetica','italic');doc.text('v_d = N_Ed / (A_c * f_cd),  A_c = aria inimii + ambii bulbi',ml,y);doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);y+=6;
   const vlim=d.DC==='DCH'?'0.35':d.DC==='DCM'?'0.40':'-';
   doc.autoTable({startY:y,head:[['Marime','Notatie','Valoare']],body:[
     ['Aria inimii','A_web',nf(d.Aweb)+' mm2'],['Aria bulb 1','A_f',nf(d.Af)+' mm2'],['Aria bulb 2','A_f2',nf(d.Af2)+' mm2'],['Aria totala','A_c',nf(d.Ac)+' mm2'],['Forta axiala normalizata','v_d',nf(d.vd,3)],['Limita ('+d.DC+')','v_d,lim',vlim],
-  ],margin:{left:ml,right:mr},tableWidth:cw,headStyles:{fillColor:[28,28,30],textColor:255,fontSize:8.5,fontStyle:'bold'},bodyStyles:{fontSize:8.5},alternateRowStyles:{fillColor:[245,247,250]},columnStyles:{0:{cellWidth:95},1:{cellWidth:35,fontStyle:'italic'},2:{halign:'right'}}});
+  ],margin:{left:ml,right:mr},tableWidth:cw,theme:'grid',styles:{lineColor:[180,200,220],lineWidth:0.3,fontSize:8.5,textColor:[0,0,0]},headStyles:{fillColor:[200,215,235],textColor:[0,0,0],fontStyle:'bold',lineColor:[180,200,220]},alternateRowStyles:{fillColor:[240,245,252]},columnStyles:{0:{cellWidth:95},1:{cellWidth:35,fontStyle:'italic'},2:{halign:'right'}}});
   y=doc.lastAutoTable.finalY+6;
   function condTable(title,arr){
     cyf(16);sT(title);const body=[];
     arr.forEach(o=>{
-      if(o.g){body.push([{content:plain(o.g),colSpan:5,styles:{fillColor:[235,243,252],textColor:[0,102,204],fontStyle:'bold',fontSize:8.5}}]);return;}
+      if(o.g){body.push([{content:plain(o.g),colSpan:5,styles:{fillColor:[240,245,250],textColor:[0,102,204],fontStyle:'bold',fontSize:8.5}}]);return;}
       const stat=o.ok===null?'n/a':(o.ok?'OK':'X');
       const fmtv=v=>o.txt?v:(o.u==='mm\u00b2'?nf(v):(o.d!==undefined?nf(v,o.d):nf(v)));
       const u=o.u&&!o.txt?(' '+o.u.replace('\u00b2','2')):'';
       body.push([stat,plain(o.nm),plain(o.rule),fmtv(o.cur)+u,(o.inv?'<= ':'>= ')+fmtv(o.lim)+u]);
     });
     doc.autoTable({startY:y,head:[['','Conditie','Regula','Valoare','Limita']],body,margin:{left:ml,right:mr},tableWidth:cw,
-      headStyles:{fillColor:[28,28,30],textColor:255,fontSize:8,fontStyle:'bold'},bodyStyles:{fontSize:8},
+      theme:'grid',styles:{lineColor:[180,200,220],lineWidth:0.3,fontSize:8,textColor:[0,0,0]},headStyles:{fillColor:[200,215,235],textColor:[0,0,0],fontStyle:'bold',lineColor:[180,200,220]},
       columnStyles:{0:{cellWidth:12,halign:'center',fontStyle:'bold'},1:{cellWidth:60},2:{cellWidth:46},3:{cellWidth:30,halign:'right'},4:{cellWidth:32,halign:'right'}},
       didParseCell:function(h){if(h.section==='body'&&h.column.index===0){if(h.cell.raw==='X'){h.cell.styles.textColor=[198,40,40];}else if(h.cell.raw==='OK'){h.cell.styles.textColor=[46,125,50];}else{h.cell.styles.textColor=[174,174,178];}}}});
     y=doc.lastAutoTable.finalY+6;
@@ -534,49 +663,78 @@ function buildPdf(sk){
   doc.setFontSize(10);doc.setFont('helvetica','bold');
   if(bad===0){doc.setTextColor(46,125,50);doc.text('CONFORM - toate conditiile minime sunt indeplinite.',ml,y+1);}else{doc.setTextColor(198,40,40);doc.text('NECONFORM - '+bad+' conditii neindeplinite (vezi randurile X).',ml,y+1);}
   doc.setTextColor(0,0,0);doc.setFont('helvetica','normal');y+=8;
-  const tp=doc.internal.getNumberOfPages();
-  for(let i=1;i<=tp;i++){doc.setPage(i);doc.setFontSize(7.5);doc.setTextColor(150,150,150);doc.setFont('helvetica','normal');doc.line(ml,285,ml+cw,285);doc.text('CR 2-1-1.1/2022',ml,289);doc.text('Pagina '+i+' din '+tp,pW-mr,289,{align:'right'});doc.text('Generat: '+ds,pW/2,289,{align:'center'});}
-  doc.save('Raport_predimensionare_pereti.pdf');
+  // Disclaimer fixed at bottom of last page, just above footer
+  doc.setFontSize(7.5);doc.setFont('helvetica','italic');doc.setTextColor(0,0,0);
+  doc.text('Responsabilitatea pentru rezultatele obtinute revine in exclusivitate utilizatorului.',ml,276);
+  doc.text('Toate valorile trebuie verificate inainte de utilizare.',ml,280);
+  doc.setFont('helvetica','normal');
 }
 
-// ─── Persist inputs across navigation ───
+// ─── Preset system: 5 wall slots ───
+let currentPreset='P1';
+function getKey(p){return 'sw_mod1_'+p;}
+function captureState(){
+  const state={};
+  document.querySelectorAll('input[id],select[id]').forEach(el=>{if(el.id!=='presetSel')state[el.id]=el.value;});
+  document.querySelectorAll('input[type=checkbox][id]').forEach(el=>{state['_chk_'+el.id]=el.checked;});
+  document.querySelectorAll('.seg').forEach((seg,i)=>{
+    const on=seg.querySelector('.on');
+    if(on)state['_seg_'+i]=on.dataset.v||on.textContent;
+  });
+  return state;
+}
+function applyState(state){
+  if(!state)return;
+  document.querySelectorAll('input[id],select[id]').forEach(el=>{
+    if(el.id!=='presetSel'&&state[el.id]!==undefined)el.value=state[el.id];
+  });
+  document.querySelectorAll('input[type=checkbox][id]').forEach(el=>{
+    if(state['_chk_'+el.id]!==undefined)el.checked=state['_chk_'+el.id];
+  });
+  document.querySelectorAll('.seg').forEach((seg,i)=>{
+    const sv=state['_seg_'+i];
+    if(!sv)return;
+    seg.querySelectorAll('button').forEach(b=>{
+      const match=(b.dataset.v||b.textContent)===sv;
+      b.classList.toggle('on',match);
+      if(match){
+        const evtName=seg.id;
+        if(evtName==='seg-dc')DC=sv;
+        if(evtName==='seg-ag')AG=sv;
+        if(evtName==='seg-zone')ZONE=sv;
+      }
+    });
+  });
+  curC=document.getElementById('cp').value;curS=document.getElementById('sp').value;
+  toggleBulb();updMat();
+}
+function saveCurrentPreset(){
+  try{localStorage.setItem(getKey(currentPreset),JSON.stringify(captureState()));}catch(e){}
+}
+function switchPreset(p){
+  saveCurrentPreset();
+  currentPreset=p;
+  try{localStorage.setItem('sw_mod1_active',p);}catch(e){}
+  const saved=loadPreset(p);
+  if(saved)applyState(saved);
+  calc();
+}
+function loadPreset(p){
+  try{const s=localStorage.getItem(getKey(p));return s?JSON.parse(s):null;}catch(e){return null;}
+}
 (function(){
-  const SKEY='design_mod1';
-  function saveState(){
-    const state={};
-    document.querySelectorAll('input[id],select[id]').forEach(el=>{state[el.id]=el.value;});
-    document.querySelectorAll('input[type=checkbox][id]').forEach(el=>{state['_chk_'+el.id]=el.checked;});
-    document.querySelectorAll('.seg').forEach((seg,i)=>{
-      const on=seg.querySelector('.on');
-      if(on)state['_seg_'+i]=on.dataset.v||on.textContent;
-    });
-    try{localStorage.setItem(SKEY,JSON.stringify(state));}catch(e){}
-  }
-  function restoreState(){
-    let state;
-    try{state=JSON.parse(localStorage.getItem(SKEY));}catch(e){return;}
-    if(!state)return;
-    document.querySelectorAll('input[id],select[id]').forEach(el=>{
-      if(state[el.id]!==undefined)el.value=state[el.id];
-    });
-    document.querySelectorAll('input[type=checkbox][id]').forEach(el=>{
-      if(state['_chk_'+el.id]!==undefined)el.checked=state['_chk_'+el.id];
-    });
-    document.querySelectorAll('.seg').forEach((seg,i)=>{
-      const sv=state['_seg_'+i];
-      if(!sv)return;
-      seg.querySelectorAll('button').forEach(b=>{
-        const match=(b.dataset.v||b.textContent)===sv;
-        b.classList.toggle('on',match);
-        if(match)b.click&&b.dispatchEvent(new Event('click'));
-      });
-    });
-  }
-  restoreState();
-  document.addEventListener('input',saveState);
-  document.addEventListener('change',saveState);
-  document.addEventListener('click',e=>{if(e.target.closest('.seg'))setTimeout(saveState,50);});
+  // Restore last active preset
+  try{const ap=localStorage.getItem('sw_mod1_active');if(ap)currentPreset=ap;}catch(e){}
+  document.getElementById('presetSel').value=currentPreset;
+  const saved=loadPreset(currentPreset);
+  if(saved)applyState(saved);
+  // Auto-save on any change
+  document.addEventListener('input',saveCurrentPreset);
+  document.addEventListener('change',saveCurrentPreset);
+  document.addEventListener('click',e=>{if(e.target.closest('.seg'))setTimeout(saveCurrentPreset,50);});
 })();
 
 updMat();calc();
 </script>
+</body>
+</html>
