@@ -144,8 +144,8 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
       <div class="toggle-row">
         <span>Tip perete</span>
         <div class="seg">
-          <button id="seg-bulb" class="on" onclick="setWall('Bulb')">Bulb</button>
-          <button id="seg-bulbinima" onclick="setWall('Bulb+inima')">Bulb+inima</button>
+          <button id="seg-bulb" onclick="setWall('Bulb')">Bulb</button>
+          <button id="seg-bulbinima" class="on" onclick="setWall('Bulb+inima')">Bulb+inima</button>
         </div>
       </div>
       <div class="toggle-row">
@@ -192,6 +192,31 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
     </div>
   </div>
 
+  <!-- Armare bulb: un singur card la Bulb, doua carduri la Bulb+inima -->
+  <div class="ip" id="ip-bulb-single" style="display:none">
+    <div class="ph">Armare bulb</div>
+    <div class="pb">
+      <div class="row"><div class="rl">Diametru bare <span class="rn">(&Oslash;<sub>b</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="obb1" value="14" min="4" step="2" oninput="calc()"><span class="ru">mm</span></div></div>
+      <div class="row"><div class="rl">Nr. bare <span class="rn">(buc)</span></div><div class="rc"><input type="number" inputmode="numeric" id="nbb1" value="8" min="0" step="1" oninput="calc()"></div></div>
+    </div>
+  </div>
+
+  <div class="ip" id="ip-bulb1">
+    <div class="ph">Bulb 1 (bulb intins)</div>
+    <div class="pb">
+      <div class="row"><div class="rl">Diametru bare <span class="rn">(&Oslash;<sub>b1</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="obb1bi" value="14" min="4" step="2" oninput="calc()"><span class="ru">mm</span></div></div>
+      <div class="row"><div class="rl">Nr. bare <span class="rn">(buc)</span></div><div class="rc"><input type="number" inputmode="numeric" id="nbb1bi" value="8" min="0" step="1" oninput="calc()"></div></div>
+    </div>
+  </div>
+
+  <div class="ip" id="ip-bulb2">
+    <div class="ph">Bulb 2 (bulb comprimat)</div>
+    <div class="pb">
+      <div class="row"><div class="rl">Diametru bare <span class="rn">(&Oslash;<sub>b2</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="obb2bi" value="14" min="4" step="2" oninput="calc()"><span class="ru">mm</span></div></div>
+      <div class="row"><div class="rl">Nr. bare <span class="rn">(buc)</span></div><div class="rc"><input type="number" inputmode="numeric" id="nbb2bi" value="8" min="0" step="1" oninput="calc()"></div></div>
+    </div>
+  </div>
+
   <!-- ARMARE ORIZONTALA INIMA (numai Bulb+inima) -->
   <div class="ip" id="ip-web">
     <div class="ph">Armare orizontala inima</div>
@@ -220,15 +245,11 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
   </div>
 
   <div class="ip">
-    <div class="ph">Armare verticala (lunecare)</div>
+    <div class="ph">Armare verticala inima (lunecare)</div>
     <div class="pb">
-      <div class="sub">Inima</div>
       <div class="row"><div class="rl">Diametru armatura verticala <span class="rn">(&Oslash;<sub>l</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="ol" value="10" min="4" step="2" oninput="calc()"><span class="ru">mm</span></div></div>
       <div class="row"><div class="rl">Pas armatura verticala <span class="rn">(s<sub>l</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="sl" value="150" min="30" step="10" oninput="calc()"><span class="ru">mm</span></div></div>
       <div class="row"><div class="rl">Nr. randuri (straturi) <span class="rn">(n<sub>rl</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="nrl" value="2" min="1" step="1" oninput="calc()"></div></div>
-      <div class="sub">Bulb intins</div>
-      <div class="row"><div class="rl">Diametru bare bulb <span class="rn">(&Oslash;<sub>b</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="obb" value="14" min="4" step="2" oninput="calc()"><span class="ru">mm</span></div></div>
-      <div class="row"><div class="rl">Nr. bare bulb <span class="rn">(buc)</span></div><div class="rc"><input type="number" inputmode="numeric" id="nbb" value="8" min="0" step="1" oninput="calc()"></div></div>
     </div>
   </div>
 
@@ -248,10 +269,8 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
     <div class="ph">Sectiune — armare forta taietoare</div>
     <div class="pb">
       <div class="cleg" style="margin-bottom:6px">
-        <span><i style="background:#D45500"></i> bare longitudinale bulb</span>
-        <span><i style="background:#1C1C1E"></i> etrieri bulb</span>
-        <span><i style="background:#C0392B"></i> armare transversala</span>
-        <span><i style="background:#2E7D32"></i> armare longitudinala inima</span>
+        <span><i style="background:#8B0000"></i> bare longitudinale bulb</span>
+        <span><i style="background:#2E7D32"></i> etrieri bulb / armare orizontala</span>
       </div>
       <svg id="sketch" viewBox="0 0 500 300" width="100%" style="display:block"></svg>
     </div>
@@ -352,7 +371,7 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
 <script>
 const CONC={'C12/15':{fck:12,fcd:8},'C16/20':{fck:16,fcd:10.67},'C20/25':{fck:20,fcd:13.33},'C25/30':{fck:25,fcd:16.67},'C30/37':{fck:30,fcd:20},'C35/45':{fck:35,fcd:23.33},'C40/50':{fck:40,fcd:26.67},'C45/55':{fck:45,fcd:30},'C50/60':{fck:50,fcd:33.33},'C55/67':{fck:55,fcd:36.67},'C60/75':{fck:60,fcd:40}};
 const STEEL={'S 235':{fyk:235,fyd:204.3},'S 255':{fyk:255,fyd:221.7},'S 345':{fyk:345,fyd:300.0},'S 355':{fyk:355,fyd:308.7},'S 405':{fyk:405,fyd:352.2},'S 420':{fyk:420,fyd:365.2},'S 500':{fyk:500,fyd:434.8}};
-let curC='C30/37',curS='S 500',wallType='Bulb',muf=0.7,lastCalc={};
+let curC='C30/37',curS='S 500',wallType='Bulb+inima',muf=0.7,lastCalc={};
 const A=(d)=>d*d*Math.PI/4;
 
 function updMat(){
@@ -370,6 +389,17 @@ function setWall(w){
   document.getElementById('seg-bulbinima').classList.toggle('on',w==='Bulb+inima');
   document.getElementById('ip-web').style.display=(w==='Bulb+inima')?'':'none';
   document.getElementById('ip-stir').style.display=(w==='Bulb')?'':'none';
+  document.getElementById('ip-bulb-single').style.display=(w==='Bulb')?'':'none';
+  document.getElementById('ip-bulb1').style.display=(w==='Bulb+inima')?'':'none';
+  document.getElementById('ip-bulb2').style.display=(w==='Bulb+inima')?'':'none';
+  const bfEl=document.getElementById('bf');
+  if(w==='Bulb'){
+    bfEl.readOnly=true;
+    bfEl.style.opacity='0.5';
+  }else{
+    bfEl.readOnly=false;
+    bfEl.style.opacity='1';
+  }
   document.getElementById('walltip').innerHTML=(w==='Bulb')
     ? 'Perete <b>lamelar scurt</b>, fara inima: V<sub>Rd,s</sub> este dat de <b>etrierii taiati de fisura</b> (perimetral + intermediari).'
     : 'Perete <b>cu inima</b>: V<sub>Rd,s</sub> este dat <b>numai de armatura orizontala a inimii</b>; etrierii nu se adauga.';
@@ -445,8 +475,17 @@ function calc(){
 
   // ---- Slip resistance ----
   const ol=gv('ol'),sl=gv('sl'),nrl=gv('nrl');
-  const obb=gv('obb'),nbb=gv('nbb');
-  const asvb=nbb*A(obb);
+  let obb1,nbb1,obb2,nbb2;
+  if(wallType==='Bulb'){
+    obb1=gv('obb1');nbb1=gv('nbb1');
+    obb2=obb1;nbb2=nbb1; // symmetric
+  }else{
+    obb1=gv('obb1bi');nbb1=gv('nbb1bi');
+    obb2=gv('obb2bi');nbb2=gv('nbb2bi');
+  }
+  const asvb1=nbb1*A(obb1);
+  const asvb2=nbb2*A(obb2);
+  const asvb=asvb1; // bulb intins governs for slip
   const lweb=(wallType==='Bulb')?0:Math.max(lw-bf-bf-4*cnom,0);
   const AsvWeb=sl>0?nrl*((lweb/sl)*A(ol)):0;
   const vRdiWeb=(muf*(AsvWeb*fyd+ned*1e3))/1e3;
@@ -471,7 +510,7 @@ function calc(){
   setChk('chk_vsB','chk_vsB_v',vRdsB>0?ved/vRdsB:99,'ub_vsB');
 
   document.getElementById('asvweb_r').textContent=AsvWeb.toFixed(1)+' mm\u00B2';
-  document.getElementById('asvbulb_r').innerHTML=asvb.toFixed(1)+' mm\u00B2 ('+nbb+'\u00D8'+obb+')';
+  document.getElementById('asvbulb_r').innerHTML=asvb1.toFixed(1)+' mm\u00B2 ('+nbb1+'\u00D8'+obb1+')';
   document.getElementById('muf_r').textContent=muf.toFixed(1);
   document.getElementById('vrdiweb_r').textContent=vRdiWeb.toFixed(1);
   document.getElementById('vrdibulb_r').textContent=vRdiBulb.toFixed(1);
@@ -488,7 +527,7 @@ function calc(){
 
   Object.assign(lastCalc,{curC,curS,fck:c.fck,fcd,fyk:s.fyk,fyd,sq,wallType,muf,
     lw,bw0,bf,cnom,ved,ned,Acw,scp,vRdmaxA,vRdmaxB,Ash,vRdsA,vsB1,vsB2,vRdsB,
-    asvb,nbb,obb,lweb,AsvWeb,vRdiWeb,vRdiBulb,govA,govB,
+    asvb,asvb1,asvb2,nbb1,obb1,nbb2,obb2,lweb,AsvWeb,vRdiWeb,vRdiBulb,govA,govB,
     oh:gv('oh'),sh:gv('sh'),nr:gv('nr'),ss:gv('ss'),loswi:gv('loswi'),
     oswp:gv('oswp'),nswp:gv('nswp'),oswi:gv('oswi'),nei:gv('nei'),nswi:gv('nswi'),
     ol:gv('ol'),sl:gv('sl'),nrl:gv('nrl')});
@@ -508,88 +547,112 @@ function drawSketch(){
   const ox=pad+(drawW-wW)/2,oy=pad+(drawH-wH)/2;
   // Colors
   const wall='#E8E8ED',wallS='#8E8E93',bulbF='#F0E8F5',bulbS='#9B59B6';
-  const barBulb='#D45500',etrBulb='#1C1C1E',barTrans='#C0392B',barLong='#2E7D32';
+  const barVert='#8B0000',barHoriz='#2E7D32';
   const dim='#8E8E93',lbl='#8E8E93';
   let o='';
-  // Wall outline: inima
-  o+=`<rect x="${ox+bf*scl}" y="${oy}" width="${(lw-2*bf)*scl}" height="${wH}" rx="1" fill="${wall}" stroke="${wallS}" stroke-width="1"/>`;
-  // Bulb 1 (left)
-  if(bf>0)o+=`<rect x="${ox}" y="${oy}" width="${bf*scl}" height="${wH}" rx="1" fill="${bulbF}" stroke="${bulbS}" stroke-width="1.2"/>`;
-  // Bulb 2 (right)
-  if(bf>0)o+=`<rect x="${ox+(lw-bf)*scl}" y="${oy}" width="${bf*scl}" height="${wH}" rx="1" fill="${bulbF}" stroke="${bulbS}" stroke-width="1.2"/>`;
-  // Bulb bars (vertical orange lines inside bulbs)
-  const nbb=d.nbb||0,R=2;
-  if(bf>0&&nbb>0){
-    const bfW=bf*scl,margin=8;
-    // Distribute nbb/2 bars per bulb side (simplified: 2 columns)
-    const cols=2,rows=Math.ceil(nbb/cols);
-    for(let b=0;b<2;b++){
-      const bx=b===0?ox:ox+(lw-bf)*scl;
-      for(let c=0;c<cols;c++){
-        const cx=bx+margin+(bfW-2*margin)*c/(Math.max(cols-1,1));
-        // Vertical bar line
-        o+=`<line x1="${cx}" y1="${oy+margin}" x2="${cx}" y2="${oy+wH-margin}" stroke="${barBulb}" stroke-width="2.5" stroke-linecap="round"/>`;
-      }
-      // Etrieri (horizontal lines across bulb)
-      const ss=isBulb?d.ss:100;
-      const nEtr=Math.max(2,Math.floor(wH/(ss*scl>5?ss*scl:20)));
-      for(let e=0;e<=nEtr;e++){
-        const ey=oy+margin+(wH-2*margin)*e/nEtr;
-        o+=`<line x1="${bx+margin-2}" y1="${ey}" x2="${bx+bfW-margin+2}" y2="${ey}" stroke="${etrBulb}" stroke-width="1.5" stroke-linecap="round"/>`;
-      }
-    }
-  }
-  // Armare transversala (horizontal red lines across full width)
-  const sh=isBulb?0:d.sh;
-  const nr=isBulb?0:d.nr;
-  if(!isBulb&&sh>0&&nr>0){
-    // Draw nr horizontal lines at mid-height area
-    const midY=oy+wH/2;
-    for(let r=0;r<nr;r++){
-      const ry=nr===1?midY:midY-6*(nr-1)/2+6*r;
-      o+=`<line x1="${ox+4}" y1="${ry}" x2="${ox+wW-4}" y2="${ry}" stroke="${barTrans}" stroke-width="2.5" stroke-linecap="round"/>`;
-    }
-    // Label
-    o+=`<text x="${ox+wW/2}" y="${midY+16+nr*3}" text-anchor="middle" font-size="8" fill="${lbl}" font-family="Inter,sans-serif">armare transversala (${nr}x\u00d8${d.oh}/${d.sh})</text>`;
-  }
   if(isBulb){
-    // For Bulb type: stirrup legs act as transversal reinforcement
-    // Draw perimeter stirrup crossing the wall
-    const midY=oy+wH/2;
-    o+=`<line x1="${ox+4}" y1="${midY}" x2="${ox+wW-4}" y2="${midY}" stroke="${barTrans}" stroke-width="2.5" stroke-linecap="round"/>`;
-    o+=`<text x="${ox+wW/2}" y="${midY+14}" text-anchor="middle" font-size="8" fill="${lbl}" font-family="Inter,sans-serif">armare transversala (etrieri)</text>`;
+    // Single rectangle — no bulb/inima separation
+    o+=`<rect x="${ox}" y="${oy}" width="${wW}" height="${wH}" rx="2" fill="${wall}" stroke="${wallS}" stroke-width="1.5"/>`;
+  }else{
+    // Wall outline: inima
+    o+=`<rect x="${ox+bf*scl}" y="${oy}" width="${(lw-2*bf)*scl}" height="${wH}" rx="1" fill="${wall}" stroke="${wallS}" stroke-width="1"/>`;
+    // Bulb 1 (left)
+    if(bf>0)o+=`<rect x="${ox}" y="${oy}" width="${bf*scl}" height="${wH}" rx="1" fill="${bulbF}" stroke="${bulbS}" stroke-width="1.2"/>`;
+    // Bulb 2 (right)
+    if(bf>0)o+=`<rect x="${ox+(lw-bf)*scl}" y="${oy}" width="${bf*scl}" height="${wH}" rx="1" fill="${bulbF}" stroke="${bulbS}" stroke-width="1.2"/>`;
   }
-  // Armare longitudinala inima (vertical green lines)
-  const ol_d=d.ol,sl_d=d.sl,nrl=d.nrl;
-  if(sl_d>0){
-    const webStart=bf*scl+cnom*scl;
-    const webEnd=(lw-bf)*scl-cnom*scl;
-    const webLen=webEnd-webStart;
-    const nBars=Math.max(2,Math.floor(webLen/(sl_d*scl>8?sl_d*scl:15)));
-    for(let i=0;i<=nBars;i++){
-      const bx=ox+webStart+webLen*i/nBars;
-      o+=`<line x1="${bx}" y1="${oy+10}" x2="${bx}" y2="${oy+wH-10}" stroke="${barLong}" stroke-width="1.8" stroke-linecap="round" opacity="0.8"/>`;
+
+  const margin=8;
+  const bfW=bf*scl;
+
+  if(isBulb){
+    // === BULB: single rectangle, uniform bars + stirrups across full width ===
+    const nbb1=d.nbb1||0;
+    const nDraw=Math.ceil(nbb1/2);
+    if(nDraw>0){
+      const cols=Math.max(2,Math.min(nDraw,8));
+      for(let c=0;c<cols;c++){
+        const cx=ox+margin+(wW-2*margin)*c/(Math.max(cols-1,1));
+        o+=`<line x1="${cx}" y1="${oy+margin}" x2="${cx}" y2="${oy+wH-margin}" stroke="${barVert}" stroke-width="2.5" stroke-linecap="round"/>`;
+      }
     }
-    o+=`<text x="${ox+wW/2}" y="${oy+wH-16}" text-anchor="middle" font-size="8" fill="${lbl}" font-family="Inter,sans-serif">armare longitudinala (\u00d8${ol_d}/${sl_d})</text>`;
+    // Stirrups across full width
+    const ss=d.ss||100;
+    const nEtr=Math.max(3,Math.floor(wH/(ss*scl>5?ss*scl:18)));
+    for(let e=0;e<=nEtr;e++){
+      const ey=oy+margin+(wH-2*margin)*e/nEtr;
+      o+=`<line x1="${ox+margin-2}" y1="${ey}" x2="${ox+wW-margin+2}" y2="${ey}" stroke="${barHoriz}" stroke-width="2" stroke-linecap="round"/>`;
+    }
+  }else{
+    // === BULB+INIMA: bulb bars + stirrups in bulbs + horizontal web bars + vertical web bars ===
+    const nbb1=d.nbb1||0, nbb2=d.nbb2||0;
+    if(bf>0){
+      const bulbs=[{bx:ox, nb:Math.ceil(nbb1/2)},{bx:ox+(lw-bf)*scl, nb:Math.ceil(nbb2/2)}];
+      for(const {bx,nb} of bulbs){
+        if(nb>0){
+          const cols=Math.max(2,Math.min(nb,5));
+          for(let c=0;c<cols;c++){
+            const cx=bx+margin+(bfW-2*margin)*c/(Math.max(cols-1,1));
+            o+=`<line x1="${cx}" y1="${oy+margin}" x2="${cx}" y2="${oy+wH-margin}" stroke="${barVert}" stroke-width="2.5" stroke-linecap="round"/>`;
+          }
+        }
+        // Stirrups in bulb
+        const nEtr=Math.max(3,Math.floor(wH/18));
+        for(let e=0;e<=nEtr;e++){
+          const ey=oy+margin+(wH-2*margin)*e/nEtr;
+          o+=`<line x1="${bx+margin-2}" y1="${ey}" x2="${bx+bfW-margin+2}" y2="${ey}" stroke="${barHoriz}" stroke-width="2" stroke-linecap="round"/>`;
+        }
+      }
+    }
+    // Horizontal web reinforcement (across full wall width)
+    const sh=d.sh||100,nr=d.nr||2;
+    if(sh>0&&nr>0){
+      const webX1=ox+bf*scl+4, webX2=ox+(lw-bf)*scl-4;
+      const nLines=Math.max(3,Math.floor(wH/(sh*scl>5?sh*scl:18)));
+      for(let e=0;e<=nLines;e++){
+        const ey=oy+margin+(wH-2*margin)*e/nLines;
+        for(let r=0;r<nr;r++){
+          const offset=(nr===1)?0:(r-(nr-1)/2)*3;
+          o+=`<line x1="${webX1}" y1="${ey+offset}" x2="${webX2}" y2="${ey+offset}" stroke="${barHoriz}" stroke-width="2" stroke-linecap="round"/>`;
+        }
+      }
+    }
+    // Vertical web reinforcement
+    const ol_d=d.ol,sl_d=d.sl,nrl=d.nrl;
+    if(sl_d>0){
+      const webStart=bf*scl+cnom*scl;
+      const webEnd=(lw-bf)*scl-cnom*scl;
+      const webLen=webEnd-webStart;
+      const nBars=Math.max(2,Math.floor(webLen/(sl_d*scl>8?sl_d*scl:15)));
+      for(let i=0;i<=nBars;i++){
+        const bx=ox+webStart+webLen*i/nBars;
+        o+=`<line x1="${bx}" y1="${oy+margin}" x2="${bx}" y2="${oy+wH-margin}" stroke="${barVert}" stroke-width="1.8" stroke-linecap="round" opacity="0.7"/>`;
+      }
+    }
   }
-  // Dimensioning
+
+  // Dimensioning — l_w
   const dy=oy+wH+18;
   o+=`<line x1="${ox}" y1="${dy}" x2="${ox+wW}" y2="${dy}" stroke="${dim}" stroke-width="0.7"/>`;
   o+=`<line x1="${ox}" y1="${dy-3}" x2="${ox}" y2="${dy+3}" stroke="${dim}" stroke-width="0.7"/>`;
   o+=`<line x1="${ox+wW}" y1="${dy-3}" x2="${ox+wW}" y2="${dy+3}" stroke="${dim}" stroke-width="0.7"/>`;
   o+=`<text x="${ox+wW/2}" y="${dy+12}" text-anchor="middle" font-size="8" fill="${lbl}" font-family="Inter,sans-serif">l_w = ${lw} mm</text>`;
-  // Bulb dimensions
-  if(bf>0){
-    const dy2=oy-8;
-    o+=`<line x1="${ox}" y1="${dy2}" x2="${ox+bf*scl}" y2="${dy2}" stroke="${dim}" stroke-width="0.5"/>`;
-    o+=`<line x1="${ox}" y1="${dy2-2}" x2="${ox}" y2="${dy2+2}" stroke="${dim}" stroke-width="0.5"/>`;
-    o+=`<line x1="${ox+bf*scl}" y1="${dy2-2}" x2="${ox+bf*scl}" y2="${dy2+2}" stroke="${dim}" stroke-width="0.5"/>`;
-    o+=`<text x="${ox+bf*scl/2}" y="${dy2-2}" text-anchor="middle" font-size="7" fill="${lbl}" font-family="Inter,sans-serif">b_f=${bf}</text>`;
-    o+=`<text x="${ox+wW-bf*scl/2}" y="${dy2-2}" text-anchor="middle" font-size="7" fill="${lbl}" font-family="Inter,sans-serif">b_f=${bf}</text>`;
+  if(!isBulb){
+    // Bulb dimensions — only for Bulb+inima
+    if(bf>0){
+      const dy2=oy-8;
+      o+=`<line x1="${ox}" y1="${dy2}" x2="${ox+bf*scl}" y2="${dy2}" stroke="${dim}" stroke-width="0.5"/>`;
+      o+=`<line x1="${ox}" y1="${dy2-2}" x2="${ox}" y2="${dy2+2}" stroke="${dim}" stroke-width="0.5"/>`;
+      o+=`<line x1="${ox+bf*scl}" y1="${dy2-2}" x2="${ox+bf*scl}" y2="${dy2+2}" stroke="${dim}" stroke-width="0.5"/>`;
+      o+=`<text x="${ox+bf*scl/2}" y="${dy2-2}" text-anchor="middle" font-size="7" fill="${lbl}" font-family="Inter,sans-serif">b_f=${bf}</text>`;
+      o+=`<text x="${ox+wW-bf*scl/2}" y="${dy2-2}" text-anchor="middle" font-size="7" fill="${lbl}" font-family="Inter,sans-serif">b_f=${bf}</text>`;
+    }
+    // Labels
+    o+=`<text x="${ox+bf*scl/2}" y="${oy+wH+30}" text-anchor="middle" font-size="8" fill="${lbl}" font-family="Inter,sans-serif" font-weight="500">Bulb 1</text>`;
+    o+=`<text x="${ox+wW-bf*scl/2}" y="${oy+wH+30}" text-anchor="middle" font-size="8" fill="${lbl}" font-family="Inter,sans-serif" font-weight="500">Bulb 2</text>`;
   }
-  // Labels
-  o+=`<text x="${ox+bf*scl/2}" y="${oy+wH+30}" text-anchor="middle" font-size="8" fill="${lbl}" font-family="Inter,sans-serif" font-weight="500">Bulb 1</text>`;
-  o+=`<text x="${ox+wW-bf*scl/2}" y="${oy+wH+30}" text-anchor="middle" font-size="8" fill="${lbl}" font-family="Inter,sans-serif" font-weight="500">Bulb 2</text>`;
+  // Type label
+  o+=`<text x="${ox+wW/2}" y="${oy+wH+42}" text-anchor="middle" font-size="9" fill="${lbl}" font-family="Inter,sans-serif" font-weight="500" font-style="italic">${d.wallType.toLowerCase()}</text>`;
   svg.innerHTML=o;
 }
 
@@ -703,7 +766,8 @@ function buildPdfPage(doc,pName,skImg){
       ['Diametru etrier intermediar','O_sw',d.oswi+' mm'],['Lungime ramura intermediar','l_Osw,i',d.loswi+' mm'],['Nr. etrieri intermediari','buc',''+d.nei],['Nr. ramuri / etrier interm','n_i',''+d.nswi]);
   }
   body.push(['Diametru armatura verticala','O_l',d.ol+' mm'],['Pas armatura verticala','s_l',d.sl+' mm'],['Nr. randuri verticale','n_rl',''+d.nrl],
-    ['Diametru bare bulb','O_b',d.obb+' mm'],['Nr. bare bulb','buc',''+d.nbb],
+    ['Diametru bare bulb 1 (intins)','O_b1',d.obb1+' mm'],['Nr. bare bulb 1','buc',''+d.nbb1],
+    ['Diametru bare bulb 2 (comprimat)','O_b2',d.obb2+' mm'],['Nr. bare bulb 2','buc',''+d.nbb2],
     ['Coeficient de frecare','mu_f',d.muf.toFixed(1)],['Forta taietoare','V_Ed',d.ved+' kN'],['Forta axiala','N_Ed',d.ned+' kN']);
   sT('1. DATE DE INTRARE');
   doc.autoTable({startY:y,head:[['Parametru','Notatie','Valoare']],body,margin:{left:ml,right:mr},tableWidth:cw,theme:'grid',styles:{lineColor:[180,200,220],lineWidth:0.3,fontSize:8.5,textColor:[0,0,0]},headStyles:{fillColor:[200,215,235],textColor:[0,0,0],fontStyle:'bold',lineColor:[200,215,235]},alternateRowStyles:{fillColor:[240,245,252]},columnStyles:{0:{cellWidth:95},1:{cellWidth:35,fontStyle:'italic'},2:{halign:'right'}}});
@@ -742,7 +806,8 @@ function buildPdfPage(doc,pName,skImg){
   row('Verificare V_Ed/V_Rd.s - Zona B','',(d.ved/d.vRdsB*100).toFixed(1)+' %');hl();
   cy(26);sT('6. V.Rd.i - REZISTENTA LA LUNECARE IN ROST');doc.setFontSize(8);doc.setTextColor(0,0,0);doc.setFont('helvetica','italic');doc.text('V_Rd = mu_f * (Sum A_sv * f_yd,v + N_Ed)',ml,y);doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);y+=6;
   row('Aria armatura verticala inima','A_sv,web',d.AsvWeb.toFixed(1)+' mm2');
-  row('Aria armatura verticala bulb','A_sv,bulb ('+d.nbb+'O'+d.obb+')',d.asvb.toFixed(1)+' mm2');
+  row('Aria armatura verticala bulb 1 (intins)','A_sv,b1 ('+d.nbb1+'O'+d.obb1+')',d.asvb1.toFixed(1)+' mm2');
+  row('Aria armatura verticala bulb 2 (comprimat)','A_sv,b2 ('+d.nbb2+'O'+d.obb2+')',d.asvb2.toFixed(1)+' mm2');
   row('Coeficient de frecare','mu_f',d.muf.toFixed(1));
   row('V_Rd.i (numai inima)','',d.vRdiWeb.toFixed(1)+' kN');
   row('V_Rd.i (inima + bulb intins)','',d.vRdiBulb.toFixed(1)+' kN',true);
@@ -815,7 +880,7 @@ function loadPreset(p){
   document.addEventListener('click',e=>{if(e.target.closest('.seg'))setTimeout(saveCurrentPreset,50);});
 })();
 
-updMat();setWall('Bulb');
+updMat();setWall('Bulb+inima');
 </script>
 </body>
 </html>
