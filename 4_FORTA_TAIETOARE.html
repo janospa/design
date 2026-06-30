@@ -301,16 +301,16 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
   <div class="op">
     <div class="ph">V<sub>Rd,s</sub> &mdash; Rezistenta data de armatura orizontala</div>
     <div class="pb">
-      <div class="zhead"><span class="zbadge zA">Critic</span></div>
       <div class="alfa-box" style="margin-bottom:10px" id="vsA-box"></div>
-      <div class="chk" id="chk_vsA"><span>V<sub>Ed</sub> &le; V<sub>Rd,s</sub> (critic)</span><div class="util-wrap"><div class="util-track"><div class="util-fill" id="ub_vsA"></div></div><span class="util-pct cv" id="chk_vsA_v">&mdash;</span></div></div>
-
-      <div class="zhead" style="margin-top:14px"><span class="zbadge zB">Non-critic</span></div>
       <div class="alfa-box" style="margin-bottom:10px">
         <div class="ar"><span class="al">Contributie beton (0,5&middot;&sigma;<sub>cp</sub>&middot;A<sub>cw</sub>)</span><span class="av" id="vsB1_r">&mdash;</span></div>
         <div class="ar"><span class="al">Contributie armatura (&Sigma;A<sub>sh</sub>&middot;f<sub>yd,h</sub>)</span><span class="av" id="vsB2_r">&mdash;</span></div>
-        <div class="ar tot"><span class="al">V<sub>Rd,s</sub> (non-critic)</span><span class="av" id="vrdsB_r">&mdash;</span></div>
       </div>
+      <div class="res-grid" style="margin-bottom:8px">
+        <div class="rc2 hl"><div class="rl2"><span class="zbadge zA" style="font-size:10px;padding:1px 7px">Critic</span></div><div class="rv" id="vrdsA_r">&mdash;</div><div class="ru2">kN</div></div>
+        <div class="rc2 hl"><div class="rl2"><span class="zbadge zB" style="font-size:10px;padding:1px 7px">Non-critic</span></div><div class="rv" id="vrdsB_r">&mdash;</div><div class="ru2">kN</div></div>
+      </div>
+      <div class="chk" id="chk_vsA"><span>V<sub>Ed</sub> &le; V<sub>Rd,s</sub> (critic)</span><div class="util-wrap"><div class="util-track"><div class="util-fill" id="ub_vsA"></div></div><span class="util-pct cv" id="chk_vsA_v">&mdash;</span></div></div>
       <div class="chk" id="chk_vsB"><span>V<sub>Ed</sub> &le; V<sub>Rd,s</sub> (non-critic)</span><div class="util-wrap"><div class="util-track"><div class="util-fill" id="ub_vsB"></div></div><span class="util-pct cv" id="chk_vsB_v">&mdash;</span></div></div>
     </div>
   </div>
@@ -322,22 +322,13 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
         <div class="ar"><span class="al">A<sub>sv,web</sub> (armatura verticala inima)</span><span class="av" id="asvweb_r">&mdash;</span></div>
         <div class="ar"><span class="al">A<sub>sv,bulb</sub> (bulb intins)</span><span class="av" id="asvbulb_r">&mdash;</span></div>
         <div class="ar"><span class="al">&mu;<sub>f</sub></span><span class="av" id="muf_r">&mdash;</span></div>
+        <div class="ar"><span class="al">V<sub>Rd,i</sub> (numai inima)</span><span class="av" id="vrdiweb_r">&mdash; <small>kN</small></span></div>
       </div>
-      <div class="res-grid">
-        <div class="rc2"><div class="rl2">V<sub>Rd,i</sub> (numai inima)</div><div class="rv" id="vrdiweb_r">&mdash;</div><div class="ru2">kN</div></div>
-        <div class="rc2 hl"><div class="rl2">V<sub>Rd,i</sub> (inima + bulb intins)</div><div class="rv" id="vrdibulb_r">&mdash;</div><div class="ru2">kN</div></div>
+      <div class="res-grid" style="margin-bottom:8px">
+        <div class="rc2 hl"><div class="rl2"><span class="zbadge zA" style="font-size:10px;padding:1px 7px">Critic</span> inima + bulb intins</div><div class="rv" id="vrdibulb_r">&mdash;</div><div class="ru2">kN</div></div>
+        <div class="rc2 hl"><div class="rl2"><span class="zbadge zB" style="font-size:10px;padding:1px 7px">Non-critic</span> inima + bulb intins</div><div class="rv" id="vrdibulb_r2">&mdash;</div><div class="ru2">kN</div></div>
       </div>
       <div class="chk" id="chk_vi"><span>V<sub>Ed</sub> &le; V<sub>Rd,i</sub></span><div class="util-wrap"><div class="util-track"><div class="util-fill" id="ub_vi"></div></div><span class="util-pct cv" id="chk_vi_v">&mdash;</span></div></div>
-    </div>
-  </div>
-
-  <div class="op">
-    <div class="ph">Verdict capacitate la forfecare</div>
-    <div class="pb">
-      <div class="res-grid">
-        <div class="rc2" id="verA_r"><div class="rl2">Critic</div><div class="rv" id="verAv_r">&mdash;</div><div class="ru2" id="verAg_r">V<sub>Rd</sub> guvernant</div></div>
-        <div class="rc2" id="verB_r"><div class="rl2">Non-critic</div><div class="rv" id="verBv_r">&mdash;</div><div class="ru2" id="verBg_r">V<sub>Rd</sub> guvernant</div></div>
-      </div>
     </div>
   </div>
 
@@ -506,24 +497,17 @@ function calc(){
   setChk('chk_vsA','chk_vsA_v',vRdsA>0?ved/vRdsA:99,'ub_vsA');
   document.getElementById('vsB1_r').textContent=vsB1.toFixed(1)+' kN';
   document.getElementById('vsB2_r').textContent=vsB2.toFixed(1)+' kN';
-  document.getElementById('vrdsB_r').textContent=vRdsB.toFixed(1)+' kN';
+  document.getElementById('vrdsA_r').textContent=vRdsA.toFixed(1);
+  document.getElementById('vrdsB_r').textContent=vRdsB.toFixed(1);
   setChk('chk_vsB','chk_vsB_v',vRdsB>0?ved/vRdsB:99,'ub_vsB');
 
   document.getElementById('asvweb_r').textContent=AsvWeb.toFixed(1)+' mm\u00B2';
   document.getElementById('asvbulb_r').innerHTML=asvb1.toFixed(1)+' mm\u00B2 ('+nbb1+'\u00D8'+obb1+')';
   document.getElementById('muf_r').textContent=muf.toFixed(1);
-  document.getElementById('vrdiweb_r').textContent=vRdiWeb.toFixed(1);
+  document.getElementById('vrdiweb_r').textContent=vRdiWeb.toFixed(1)+' kN';
   document.getElementById('vrdibulb_r').textContent=vRdiBulb.toFixed(1);
+  document.getElementById('vrdibulb_r2').textContent=vRdiBulb.toFixed(1);
   setChk('chk_vi','chk_vi_v',vRdiBulb>0?ved/vRdiBulb:99,'ub_vi');
-
-  const verdict=(elBox,elV,elG,gov)=>{
-    document.getElementById(elV).textContent=gov.toFixed(1)+' kN';
-    const ok=ved<=gov;
-    document.getElementById(elBox).className='rc2 '+(ok?'gr':'rd');
-    document.getElementById(elG).innerHTML=(ok?'VERIFICAT':'INSUFICIENT')+' \u2022 V<sub>Ed</sub>='+ved+' kN';
-  };
-  verdict('verA_r','verAv_r','verAg_r',govA);
-  verdict('verB_r','verBv_r','verBg_r',govB);
 
   Object.assign(lastCalc,{curC,curS,fck:c.fck,fcd,fyk:s.fyk,fyd,sq,wallType,muf,
     lw,bw0,bf,cnom,ved,ned,Acw,scp,vRdmaxA,vRdmaxB,Ash,vRdsA,vsB1,vsB2,vRdsB,
@@ -604,16 +588,21 @@ function drawSketch(){
         }
       }
     }
-    // Horizontal web reinforcement (across full wall width)
+    // Horizontal web reinforcement — solid in web, dashed anchorage into bulbs
     const sh=d.sh||100,nr=d.nr||2;
     if(sh>0&&nr>0){
-      const webX1=ox+bf*scl+4, webX2=ox+(lw-bf)*scl-4;
       const nLines=Math.max(3,Math.floor(wH/(sh*scl>5?sh*scl:18)));
+      const webX1=ox+bf*scl, webX2=ox+(lw-bf)*scl;
       for(let e=0;e<=nLines;e++){
         const ey=oy+margin+(wH-2*margin)*e/nLines;
         for(let r=0;r<nr;r++){
           const offset=(nr===1)?0:(r-(nr-1)/2)*3;
+          // solid line in web zone
           o+=`<line x1="${webX1}" y1="${ey+offset}" x2="${webX2}" y2="${ey+offset}" stroke="${barHoriz}" stroke-width="2" stroke-linecap="round"/>`;
+          // dashed anchorage into left bulb
+          o+=`<line x1="${ox+margin}" y1="${ey+offset}" x2="${webX1}" y2="${ey+offset}" stroke="${barHoriz}" stroke-width="1.5" stroke-dasharray="4,3" stroke-linecap="round"/>`;
+          // dashed anchorage into right bulb
+          o+=`<line x1="${webX2}" y1="${ey+offset}" x2="${ox+wW-margin}" y2="${ey+offset}" stroke="${barHoriz}" stroke-width="1.5" stroke-dasharray="4,3" stroke-linecap="round"/>`;
         }
       }
     }
