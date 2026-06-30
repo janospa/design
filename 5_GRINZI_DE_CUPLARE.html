@@ -11,14 +11,15 @@
 <style>
 :root{--bg:#F5F5F7;--panel:#ffffff;--ink:#1C1C1E;--sub:#8E8E93;--line:#E5E5EA;--accent:#007AFF;--accent-soft:#EBF3FF;--ok:#2E7D32;--ok-bg:#EAF6EC;--bad:#C62828;--bad-bg:#FDECEA;--warn:#E65100;--warn-bg:#FFF3E0;--rc:#F2F2F7}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1C1E}
+body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1C1E;min-height:100vh}
 .wrap{max-width:1080px;margin:0 auto;padding:20px 16px}
 .cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:start}
 .slabel{font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:#1C1C1E;padding:0 0 7px;margin-top:14px}
 .slabel:first-child{margin-top:0}
-.ip,.op{background:#fff;border:1px solid #E5E5EA;border-radius:12px;overflow:hidden;margin-bottom:10px}
-.ph{padding:10px 15px 0;font-size:13px;font-weight:500;color:#1C1C1E}
-.pb{padding:6px 15px 14px}
+.ip{background:#EFEFEF;border:1px solid #DCDCE0;border-radius:12px;overflow:hidden;margin-bottom:13px}
+.op{background:#fff;border:1px solid #E5E5EA;border-radius:12px;overflow:hidden;margin-bottom:10px}
+.ph{padding:12px 15px 0;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:#1C1C1E}
+.pb{padding:8px 15px 14px}
 .row{display:flex;align-items:center;padding:7px 0;border-bottom:1px solid #E0E0E5;gap:8px}
 .row:last-child{border-bottom:none}
 .rl{flex:1;font-size:13px;color:#1C1C1E;min-width:0}
@@ -35,7 +36,7 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
 .sel-wrap::after{content:'';position:absolute;right:13px;top:50%;width:7px;height:7px;border-right:2px solid #8E8E93;border-bottom:2px solid #8E8E93;transform:translateY(-65%) rotate(45deg);pointer-events:none}
 .sel-field select{width:100%;padding:8px 34px 8px 11px;font-size:13px;border:1px solid #C7C7CC;border-radius:8px;background:#fff;color:#1C1C1E;font-family:'Inter',sans-serif;cursor:pointer;-webkit-appearance:none;appearance:none}
 .sel-field select:focus{outline:none;box-shadow:0 0 0 2px rgba(0,122,255,.2);border-color:#007AFF}
-.seg{display:inline-flex;background:#E0E0E5;border-radius:8px;padding:2px;gap:2px}
+.seg{display:inline-flex;background:#E0E0E5;border-radius:8px;padding:2px;gap:2px;flex-wrap:wrap;max-width:100%}
 .seg button{font-family:inherit;font-size:12px;font-weight:500;color:#8E8E93;border:none;background:transparent;padding:5px 12px;border-radius:6px;cursor:pointer;transition:all .12s}
 .seg button.on{background:#fff;color:#1C1C1E;box-shadow:0 1px 2px rgba(0,0,0,.08)}
 .fieldset{margin-bottom:0}.fieldset:last-child{margin-bottom:0}
@@ -50,7 +51,7 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
 .verdict .ico{font-size:18px;line-height:1}
 .verdict .vh{font-size:13px;font-weight:600}
 .verdict .vb{font-size:12px;color:var(--sub);margin-top:3px;line-height:1.5}
-.vsec-h{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;color:var(--sub);margin:14px 0 8px;display:flex;align-items:center;gap:8px}
+.vsec-h{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;color:#8E8E93;margin:14px 0 8px;display:flex;align-items:center;gap:8px}
 .vsec-h .tag{font-size:10px;font-weight:600;padding:2px 8px;border-radius:10px}
 .vsec-h .tag.o{color:var(--ok);background:var(--ok-bg)}
 .vsec-h .tag.d{color:var(--bad);background:var(--bad-bg)}
@@ -60,16 +61,16 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
 .vrow.ok .vi{background:var(--ok)}.vrow.no .vi{background:var(--bad)}.vrow.nt .vi{background:var(--sub)}
 .vrow .vname{flex:1;min-width:0}
 .vrow .vname .t{font-size:13px;font-weight:500}
-.vrow .vname .s{font-size:11px;color:var(--sub);margin-top:1px}
+.vrow .vname .s{font-size:11px;color:#8E8E93;margin-top:1px}
 .vrow .vval{font-size:12px;font-weight:500;font-feature-settings:"tnum" 1;text-align:right;white-space:nowrap}
 .vrow .vbar{width:74px;flex:0 0 74px}
 .vbar .track{height:7px;border-radius:4px;background:#E8E8ED;overflow:hidden}
 .vbar .fill{height:100%;border-radius:4px}
 .vbar .pct{font-size:10.5px;font-weight:600;margin-top:3px;text-align:right;font-feature-settings:"tnum" 1}
-.kv{font-size:12px;color:var(--sub);display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px dotted var(--line)}
+.kv{font-size:12px;color:#8E8E93;display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px dotted var(--line)}
 .kv b{color:var(--ink);font-weight:500;font-feature-settings:"tnum" 1}
 .kv:last-child{border-bottom:none}
-.note{font-size:11px;color:var(--sub);line-height:1.5;margin-top:10px;padding:9px 12px;background:var(--rc);border:1px solid var(--line);border-radius:9px}
+.note{font-size:11px;color:#8E8E93;line-height:1.5;margin-top:10px;padding:9px 12px;background:var(--rc);border:1px solid var(--line);border-radius:9px}
 .note b{color:var(--ink)}
 .hidden{display:none!important}
 .sketch-card{background:#fff;border:1px solid #E5E5EA;border-radius:12px;padding:15px;margin-top:13px}
@@ -83,6 +84,27 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
 .report-btn:active{opacity:.7}
 .report-btn:disabled{opacity:.4}
 .report-status{font-size:12px;color:#8E8E93;text-align:center;padding:6px 0 0;min-height:16px}
+.chk{display:flex;align-items:center;padding:8px 0;border-bottom:1px solid #F0F0F5;gap:8px;font-size:13px}
+.chk:last-child{border-bottom:none}
+.chk .badge-st{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;font-size:12px;font-weight:600;color:#fff;flex-shrink:0}
+.chk .badge-st.ok{background:#2E7D32}
+.chk .badge-st.no{background:#C62828}
+.chk .chk-name{flex:1;min-width:0}
+.chk .chk-name .t{font-size:13px;font-weight:500}
+.chk .chk-name .s{font-size:11px;color:#8E8E93;margin-top:1px}
+.chk .chk-val{font-size:12px;font-weight:500;text-align:right;white-space:nowrap;font-feature-settings:"tnum" 1}
+.chk .chk-bar{width:74px;flex-shrink:0}
+.chk .chk-bar .track{height:7px;border-radius:4px;background:#E8E8ED;overflow:hidden}
+.chk .chk-bar .fill{height:100%;border-radius:4px}
+.chk .chk-bar .pct{font-size:10.5px;font-weight:600;margin-top:3px;text-align:right;font-feature-settings:"tnum" 1}
+.verdict-box{border-radius:10px;padding:10px 14px;font-size:13px;font-weight:500;line-height:1.5}
+.verdict-box.ok{background:#EAF6EC;color:#2E7D32;border:1px solid #BFE3C6}
+.verdict-box.no{background:#FDECEA;color:#C62828;border:1px solid #F5C6C2}
+.verdict-box.warn{background:#FFF3E0;color:#E65100;border:1px solid #F5D9A8}
+.res-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #F0F0F5;font-size:13px}
+.res-row:last-child{border-bottom:none}
+.res-row .rr-lbl{color:#1C1C1E}
+.res-row .rr-val{font-weight:500;font-feature-settings:"tnum" 1}
 .back-btn{display:inline-flex;align-items:center;gap:5px;font-family:'Inter',sans-serif;font-size:14px;font-weight:500;color:#8E8E93;background:transparent;border:none;cursor:pointer;padding:12px 16px;text-decoration:none;line-height:1}
 .back-btn svg{width:16px;height:16px;stroke:#8E8E93;stroke-width:2.5;fill:none;stroke-linecap:round;stroke-linejoin:round}
 .back-btn:hover{color:#1C1C1E}
@@ -162,7 +184,6 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
         <div class="seg" id="seg-duct">
           <button data-v="DCM" class="on">DCM</button><button data-v="DCH">DCH</button>
         </div>
-      </div>
 
       <div class="fieldset">
         <div class="fs-lbl">Armare longitudinală sus / jos <span class="mini" id="m-long">min</span></div>
@@ -181,6 +202,7 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
         <div class="note" style="margin-top:12px">
           V<sub>Ed</sub> = 1.25·(M<sub>Rd,b</sub><sup>l</sup>+M<sub>Rd,b</sub><sup>r</sup>)/l<sub>cl</sub>. La carcasă diagonală, V<sub>Ed</sub> se ia automat din combinația seismică (GS).
         </div>
+      </div>
       </div>
     </div>
 
@@ -213,9 +235,6 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
         <div class="row"><div class="rl">Diametru etrieri <span class="rn">(Ø)</span></div><div class="rc"><input type="number" id="d_estir_dia" value="10"><span class="ru">mm</span></div></div>
         <div class="row"><div class="rl">Ramuri etrieri</div><div class="rc"><input type="number" id="d_estir_n" value="2"><span class="ru">buc</span></div></div>
         <div class="row"><div class="rl">Pas etrieri <span class="rn">(s)</span></div><div class="rc"><input type="number" id="d_estir_s" value="100"><span class="ru">mm</span></div></div>
-        <div class="note" style="margin-top:8px">
-          Efortul tăietor e preluat de barele diagonale.
-        </div>
       </div>
       </div>
     </div>
@@ -223,14 +242,33 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
 
 <div>
     <div class="slabel">Rezultate</div>
+
     <div class="op">
+      <div class="ph">Verdict</div>
       <div class="pb">
-      <div id="verdict"></div>
-      <div id="results"></div>
-      <div style="padding:8px 0 4px">
-        <button class="report-btn" id="rptBtn" onclick="generatePdf()">Descarca PDF</button>
+        <div id="verdict"></div>
       </div>
     </div>
+
+    <div class="op">
+      <div class="ph">Marimi de baza</div>
+      <div class="pb" id="res-basics"></div>
+    </div>
+
+    <div class="op">
+      <div class="ph" id="res-checks-title">Verificari</div>
+      <div class="pb" id="res-checks"></div>
+    </div>
+
+    <div class="op">
+      <div class="ph">Raport</div>
+      <div class="pb">
+        <div class="report-bar" style="flex-direction:column;gap:8px">
+          <span class="report-lbl">Export nota de calcul (PDF)</span>
+          <button class="report-btn" id="rptBtn" onclick="generatePdf()">Descarca PDF</button>
+        </div>
+        <div class="report-status" id="rptStatus"></div>
+      </div>
     </div>
   </div>
 
@@ -377,43 +415,50 @@ function render(){
   setMini('m-stir',m.stirOK);setMini('m-int',m.intOK);
   setMini('m-dlong',m.dpL_ok);setMini('m-dstir',m.de_ok);
 
-  // verdict
-  let vh,vb,vc,vi;
+  // Verdict
+  let vOk,vText;
   if(m.needDiagonal){
-    if(m.diagVerifies){vc='ortho';vi='✓';vh='Carcasă DIAGONALĂ — se verifică';
-      vb='Carcasa ortogonală nu e suficientă → bare diagonale. Cu V<sub>Ed</sub> din combinația seismică, biela și barele înclinate verifică.';}
-    else{vc='diag';vi='⚠';vh='Carcasă DIAGONALĂ — NU se verifică';
-      vb='Cu V<sub>Ed</sub> din combinația seismică, '+(!m.d_conc_ok?'biela comprimată e depășită — mărește secțiunea.':'barele înclinate sunt insuficiente — mărește numărul/Ø.');}
+    vOk=m.diagVerifies;
+    vText=vOk?'CARCASĂ DIAGONALĂ — SE VERIFICĂ':'CARCASĂ DIAGONALĂ — NU SE VERIFICĂ';
   } else {
-    const allOK=m.o_conc_ok&&m.o_steel_ok;
-    if(allOK){vc='ortho';vi='✓';vh='Carcasă ORTOGONALĂ — se verifică';
-      vb='V<sub>Ed</sub> ≤ capacitatea bielei. Etrieri ortogonali + armătură orizontală suficienți.';}
-    else{vc='diag';vi='⚠';vh='Carcasă ORTOGONALĂ — NU se verifică';
-      vb='Armătura ortogonală e insuficientă pentru V<sub>Ed</sub> — mărește etrierii.';}
+    vOk=m.o_conc_ok&&m.o_steel_ok;
+    vText=vOk?'CARCASĂ ORTOGONALĂ — SE VERIFICĂ':'CARCASĂ ORTOGONALĂ — NU SE VERIFICĂ';
   }
-  $('verdict').innerHTML=`<div class="verdict ${vc}"><div class="ico">${vi}</div><div><div class="vh">${vh}</div><div class="vb">${vb}</div></div></div>`;
+  $('verdict').innerHTML=`<div class="verdict-box ${vOk?'ok':'warn'}">${vOk?'✓':'⚠'} ${vText}</div>`;
 
-  // results: solicitation summary + the relevant casing block only
+  // Basics
+  let b='';
+  b+=`<div class="res-row"><span class="rr-lbl">l<sub>cl</sub>/h<sub>w</sub> (regim grindă scurtă)</span><span class="rr-val">${fmt(m.ratio,2)} ${m.regimeOK?'✓':'⚠'}</span></div>`;
+  b+=`<div class="res-row"><span class="rr-lbl">M<sub>Rd,b</sub> capabil (${m.nL}Ø${m.dL})</span><span class="rr-val">${fmt(m.Mrd_b)} kNm</span></div>`;
+  b+=`<div class="res-row"><span class="rr-lbl">V<sub>Ed</sub> aplicat${m.needDiagonal?' (seismic)':''}</span><span class="rr-val">${fmt(m.Ved)} kN</span></div>`;
+  $('res-basics').innerHTML=b;
+
+  // Checks
+  function chkRow(ok,name,sub,val,util){
+    const cls=ok?'ok':'no', ico=ok?'✓':'✕';
+    const pct=Math.min(util*100,140), col=util<=1?'#2E7D32':'#C62828', w=Math.min(pct,100);
+    return `<div class="chk"><div class="badge-st ${cls}">${ico}</div>
+      <div class="chk-name"><div class="t">${name}</div><div class="s">${sub}</div></div>
+      <div class="chk-val">${val}</div>
+      <div class="chk-bar"><div class="track"><div class="fill" style="width:${w}%;background:${col}"></div></div><div class="pct" style="color:${col}">${(util*100).toFixed(0)}%</div></div></div>`;
+  }
+
   let h='';
-  h+=`<div class="kv"><span>l<sub>cl</sub>/h<sub>w</sub> (regim grindă scurtă)</span><b>${fmt(m.ratio,2)} ${m.regimeOK?'✓':'⚠ P100'}</b></div>`;
-  h+=`<div class="kv"><span>M<sub>Rd,b</sub> capabil (${m.nL}Ø${m.dL})</span><b>${fmt(m.Mrd_b)} kNm</b></div>`;
-  h+=`<div class="kv"><span>V<sub>Ed</sub> aplicat${m.needDiagonal?' (seismic)':''}</span><b>${fmt(m.Ved)} kN</b></div>`;
-
   if(!m.needDiagonal){
-    h+=`<div class="vsec-h">Verificări carcasă ortogonală <span class="tag o">ORTOGONAL</span></div>`;
-    h+=vrow(m.o_conc_ok,'Bielă comprimată (beton)',`V<sub>Ed</sub> ≤ ${m.cFac}·b<sub>w</sub>·d·f<sub>ctd</sub>`,`${fmt(m.Ved_ortho)} / ${fmt(m.VRd_max_o)} kN`,m.o_conc_util);
-    h+=vrow(m.o_steel_ok,'Etrieri (oțel)',`V<sub>Ed</sub> ≤ V<sub>Rd,s</sub>`,`${fmt(m.Ved_ortho)} / ${fmt(m.VRd_s_o)} kN`,m.o_steel_util);
-    h+=vrow(m.stirOK,'Procent etrieri',`ρ ≥ 0.20% · s ≤ ${fmt(m.s_min_st,0)}`,`${(m.rhoST*100).toFixed(2)}%`,m.rhoST/0.002>=1?0.002/m.rhoST:m.rhoST/0.002);
-    h+=vrow(m.intOK,'Procent armătură orizontală',`ρ ≥ ${(m.rhoI_min*100).toFixed(2)}%`,`${(m.rhoI*100).toFixed(2)}%`,m.rhoI>=m.rhoI_min?m.rhoI_min/m.rhoI:m.rhoI/m.rhoI_min);
-    h+=vrow(m.longOK,'Procent longitudinal',`ρ ≥ ${(m.rhoL_req*100).toFixed(2)}%`,`${(m.rhoL*100).toFixed(2)}%`,m.rhoL>=m.rhoL_req?m.rhoL_req/m.rhoL:m.rhoL/m.rhoL_req);
+    $('res-checks-title').textContent='Verificari — carcasa ortogonala';
+    h+=chkRow(m.o_conc_ok,'Bielă comprimată (beton)',`V<sub>Ed</sub> ≤ ${m.cFac}·b<sub>w</sub>·d·f<sub>ctd</sub>`,`${fmt(m.Ved_ortho)} / ${fmt(m.VRd_max_o)} kN`,m.o_conc_util);
+    h+=chkRow(m.o_steel_ok,'Etrieri (oțel)',`V<sub>Ed</sub> ≤ V<sub>Rd,s</sub>`,`${fmt(m.Ved_ortho)} / ${fmt(m.VRd_s_o)} kN`,m.o_steel_util);
+    h+=chkRow(m.stirOK,'Procent etrieri',`ρ ≥ 0.20%`,`${(m.rhoST*100).toFixed(2)}%`,m.rhoST>0?0.002/m.rhoST:999);
+    h+=chkRow(m.intOK,'Procent armătură orizontală',`ρ ≥ ${(m.rhoI_min*100).toFixed(2)}%`,`${(m.rhoI*100).toFixed(2)}%`,m.rhoI>0?m.rhoI_min/m.rhoI:999);
+    h+=chkRow(m.longOK,'Procent longitudinal',`ρ ≥ ${(m.rhoL_req*100).toFixed(2)}%`,`${(m.rhoL*100).toFixed(2)}%`,m.rhoL>0?m.rhoL_req/m.rhoL:999);
   } else {
-    h+=`<div class="vsec-h">Verificări carcasă diagonală <span class="tag d">DIAGONAL</span></div>`;
-    h+=vrow(m.d_conc_ok,'Bielă comprimată (beton)',`V<sub>Ed,GS</sub> ≤ V<sub>Rd,max</sub> (α)`,`${fmt(m.Ved_gs)} / ${fmt(m.VRd_max_d)} kN`,m.d_conc_util);
-    h+=vrow(m.d_steel_ok,'Bare diagonale (oțel)',`V<sub>Ed,GS</sub> ≤ 2·ΣA<sub>si</sub>·f<sub>yd</sub>·sin α`,`${fmt(m.Ved_gs)} / ${fmt(m.VRd_s_d)} kN`,m.d_steel_util);
-    h+=vrow(m.dpL_ok,'Bare longitudinale perimetrale',`${m.dpN}Ø${m.dpL} (min ${m.nPerim_req}) · ρ ≥ ${(m.rho_pL_min*100).toFixed(2)}%`,`${(m.rho_pL*100).toFixed(2)}%`,m.rho_pL>=m.rho_pL_min?m.rho_pL_min/m.rho_pL:m.rho_pL/m.rho_pL_min);
-    h+=vrow(m.de_ok,'Etrieri perimetrali',`Ø${m.deD}/${fmt(m.deS,0)} · ρ ≥ ${(m.rho_de_min*100).toFixed(2)}%`,`${(m.rho_de*100).toFixed(2)}%`,m.rho_de>=m.rho_de_min?m.rho_de_min/m.rho_de:m.rho_de/m.rho_de_min);
+    $('res-checks-title').textContent='Verificari — carcasa diagonala';
+    h+=chkRow(m.d_conc_ok,'Bielă comprimată (beton)',`V<sub>Ed,GS</sub> ≤ V<sub>Rd,max</sub>`,`${fmt(m.Ved_gs)} / ${fmt(m.VRd_max_d)} kN`,m.d_conc_util);
+    h+=chkRow(m.d_steel_ok,'Bare diagonale (oțel)',`V<sub>Ed,GS</sub> ≤ 2·A<sub>si</sub>·f<sub>yd</sub>·sin α`,`${fmt(m.Ved_gs)} / ${fmt(m.VRd_s_d)} kN`,m.d_steel_util);
+    h+=chkRow(m.dpL_ok,'Bare long. perimetrale',`${m.dpN}Ø${m.dpL} (min ${m.nPerim_req})`,`ρ=${(m.rho_pL*100).toFixed(2)}%`,m.rho_pL>0?m.rho_pL_min/m.rho_pL:999);
+    h+=chkRow(m.de_ok,'Etrieri perimetrali',`Ø${m.deD}/${fmt(m.deS,0)}`,`ρ=${(m.rho_de*100).toFixed(2)}%`,m.rho_de>0?m.rho_de_min/m.rho_de:999);
   }
-  $('results').innerHTML=h;
+  $('res-checks').innerHTML=h;
   drawSketch();
 }
 
@@ -471,54 +516,66 @@ function drawSketch(){
 }
 
 function exportPDF(){
-  const m=M;const {jsPDF}=window.jspdf;const doc=new jsPDF({unit:'mm',format:'a4'});const pw=210;let y=16;
-  doc.setFont('helvetica','bold');doc.setFontSize(15);
-  doc.text('Grinzi de cuplare — Verificare la forta taietoare',14,y);
-  y+=6;doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(110);
-  doc.text('CR 2-1-1.1/2022, cap. 2.3.5 (reluat in 3.8).',14,y);y+=8;doc.setTextColor(20);
+  const m=M;const {jsPDF}=window.jspdf;const doc=new jsPDF({unit:'mm',format:'a4'});const pW=210,ml=15,mr=15,cw=pW-ml-mr;let y=0;
+  const ds=new Date().toLocaleDateString('ro-RO');
+  function hdr(){doc.setFillColor(40,80,140);doc.rect(0,0,210,14,'F');doc.setTextColor(255,255,255);doc.setFontSize(11);doc.setFont('helvetica','bold');doc.text('NOTA DE CALCUL \u2014 GRINZI DE CUPLARE',ml,9);doc.setFontSize(8);doc.setFont('helvetica','normal');doc.text('CR 2-1-1.1/2022 cap. 2.3.5',ml,13);doc.text('Perete: '+currentPreset+'  |  Data: '+ds,pW-mr,9,{align:'right'});doc.setTextColor(0,0,0);y=20;}
+  function cy(n){n=n||10;if(y+n>275){doc.addPage();hdr();}}
+  function sT(t){cy(12);doc.setFillColor(240,245,250);doc.rect(ml,y-4,cw,8,'F');doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor(0,102,204);doc.text(t,ml+2,y+1);doc.setTextColor(0,0,0);doc.setFont('helvetica','normal');y+=8;}
+  hdr();
+  doc.autoTable({startY:22,body:[
+    [{content:'GRINZI DE CUPLARE',colSpan:2,styles:{fontSize:14,fontStyle:'bold',halign:'center',textColor:[28,28,30],fillColor:[255,255,255],cellPadding:{top:6,bottom:2}}}],
+    [{content:'Verificare la forta taietoare \u2014 CR 2-1-1.1/2022 cap. 2.3.5',colSpan:2,styles:{fontSize:9.5,halign:'center',textColor:[0,0,0],fillColor:[255,255,255],cellPadding:{top:1,bottom:2}}}],
+    [{content:'Aplicatie dezvoltata in cadrul lucrarii de disertatie \u2014 Janos Patrik',colSpan:2,styles:{fontSize:8,fontStyle:'italic',halign:'center',textColor:[0,0,0],fillColor:[255,255,255],cellPadding:{top:1,bottom:4}}}],
+    ['Perete: '+currentPreset,'Data: '+ds],
+  ],margin:{left:ml,right:mr},tableWidth:cw,theme:'plain',styles:{lineColor:[0,102,204],lineWidth:0},
+  columnStyles:{0:{fontStyle:'bold',fontSize:9,textColor:[0,102,204]},1:{halign:'right',fontSize:9,textColor:[0,0,0]}},
+  didParseCell:function(data){if(data.row.index===3){data.cell.styles.lineWidth={top:0.4,bottom:0.4};data.cell.styles.lineColor=[0,102,204];}},
+  });
+  y=doc.lastAutoTable.finalY+6;
   const diagPass=m.needDiagonal?m.diagVerifies:(m.o_conc_ok&&m.o_steel_ok);
-  doc.setFillColor(diagPass?231:253,diagPass?246:241,diagPass?238:227);
-  doc.roundedRect(14,y,pw-28,12,2,2,'F');
-  doc.setFont('helvetica','bold');doc.setFontSize(11);
-  doc.setTextColor(diagPass?29:178,diagPass?155:94,diagPass?84:0);
   const vt=m.needDiagonal?('CARCASA DIAGONALA - '+(m.diagVerifies?'SE VERIFICA':'NU SE VERIFICA')):('CARCASA ORTOGONALA - '+(diagPass?'SE VERIFICA':'NU SE VERIFICA'));
-  doc.text(vt,17,y+8);doc.setTextColor(20);y+=18;
-  const AT=(head,body,title)=>{doc.setFont('helvetica','bold');doc.setFontSize(10);doc.text(title,14,y);y+=2;
-    doc.autoTable({startY:y+1,head:[head],body,theme:'grid',headStyles:{fillColor:[29,29,31],fontSize:8,halign:'left'},
-      bodyStyles:{fontSize:8.2,textColor:30},alternateRowStyles:{fillColor:[250,250,252]},margin:{left:14,right:14},
-      styles:{cellPadding:1.8,lineColor:[210,210,215],lineWidth:0.1}});y=doc.lastAutoTable.finalY+7;};
-
-  AT(['Parametru','Valoare','Parametru','Valoare'],[
-    ['b_w',fmt(m.bw,0)+' mm','Beton',m.conc],['h_w',fmt(m.hw,0)+' mm','Otel',m.steel],
-    ['l_cl',fmt(m.lcl,0)+' mm','f_cd',fmt(m.fcd)+' N/mm2'],['d',fmt(m.d,0)+' mm','f_yd',fmt(m.fyd)+' N/mm2'],
-    ['Ductilitate',m.ductMode,'l_cl/h_w',fmt(m.ratio,2)],
-  ],'1. Date de intrare');
-
-  AT(['Marime','Valoare'],[
+  doc.setFillColor(diagPass?234:253,diagPass?246:236,diagPass?238:227);doc.roundedRect(ml,y,cw,10,2,2,'F');
+  doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor(diagPass?46:198,diagPass?125:57,diagPass?50:43);doc.text(vt,ml+4,y+7);doc.setTextColor(0,0,0);doc.setFont('helvetica','normal');y+=16;
+  sT('1. DATE DE INTRARE');
+  doc.autoTable({startY:y,head:[['Parametru','Notatie','Valoare']],body:[
+    ['Latimea grinzii','b_w',fmt(m.bw,0)+' mm'],['Inaltimea grinzii','h_w',fmt(m.hw,0)+' mm'],['Lungimea libera','l_cl',fmt(m.lcl,0)+' mm'],
+    ['Inaltimea utila','d',fmt(m.d,0)+' mm'],['Clasa beton','-',m.conc],['Clasa otel','-',m.steel],
+    ['f_cd','-',fmt(m.fcd)+' MPa'],['f_yd','-',fmt(m.fyd)+' MPa'],['Ductilitate','-',m.ductMode],
+    ['l_cl/h_w','-',fmt(m.ratio,2)],
+  ],margin:{left:ml,right:mr},tableWidth:cw,theme:'grid',styles:{lineColor:[180,200,220],lineWidth:0.3,fontSize:8.5,textColor:[0,0,0]},headStyles:{fillColor:[200,215,235],textColor:[0,0,0],fontStyle:'bold',lineColor:[200,215,235]},alternateRowStyles:{fillColor:[240,245,252]},columnStyles:{0:{cellWidth:95},1:{cellWidth:35,fontStyle:'italic'},2:{halign:'right'}}});
+  y=doc.lastAutoTable.finalY+6;
+  sT('2. MOMENT CAPABIL SI FORTA TAIETOARE');
+  doc.autoTable({startY:y,head:[['Marime','Valoare']],body:[
     ['M_Rd,b ('+m.nL+'xO'+m.dL+')',fmt(m.Mrd_b)+' kNm'],
     ['V_Ed aplicat'+(m.needDiagonal?' (seismic GS)':''),fmt(m.Ved)+' kN'],
-  ],'2. Moment capabil -> forta taietoare');
-
+  ],margin:{left:ml,right:mr},tableWidth:cw,theme:'grid',styles:{lineColor:[180,200,220],lineWidth:0.3,fontSize:8.5,textColor:[0,0,0]},headStyles:{fillColor:[200,215,235],textColor:[0,0,0],fontStyle:'bold',lineColor:[200,215,235]},alternateRowStyles:{fillColor:[240,245,252]}});
+  y=doc.lastAutoTable.finalY+6;
   if(!m.needDiagonal){
-    AT(['Verificare','Conditie','V_Ed / V_Rd  ·  valoare','Util.','Stare'],[
-      ['Biela comprimata',m.cFac+'*b_w*d*f_ctd',fmt(m.Ved_ortho)+' / '+fmt(m.VRd_max_o)+' kN',(m.o_conc_util*100).toFixed(0)+'%',m.o_conc_ok?'OK':'NU'],
+    sT('3. VERIFICARI CARCASA ORTOGONALA');
+    doc.autoTable({startY:y,head:[['Verificare','Conditie','V_Ed / V_Rd','Util.','Stare']],body:[
+      ['Biela comprimata',m.cFac+'*bw*d*fctd',fmt(m.Ved_ortho)+' / '+fmt(m.VRd_max_o)+' kN',(m.o_conc_util*100).toFixed(0)+'%',m.o_conc_ok?'OK':'NU'],
       ['Etrieri (otel)','V_Rd,s',fmt(m.Ved_ortho)+' / '+fmt(m.VRd_s_o)+' kN',(m.o_steel_util*100).toFixed(0)+'%',m.o_steel_ok?'OK':'NU'],
       ['Procent etrieri','rho>=0.20%',(m.rhoST*100).toFixed(2)+'%','-',m.stirOK?'OK':'NU'],
       ['Procent orizontal','rho>='+(m.rhoI_min*100).toFixed(2)+'%',(m.rhoI*100).toFixed(2)+'%','-',m.intOK?'OK':'NU'],
       ['Procent longitudinal','rho>='+(m.rhoL_req*100).toFixed(2)+'%',(m.rhoL*100).toFixed(2)+'%','-',m.longOK?'OK':'NU'],
-    ],'3. Verificari carcasa ORTOGONALA');
+    ],margin:{left:ml,right:mr},tableWidth:cw,theme:'grid',styles:{lineColor:[180,200,220],lineWidth:0.3,fontSize:8,textColor:[0,0,0]},headStyles:{fillColor:[200,215,235],textColor:[0,0,0],fontStyle:'bold',lineColor:[200,215,235]},alternateRowStyles:{fillColor:[240,245,252]}});
   } else {
-    AT(['Verificare','Conditie','V_Ed / V_Rd  ·  valoare','Util.','Stare'],[
-      ['Biela comprimata','a_cw*b_w*z*nu1*f_cd*(...)',fmt(m.Ved_gs)+' / '+fmt(m.VRd_max_d)+' kN',(m.d_conc_util*100).toFixed(0)+'%',m.d_conc_ok?'OK':'NU'],
-      ['Bare diagonale','2*A_si*f_yd*sin a',fmt(m.Ved_gs)+' / '+fmt(m.VRd_s_d)+' kN',(m.d_steel_util*100).toFixed(0)+'%',m.d_steel_ok?'OK':'NU'],
-      ['Bare perimetrale',m.dpN+'xO'+m.dpL+' (min '+m.nPerim_req+') · rho>='+(m.rho_pL_min*100).toFixed(2)+'%',(m.rho_pL*100).toFixed(2)+'%','-',m.dpL_ok?'OK':'NU'],
-      ['Etrieri perimetrali','O'+m.deD+'/'+fmt(m.deS,0)+' · rho>='+(m.rho_de_min*100).toFixed(2)+'%',(m.rho_de*100).toFixed(2)+'%','-',m.de_ok?'OK':'NU'],
-    ],'3. Verificari carcasa DIAGONALA (V_Ed,GS)');
+    sT('3. VERIFICARI CARCASA DIAGONALA');
+    doc.autoTable({startY:y,head:[['Verificare','Conditie','V_Ed / V_Rd','Util.','Stare']],body:[
+      ['Biela comprimata','acw*bw*z*nu1*fcd',fmt(m.Ved_gs)+' / '+fmt(m.VRd_max_d)+' kN',(m.d_conc_util*100).toFixed(0)+'%',m.d_conc_ok?'OK':'NU'],
+      ['Bare diagonale','2*Asi*fyd*sin a',fmt(m.Ved_gs)+' / '+fmt(m.VRd_s_d)+' kN',(m.d_steel_util*100).toFixed(0)+'%',m.d_steel_ok?'OK':'NU'],
+      ['Bare perimetrale',m.dpN+'xO'+m.dpL,(m.rho_pL*100).toFixed(2)+'%','-',m.dpL_ok?'OK':'NU'],
+      ['Etrieri perimetrali','O'+m.deD+'/'+fmt(m.deS,0),(m.rho_de*100).toFixed(2)+'%','-',m.de_ok?'OK':'NU'],
+    ],margin:{left:ml,right:mr},tableWidth:cw,theme:'grid',styles:{lineColor:[180,200,220],lineWidth:0.3,fontSize:8,textColor:[0,0,0]},headStyles:{fillColor:[200,215,235],textColor:[0,0,0],fontStyle:'bold',lineColor:[200,215,235]},alternateRowStyles:{fillColor:[240,245,252]}});
   }
-  doc.setFontSize(7.5);doc.setTextColor(120);
-  doc.text('Algoritm dezvoltat pe baza foii de calcul a proiectantului. Asistenta AI la implementare; autorul algoritmului este proiectantul.',14,285);
-  doc.text('Rezultatele se verifica de inginerul proiectant. CR 2-1-1.1/2022.',14,289);
-  doc.save('grinda_de_cuplare_CR2-2022.pdf');
+  y=doc.lastAutoTable.finalY+6;
+  doc.setFontSize(7.5);doc.setFont('helvetica','italic');doc.setTextColor(0,0,0);
+  doc.text('Responsabilitatea pentru rezultatele obtinute revine in exclusivitate utilizatorului.',ml,276);
+  doc.text('Toate valorile trebuie verificate inainte de utilizare.',ml,280);
+  doc.setFont('helvetica','normal');
+  const tp=doc.internal.getNumberOfPages();
+  for(let i=1;i<=tp;i++){doc.setPage(i);doc.setFontSize(7.5);doc.setTextColor(0,0,0);doc.setDrawColor(40,80,140);doc.setFont('helvetica','normal');doc.line(ml,285,ml+cw,285);doc.text('CR 2-1-1.1/2022',ml,289);doc.text('Pagina '+i+' din '+tp,pW-mr,289,{align:'right'});doc.text('Generat: '+ds,pW/2,289,{align:'center'});}
+  doc.save('Raport_grinzi_cuplare_'+currentPreset+'.pdf');
 }
 
 
