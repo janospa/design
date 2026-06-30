@@ -59,7 +59,7 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
 .ru2{font-size:11px;color:#8E8E93}
 .zhead{display:flex;align-items:center;gap:8px;margin-bottom:10px}
 .zbadge{display:inline-flex;align-items:center;padding:3px 11px;border-radius:20px;font-size:12px;font-weight:500}
-.zA{background:#EBF3FF;color:#0066CC}.zB{background:#FFF3E0;color:#E65100}
+.zA{background:#FF6B35;color:#fff}.zB{background:#2E7D32;color:#fff}
 .alfa-box{background:#F2F2F7;border-radius:8px;padding:10px 13px}
 .ar{display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:13px;border-bottom:1px solid #E5E5EA}
 .ar:last-child{border-bottom:none}
@@ -198,6 +198,7 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
     <div class="pb">
       <div class="row"><div class="rl">Diametru bare <span class="rn">(&Oslash;<sub>b</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="obb1" value="14" min="4" step="2" oninput="calc()"><span class="ru">mm</span></div></div>
       <div class="row"><div class="rl">Nr. bare <span class="rn">(buc)</span></div><div class="rc"><input type="number" inputmode="numeric" id="nbb1" value="8" min="0" step="1" oninput="calc()"></div></div>
+      <div class="row"><div class="rl">Pas etrieri <span class="rn">(s<sub>etr</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="setr1" value="100" min="30" step="10" oninput="calc()"><span class="ru">mm</span></div></div>
     </div>
   </div>
 
@@ -206,6 +207,7 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
     <div class="pb">
       <div class="row"><div class="rl">Diametru bare <span class="rn">(&Oslash;<sub>b1</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="obb1bi" value="14" min="4" step="2" oninput="calc()"><span class="ru">mm</span></div></div>
       <div class="row"><div class="rl">Nr. bare <span class="rn">(buc)</span></div><div class="rc"><input type="number" inputmode="numeric" id="nbb1bi" value="8" min="0" step="1" oninput="calc()"></div></div>
+      <div class="row"><div class="rl">Pas etrieri <span class="rn">(s<sub>etr,1</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="setr1bi" value="100" min="30" step="10" oninput="calc()"><span class="ru">mm</span></div></div>
     </div>
   </div>
 
@@ -214,6 +216,7 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
     <div class="pb">
       <div class="row"><div class="rl">Diametru bare <span class="rn">(&Oslash;<sub>b2</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="obb2bi" value="14" min="4" step="2" oninput="calc()"><span class="ru">mm</span></div></div>
       <div class="row"><div class="rl">Nr. bare <span class="rn">(buc)</span></div><div class="rc"><input type="number" inputmode="numeric" id="nbb2bi" value="8" min="0" step="1" oninput="calc()"></div></div>
+      <div class="row"><div class="rl">Pas etrieri <span class="rn">(s<sub>etr,2</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="setr2bi" value="100" min="30" step="10" oninput="calc()"><span class="ru">mm</span></div></div>
     </div>
   </div>
 
@@ -268,10 +271,6 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
   <div class="op">
     <div class="ph">Sectiune — armare forta taietoare</div>
     <div class="pb">
-      <div class="cleg" style="margin-bottom:6px">
-        <span><i style="background:#8B0000"></i> bare longitudinale bulb</span>
-        <span><i style="background:#2E7D32"></i> etrieri bulb / armare orizontala</span>
-      </div>
       <svg id="sketch" viewBox="0 0 500 300" width="100%" style="display:block"></svg>
     </div>
   </div>
@@ -319,14 +318,14 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
     <div class="ph">V<sub>Rd,i</sub> &mdash; Rezistenta la lunecare in rostul de turnare</div>
     <div class="pb">
       <div class="alfa-box" style="margin-bottom:10px">
-        <div class="ar"><span class="al">A<sub>sv,web</sub> (armatura verticala inima)</span><span class="av" id="asvweb_r">&mdash;</span></div>
-        <div class="ar"><span class="al">A<sub>sv,bulb</sub> (bulb intins)</span><span class="av" id="asvbulb_r">&mdash;</span></div>
+        <div class="ar" id="ar_asvweb"><span class="al">A<sub>sv,web</sub> (armatura verticala inima)</span><span class="av" id="asvweb_r">&mdash;</span></div>
+        <div class="ar"><span class="al">A<sub>sv,bulb</sub> (<span id="asvbulb_lbl">bulb intins</span>)</span><span class="av" id="asvbulb_r">&mdash;</span></div>
         <div class="ar"><span class="al">&mu;<sub>f</sub></span><span class="av" id="muf_r">&mdash;</span></div>
-        <div class="ar"><span class="al">V<sub>Rd,i</sub> (numai inima)</span><span class="av" id="vrdiweb_r">&mdash; <small>kN</small></span></div>
+        <div class="ar" id="ar_vrdiweb"><span class="al">V<sub>Rd,i</sub> (numai inima)</span><span class="av" id="vrdiweb_r">&mdash; <small>kN</small></span></div>
       </div>
       <div class="res-grid" style="margin-bottom:8px">
-        <div class="rc2 hl"><div class="rl2"><span class="zbadge zA" style="font-size:10px;padding:1px 7px">Critic</span> inima + bulb intins</div><div class="rv" id="vrdibulb_r">&mdash;</div><div class="ru2">kN</div></div>
-        <div class="rc2 hl"><div class="rl2"><span class="zbadge zB" style="font-size:10px;padding:1px 7px">Non-critic</span> inima + bulb intins</div><div class="rv" id="vrdibulb_r2">&mdash;</div><div class="ru2">kN</div></div>
+        <div class="rc2 hl"><div class="rl2"><span class="zbadge zA" style="font-size:10px;padding:1px 7px">Critic</span> <span id="vrdi_lblA">inima + bulb intins</span></div><div class="rv" id="vrdibulb_r">&mdash;</div><div class="ru2">kN</div></div>
+        <div class="rc2 hl"><div class="rl2"><span class="zbadge zB" style="font-size:10px;padding:1px 7px">Non-critic</span> <span id="vrdi_lblB">inima + bulb intins</span></div><div class="rv" id="vrdibulb_r2">&mdash;</div><div class="ru2">kN</div></div>
       </div>
       <div class="chk" id="chk_vi"><span>V<sub>Ed</sub> &le; V<sub>Rd,i</sub></span><div class="util-wrap"><div class="util-track"><div class="util-fill" id="ub_vi"></div></div><span class="util-pct cv" id="chk_vi_v">&mdash;</span></div></div>
     </div>
@@ -507,12 +506,22 @@ function calc(){
   document.getElementById('vrdiweb_r').textContent=vRdiWeb.toFixed(1)+' kN';
   document.getElementById('vrdibulb_r').textContent=vRdiBulb.toFixed(1);
   document.getElementById('vrdibulb_r2').textContent=vRdiBulb.toFixed(1);
+  // Dynamic labels and visibility based on wall type
+  const isBulbType=wallType==='Bulb';
+  document.getElementById('ar_asvweb').style.display=isBulbType?'none':'';
+  document.getElementById('ar_vrdiweb').style.display=isBulbType?'none':'';
+  document.getElementById('asvbulb_lbl').textContent=isBulbType?'bulb':'bulb intins';
+  document.getElementById('vrdi_lblA').textContent=isBulbType?'bulb':'inima + bulb intins';
+  document.getElementById('vrdi_lblB').textContent=isBulbType?'bulb':'inima + bulb intins';
   setChk('chk_vi','chk_vi_v',vRdiBulb>0?ved/vRdiBulb:99,'ub_vi');
 
   Object.assign(lastCalc,{curC,curS,fck:c.fck,fcd,fyk:s.fyk,fyd,sq,wallType,muf,
     lw,bw0,bf,cnom,ved,ned,Acw,scp,vRdmaxA,vRdmaxB,Ash,vRdsA,vsB1,vsB2,vRdsB,
     asvb,asvb1,asvb2,nbb1,obb1,nbb2,obb2,lweb,AsvWeb,vRdiWeb,vRdiBulb,govA,govB,
-    oh:gv('oh'),sh:gv('sh'),nr:gv('nr'),ss:gv('ss'),loswi:gv('loswi'),
+    oh:gv('oh'),sh:gv('sh'),nr:gv('nr'),ss:gv('ss'),
+    setr1:wallType==='Bulb'?gv('setr1'):gv('setr1bi'),
+    setr2:wallType==='Bulb'?gv('setr1'):gv('setr2bi'),
+    loswi:gv('loswi'),
     oswp:gv('oswp'),nswp:gv('nswp'),oswi:gv('oswi'),nei:gv('nei'),nswi:gv('nswi'),
     ol:gv('ol'),sl:gv('sl'),nrl:gv('nrl')});
   drawSketch();
@@ -561,8 +570,8 @@ function drawSketch(){
       }
     }
     // Stirrups across full width
-    const ss=d.ss||100;
-    const nEtr=Math.max(3,Math.floor(wH/(ss*scl>5?ss*scl:18)));
+    const setr1=d.setr1||100;
+    const nEtr=Math.max(3,Math.floor(wH/(setr1*scl>5?setr1*scl:18)));
     for(let e=0;e<=nEtr;e++){
       const ey=oy+margin+(wH-2*margin)*e/nEtr;
       o+=`<line x1="${ox+margin-2}" y1="${ey}" x2="${ox+wW-margin+2}" y2="${ey}" stroke="${barHoriz}" stroke-width="2" stroke-linecap="round"/>`;
@@ -571,8 +580,11 @@ function drawSketch(){
     // === BULB+INIMA: bulb bars + stirrups in bulbs + horizontal web bars + vertical web bars ===
     const nbb1=d.nbb1||0, nbb2=d.nbb2||0;
     if(bf>0){
-      const bulbs=[{bx:ox, nb:Math.ceil(nbb1/2)},{bx:ox+(lw-bf)*scl, nb:Math.ceil(nbb2/2)}];
-      for(const {bx,nb} of bulbs){
+      const bulbs=[
+        {bx:ox, nb:Math.ceil(nbb1/2), setr:d.setr1||100},
+        {bx:ox+(lw-bf)*scl, nb:Math.ceil(nbb2/2), setr:d.setr2||100}
+      ];
+      for(const {bx,nb,setr} of bulbs){
         if(nb>0){
           const cols=Math.max(2,Math.min(nb,5));
           for(let c=0;c<cols;c++){
@@ -580,30 +592,21 @@ function drawSketch(){
             o+=`<line x1="${cx}" y1="${oy+margin}" x2="${cx}" y2="${oy+wH-margin}" stroke="${barVert}" stroke-width="2.5" stroke-linecap="round"/>`;
           }
         }
-        // Stirrups in bulb
-        const nEtr=Math.max(3,Math.floor(wH/18));
+        // Stirrups in bulb — independent spacing per bulb
+        const nEtr=Math.max(3,Math.floor(wH/(setr*scl>5?setr*scl:18)));
         for(let e=0;e<=nEtr;e++){
           const ey=oy+margin+(wH-2*margin)*e/nEtr;
           o+=`<line x1="${bx+margin-2}" y1="${ey}" x2="${bx+bfW-margin+2}" y2="${ey}" stroke="${barHoriz}" stroke-width="2" stroke-linecap="round"/>`;
         }
       }
     }
-    // Horizontal web reinforcement — solid in web, dashed anchorage into bulbs
+    // Horizontal web reinforcement — solid across full width including bulb anchorage
     const sh=d.sh||100,nr=d.nr||2;
     if(sh>0&&nr>0){
       const nLines=Math.max(3,Math.floor(wH/(sh*scl>5?sh*scl:18)));
-      const webX1=ox+bf*scl, webX2=ox+(lw-bf)*scl;
       for(let e=0;e<=nLines;e++){
         const ey=oy+margin+(wH-2*margin)*e/nLines;
-        for(let r=0;r<nr;r++){
-          const offset=(nr===1)?0:(r-(nr-1)/2)*3;
-          // solid line in web zone
-          o+=`<line x1="${webX1}" y1="${ey+offset}" x2="${webX2}" y2="${ey+offset}" stroke="${barHoriz}" stroke-width="2" stroke-linecap="round"/>`;
-          // dashed anchorage into left bulb
-          o+=`<line x1="${ox+margin}" y1="${ey+offset}" x2="${webX1}" y2="${ey+offset}" stroke="${barHoriz}" stroke-width="1.5" stroke-dasharray="4,3" stroke-linecap="round"/>`;
-          // dashed anchorage into right bulb
-          o+=`<line x1="${webX2}" y1="${ey+offset}" x2="${ox+wW-margin}" y2="${ey+offset}" stroke="${barHoriz}" stroke-width="1.5" stroke-dasharray="4,3" stroke-linecap="round"/>`;
-        }
+        o+=`<line x1="${ox+margin}" y1="${ey}" x2="${ox+wW-margin}" y2="${ey}" stroke="${barHoriz}" stroke-width="2" stroke-linecap="round"/>`;
       }
     }
     // Vertical web reinforcement
@@ -766,7 +769,11 @@ function buildPdfPage(doc,pName,skImg){
   row('Aria inimii','A_cw = l_w * b_w0',d.Acw.toLocaleString('ro-RO')+' mm2',true);
   row('Tensiunea medie de compresiune','sigma_cp = N_Ed/A_cw',d.scp.toFixed(3)+' MPa');
   if(d.wallType!=='Bulb')row('Lungimea inimii','l_web',d.lweb.toFixed(0)+' mm');hl();
-  cy(22);sT('4. V.Rd.max - REZISTENTA MAXIMA A SECTIUNII');doc.setFontSize(8);doc.setTextColor(0,0,0);doc.setFont('helvetica','italic');doc.text('Zona A: 0.67*A_cw*sqrt(f_cd)     Zona B: 0.80*A_cw*sqrt(f_cd)',ml,y);doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);y+=6;
+  cy(22);sT('4. V.Rd.max - REZISTENTA MAXIMA A SECTIUNII');doc.setFontSize(8);doc.setTextColor(0,0,0);doc.setFont('helvetica','italic');
+  doc.text('Zona A (DCH): V_Rd.max = 0,67 * A_cw * sqrt(f_cd)',ml,y);y+=4;
+  doc.text('Zona A (DCM): V_Rd.max = 0,67 * A_cw * sqrt(f_cd)',ml,y);y+=4;
+  doc.text('Zona B: V_Rd.max = 0,80 * A_cw * sqrt(f_cd)',ml,y);
+  doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);y+=6;
   row('V_Rd.max - Zona A (critica)','',d.vRdmaxA.toFixed(1)+' kN',true);
   row('V_Rd.max - Zona B (non-critica)','',d.vRdmaxB.toFixed(1)+' kN',true);
   row('Verificare V_Ed/V_Rd.max - Zona A','',(d.ved/d.vRdmaxA*100).toFixed(1)+' %');
@@ -774,7 +781,8 @@ function buildPdfPage(doc,pName,skImg){
   cy(30);sT('5. V.Rd.s - REZISTENTA DATA DE ARMATURA ORIZONTALA');
   const vd=d.vsDetail;
   doc.setFontSize(8);doc.setTextColor(0,0,0);doc.setFont('helvetica','italic');
-  doc.text(d.wallType==='Bulb'?'Zona A: V_Rd.s = (A_sh,perim + A_sh,interm) * f_yd,h':'Zona A: V_Rd.s = A_sh,web * f_yd,h',ml,y);
+  doc.text('Zona A: V_Rd.s = A_sh * f_yd,h',ml,y);y+=4;
+  doc.text('Zona B: V_Rd.s = 0,5 * sigma_cp * A_cw + Sum(A_sh) * f_yd,h',ml,y);
   doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);y+=6;
   if(vd.mode==='web'){
     row('Bare orizontale taiate','n = n_r*l_w/s_h',vd.barsCut.toFixed(1)+' buc');
@@ -786,14 +794,16 @@ function buildPdfPage(doc,pName,skImg){
     row('Aria intermediari','A_sh,interm',vd.AshI.toFixed(1)+' mm2');
   }
   row('Aria totala armatura orizontala','A_sh',d.Ash.toFixed(1)+' mm2');
-  row('V_Rd.s - Zona A','',d.vRdsA.toFixed(1)+' kN',true);
-  row('Verificare V_Ed/V_Rd.s - Zona A','',(d.ved/d.vRdsA*100).toFixed(1)+' %');hl();
-  doc.setFontSize(8);doc.setTextColor(0,0,0);doc.setFont('helvetica','italic');doc.text('Zona B: V_Rd.s = 0.5*sigma_cp*A_cw + Sum(A_sh)*f_yd,h',ml,y);doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);y+=6;
-  row('Contributie beton','0.5*sigma_cp*A_cw',d.vsB1.toFixed(1)+' kN');
-  row('Contributie armatura','Sum(A_sh)*f_yd',d.vsB2.toFixed(1)+' kN');
+  row('V_Rd.s - Zona A','A_sh * f_yd,h',d.vRdsA.toFixed(1)+' kN',true);
+  row('Verificare V_Ed/V_Rd.s - Zona A','',(d.ved/d.vRdsA*100).toFixed(1)+' %');
+  row('Contributie beton','0,5 * sigma_cp * A_cw',d.vsB1.toFixed(1)+' kN');
+  row('Contributie armatura','Sum(A_sh) * f_yd,h',d.vsB2.toFixed(1)+' kN');
   row('V_Rd.s - Zona B','',d.vRdsB.toFixed(1)+' kN',true);
   row('Verificare V_Ed/V_Rd.s - Zona B','',(d.ved/d.vRdsB*100).toFixed(1)+' %');hl();
-  cy(26);sT('6. V.Rd.i - REZISTENTA LA LUNECARE IN ROST');doc.setFontSize(8);doc.setTextColor(0,0,0);doc.setFont('helvetica','italic');doc.text('V_Rd = mu_f * (Sum A_sv * f_yd,v + N_Ed)',ml,y);doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);y+=6;
+  cy(26);sT('6. V.Rd.i - REZISTENTA LA LUNECARE IN ROST');doc.setFontSize(8);doc.setTextColor(0,0,0);doc.setFont('helvetica','italic');
+  doc.text('V_Rd = mu_f * (Sum(A_sv) * f_yd,v + N_Ed)',ml,y);y+=4;
+  doc.text('       + Sum(A_si) * f_yd,i * (cos(alpha) + mu_f * sin(alpha))',ml,y);
+  doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);y+=6;
   row('Aria armatura verticala inima','A_sv,web',d.AsvWeb.toFixed(1)+' mm2');
   row('Aria armatura verticala bulb 1 (intins)','A_sv,b1 ('+d.nbb1+'O'+d.obb1+')',d.asvb1.toFixed(1)+' mm2');
   row('Aria armatura verticala bulb 2 (comprimat)','A_sv,b2 ('+d.nbb2+'O'+d.obb2+')',d.asvb2.toFixed(1)+' mm2');
