@@ -774,7 +774,7 @@ function buildPdfPage(doc,nmImg,skImg,pName){
   // Tabular header
   doc.autoTable({startY:22,body:[
     [{content:'MOMENT CAPABIL M.Rd',colSpan:2,styles:{fontSize:14,fontStyle:'bold',halign:'center',textColor:[28,28,30],fillColor:[255,255,255],cellPadding:{top:6,bottom:2}}}],
-    [{content:'Metoda exacta \u2014 discretizare in fibre, CR 2-2022 / SR EN 1992-1-1 Anexa A',colSpan:2,styles:{fontSize:9.5,halign:'center',textColor:[0,0,0],fillColor:[255,255,255],cellPadding:{top:1,bottom:2}}}],
+    [{content:'Metoda exacta \u2014 discretizare in fibre, CR 2-2022 / SR EN 1992-1-1',colSpan:2,styles:{fontSize:9.5,halign:'center',textColor:[0,0,0],fillColor:[255,255,255],cellPadding:{top:1,bottom:2}}}],
     [{content:'Aplicatie dezvoltata in cadrul lucrarii de disertatie \u2014 Janos Patrik',colSpan:2,styles:{fontSize:8,fontStyle:'italic',halign:'center',textColor:[0,0,0],fillColor:[255,255,255],cellPadding:{top:1,bottom:4}}}],
     ['Perete: '+pName,'Data: '+ds],
   ],margin:{left:ml,right:mr},tableWidth:cw,
