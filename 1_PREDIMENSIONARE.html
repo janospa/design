@@ -106,6 +106,10 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
 .back-btn svg{width:16px;height:16px;stroke:#8E8E93;stroke-width:2.5;fill:none;stroke-linecap:round;stroke-linejoin:round}
 .back-btn:hover{color:#1C1C1E}
 .back-btn:hover svg{stroke:#1C1C1E}
+.lang-seg{display:inline-flex;background:#E0E0E5;border-radius:8px;padding:2px;gap:2px;margin-left:auto}
+.lang-seg button{padding:5px 11px;font-size:12px;font-weight:600;border:none;border-radius:6px;background:transparent;color:#8E8E93;cursor:pointer;font-family:'Inter',sans-serif;transition:all .12s;letter-spacing:.02em}
+.lang-seg button.on{background:#fff;color:#1C1C1E;box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.topbar{display:flex;align-items:center;gap:8px;padding-right:12px}
 .preset-bar{display:flex;align-items:center;gap:10px;padding:0 16px 10px}
 .preset-bar label{font-size:14px;font-weight:500;color:#8E8E93}
 .preset-bar select{padding:6px 28px 6px 10px;font-size:14px;border:1px solid #C7C7CC;border-radius:8px;background:#fff;color:#1C1C1E;font-family:'Inter',sans-serif;-webkit-appearance:none;appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238E8E93'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
@@ -133,9 +137,12 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
 </head>
 <body>
 
-<a href="index.html" class="back-btn"><svg viewBox="0 0 16 16"><polyline points="10,3 4,8 10,13"/></svg>Toate modulele</a>
+<div class="topbar">
+<a href="index.html" class="back-btn"><svg viewBox="0 0 16 16"><polyline points="10,3 4,8 10,13"/></svg><span data-i18n="backAll">Toate modulele</span></a>
+<div class="lang-seg" id="langSeg"><button data-lang="ro">RO</button><button data-lang="en">EN</button></div>
+</div>
 <div class="preset-bar">
-  <label>Perete:</label>
+  <label data-i18n="wallLabel">Perete:</label>
   <select id="presetSel" onchange="switchPreset(this.value)">
     <option value="P1">P1</option>
     <option value="P2">P2</option>
@@ -149,13 +156,13 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
 <div class="cols">
 
 <div>
-  <div class="slabel">Intrari</div>
+  <div class="slabel" data-i18n="inputs">Intrari</div>
 
   <div class="ip">
-    <div class="ph">Clasa de ductilitate &amp; seismicitate</div>
+    <div class="ph" data-i18n="ductSeismClass">Clasa de ductilitate &amp; seismicitate</div>
     <div class="pb">
       <div class="toggle-row">
-        <span>Clasa de ductilitate</span>
+        <span data-i18n="ductClass">Clasa de ductilitate</span>
         <div class="seg" id="seg-dc">
           <button data-v="DCL">DCL</button>
           <button data-v="DCM" class="on">DCM</button>
@@ -163,57 +170,57 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
         </div>
       </div>
       <div class="toggle-row">
-        <span>Acceleratia terenului a<sub>g</sub></span>
+        <span data-i18n-sym="groundAccel">Acceleratia terenului a<sub>g</sub></span>
         <div class="seg" id="seg-ag">
           <button data-v="le">&le; 0,15g</button>
           <button data-v="gt" class="on">&gt; 0,15g</button>
         </div>
       </div>
       <div class="toggle-row nb">
-        <span>Zona verificata</span>
+        <span data-i18n="verifiedZone">Zona verificata</span>
         <div class="seg" id="seg-zone">
-          <button data-v="cr" class="on">Critica</button>
-          <button data-v="nc">Non-critica</button>
+          <button data-v="cr" class="on" data-i18n="critical">Critica</button>
+          <button data-v="nc" data-i18n="nonCritical">Non-critica</button>
         </div>
       </div>
     </div>
   </div>
 
   <div class="ip">
-    <div class="ph">Geometrie inima</div>
+    <div class="ph" data-i18n="webGeom">Geometrie inima</div>
     <div class="pb">
-      <div class="row"><div class="rl">Grosimea inimii <span class="rn">(b<sub>w0</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="bw0" value="300" min="100" step="10" oninput="calc()"><span class="ru">mm</span></div></div>
-      <div class="row"><div class="rl">Lungimea peretelui <span class="rn">(l<sub>w</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="lw" value="1000" min="200" step="50" oninput="calc()"><span class="ru">mm</span></div></div>
-      <div class="row"><div class="rl">Inaltimea nivelului <span class="rn">(h<sub>cl</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="hcl" value="2780" min="1500" step="10" oninput="calc()"><span class="ru">mm</span></div></div>
+      <div class="row"><div class="rl"><span data-i18n="webThick">Grosimea inimii</span> <span class="rn">(b<sub>w0</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="bw0" value="300" min="100" step="10" oninput="calc()"><span class="ru">mm</span></div></div>
+      <div class="row"><div class="rl"><span data-i18n="wallLen">Lungimea peretelui</span> <span class="rn">(l<sub>w</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="lw" value="1000" min="200" step="50" oninput="calc()"><span class="ru">mm</span></div></div>
+      <div class="row"><div class="rl"><span data-i18n="storeyHeight">Inaltimea nivelului</span> <span class="rn">(h<sub>cl</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="hcl" value="2780" min="1500" step="10" oninput="calc()"><span class="ru">mm</span></div></div>
     </div>
   </div>
 
   <div class="ip">
-    <div class="ph">Bulbi rectangulari</div>
+    <div class="ph" data-i18n="rectBE">Bulbi rectangulari</div>
     <div class="pb">
       <div class="toggle-row">
-        <span>Bulb 2 identic cu Bulb 1</span>
+        <span data-i18n="be2same">Bulb 2 identic cu Bulb 1</span>
         <label class="sw"><input type="checkbox" id="bulbsame" checked onchange="toggleBulb()"><span class="sl"></span></label>
       </div>
-      <div class="hint">Activat: un singur set de valori &mdash; perete simetric (cazul uzual).</div>
-      <div class="row"><div class="rl">Lungimea bulbului <span class="rn">(l<sub>f</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="lf" value="300" min="100" step="10" oninput="syncBulb();calc()"><span class="ru">mm</span></div></div>
-      <div class="row"><div class="rl">Latimea bulbului <span class="rn">(b<sub>f</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="bf" value="300" min="100" step="10" oninput="syncBulb();calc()"><span class="ru">mm</span></div></div>
+      <div class="hint" data-i18n="be2sameHint">Activat: un singur set de valori &mdash; perete simetric (cazul uzual).</div>
+      <div class="row"><div class="rl"><span data-i18n="beLen">Lungimea bulbului</span> <span class="rn">(l<sub>f</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="lf" value="300" min="100" step="10" oninput="syncBulb();calc()"><span class="ru">mm</span></div></div>
+      <div class="row"><div class="rl"><span data-i18n="beWidth">Latimea bulbului</span> <span class="rn">(b<sub>f</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="bf" value="300" min="100" step="10" oninput="syncBulb();calc()"><span class="ru">mm</span></div></div>
       <div id="bulb2wrap" style="display:none">
-        <div class="row"><div class="rl">Lungimea bulbului 2 <span class="rn">(l<sub>f,2</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="lf2" value="300" min="100" step="10" oninput="calc()"><span class="ru">mm</span></div></div>
-        <div class="row"><div class="rl">Latimea bulbului 2 <span class="rn">(b<sub>f,2</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="bf2" value="300" min="100" step="10" oninput="calc()"><span class="ru">mm</span></div></div>
+        <div class="row"><div class="rl"><span data-i18n="beLen2">Lungimea bulbului 2</span> <span class="rn">(l<sub>f,2</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="lf2" value="300" min="100" step="10" oninput="calc()"><span class="ru">mm</span></div></div>
+        <div class="row"><div class="rl"><span data-i18n="beWidth2">Latimea bulbului 2</span> <span class="rn">(b<sub>f,2</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="bf2" value="300" min="100" step="10" oninput="calc()"><span class="ru">mm</span></div></div>
       </div>
     </div>
   </div>
 
   <div class="ip">
-    <div class="ph">Materiale</div>
+    <div class="ph" data-i18n="materials">Materiale</div>
     <div class="pb">
-      <div class="sel-field"><label>Clasa beton</label><div class="sel-wrap">
+      <div class="sel-field"><label data-i18n="concClass">Clasa beton</label><div class="sel-wrap">
         <select id="cp" onchange="curC=this.value;updMat();calc()">
           <option>C16/20</option><option>C20/25</option><option selected>C25/30</option>
           <option>C30/37</option><option>C35/45</option><option>C40/50</option><option>C45/55</option><option>C50/60</option>
         </select></div></div>
-      <div class="sel-field"><label>Clasa otel</label><div class="sel-wrap">
+      <div class="sel-field"><label data-i18n="steelClass">Clasa otel</label><div class="sel-wrap">
         <select id="sp" onchange="curS=this.value;updMat();calc()">
           <option>S400B</option><option>S500B</option><option selected>S 500</option>
         </select></div></div>
@@ -223,45 +230,45 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
         <div class="mv"><div class="mvl">f<sub>yk</sub></div><div class="mvv" id="fyk_d">500</div><div class="mvu">MPa</div></div>
         <div class="mv"><div class="mvl">f<sub>yd</sub></div><div class="mvv" id="fyd_d">434.8</div><div class="mvu">MPa</div></div>
       </div>
-      <div class="row" style="border-top:1px solid #E0E0E5;margin-top:8px;padding-top:11px"><div class="rl">Forta axiala <span class="rn">(N<sub>Ed</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="ned" value="4031" step="10" oninput="calc()"><span class="ru">kN</span></div></div>
+      <div class="row" style="border-top:1px solid #E0E0E5;margin-top:8px;padding-top:11px"><div class="rl"><span data-i18n="axialForce">Forta axiala</span> <span class="rn">(N<sub>Ed</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="ned" value="4031" step="10" oninput="calc()"><span class="ru">kN</span></div></div>
     </div>
   </div>
 
   <div class="ip">
-    <div class="ph">Armare adoptata</div>
+    <div class="ph" data-i18n="adoptedReinf">Armare adoptata</div>
     <div class="pb">
-      <div class="sub">Bulb</div>
-      <div class="row"><div class="rl">Diametru bare bulb <span class="rn">(&Oslash;<sub>1</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="db1" value="20" min="8" step="1" oninput="calc()"><span class="ru">mm</span></div></div>
-      <div class="row"><div class="rl">Nr. bare <span class="rn">(n<sub>1</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="nbulb" value="10" min="0" step="1" oninput="calc()"><span class="ru">buc</span></div></div>
-      <div class="row"><div class="rl">Diametru bare diferite <span class="rn">(&Oslash;<sub>2</sub>, optional)</span></div><div class="rc"><input type="number" inputmode="numeric" id="db2" value="18" min="0" step="1" oninput="calc()"><span class="ru">mm</span></div></div>
-      <div class="row"><div class="rl">Nr. bare diferite <span class="rn">(n<sub>2</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="nbulb2" value="0" min="0" step="1" oninput="calc()"><span class="ru">buc</span></div></div>
-      <div class="row"><div class="rl">Diametru etrier <span class="rn">(&Oslash;<sub>sw</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="dsw" value="8" min="6" step="1" oninput="calc()"><span class="ru">mm</span></div></div>
-      <div class="row"><div class="rl">Pas etrieri <span class="rn">(s<sub>sw</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="scr" value="100" min="40" step="10" oninput="calc()"><span class="ru">mm</span></div></div>
-      <div class="row"><div class="rl">Pas bare long. restranse <span class="rn">(s<sub>sl</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="ssl" value="150" min="50" step="10" oninput="calc()"><span class="ru">mm</span></div></div>
-      <div class="sub">Inima</div>
-      <div class="sub" style="margin-top:2px">Armare longitudinala (verticala)</div>
-      <div class="row"><div class="rl">Diametru bare <span class="rn">(&Oslash;<sub>long</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="dwl" value="10" min="6" step="1" oninput="calc()"><span class="ru">mm</span></div></div>
-      <div class="row"><div class="rl">Pas bare <span class="rn">(s<sub>long</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="swl" value="150" min="50" step="10" oninput="calc()"><span class="ru">mm</span></div></div>
-      <div class="sub">Armare transversala (orizontala)</div>
-      <div class="row"><div class="rl">Diametru bare <span class="rn">(&Oslash;<sub>transv</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="dwt" value="8" min="6" step="1" oninput="calc()"><span class="ru">mm</span></div></div>
-      <div class="row"><div class="rl">Pas bare <span class="rn">(s<sub>transv</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="swt" value="200" min="50" step="10" oninput="calc()"><span class="ru">mm</span></div></div>
-      <div class="sub">General</div>
-      <div class="row"><div class="rl">Acoperire cu beton <span class="rn">(c<sub>nom</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="cnom" value="35" min="15" step="5" oninput="calc()"><span class="ru">mm</span></div></div>
+      <div class="sub" data-i18n="beSub">Bulb</div>
+      <div class="row"><div class="rl"><span data-i18n="beBarDia">Diametru bare bulb</span> <span class="rn">(&Oslash;<sub>1</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="db1" value="20" min="8" step="1" oninput="calc()"><span class="ru">mm</span></div></div>
+      <div class="row"><div class="rl"><span data-i18n="nBars">Nr. bare</span> <span class="rn">(n<sub>1</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="nbulb" value="10" min="0" step="1" oninput="calc()"><span class="ru" data-i18n="pcs">buc</span></div></div>
+      <div class="row"><div class="rl"><span data-i18n="diffBarDia">Diametru bare diferite</span> <span class="rn">(&Oslash;<sub>2</sub><span data-i18n="optional">, optional</span>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="db2" value="18" min="0" step="1" oninput="calc()"><span class="ru">mm</span></div></div>
+      <div class="row"><div class="rl"><span data-i18n="nDiffBars">Nr. bare diferite</span> <span class="rn">(n<sub>2</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="nbulb2" value="0" min="0" step="1" oninput="calc()"><span class="ru" data-i18n="pcs">buc</span></div></div>
+      <div class="row"><div class="rl"><span data-i18n="stirrupDia">Diametru etrier</span> <span class="rn">(&Oslash;<sub>sw</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="dsw" value="8" min="6" step="1" oninput="calc()"><span class="ru">mm</span></div></div>
+      <div class="row"><div class="rl"><span data-i18n="stirrupSpacing">Pas etrieri</span> <span class="rn">(s<sub>sw</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="scr" value="100" min="40" step="10" oninput="calc()"><span class="ru">mm</span></div></div>
+      <div class="row"><div class="rl"><span data-i18n="restrLongSpacing">Pas bare longitudinale restranse</span> <span class="rn">(s<sub>sl</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="ssl" value="150" min="50" step="10" oninput="calc()"><span class="ru">mm</span></div></div>
+      <div class="sub" data-i18n="webSub">Inima</div>
+      <div class="sub" style="margin-top:2px" data-i18n="longReinfVert">Armare longitudinala (verticala)</div>
+      <div class="row"><div class="rl"><span data-i18n="barDia">Diametru bare</span> <span class="rn">(&Oslash;<sub>long</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="dwl" value="10" min="6" step="1" oninput="calc()"><span class="ru">mm</span></div></div>
+      <div class="row"><div class="rl"><span data-i18n="barSpacing">Pas bare</span> <span class="rn">(s<sub>long</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="swl" value="150" min="50" step="10" oninput="calc()"><span class="ru">mm</span></div></div>
+      <div class="sub" data-i18n="transvReinfHoriz">Armare transversala (orizontala)</div>
+      <div class="row"><div class="rl"><span data-i18n="barDia">Diametru bare</span> <span class="rn">(&Oslash;<sub>transv</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="dwt" value="8" min="6" step="1" oninput="calc()"><span class="ru">mm</span></div></div>
+      <div class="row"><div class="rl"><span data-i18n="barSpacing">Pas bare</span> <span class="rn">(s<sub>transv</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="swt" value="200" min="50" step="10" oninput="calc()"><span class="ru">mm</span></div></div>
+      <div class="sub" data-i18n="generalSub">General</div>
+      <div class="row"><div class="rl"><span data-i18n="concCover">Acoperire cu beton</span> <span class="rn">(c<sub>nom</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="cnom" value="35" min="15" step="5" oninput="calc()"><span class="ru">mm</span></div></div>
     </div>
   </div>
 </div>
 
 <div>
-  <div class="slabel">Rezultate</div>
+  <div class="slabel" data-i18n="results">Rezultate</div>
 
   <div class="op">
-    <div class="ph">Verdict</div>
+    <div class="ph" data-i18n="verdict">Verdict</div>
     <div class="pb">
       <span class="ftag" id="verdict">&mdash;</span>
       <div class="res-grid-3">
-        <div class="rc2"><div class="rl2">Geometrie</div><div class="rv" id="sc_geo">&mdash;</div><div class="ru2">conditii</div></div>
-        <div class="rc2"><div class="rl2">Armare</div><div class="rv" id="sc_rein">&mdash;</div><div class="ru2">conditii</div></div>
-        <div class="rc2 hl"><div class="rl2">&nu;<sub>d</sub> = N<sub>Ed</sub>/(A<sub>c</sub>&middot;f<sub>cd</sub>)</div><div class="rv" id="sc_vd">&mdash;</div><div class="ru2">A<sub>c</sub> = inima + bulbi</div></div>
+        <div class="rc2"><div class="rl2" data-i18n="geometry">Geometrie</div><div class="rv" id="sc_geo">&mdash;</div><div class="ru2" data-i18n="conditions">conditii</div></div>
+        <div class="rc2"><div class="rl2" data-i18n="reinforcement">Armare</div><div class="rv" id="sc_rein">&mdash;</div><div class="ru2" data-i18n="conditions">conditii</div></div>
+        <div class="rc2 hl"><div class="rl2">&nu;<sub>d</sub> = N<sub>Ed</sub>/(A<sub>c</sub>&middot;f<sub>cd</sub>)</div><div class="rv" id="sc_vd">&mdash;</div><div class="ru2" data-i18n-sym="acWebBulbs">A<sub>c</sub> = inima + bulbi</div></div>
       </div>
     </div>
   </div>
@@ -269,18 +276,18 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
   <div id="flagzone"></div>
 
   <div class="op">
-    <div class="ph">Sectiunea &mdash; zona de capat (bulb + inima)</div>
+    <div class="ph" data-i18n="sectionEndZone">Sectiunea &mdash; zona de capat (bulb + inima)</div>
     <div class="pb">
       <div class="cleg">
-        <span><i style="background:#C9B8E8"></i> bulb (element de capat)</span>
-        <span><i style="background:#F0D6E6"></i> inima</span>
+        <span><i style="background:#C9B8E8"></i> <span data-i18n="legBE">bulb (element de capat)</span></span>
+        <span><i style="background:#F0D6E6"></i> <span data-i18n="legWeb">inima</span></span>
       </div>
       <svg id="sketch" viewBox="0 0 460 280" width="100%" style="display:block"></svg>
     </div>
   </div>
 
   <div class="op">
-    <div class="ph">Conditii minime de alcatuire &mdash; CR 2&ndash;2022 &sect;7</div>
+    <div class="ph" data-i18n="minDetailConds">Conditii minime de alcatuire &mdash; CR 2&ndash;2022 &sect;7</div>
     <div class="pb" style="padding-left:4px;padding-right:4px">
       <table class="chk" id="chktbl"></table>
       <div id="chknote"></div>
@@ -288,11 +295,11 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
   </div>
 
   <div class="op">
-    <div class="ph">Raport</div>
+    <div class="ph" data-i18n="report">Raport</div>
     <div class="pb">
       <div class="report-bar">
-        <span class="report-lbl">Export nota de calcul (PDF)</span>
-        <button class="report-btn" id="rptBtn" onclick="generatePdf()">Descarca PDF</button>
+        <span class="report-lbl" data-i18n="exportCalcNote">Export nota de calcul (PDF)</span>
+        <button class="report-btn" id="rptBtn" onclick="generatePdf()" data-i18n="downloadPdf">Descarca PDF</button>
       </div>
       <div class="report-status" id="rptStatus"></div>
     </div>
@@ -301,15 +308,15 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
 
 </div>
 </div>
-<div class="author-footer">Lucrare de disertație — Janos Patrik · UTCN · Facultatea de Construcții · 2026</div>
+<div class="author-footer" data-i18n="footer">Lucrare de disertație — Janos Patrik · UTCN · Facultatea de Construcții · 2026</div>
 
 <div class="modal-overlay" id="exportModal">
   <div class="modal">
-    <h3>Export PDF — selecteaza peretii</h3>
+    <h3 data-i18n="exportSelectWalls">Export PDF — selecteaza peretii</h3>
     <div class="modal-presets" id="modalPresets"></div>
     <div class="modal-btns">
-      <button class="m-cancel" onclick="closeExportModal()">Anuleaza</button>
-      <button class="m-export" id="modalExportBtn" onclick="exportSelected()">Exporta</button>
+      <button class="m-cancel" onclick="closeExportModal()" data-i18n="cancel">Anuleaza</button>
+      <button class="m-export" id="modalExportBtn" onclick="exportSelected()" data-i18n="export">Exporta</button>
     </div>
   </div>
 </div>
@@ -317,6 +324,220 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
 <script>
+// ═══════════════ i18n ═══════════════
+let LANG=(function(){try{return localStorage.getItem('sw_lang')||'ro';}catch(e){return 'ro';}})();
+const T={
+  // static GUI
+  backAll:{ro:'Toate modulele',en:'All modules'},
+  wallLabel:{ro:'Perete:',en:'Wall:'},
+  inputs:{ro:'Intrari',en:'Inputs'},
+  results:{ro:'Rezultate',en:'Results'},
+  ductSeismClass:{ro:'Clasa de ductilitate &amp; seismicitate',en:'Ductility &amp; seismicity class'},
+  ductClass:{ro:'Clasa de ductilitate',en:'Ductility class'},
+  groundAccel:{ro:'Acceleratia terenului a<sub>g</sub>',en:'Ground acceleration a<sub>g</sub>'},
+  verifiedZone:{ro:'Zona verificata',en:'Checked zone'},
+  critical:{ro:'Critica',en:'Critical'},
+  nonCritical:{ro:'Non-critica',en:'Non-critical'},
+  webGeom:{ro:'Geometrie inima',en:'Web geometry'},
+  webThick:{ro:'Grosimea inimii',en:'Web thickness'},
+  wallLen:{ro:'Lungimea peretelui',en:'Wall length'},
+  storeyHeight:{ro:'Inaltimea nivelului',en:'Storey height'},
+  rectBE:{ro:'Bulbi rectangulari',en:'Rectangular boundary elements'},
+  be2same:{ro:'Bulb 2 identic cu Bulb 1',en:'BE 2 identical to BE 1'},
+  be2sameHint:{ro:'Activat: un singur set de valori &mdash; perete simetric (cazul uzual).',en:'Enabled: a single set of values &mdash; symmetric wall (the usual case).'},
+  beLen:{ro:'Lungimea bulbului',en:'BE length'},
+  beWidth:{ro:'Latimea bulbului',en:'BE width'},
+  beLen2:{ro:'Lungimea bulbului 2',en:'BE 2 length'},
+  beWidth2:{ro:'Latimea bulbului 2',en:'BE 2 width'},
+  materials:{ro:'Materiale',en:'Materials'},
+  concClass:{ro:'Clasa beton',en:'Concrete class'},
+  steelClass:{ro:'Clasa otel',en:'Steel class'},
+  axialForce:{ro:'Forta axiala',en:'Axial force'},
+  adoptedReinf:{ro:'Armare adoptata',en:'Adopted reinforcement'},
+  beSub:{ro:'Bulb',en:'Boundary element'},
+  webSub:{ro:'Inima',en:'Web'},
+  beBarDia:{ro:'Diametru bare bulb',en:'BE bar diameter'},
+  nBars:{ro:'Nr. bare',en:'No. bars'},
+  diffBarDia:{ro:'Diametru bare diferite',en:'Different bar diameter'},
+  optional:{ro:', optional',en:', optional'},
+  nDiffBars:{ro:'Nr. bare diferite',en:'No. different bars'},
+  stirrupDia:{ro:'Diametru etrier',en:'Stirrup diameter'},
+  stirrupSpacing:{ro:'Pas etrieri',en:'Stirrup spacing'},
+  restrLongSpacing:{ro:'Pas bare longitudinale restranse',en:'Restrained longitudinal bar spacing'},
+  longReinfVert:{ro:'Armare longitudinala (verticala)',en:'Longitudinal reinforcement (vertical)'},
+  transvReinfHoriz:{ro:'Armare transversala (orizontala)',en:'Transverse reinforcement (horizontal)'},
+  barDia:{ro:'Diametru bare',en:'Bar diameter'},
+  barSpacing:{ro:'Pas bare',en:'Bar spacing'},
+  generalSub:{ro:'General',en:'General'},
+  concCover:{ro:'Acoperire cu beton',en:'Concrete cover'},
+  pcs:{ro:'buc',en:'pcs'},
+  verdict:{ro:'Verdict',en:'Verdict'},
+  geometry:{ro:'Geometrie',en:'Geometry'},
+  reinforcement:{ro:'Armare',en:'Reinforcement'},
+  conditions:{ro:'conditii',en:'conditions'},
+  acWebBulbs:{ro:'A<sub>c</sub> = inima + bulbi',en:'A<sub>c</sub> = web + boundary elements'},
+  sectionEndZone:{ro:'Sectiunea &mdash; zona de capat (bulb + inima)',en:'Section &mdash; end zone (boundary element + web)'},
+  legBE:{ro:'bulb (element de capat)',en:'boundary element'},
+  legWeb:{ro:'inima',en:'web'},
+  minDetailConds:{ro:'Conditii minime de alcatuire &mdash; CR 2&ndash;2022 &sect;7',en:'Minimum detailing conditions &mdash; CR 2&ndash;2022 &sect;7'},
+  report:{ro:'Raport',en:'Report'},
+  exportCalcNote:{ro:'Export nota de calcul (PDF)',en:'Export calculation report (PDF)'},
+  downloadPdf:{ro:'Descarca PDF',en:'Download PDF'},
+  generating:{ro:'Se genereaza...',en:'Generating...'},
+  pdfLoading:{ro:'Libraria PDF se incarca... incearca din nou.',en:'PDF library is loading... try again.'},
+  footer:{ro:'Lucrare de disertație — Janos Patrik · UTCN · Facultatea de Construcții · 2026',en:'Dissertation — Janos Patrik · UTCN · Faculty of Civil Engineering · 2026'},
+  exportSelectWalls:{ro:'Export PDF — selecteaza peretii',en:'Export PDF — select walls'},
+  cancel:{ro:'Anuleaza',en:'Cancel'},
+  export:{ro:'Exporta',en:'Export'},
+  empty:{ro:'(gol)',en:'(empty)'},
+  // verdict / flags
+  conform:{ro:'CONFORM',en:'PASS'},
+  nonConform:{ro:'NECONFORM',en:'FAIL'},
+  condsWord:{ro:'conditii',en:'conditions'},
+  warning:{ro:'Atentie:',en:'Warning:'},
+  flagVd:{ro:(vd,vlim,dc)=>`forta axiala normalizata &nu;<sub>d</sub> = ${vd} depaseste limita ${vlim} pentru ${dc} (&sect;7.2). Sectiunea trebuie marita sau clasa de beton sporita.`,
+          en:(vd,vlim,dc)=>`the normalized axial force &nu;<sub>d</sub> = ${vd} exceeds the limit ${vlim} for ${dc} (&sect;7.2). The section must be enlarged or the concrete class increased.`},
+  // checklist columns
+  colCondition:{ro:'Conditie',en:'Condition'},
+  colRule:{ro:'Regula',en:'Rule'},
+  colValue:{ro:'Valoare',en:'Value'},
+  colLimit:{ro:'Limita',en:'Limit'},
+  // checklist group headers
+  grpGenGeomMat:{ro:'Geometrie generala & materiale',en:'General geometry & materials'},
+  grpBEcrit:{ro:'Geometrie bulb \u2014 zona critica',en:'BE geometry \u2014 critical zone'},
+  grpBEnc:{ro:'Geometrie bulb \u2014 in afara zonei critice',en:'BE geometry \u2014 outside critical zone'},
+  grpReinfBE:{ro:zl=>'Armare bulb \u2014 '+zl,en:zl=>'BE reinforcement \u2014 '+zl},
+  grpReinfWeb:{ro:'Armare inima',en:'Web reinforcement'},
+  zlCrit:{ro:'zona critica',en:'critical zone'},
+  zlNc:{ro:'in afara zonei critice',en:'outside critical zone'},
+  // condition names
+  cnMinConc:{ro:'Clasa beton minima',en:'Minimum concrete class'},
+  cnBEbarMin:{ro:'&Oslash;<sub>sl,min</sub> bara bulb',en:'&Oslash;<sub>sl,min</sub> BE bar'},
+  cnSslRestr:{ro:'s<sub>sl</sub> bare long. restranse',en:'s<sub>sl</sub> restrained long. bars'},
+  cnSswStir:{ro:z=>`s<sub>sw</sub> etrieri (${z})`,en:z=>`s<sub>sw</sub> stirrups (${z})`},
+  cnDswStir:{ro:'&Oslash;<sub>sw,min</sub> etrier',en:'&Oslash;<sub>sw,min</sub> stirrup'},
+  cnOmega:{ro:z=>`&omega;<sub>l,min</sub> (${z})`,en:z=>`&omega;<sub>l,min</sub> (${z})`},
+  cnRhoLbe:{ro:'&rho;<sub>l,min</sub> bulb',en:'&rho;<sub>l,min</sub> BE'},
+  cnRhoLongWeb:{ro:ag=>`&rho;<sub>long,min</sub> inima (a<sub>g</sub>${ag}0,15g)`,en:ag=>`&rho;<sub>long,min</sub> web (a<sub>g</sub>${ag}0,15g)`},
+  cnRhoTrWeb:{ro:z=>`&rho;<sub>transv,min</sub> inima (${z})`,en:z=>`&rho;<sub>transv,min</sub> web (${z})`},
+  cnDlongWeb:{ro:'&Oslash;<sub>long,min</sub> inima',en:'&Oslash;<sub>long,min</sub> web'},
+  cnDtransvWeb:{ro:'&Oslash;<sub>transv,min</sub> inima',en:'&Oslash;<sub>transv,min</sub> web'},
+  cnSlongWeb:{ro:'s<sub>long</sub> inima',en:'s<sub>long</sub> web'},
+  cnStransvWeb:{ro:'s<sub>transv</sub> inima',en:'s<sub>transv</sub> web'},
+  zCrit:{ro:'critic',en:'critical'},
+  zNc:{ro:'non-critic',en:'non-critical'},
+  z2lcrit:{ro:'2&times;l.critic',en:'2&times;l.critical'},
+  // advice
+  advMinConc:{ro:dc=>`Pentru ${dc} se cere minim <b>${MIN_CONC[dc]}</b>.`,en:dc=>`For ${dc} the minimum required is <b>${MIN_CONC[dc]}</b>.`},
+  advBw0:{ro:v=>`Grosimea inimii insuficienta. Minim <b>b<sub>w0</sub> = ${v} mm</b> = max(150; h<sub>cl</sub>/20).`,en:v=>`Insufficient web thickness. Minimum <b>b<sub>w0</sub> = ${v} mm</b> = max(150; h<sub>cl</sub>/20).`},
+  advLfCr:{ro:v=>`Lungimea bulbului insuficienta. Minim <b>l<sub>f</sub> = ${v} mm</b> = max(200; h<sub>cl</sub>/10).`,en:v=>`Insufficient BE length. Minimum <b>l<sub>f</sub> = ${v} mm</b> = max(200; h<sub>cl</sub>/10).`},
+  advAfCr:{ro:v=>`Aria bulbului insuficienta. Minim <b>${v} mm&sup2;</b>.`,en:v=>`Insufficient BE area. Minimum <b>${v} mm&sup2;</b>.`},
+  advBfHcl15:{ro:v=>`Minim <b>b<sub>f</sub> = ${v} mm</b>.`,en:v=>`Minimum <b>b<sub>f</sub> = ${v} mm</b>.`},
+  advLfHcl10:{ro:v=>`Minim <b>l<sub>f</sub> = ${v} mm</b>.`,en:v=>`Minimum <b>l<sub>f</sub> = ${v} mm</b>.`},
+  advBfBw0:{ro:v=>`Minim <b>b<sub>f</sub> = ${v} mm</b>.`,en:v=>`Minimum <b>b<sub>f</sub> = ${v} mm</b>.`},
+  advLfBw0:{ro:v=>`Minim <b>l<sub>f</sub> = ${v} mm</b>.`,en:v=>`Minimum <b>l<sub>f</sub> = ${v} mm</b>.`},
+  advLfNc:{ro:v=>`Lungimea bulbului insuficienta. Minim <b>l<sub>f</sub> = ${v} mm</b> = max(150; h<sub>cl</sub>/15).`,en:v=>`Insufficient BE length. Minimum <b>l<sub>f</sub> = ${v} mm</b> = max(150; h<sub>cl</sub>/15).`},
+  advAfNc:{ro:v=>`In afara zonei critice: minim <b>${v} mm&sup2;</b>.`,en:v=>`Outside the critical zone: minimum <b>${v} mm&sup2;</b>.`},
+  advLfHcl15:{ro:v=>`Minim <b>l<sub>f</sub> = ${v} mm</b>.`,en:v=>`Minimum <b>l<sub>f</sub> = ${v} mm</b>.`},
+  advOmega:{ro:(w,a)=>`Confinare insuficienta. Necesar &omega;=<b>${w}</b> &rarr; A<sub>s,nec</sub>&asymp;<b>${a} mm&sup2;</b>.`,en:(w,a)=>`Insufficient confinement. Required &omega;=<b>${w}</b> &rarr; A<sub>s,req</sub>&asymp;<b>${a} mm&sup2;</b>.`},
+  advRhoL:{ro:(p,a)=>`Procent longitudinal mic. Necesar &rho;=<b>${p}%</b> &rarr; A<sub>s,nec</sub>&asymp;<b>${a} mm&sup2;</b>.`,en:(p,a)=>`Longitudinal ratio too low. Required &rho;=<b>${p}%</b> &rarr; A<sub>s,req</sub>&asymp;<b>${a} mm&sup2;</b>.`},
+  advDslBE:{ro:'Diametru minim in zonele de capat <b>12 mm</b>, respectiv <b>14 mm</b> la coltul carcaselor.',en:'Minimum diameter in end zones <b>12 mm</b>, respectively <b>14 mm</b> at the corner of the cages.'},
+  advSsl:{ro:(v,dc)=>`Pas bare longitudinale prea mare. Maxim <b>${v} mm</b> (${dc}).`,en:(v,dc)=>`Longitudinal bar spacing too large. Maximum <b>${v} mm</b> (${dc}).`},
+  advSsw:{ro:(v,t)=>`Pas etrieri prea mare. Maxim <b>${v} mm</b> = ${t}.`,en:(v,t)=>`Stirrup spacing too large. Maximum <b>${v} mm</b> = ${t}.`},
+  advDsw:{ro:v=>`Diametru etrier insuficient. Minim <b>${v} mm</b>.`,en:v=>`Insufficient stirrup diameter. Minimum <b>${v} mm</b>.`},
+  advRhoLongWeb:{ro:p=>`Armare longitudinala (verticala) inima mica. Necesar &rho;=<b>${p}%</b>.`,en:p=>`Web longitudinal (vertical) reinforcement too low. Required &rho;=<b>${p}%</b>.`},
+  advRhoTrWeb:{ro:p=>`Armare transversala (orizontala) inima mica. Necesar &rho;=<b>${p}%</b>.`,en:p=>`Web transverse (horizontal) reinforcement too low. Required &rho;=<b>${p}%</b>.`},
+  advDlongWeb:{ro:'Diametru minim bare longitudinale inima <b>10 mm</b>.',en:'Minimum web longitudinal bar diameter <b>10 mm</b>.'},
+  advDtransvWeb:{ro:'Diametru minim bare transversale inima <b>8 mm</b>.',en:'Minimum web transverse bar diameter <b>8 mm</b>.'},
+  advSlongWeb:{ro:'Pas bare longitudinale inima prea mare. Maxim <b>350 mm</b>.',en:'Web longitudinal bar spacing too large. Maximum <b>350 mm</b>.'},
+  advStransvWeb:{ro:'Pas bare transversale inima prea mare. Maxim <b>250 mm</b>.',en:'Web transverse bar spacing too large. Maximum <b>250 mm</b>.'},
+  // checklist footnote
+  condFoot:{ro:dc=>`<b>Cond. (14):</b> Pentru ${dc}, a<sub>g</sub> &gt; 0,15g &mdash; restrictionarea flambajului barelor longitudinale comprimate se asigura pe toata lungimea talpii (bulbului).`,en:dc=>`<b>Cond. (14):</b> For ${dc}, a<sub>g</sub> &gt; 0,15g &mdash; buckling restraint of the compressed longitudinal bars is provided along the entire length of the flange (boundary element).`},
+  // sketch labels
+  skAsBulb:{ro:'A_s,bulb',en:'A_s,BE'},
+  skAsWeb:{ro:'A_s,inima',en:'A_s,web'},
+  skWeb:{ro:'inima',en:'web'},
+  skBE1:{ro:'bulb 1',en:'BE 1'},
+  skBE2:{ro:'bulb 2',en:'BE 2'},
+  // preset describe
+  presetEmpty:{ro:'(gol)',en:'(empty)'},
+  // PDF
+  pdfHeaderTitle:{ro:'NOTA DE CALCUL \u2014 PREDIMENSIONARE PERETI',en:'CALCULATION REPORT \u2014 PRELIMINARY WALL DESIGN'},
+  pdfWallData:{ro:'Perete: ',en:'Wall: '},
+  pdfDate:{ro:'Data: ',en:'Date: '},
+  pdfBigTitle:{ro:'CONDITII MINIME DE ALCATUIRE',en:'MINIMUM DETAILING CONDITIONS'},
+  pdfSubtitle:{ro:'Pereti structurali din beton armat cu bulbi \u2014 CR 2-1-1.1/2022 cap. 7',en:'Reinforced concrete structural walls with boundary elements \u2014 CR 2-1-1.1/2022 ch. 7'},
+  pdfAppLine:{ro:'Aplicatie dezvoltata in cadrul lucrarii de disertatie \u2014 Janos Patrik',en:'Application developed within the dissertation \u2014 Janos Patrik'},
+  pdfSec1:{ro:'1. DATE DE INTRARE',en:'1. INPUT DATA'},
+  pdfSec2:{ro:'2. SECTIUNE - ZONA DE CAPAT',en:'2. SECTION - END ZONE'},
+  pdfSec3:{ro:'3. FORTA AXIALA NORMALIZATA',en:'3. NORMALIZED AXIAL FORCE'},
+  pdfSec4:{ro:'4. CONDITII GEOMETRICE',en:'4. GEOMETRIC CONDITIONS'},
+  pdfSec5:{ro:'5. CONDITII DE ARMARE',en:'5. REINFORCEMENT CONDITIONS'},
+  pdfSec6:{ro:'6. CONCLUZIE',en:'6. CONCLUSION'},
+  pdfColParam:{ro:'Parametru',en:'Parameter'},
+  pdfColNot:{ro:'Notatie',en:'Notation'},
+  pdfColVal:{ro:'Valoare',en:'Value'},
+  pdfColMarime:{ro:'Marime',en:'Quantity'},
+  pdfColCond:{ro:'Conditie',en:'Condition'},
+  pdfColRegula:{ro:'Regula',en:'Rule'},
+  pdfColLimita:{ro:'Limita',en:'Limit'},
+  pdfBE2same:{ro:'Bulb 2 identic cu Bulb 1',en:'BE 2 identical to BE 1'},
+  pdfBEdiff:{ro:'Bulbi diferiti',en:'Different BEs'},
+  pdfDuctClass:{ro:'Clasa de ductilitate',en:'Ductility class'},
+  pdfGroundAccel:{ro:'Acceleratia terenului',en:'Ground acceleration'},
+  pdfCheckedZone:{ro:'Zona verificata',en:'Checked zone'},
+  pdfCrit:{ro:'Critica',en:'Critical'},
+  pdfNc:{ro:'Non-critica',en:'Non-critical'},
+  pdfWebThick:{ro:'Grosimea inimii',en:'Web thickness'},
+  pdfWallLen:{ro:'Lungimea peretelui',en:'Wall length'},
+  pdfStoreyH:{ro:'Inaltimea nivelului',en:'Storey height'},
+  pdfBEconfig:{ro:'Configuratie bulbi',en:'BE configuration'},
+  pdfBElen:{ro:'Lungimea bulbului',en:'BE length'},
+  pdfBEwidth:{ro:'Latimea bulbului',en:'BE width'},
+  pdfConcClass:{ro:'Clasa beton',en:'Concrete class'},
+  pdfConcStr:{ro:'Rezistenta beton',en:'Concrete strength'},
+  pdfSteelClass:{ro:'Clasa otel',en:'Steel class'},
+  pdfSteelStr:{ro:'Rezistenta otel',en:'Steel strength'},
+  pdfAxialForce:{ro:'Forta axiala',en:'Axial force'},
+  pdfBEbars:{ro:'Bare bulb',en:'BE bars'},
+  pdfWebLong:{ro:'Inima longitudinala',en:'Web longitudinal'},
+  pdfWebTransv:{ro:'Inima transversala',en:'Web transverse'},
+  pdfStirrups:{ro:'Etrieri',en:'Stirrups'},
+  pdfStirrupSp:{ro:'Pas etrieri',en:'Stirrup spacing'},
+  pdfRestrLongSp:{ro:'Pas bare longitudinale restranse',en:'Restrained long. bar spacing'},
+  pdfCover:{ro:'Acoperire',en:'Cover'},
+  pdfWebArea:{ro:'Aria inimii',en:'Web area'},
+  pdfBE1area:{ro:'Aria bulb 1',en:'BE 1 area'},
+  pdfBE2area:{ro:'Aria bulb 2',en:'BE 2 area'},
+  pdfTotArea:{ro:'Aria totala',en:'Total area'},
+  pdfNormAxial:{ro:'Forta axiala normalizata',en:'Normalized axial force'},
+  pdfLimit:{ro:'Limita',en:'Limit'},
+  pdfVdFormula:{ro:'v_d = N_Ed / (A_c * f_cd),  A_c = aria inimii + ambii bulbi',en:'v_d = N_Ed / (A_c * f_cd),  A_c = web area + both boundary elements'},
+  pdfConclPass:{ro:'CONFORM - toate conditiile minime sunt indeplinite.',en:'PASS - all minimum conditions are satisfied.'},
+  pdfConclFail:{ro:n=>`NECONFORM - ${n} conditii neindeplinite (vezi randurile X).`,en:n=>`FAIL - ${n} conditions not satisfied (see rows marked X).`},
+  pdfDisc1:{ro:'Responsabilitatea pentru rezultatele obtinute revine in exclusivitate utilizatorului.',en:'Responsibility for the obtained results rests solely with the user.'},
+  pdfDisc2:{ro:'Toate valorile trebuie verificate inainte de utilizare.',en:'All values must be verified before use.'},
+  pdfPage:{ro:(i,n)=>'Pagina '+i+' din '+n,en:(i,n)=>'Page '+i+' of '+n},
+  pdfGenerated:{ro:'Generat: ',en:'Generated: '},
+  pdfFnamePrefix:{ro:'Raport_predimensionare_',en:'Report_preliminary_design_'},
+  statusDownloaded:{ro:n=>`Raport descarcat (${n} perete/pereti).`,en:n=>`Report downloaded (${n} wall${n>1?'s':''}).`}
+};
+function t(key,...args){
+  const e=T[key];
+  if(!e)return key;
+  const v=e[LANG]!==undefined?e[LANG]:e.ro;
+  return typeof v==='function'?v(...args):v;
+}
+function applyStaticLang(){
+  document.documentElement.lang=LANG;
+  document.querySelectorAll('[data-i18n],[data-i18n-sym]').forEach(el=>{
+    const k=el.getAttribute('data-i18n')||el.getAttribute('data-i18n-sym');
+    if(T[k]){const v=T[k][LANG];if(v!==undefined&&typeof v!=='function')el.innerHTML=v;}
+  });
+  document.querySelectorAll('#langSeg button').forEach(b=>b.classList.toggle('on',b.dataset.lang===LANG));
+}
+function setLang(l){LANG=l;try{localStorage.setItem('sw_lang',l);}catch(e){}applyStaticLang();calc();}
+
 const CONC={'C16/20':{fck:16,fcd:10.67},'C20/25':{fck:20,fcd:13.33},'C25/30':{fck:25,fcd:16.67},'C30/37':{fck:30,fcd:20},'C35/45':{fck:35,fcd:23.33},'C40/50':{fck:40,fcd:26.67},'C45/55':{fck:45,fcd:30},'C50/60':{fck:50,fcd:33.33}};
 const CONC_ORDER=Object.keys(CONC);
 const CRANK=c=>CONC_ORDER.indexOf(c);
@@ -377,29 +598,29 @@ function calc(){
   const vd=ned*1e3/(Ac*fcd);
   const b0=bw0-2*cnom;
   const G=[];
-  const zlabel = ZONE==='cr' ? 'zona critica' : 'in afara zonei critice';
+  const zlabel = ZONE==='cr' ? t('zlCrit') : t('zlNc');
   const bw0min=Math.max(150,hcl/20);
-  G.push({g:'Geometrie generala & materiale'});
-  G.push({nm:'Clasa beton minima',rule:'\u2265 '+MIN_CONC[DC],art:'7.1(1)',cur:curC,lim:MIN_CONC[DC],txt:1,ok:CRANK(curC)>=CRANK(MIN_CONC[DC]),adv:`Pentru ${DC} se cere minim <b>${MIN_CONC[DC]}</b>.`});
-  G.push({nm:'b<sub>w0</sub> &ge; max{150; h<sub>cl</sub>/20}',rule:'b.w0 \u2265 max(150;h.cl/20)',art:'7.2.1.1(1)',cur:bw0,lim:bw0min,u:'mm',ok:bw0>=bw0min,adv:`Grosimea inimii insuficienta. Minim <b>b<sub>w0</sub> = ${nf(bw0min)} mm</b> = max(150; h<sub>cl</sub>/20).`});
+  G.push({g:t('grpGenGeomMat')});
+  G.push({nm:t('cnMinConc'),rule:'\u2265 '+MIN_CONC[DC],art:'7.1(1)',cur:curC,lim:MIN_CONC[DC],txt:1,ok:CRANK(curC)>=CRANK(MIN_CONC[DC]),adv:t('advMinConc',DC)});
+  G.push({nm:'b<sub>w0</sub> &ge; max{150; h<sub>cl</sub>/20}',rule:'b.w0 \u2265 max(150;h.cl/20)',art:'7.2.1.1(1)',cur:bw0,lim:bw0min,u:'mm',ok:bw0>=bw0min,adv:t('advBw0',nf(bw0min))});
   if(ZONE==='cr'){
     const lfcr=Math.max(200,hcl/10);
-    G.push({g:'Geometrie bulb \u2014 zona critica'});
-    G.push({nm:'l<sub>f</sub> &ge; max{200; h<sub>cl</sub>/10}',rule:'l.f \u2265 max(200;h.cl/10)',art:'4',cur:lf,lim:lfcr,u:'mm',ok:lf>=lfcr,adv:`Lungimea bulbului insuficienta. Minim <b>l<sub>f</sub> = ${nf(lfcr)} mm</b> = max(200; h<sub>cl</sub>/10).`});
-    G.push({nm:'A<sub>f</sub> &ge; 0,01&middot;h<sub>cl</sub>&middot;l<sub>w</sub>',rule:'A.f \u2265 0.01\u00b7h.cl\u00b7l.w',art:'5',cur:Af,lim:0.01*hcl*lw,u:'mm\u00b2',ok:Af>=0.01*hcl*lw,adv:`Aria bulbului insuficienta. Minim <b>${nf(0.01*hcl*lw)} mm&sup2;</b>.`});
-    G.push({nm:'b<sub>f</sub> &ge; h<sub>cl</sub>/15',rule:'b.f \u2265 h.cl/15',art:'5',cur:bf,lim:hcl/15,u:'mm',ok:bf>=hcl/15,adv:`Minim <b>b<sub>f</sub> = ${nf(hcl/15)} mm</b>.`});
-    G.push({nm:'l<sub>f</sub> &ge; h<sub>cl</sub>/10',rule:'l.f \u2265 h.cl/10',art:'5',cur:lf,lim:hcl/10,u:'mm',ok:lf>=hcl/10,adv:`Minim <b>l<sub>f</sub> = ${nf(hcl/10)} mm</b>.`});
-    G.push({nm:'b<sub>f</sub> &ge; b<sub>w0</sub>',rule:'b.f \u2265 b.w0',art:'5',cur:bf,lim:bw0,u:'mm',ok:bf>=bw0,adv:`Minim <b>b<sub>f</sub> = ${nf(bw0)} mm</b>.`});
-    G.push({nm:'l<sub>f</sub> &ge; b<sub>w0</sub>',rule:'l.f \u2265 b.w0',art:'5',cur:lf,lim:bw0,u:'mm',ok:lf>=bw0,adv:`Minim <b>l<sub>f</sub> = ${nf(bw0)} mm</b>.`});
+    G.push({g:t('grpBEcrit')});
+    G.push({nm:'l<sub>f</sub> &ge; max{200; h<sub>cl</sub>/10}',rule:'l.f \u2265 max(200;h.cl/10)',art:'4',cur:lf,lim:lfcr,u:'mm',ok:lf>=lfcr,adv:t('advLfCr',nf(lfcr))});
+    G.push({nm:'A<sub>f</sub> &ge; 0,01&middot;h<sub>cl</sub>&middot;l<sub>w</sub>',rule:'A.f \u2265 0.01\u00b7h.cl\u00b7l.w',art:'5',cur:Af,lim:0.01*hcl*lw,u:'mm\u00b2',ok:Af>=0.01*hcl*lw,adv:t('advAfCr',nf(0.01*hcl*lw))});
+    G.push({nm:'b<sub>f</sub> &ge; h<sub>cl</sub>/15',rule:'b.f \u2265 h.cl/15',art:'5',cur:bf,lim:hcl/15,u:'mm',ok:bf>=hcl/15,adv:t('advBfHcl15',nf(hcl/15))});
+    G.push({nm:'l<sub>f</sub> &ge; h<sub>cl</sub>/10',rule:'l.f \u2265 h.cl/10',art:'5',cur:lf,lim:hcl/10,u:'mm',ok:lf>=hcl/10,adv:t('advLfHcl10',nf(hcl/10))});
+    G.push({nm:'b<sub>f</sub> &ge; b<sub>w0</sub>',rule:'b.f \u2265 b.w0',art:'5',cur:bf,lim:bw0,u:'mm',ok:bf>=bw0,adv:t('advBfBw0',nf(bw0))});
+    G.push({nm:'l<sub>f</sub> &ge; b<sub>w0</sub>',rule:'l.f \u2265 b.w0',art:'5',cur:lf,lim:bw0,u:'mm',ok:lf>=bw0,adv:t('advLfBw0',nf(bw0))});
   } else {
     const lfnc=Math.max(150,hcl/15);
-    G.push({g:'Geometrie bulb \u2014 in afara zonei critice'});
-    G.push({nm:'l<sub>f</sub> &ge; max{150; h<sub>cl</sub>/15}',rule:'l.f \u2265 max(150;h.cl/15)',art:'6',cur:lf,lim:lfnc,u:'mm',ok:lf>=lfnc,adv:`Lungimea bulbului insuficienta. Minim <b>l<sub>f</sub> = ${nf(lfnc)} mm</b> = max(150; h<sub>cl</sub>/15).`});
-    G.push({nm:'A<sub>f</sub> &ge; 0,0067&middot;h<sub>cl</sub>&middot;l<sub>w</sub>',rule:'A.f \u2265 0.0067\u00b7h.cl\u00b7l.w',art:'6',cur:Af,lim:0.0067*hcl*lw,u:'mm\u00b2',ok:Af>=0.0067*hcl*lw,adv:`In afara zonei critice: minim <b>${nf(0.0067*hcl*lw)} mm&sup2;</b>.`});
-    G.push({nm:'b<sub>f</sub> &ge; h<sub>cl</sub>/15',rule:'b.f \u2265 h.cl/15',art:'6',cur:bf,lim:hcl/15,u:'mm',ok:bf>=hcl/15,adv:`Minim <b>b<sub>f</sub> = ${nf(hcl/15)} mm</b>.`});
-    G.push({nm:'l<sub>f</sub> &ge; h<sub>cl</sub>/15',rule:'l.f \u2265 h.cl/15',art:'6',cur:lf,lim:hcl/15,u:'mm',ok:lf>=hcl/15,adv:`Minim <b>l<sub>f</sub> = ${nf(hcl/15)} mm</b>.`});
-    G.push({nm:'b<sub>f</sub> &ge; b<sub>w0</sub>',rule:'b.f \u2265 b.w0',art:'6',cur:bf,lim:bw0,u:'mm',ok:bf>=bw0,adv:`Minim <b>b<sub>f</sub> = ${nf(bw0)} mm</b>.`});
-    G.push({nm:'l<sub>f</sub> &ge; b<sub>w0</sub>',rule:'l.f \u2265 b.w0',art:'6',cur:lf,lim:bw0,u:'mm',ok:lf>=bw0,adv:`Minim <b>l<sub>f</sub> = ${nf(bw0)} mm</b>.`});
+    G.push({g:t('grpBEnc')});
+    G.push({nm:'l<sub>f</sub> &ge; max{150; h<sub>cl</sub>/15}',rule:'l.f \u2265 max(150;h.cl/15)',art:'6',cur:lf,lim:lfnc,u:'mm',ok:lf>=lfnc,adv:t('advLfNc',nf(lfnc))});
+    G.push({nm:'A<sub>f</sub> &ge; 0,0067&middot;h<sub>cl</sub>&middot;l<sub>w</sub>',rule:'A.f \u2265 0.0067\u00b7h.cl\u00b7l.w',art:'6',cur:Af,lim:0.0067*hcl*lw,u:'mm\u00b2',ok:Af>=0.0067*hcl*lw,adv:t('advAfNc',nf(0.0067*hcl*lw))});
+    G.push({nm:'b<sub>f</sub> &ge; h<sub>cl</sub>/15',rule:'b.f \u2265 h.cl/15',art:'6',cur:bf,lim:hcl/15,u:'mm',ok:bf>=hcl/15,adv:t('advBfHcl15',nf(hcl/15))});
+    G.push({nm:'l<sub>f</sub> &ge; h<sub>cl</sub>/15',rule:'l.f \u2265 h.cl/15',art:'6',cur:lf,lim:hcl/15,u:'mm',ok:lf>=hcl/15,adv:t('advLfHcl15',nf(hcl/15))});
+    G.push({nm:'b<sub>f</sub> &ge; b<sub>w0</sub>',rule:'b.f \u2265 b.w0',art:'6',cur:bf,lim:bw0,u:'mm',ok:bf>=bw0,adv:t('advBfBw0',nf(bw0))});
+    G.push({nm:'l<sub>f</sub> &ge; b<sub>w0</sub>',rule:'l.f \u2265 b.w0',art:'6',cur:lf,lim:bw0,u:'mm',ok:lf>=bw0,adv:t('advLfBw0',nf(bw0))});
   }
   const omZone=omegaMin(ZONE),rlMin=rhoLmin();
   const dSwMin=dSwMinF(dbulbmax);
@@ -409,20 +630,21 @@ function calc(){
   const rhoTransv=(swt>0)?2*AR(dwt)/(bw0*swt):0;     // horizontal bars, both faces
   const rhoTrZone=rhoWebTransv(ZONE);
   const R=[];
-  R.push({g:'Armare bulb \u2014 '+zlabel});
-  R.push({nm:`&omega;<sub>l,min</sub> (${ZONE==='cr'?'critic':'non-critic'})`,rule:'\u03c9.l \u2265 \u03c9.min',art:'5',cur:omega_l_end,lim:omZone,d:3,ok:omega_l_end>=omZone,adv:`Confinare insuficienta. Necesar &omega;=<b>${nf(omZone,3)}</b> &rarr; A<sub>s,nec</sub>&asymp;<b>${nf(omZone*Af*fcd/fyd)} mm&sup2;</b>.`});
-  R.push({nm:'&rho;<sub>l,min</sub> bulb',rule:'\u03c1.l \u2265 \u03c1.min',art:'7',cur:rho_l_end,lim:rlMin,d:4,ok:rho_l_end>=rlMin,adv:`Procent longitudinal mic. Necesar &rho;=<b>${nf(rlMin*100,2)}%</b> &rarr; A<sub>s,nec</sub>&asymp;<b>${nf(rlMin*Af)} mm&sup2;</b>.`});
-  R.push({nm:'&Oslash;<sub>sl,min</sub> bara bulb',rule:'\u00d8.bl \u2265 12 (14 colt)',art:'8',cur:dbulbmin,lim:12,u:'mm',ok:dbulbmin>=12,adv:`Diametru minim in zonele de capat <b>12 mm</b>, respectiv <b>14 mm</b> la coltul carcaselor.`});
-  R.push({nm:'s<sub>sl</sub> bare long. restranse',rule:'s.sl \u2264 '+sslMax,art:'9',cur:ssl,lim:sslMax,u:'mm',inv:1,ok:ssl<=sslMax,adv:`Pas bare longitudinale prea mare. Maxim <b>${nf(sslMax)} mm</b> (${DC}).`});
-  R.push({nm:`s<sub>sw</sub> etrieri (${ZONE==='cr'?'critic':'non-critic'})`,rule:'s.sw \u2264 '+ssw.t,art:'11',cur:scr,lim:ssw.v,u:'mm',inv:1,ok:scr<=ssw.v,adv:`Pas etrieri prea mare. Maxim <b>${nf(ssw.v)} mm</b> = ${ssw.t}.`});
-  R.push({nm:'&Oslash;<sub>sw,min</sub> etrier',rule:'\u00d8.sw \u2265 '+(DC==='DCH'?'max(\u00d8.bl,max/3;8)':'max(\u00d8.bl,max/4;8)'),art:'13',cur:dsw,lim:dSwMin,u:'mm',ok:dsw>=dSwMin,adv:`Diametru etrier insuficient. Minim <b>${nf(dSwMin)} mm</b>.`});
-  R.push({g:'Armare inima'});
-  R.push({nm:`&rho;<sub>long,min</sub> inima (a<sub>g</sub>${AG==='gt'?'&gt;':'&le;'}0,15g)`,rule:'\u03c1.long \u2265 \u03c1.min',art:'inima',cur:rhoLong,lim:rhoWebLong(),d:4,ok:rhoLong>=rhoWebLong(),adv:`Armare longitudinala (verticala) inima mica. Necesar &rho;=<b>${nf(rhoWebLong()*100,2)}%</b>.`});
-  R.push({nm:`&rho;<sub>transv,min</sub> inima (${ZONE==='cr'?'2&times;l.critic':'non-critic'})`,rule:'\u03c1.tr \u2265 \u03c1.min',art:'inima',cur:rhoTransv,lim:rhoTrZone,d:4,ok:rhoTransv>=rhoTrZone,adv:`Armare transversala (orizontala) inima mica. Necesar &rho;=<b>${nf(rhoTrZone*100,2)}%</b>.`});
-  R.push({nm:'&Oslash;<sub>long,min</sub> inima',rule:'\u00d8.long \u2265 10',art:'inima',cur:dwl,lim:10,u:'mm',ok:dwl>=10,adv:`Diametru minim bare longitudinale inima <b>10 mm</b>.`});
-  R.push({nm:'&Oslash;<sub>transv,min</sub> inima',rule:'\u00d8.transv \u2265 8',art:'inima',cur:dwt,lim:8,u:'mm',ok:dwt>=8,adv:`Diametru minim bare transversale inima <b>8 mm</b>.`});
-  R.push({nm:'s<sub>long</sub> inima',rule:'s.long \u2264 350',art:'inima',cur:swl,lim:350,u:'mm',inv:1,ok:swl<=350,adv:`Pas bare longitudinale inima prea mare. Maxim <b>350 mm</b>.`});
-  R.push({nm:'s<sub>transv</sub> inima',rule:'s.transv \u2264 250',art:'inima',cur:swt,lim:250,u:'mm',inv:1,ok:swt<=250,adv:`Pas bare transversale inima prea mare. Maxim <b>250 mm</b>.`});
+  const zCrNc = ZONE==='cr'?t('zCrit'):t('zNc');
+  R.push({g:t('grpReinfBE',zlabel)});
+  R.push({nm:t('cnOmega',zCrNc),rule:'\u03c9.l \u2265 \u03c9.min',art:'5',cur:omega_l_end,lim:omZone,d:3,ok:omega_l_end>=omZone,adv:t('advOmega',nf(omZone,3),nf(omZone*Af*fcd/fyd))});
+  R.push({nm:t('cnRhoLbe'),rule:'\u03c1.l \u2265 \u03c1.min',art:'7',cur:rho_l_end,lim:rlMin,d:4,ok:rho_l_end>=rlMin,adv:t('advRhoL',nf(rlMin*100,2),nf(rlMin*Af))});
+  R.push({nm:t('cnBEbarMin'),rule:'\u00d8.bl \u2265 12 (14 colt)',art:'8',cur:dbulbmin,lim:12,u:'mm',ok:dbulbmin>=12,adv:t('advDslBE')});
+  R.push({nm:t('cnSslRestr'),rule:'s.sl \u2264 '+sslMax,art:'9',cur:ssl,lim:sslMax,u:'mm',inv:1,ok:ssl<=sslMax,adv:t('advSsl',nf(sslMax),DC)});
+  R.push({nm:t('cnSswStir',zCrNc),rule:'s.sw \u2264 '+ssw.t,art:'11',cur:scr,lim:ssw.v,u:'mm',inv:1,ok:scr<=ssw.v,adv:t('advSsw',nf(ssw.v),ssw.t)});
+  R.push({nm:t('cnDswStir'),rule:'\u00d8.sw \u2265 '+(DC==='DCH'?'max(\u00d8.bl,max/3;8)':'max(\u00d8.bl,max/4;8)'),art:'13',cur:dsw,lim:dSwMin,u:'mm',ok:dsw>=dSwMin,adv:t('advDsw',nf(dSwMin))});
+  R.push({g:t('grpReinfWeb')});
+  R.push({nm:t('cnRhoLongWeb',AG==='gt'?'&gt;':'&le;'),rule:'\u03c1.long \u2265 \u03c1.min',art:'inima',cur:rhoLong,lim:rhoWebLong(),d:4,ok:rhoLong>=rhoWebLong(),adv:t('advRhoLongWeb',nf(rhoWebLong()*100,2))});
+  R.push({nm:t('cnRhoTrWeb',ZONE==='cr'?t('z2lcrit'):t('zNc')),rule:'\u03c1.tr \u2265 \u03c1.min',art:'inima',cur:rhoTransv,lim:rhoTrZone,d:4,ok:rhoTransv>=rhoTrZone,adv:t('advRhoTrWeb',nf(rhoTrZone*100,2))});
+  R.push({nm:t('cnDlongWeb'),rule:'\u00d8.long \u2265 10',art:'inima',cur:dwl,lim:10,u:'mm',ok:dwl>=10,adv:t('advDlongWeb')});
+  R.push({nm:t('cnDtransvWeb'),rule:'\u00d8.transv \u2265 8',art:'inima',cur:dwt,lim:8,u:'mm',ok:dwt>=8,adv:t('advDtransvWeb')});
+  R.push({nm:t('cnSlongWeb'),rule:'s.long \u2264 350',art:'inima',cur:swl,lim:350,u:'mm',inv:1,ok:swl<=350,adv:t('advSlongWeb')});
+  R.push({nm:t('cnStransvWeb'),rule:'s.transv \u2264 250',art:'inima',cur:swt,lim:250,u:'mm',inv:1,ok:swt<=250,adv:t('advStransvWeb')});
   renderChecklist(G,R);renderVerdict(G,R,vd,DC);renderFlags(vd,DC);drawSketch(bw0,lw,lf,bf,lf2,bf2,Asl_bulb,Asl_bulb2,Asl_web);
   lastCalc={bw0,lw,hcl,lf,bf,lf2,bf2,same:document.getElementById('bulbsame').checked,concrete:curC,fck,fcd,steel:curS,fyk,fyd,ned,db1,nbulb,db2,nbulb2,n1,n2,dbulbmin,dbulbmax,dwl,swl,dwt,swt,dsw,scr,ssl,cnom,DC,AG,ZONE,Af,Af2,Aweb,Ac,Asl_bulb,rho_l_end,omega_l_end,vd,b0,omZone,rlMin,dSwMin,ssw,rhoLong,rhoTransv,G,R};
 }
@@ -435,15 +657,15 @@ function renderVerdict(G,R,vd,DC){
   const vdEl=document.getElementById('sc_vd');vdEl.textContent=nf(vd,3);
   vdEl.closest('.rc2').className='rc2 '+(vd<=vlim?'gr':'rd');
   const bad=tg.bad+tr.bad,v=document.getElementById('verdict');
-  if(bad===0){v.textContent='CONFORM';v.className='ftag f1';}else{v.textContent='NECONFORM \u2014 '+bad+' conditii';v.className='ftag f3';}
+  if(bad===0){v.textContent=t('conform');v.className='ftag f1';}else{v.textContent=t('nonConform')+' \u2014 '+bad+' '+t('condsWord');v.className='ftag f3';}
 }
 function renderFlags(vd,DC){
   const z=document.getElementById('flagzone');const vlim=DC==='DCH'?0.35:DC==='DCM'?0.40:null;
-  if(vlim&&vd>vlim){z.innerHTML=`<div class="flagbox"><b>Atentie:</b> forta axiala normalizata &nu;<sub>d</sub> = ${nf(vd,3)} depaseste limita ${nf(vlim,2)} pentru ${DC} (&sect;7.2). Sectiunea trebuie marita sau clasa de beton sporita.</div>`;}else z.innerHTML='';
+  if(vlim&&vd>vlim){z.innerHTML=`<div class="flagbox"><b>${t('warning')}</b> ${t('flagVd',nf(vd,3),nf(vlim,2),DC)}</div>`;}else z.innerHTML='';
 }
 function renderChecklist(G,R){
   const all=[...G,...R];
-  let h=`<thead><tr><th style="width:30px"></th><th>Conditie</th><th>Regula</th><th class="r">Valoare</th><th class="r">Limita</th></tr></thead><tbody>`;
+  let h=`<thead><tr><th style="width:30px"></th><th>${t('colCondition')}</th><th>${t('colRule')}</th><th class="r">${t('colValue')}</th><th class="r">${t('colLimit')}</th></tr></thead><tbody>`;
   all.forEach(o=>{
     if(o.g){h+=`<tr><td colspan="5" class="grphd">${o.g}</td></tr>`;return;}
     const st=o.ok===null?'na':(o.ok?'ok':'no');
@@ -456,7 +678,7 @@ function renderChecklist(G,R){
   document.getElementById('chktbl').innerHTML=h+'</tbody>';
   const note=document.getElementById('chknote');
   if((DC==='DCH'||DC==='DCM')&&AG==='gt'){
-    note.innerHTML=`<div class="chkfoot"><b>Cond. (14):</b> Pentru ${DC}, a<sub>g</sub> &gt; 0,15g &mdash; restrictionarea flambajului barelor longitudinale comprimate se asigura pe toata lungimea talpii (bulbului).</div>`;
+    note.innerHTML=`<div class="chkfoot">${t('condFoot',DC)}</div>`;
   } else note.innerHTML='';
 }
 function drawSketch(bw0,lw,lf,bf,lf2,bf2,AsBulb1,AsBulb2,AsWeb){
@@ -481,10 +703,10 @@ function drawSketch(bw0,lw,lf,bf,lf2,bf2,AsBulb1,AsBulb2,AsWeb){
     return `<text x="${cx}" y="${cy-2}" text-anchor="middle" font-size="9" font-weight="500" fill="${ink}" font-family="Inter,sans-serif">${t1}</text>`+
            `<text x="${cx}" y="${cy+9}" text-anchor="middle" font-size="8" fill="${ink}" font-family="Inter,sans-serif">${t2}</text>`;
   }
-  o+=lab(b1.x+b1.w/2, cyMid, 'A_s,bulb', nf(AsBulb1)+' mm\u00b2', pInk);
-  o+=lab(b2.x+b2.w/2, cyMid, 'A_s,bulb', nf(AsBulb2)+' mm\u00b2', pInk);
-  if(webLen>0 && wb.w>54) o+=lab(wb.x+wb.w/2, cyMid, 'A_s,inima', nf(AsWeb)+' mm\u00b2', pInkW);
-  else if(webLen>0) o+=`<text x="${wb.x+wb.w/2}" y="${cyMid+3}" text-anchor="middle" font-size="7.5" fill="${pInkW}" font-family="Inter,sans-serif">inima</text>`;
+  o+=lab(b1.x+b1.w/2, cyMid, t('skAsBulb'), nf(AsBulb1)+' mm\u00b2', pInk);
+  o+=lab(b2.x+b2.w/2, cyMid, t('skAsBulb'), nf(AsBulb2)+' mm\u00b2', pInk);
+  if(webLen>0 && wb.w>54) o+=lab(wb.x+wb.w/2, cyMid, t('skAsWeb'), nf(AsWeb)+' mm\u00b2', pInkW);
+  else if(webLen>0) o+=`<text x="${wb.x+wb.w/2}" y="${cyMid+3}" text-anchor="middle" font-size="7.5" fill="${pInkW}" font-family="Inter,sans-serif">${t('skWeb')}</text>`;
   // TOP dimensions: bulb lengths
   const dY=yT(maxH)-20;
   function dimSeg(x1,x2,y,col,txt){
@@ -515,8 +737,8 @@ function drawSketch(bw0,lw,lf,bf,lf2,bf2,AsBulb1,AsBulb2,AsWeb){
     o+=`<line x1="${rX-3}" y1="${cyMid+wb.h/2}" x2="${rX+3}" y2="${cyMid+wb.h/2}" stroke="${pStrokeW}" stroke-width="0.7"/>`;
     o+=`<text x="${rX+7}" y="${cyMid}" text-anchor="middle" font-size="8" fill="${pInkW}" font-family="Inter,sans-serif" transform="rotate(-90,${rX+7},${cyMid})">b_w0 = ${bw0}</text>`;
   }
-  o+=`<text x="${b1.x+b1.w/2}" y="${dB+14}" text-anchor="middle" font-size="8" fill="${pStroke}" font-family="Inter,sans-serif">bulb 1</text>`;
-  o+=`<text x="${b2.x+b2.w/2}" y="${dB+14}" text-anchor="middle" font-size="8" fill="${pStroke}" font-family="Inter,sans-serif">bulb 2</text>`;
+  o+=`<text x="${b1.x+b1.w/2}" y="${dB+14}" text-anchor="middle" font-size="8" fill="${pStroke}" font-family="Inter,sans-serif">${t('skBE1')}</text>`;
+  o+=`<text x="${b2.x+b2.w/2}" y="${dB+14}" text-anchor="middle" font-size="8" fill="${pStroke}" font-family="Inter,sans-serif">${t('skBE2')}</text>`;
   svg.innerHTML=o;
 }
 function svgToPng(cb){
@@ -537,7 +759,7 @@ function generatePdf(){
   ['P1','P2','P3','P4','P5'].forEach(p=>{
     const saved=loadPreset(p);
     const hasData=!!saved;
-    const info=hasData?describePreset(saved):'(gol)';
+    const info=hasData?describePreset(saved):t('presetEmpty');
     html+=`<div class="modal-preset${p===currentPreset?' sel':''}${!hasData?' empty':''}" data-p="${p}" onclick="toggleModalPreset(this)">
       <div class="mp-check"></div>
       <span class="mp-name">${p}</span>
@@ -568,8 +790,8 @@ function exportSelected(){
   if(!selected.length)return;
   closeExportModal();
   const btn=document.getElementById('rptBtn'),status=document.getElementById('rptStatus');
-  if(typeof window.jspdf==='undefined'){status.textContent='Libraria PDF se incarca... incearca din nou.';return;}
-  btn.disabled=true;btn.textContent='Se genereaza...';
+  if(typeof window.jspdf==='undefined'){status.textContent=t('pdfLoading');return;}
+  btn.disabled=true;btn.textContent=t('generating');
   const origPreset=currentPreset;
   const{jsPDF}=window.jspdf;
   const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
@@ -578,14 +800,14 @@ function exportSelected(){
   function processNext(){
     if(queue.length===0){
       // Page numbering
-      const pW=210,ml=15,mr=15,cw=pW-ml-mr,ds=new Date().toLocaleDateString('ro-RO');
+      const pW=210,ml=15,mr=15,cw=pW-ml-mr,ds=new Date().toLocaleDateString(LANG==='en'?'en-GB':'ro-RO');
       const tp=doc.internal.getNumberOfPages();
-      for(let i=1;i<=tp;i++){doc.setPage(i);doc.setFontSize(7.5);doc.setTextColor(0,0,0);doc.setDrawColor(40,80,140);doc.setFont('helvetica','normal');doc.line(ml,285,ml+cw,285);doc.text('CR 2-1-1.1/2022',ml,289);doc.text('Pagina '+i+' din '+tp,pW-mr,289,{align:'right'});doc.text('Generat: '+ds,pW/2,289,{align:'center'});}
-      const fname=selected.length===1?'Raport_predimensionare_'+selected[0]+'.pdf':'Raport_predimensionare_'+selected.join('_')+'.pdf';
+      for(let i=1;i<=tp;i++){doc.setPage(i);doc.setFontSize(7.5);doc.setTextColor(0,0,0);doc.setDrawColor(40,80,140);doc.setFont('helvetica','normal');doc.line(ml,285,ml+cw,285);doc.text('CR 2-1-1.1/2022',ml,289);doc.text(t('pdfPage',i,tp),pW-mr,289,{align:'right'});doc.text(t('pdfGenerated')+ds,pW/2,289,{align:'center'});}
+      const fname=selected.length===1?t('pdfFnamePrefix')+selected[0]+'.pdf':t('pdfFnamePrefix')+selected.join('_')+'.pdf';
       doc.save(fname);
       switchPreset(origPreset);
-      btn.disabled=false;btn.textContent='Descarca PDF';
-      status.textContent='Raport descarcat ('+selected.length+' perete/pereti).';
+      btn.disabled=false;btn.textContent=t('downloadPdf');
+      status.textContent=t('statusDownloaded',selected.length);
       setTimeout(()=>status.textContent='',4000);
       return;
     }
@@ -603,18 +825,18 @@ function exportSelected(){
 function plain(s){return s.replace(/<sub>/g,'').replace(/<\/sub>/g,'').replace(/<b>/g,'').replace(/<\/b>/g,'').replace(/&middot;/g,'\u00b7').replace(/&ge;/g,'>=').replace(/&le;/g,'<=').replace(/&Oslash;/g,'O').replace(/&omega;/g,'w').replace(/&rho;/g,'p').replace(/&nu;/g,'v').replace(/&rarr;/g,'->').replace(/&asymp;/g,'~').replace(/&sup2;/g,'2').replace(/\u00b2/g,'2').replace(/&amp;/g,'&').replace(/\u00d8/g,'O').replace(/\u03c9/g,'w').replace(/\u03c1/g,'p').replace(/\u2265/g,'>=').replace(/\u2264/g,'<=').replace(/\u00b7/g,'*');}
 function buildPdfPage(doc,sk,pName){
   pName=pName||currentPreset;
-  const d=lastCalc,pW=210,ml=15,mr=15,cw=pW-ml-mr,ds=new Date().toLocaleDateString('ro-RO');let y=0;
+  const d=lastCalc,pW=210,ml=15,mr=15,cw=pW-ml-mr,ds=new Date().toLocaleDateString(LANG==='en'?'en-GB':'ro-RO');let y=0;
   // Page header bar (dark grey instead of black)
-  function hdr(){doc.setFillColor(40,80,140);doc.rect(0,0,210,14,'F');doc.setTextColor(255,255,255);doc.setFontSize(11);doc.setFont('helvetica','bold');doc.text('NOTA DE CALCUL \u2014 PREDIMENSIONARE PERETI',ml,9);doc.setFontSize(8);doc.setFont('helvetica','normal');doc.text('CR 2-1-1.1/2022',ml,13);doc.text('Perete: '+pName+'  |  Data: '+ds,pW-mr,9,{align:'right'});doc.setTextColor(0,0,0);y=20;}
+  function hdr(){doc.setFillColor(40,80,140);doc.rect(0,0,210,14,'F');doc.setTextColor(255,255,255);doc.setFontSize(11);doc.setFont('helvetica','bold');doc.text(t('pdfHeaderTitle'),ml,9);doc.setFontSize(8);doc.setFont('helvetica','normal');doc.text('CR 2-1-1.1/2022',ml,13);doc.text(t('pdfWallData')+pName+'  |  '+t('pdfDate')+ds,pW-mr,9,{align:'right'});doc.setTextColor(0,0,0);y=20;}
   function cyf(n){n=n||10;if(y+n>275){doc.addPage();hdr();}}
   function sT(t){cyf(12);doc.setFillColor(235,243,252);doc.rect(ml,y-4,cw,8,'F');doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor(0,102,204);doc.text(t,ml+2,y+1);doc.setTextColor(0,0,0);doc.setFont('helvetica','normal');y+=8;}
   hdr();
   // Tabular header block
   doc.autoTable({startY:22,body:[
-    [{content:'CONDITII MINIME DE ALCATUIRE',colSpan:2,styles:{fontSize:14,fontStyle:'bold',halign:'center',textColor:[28,28,30],fillColor:[255,255,255],cellPadding:{top:6,bottom:2}}}],
-    [{content:'Pereti structurali din beton armat cu bulbi \u2014 CR 2-1-1.1/2022 cap. 7',colSpan:2,styles:{fontSize:9.5,halign:'center',textColor:[0,0,0],fillColor:[255,255,255],cellPadding:{top:1,bottom:2}}}],
-    [{content:'Aplicatie dezvoltata in cadrul lucrarii de disertatie \u2014 Janos Patrik',colSpan:2,styles:{fontSize:8,fontStyle:'italic',halign:'center',textColor:[0,0,0],fillColor:[255,255,255],cellPadding:{top:1,bottom:4}}}],
-    ['Perete: '+pName,'Data: '+ds],
+    [{content:t('pdfBigTitle'),colSpan:2,styles:{fontSize:14,fontStyle:'bold',halign:'center',textColor:[28,28,30],fillColor:[255,255,255],cellPadding:{top:6,bottom:2}}}],
+    [{content:t('pdfSubtitle'),colSpan:2,styles:{fontSize:9.5,halign:'center',textColor:[0,0,0],fillColor:[255,255,255],cellPadding:{top:1,bottom:2}}}],
+    [{content:t('pdfAppLine'),colSpan:2,styles:{fontSize:8,fontStyle:'italic',halign:'center',textColor:[0,0,0],fillColor:[255,255,255],cellPadding:{top:1,bottom:4}}}],
+    [t('pdfWallData')+pName,t('pdfDate')+ds],
   ],margin:{left:ml,right:mr},tableWidth:cw,
   theme:'plain',
   styles:{lineColor:[0,102,204],lineWidth:0},
@@ -622,23 +844,23 @@ function buildPdfPage(doc,sk,pName){
   didParseCell:function(data){if(data.row.index===3){data.cell.styles.lineWidth={top:0.4,bottom:0.4};data.cell.styles.lineColor=[0,102,204];}},
   });
   y=doc.lastAutoTable.finalY+6;
-  sT('1. DATE DE INTRARE');
-  const bulbTxt=d.same?'Bulb 2 identic cu Bulb 1':'Bulbi diferiti';
-  doc.autoTable({startY:y,head:[['Parametru','Notatie','Valoare']],body:[
-    ['Clasa de ductilitate','-',d.DC],['Acceleratia terenului','a_g',d.AG==='gt'?'> 0,15g':'<= 0,15g'],['Zona verificata','-',d.ZONE==='cr'?'Critica':'Non-critica'],
-    ['Grosimea inimii','b_w0',d.bw0+' mm'],['Lungimea peretelui','l_w',d.lw+' mm'],['Inaltimea nivelului','h_cl',d.hcl+' mm'],
-    ['Configuratie bulbi','-',bulbTxt],['Lungimea bulbului','l_f',d.lf+' mm'],['Latimea bulbului','b_f',d.bf+' mm'],
-    ['Clasa beton','-',d.concrete],['Rezistenta beton','f_cd',d.fcd.toFixed(2)+' MPa'],['Clasa otel','-',d.steel],['Rezistenta otel','f_yd',d.fyd.toFixed(2)+' MPa'],
-    ['Forta axiala','N_Ed',d.ned+' kN'],['Bare bulb','-',(d.n1>0?d.n1+' O'+d.db1:'')+(d.n2>0?' + '+d.n2+' O'+d.db2:'')+' mm'],['Inima long.','-','O'+d.dwl+'/'+d.swl+' mm'],['Inima transv.','-','O'+d.dwt+'/'+d.swt+' mm'],['Etrieri','O_sw',d.dsw+' mm'],
-    ['Pas etrieri','s_sw',d.scr+' mm'],['Pas bare long. restranse','s_sl',d.ssl+' mm'],['Acoperire','c_nom',d.cnom+' mm'],
+  sT(t('pdfSec1'));
+  const bulbTxt=d.same?t('pdfBE2same'):t('pdfBEdiff');
+  doc.autoTable({startY:y,head:[[t('pdfColParam'),t('pdfColNot'),t('pdfColVal')]],body:[
+    [t('pdfDuctClass'),'-',d.DC],[t('pdfGroundAccel'),'a_g',d.AG==='gt'?'> 0,15g':'<= 0,15g'],[t('pdfCheckedZone'),'-',d.ZONE==='cr'?t('pdfCrit'):t('pdfNc')],
+    [t('pdfWebThick'),'b_w0',d.bw0+' mm'],[t('pdfWallLen'),'l_w',d.lw+' mm'],[t('pdfStoreyH'),'h_cl',d.hcl+' mm'],
+    [t('pdfBEconfig'),'-',bulbTxt],[t('pdfBElen'),'l_f',d.lf+' mm'],[t('pdfBEwidth'),'b_f',d.bf+' mm'],
+    [t('pdfConcClass'),'-',d.concrete],[t('pdfConcStr'),'f_cd',d.fcd.toFixed(2)+' MPa'],[t('pdfSteelClass'),'-',d.steel],[t('pdfSteelStr'),'f_yd',d.fyd.toFixed(2)+' MPa'],
+    [t('pdfAxialForce'),'N_Ed',d.ned+' kN'],[t('pdfBEbars'),'-',(d.n1>0?d.n1+' O'+d.db1:'')+(d.n2>0?' + '+d.n2+' O'+d.db2:'')+' mm'],[t('pdfWebLong'),'-','O'+d.dwl+'/'+d.swl+' mm'],[t('pdfWebTransv'),'-','O'+d.dwt+'/'+d.swt+' mm'],[t('pdfStirrups'),'O_sw',d.dsw+' mm'],
+    [t('pdfStirrupSp'),'s_sw',d.scr+' mm'],[t('pdfRestrLongSp'),'s_sl',d.ssl+' mm'],[t('pdfCover'),'c_nom',d.cnom+' mm'],
   ],margin:{left:ml,right:mr},tableWidth:cw,theme:'grid',styles:{lineColor:[180,200,220],lineWidth:0.3,fontSize:8.5,textColor:[0,0,0]},headStyles:{fillColor:[200,215,235],textColor:[0,0,0],fontStyle:'bold',lineColor:[180,200,220]},alternateRowStyles:{fillColor:[240,245,252]},columnStyles:{0:{cellWidth:95},1:{cellWidth:35,fontStyle:'italic'},2:{halign:'right'}}});
   y=doc.lastAutoTable.finalY+6;
-  if(sk){cyf(60);sT('2. SECTIUNE - ZONA DE CAPAT');const iw=150,ih=75;doc.addImage(sk,'PNG',(pW-iw)/2,y,iw,ih);y+=ih+6;}
-  cyf(20);sT('3. FORTA AXIALA NORMALIZATA');
-  doc.setFontSize(8);doc.setTextColor(0,0,0);doc.setFont('helvetica','italic');doc.text('v_d = N_Ed / (A_c * f_cd),  A_c = aria inimii + ambii bulbi',ml,y);doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);y+=6;
+  if(sk){cyf(60);sT(t('pdfSec2'));const iw=150,ih=75;doc.addImage(sk,'PNG',(pW-iw)/2,y,iw,ih);y+=ih+6;}
+  cyf(20);sT(t('pdfSec3'));
+  doc.setFontSize(8);doc.setTextColor(0,0,0);doc.setFont('helvetica','italic');doc.text(t('pdfVdFormula'),ml,y);doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);y+=6;
   const vlim=d.DC==='DCH'?'0.35':d.DC==='DCM'?'0.40':'-';
-  doc.autoTable({startY:y,head:[['Marime','Notatie','Valoare']],body:[
-    ['Aria inimii','A_web',nf(d.Aweb)+' mm2'],['Aria bulb 1','A_f',nf(d.Af)+' mm2'],['Aria bulb 2','A_f2',nf(d.Af2)+' mm2'],['Aria totala','A_c',nf(d.Ac)+' mm2'],['Forta axiala normalizata','v_d',nf(d.vd,3)],['Limita ('+d.DC+')','v_d,lim',vlim],
+  doc.autoTable({startY:y,head:[[t('pdfColMarime'),t('pdfColNot'),t('pdfColVal')]],body:[
+    [t('pdfWebArea'),'A_web',nf(d.Aweb)+' mm2'],[t('pdfBE1area'),'A_f',nf(d.Af)+' mm2'],[t('pdfBE2area'),'A_f2',nf(d.Af2)+' mm2'],[t('pdfTotArea'),'A_c',nf(d.Ac)+' mm2'],[t('pdfNormAxial'),'v_d',nf(d.vd,3)],[t('pdfLimit')+' ('+d.DC+')','v_d,lim',vlim],
   ],margin:{left:ml,right:mr},tableWidth:cw,theme:'grid',styles:{lineColor:[180,200,220],lineWidth:0.3,fontSize:8.5,textColor:[0,0,0]},headStyles:{fillColor:[200,215,235],textColor:[0,0,0],fontStyle:'bold',lineColor:[180,200,220]},alternateRowStyles:{fillColor:[240,245,252]},columnStyles:{0:{cellWidth:95},1:{cellWidth:35,fontStyle:'italic'},2:{halign:'right'}}});
   y=doc.lastAutoTable.finalY+6;
   function condTable(title,arr){
@@ -650,23 +872,23 @@ function buildPdfPage(doc,sk,pName){
       const u=o.u&&!o.txt?(' '+o.u.replace('\u00b2','2')):'';
       body.push([stat,plain(o.nm),plain(o.rule),fmtv(o.cur)+u,(o.inv?'<= ':'>= ')+fmtv(o.lim)+u]);
     });
-    doc.autoTable({startY:y,head:[['','Conditie','Regula','Valoare','Limita']],body,margin:{left:ml,right:mr},tableWidth:cw,
+    doc.autoTable({startY:y,head:[['',t('pdfColCond'),t('pdfColRegula'),t('pdfColVal'),t('pdfColLimita')]],body,margin:{left:ml,right:mr},tableWidth:cw,
       theme:'grid',styles:{lineColor:[180,200,220],lineWidth:0.3,fontSize:8,textColor:[0,0,0]},headStyles:{fillColor:[200,215,235],textColor:[0,0,0],fontStyle:'bold',lineColor:[180,200,220]},
       columnStyles:{0:{cellWidth:12,halign:'center',fontStyle:'bold'},1:{cellWidth:60},2:{cellWidth:46},3:{cellWidth:30,halign:'right'},4:{cellWidth:32,halign:'right'}},
       didParseCell:function(h){if(h.section==='body'&&h.column.index===0){if(h.cell.raw==='X'){h.cell.styles.textColor=[198,40,40];}else if(h.cell.raw==='OK'){h.cell.styles.textColor=[46,125,50];}else{h.cell.styles.textColor=[174,174,178];}}}});
     y=doc.lastAutoTable.finalY+6;
   }
-  condTable('4. CONDITII GEOMETRICE',d.G);
-  condTable('5. CONDITII DE ARMARE',d.R);
+  condTable(t('pdfSec4'),d.G);
+  condTable(t('pdfSec5'),d.R);
   const tg=tally(d.G),tr=tally(d.R),bad=tg.bad+tr.bad;
-  cyf(16);sT('6. CONCLUZIE');
+  cyf(16);sT(t('pdfSec6'));
   doc.setFontSize(10);doc.setFont('helvetica','bold');
-  if(bad===0){doc.setTextColor(46,125,50);doc.text('CONFORM - toate conditiile minime sunt indeplinite.',ml,y+1);}else{doc.setTextColor(198,40,40);doc.text('NECONFORM - '+bad+' conditii neindeplinite (vezi randurile X).',ml,y+1);}
+  if(bad===0){doc.setTextColor(46,125,50);doc.text(t('pdfConclPass'),ml,y+1);}else{doc.setTextColor(198,40,40);doc.text(t('pdfConclFail',bad),ml,y+1);}
   doc.setTextColor(0,0,0);doc.setFont('helvetica','normal');y+=8;
   // Disclaimer fixed at bottom of last page, just above footer
   doc.setFontSize(7.5);doc.setFont('helvetica','italic');doc.setTextColor(0,0,0);
-  doc.text('Responsabilitatea pentru rezultatele obtinute revine in exclusivitate utilizatorului.',ml,276);
-  doc.text('Toate valorile trebuie verificate inainte de utilizare.',ml,280);
+  doc.text(t('pdfDisc1'),ml,276);
+  doc.text(t('pdfDisc2'),ml,280);
   doc.setFont('helvetica','normal');
 }
 
@@ -734,6 +956,8 @@ function loadPreset(p){
   document.addEventListener('click',e=>{if(e.target.closest('.seg'))setTimeout(saveCurrentPreset,50);});
 })();
 
+document.querySelectorAll('#langSeg button').forEach(b=>b.addEventListener('click',()=>setLang(b.dataset.lang)));
+applyStaticLang();
 updMat();calc();
 </script>
 </body>

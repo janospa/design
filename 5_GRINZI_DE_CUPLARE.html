@@ -109,6 +109,10 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
 .back-btn svg{width:16px;height:16px;stroke:#8E8E93;stroke-width:2.5;fill:none;stroke-linecap:round;stroke-linejoin:round}
 .back-btn:hover{color:#1C1C1E}
 .back-btn:hover svg{stroke:#1C1C1E}
+.lang-seg{display:inline-flex;background:#E0E0E5;border-radius:8px;padding:2px;gap:2px;margin-left:auto}
+.lang-seg button{padding:5px 11px;font-size:12px;font-weight:600;border:none;border-radius:6px;background:transparent;color:#8E8E93;cursor:pointer;font-family:'Inter',sans-serif;transition:all .12s;letter-spacing:.02em}
+.lang-seg button.on{background:#fff;color:#1C1C1E;box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.topbar{display:flex;align-items:center;gap:8px;padding-right:12px}
 .preset-bar{display:flex;align-items:center;gap:10px;padding:0 16px 10px}
 .preset-bar label{font-size:14px;font-weight:500;color:#8E8E93}
 .preset-bar select{padding:6px 28px 6px 10px;font-size:14px;border:1px solid #C7C7CC;border-radius:8px;background:#fff;color:#1C1C1E;font-family:'Inter',sans-serif;-webkit-appearance:none;appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238E8E93'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
@@ -137,9 +141,12 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
 </head>
 <body>
 
-<a href="index.html" class="back-btn"><svg viewBox="0 0 16 16"><polyline points="10,3 4,8 10,13"/></svg>Toate modulele</a>
+<div class="topbar">
+<a href="index.html" class="back-btn"><svg viewBox="0 0 16 16"><polyline points="10,3 4,8 10,13"/></svg><span data-i18n="backAll">Toate modulele</span></a>
+<div class="lang-seg" id="langSeg"><button data-lang="ro">RO</button><button data-lang="en">EN</button></div>
+</div>
 <div class="preset-bar">
-  <label>Perete:</label>
+  <label data-i18n="wallLabel">Perete:</label>
   <select id="presetSel" onchange="switchPreset(this.value)">
     <option value="P1">P1</option><option value="P2">P2</option><option value="P3">P3</option><option value="P4">P4</option><option value="P5">P5</option>
   </select>
@@ -148,27 +155,27 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
 <div class="wrap">
 <div class="cols">
 <div>
-    <div class="slabel">Intrări</div>
+    <div class="slabel" data-i18n="inputs">Intrări</div>
     <div class="ip">
-      <div class="ph">1. Geometrie</div>
+      <div class="ph" data-i18n="s1geom">1. Geometrie</div>
       <div class="pb">
-        <div class="row"><div class="rl">Lățimea grinzii <span class="rn">(b<sub>w</sub>)</span></div><div class="rc"><input type="number" id="bw" value="300"><span class="ru">mm</span></div></div>
-        <div class="row"><div class="rl">Înălțimea grinzii <span class="rn">(h<sub>w</sub>)</span></div><div class="rc"><input type="number" id="hw" value="600"><span class="ru">mm</span></div></div>
-        <div class="row"><div class="rl">Lungimea libera <span class="rn">(l<sub>cl</sub>)</span></div><div class="rc"><input type="number" id="lcl" value="1100"><span class="ru">mm</span></div></div>
-        <div class="row"><div class="rl">Acoperire nominala <span class="rn">(c<sub>nom</sub>)</span></div><div class="rc"><input type="number" id="cnom" value="45"><span class="ru">mm</span></div></div>
-        <div class="row"><div class="rl">Diametru etrier <span class="rn">(Ø<sub>sw</sub>)</span></div><div class="rc"><input type="number" id="dsw" value="12"><span class="ru">mm</span></div></div>
+        <div class="row"><div class="rl"><span data-i18n="beamWidth">Lățimea grinzii</span> <span class="rn">(b<sub>w</sub>)</span></div><div class="rc"><input type="number" id="bw" value="300"><span class="ru">mm</span></div></div>
+        <div class="row"><div class="rl"><span data-i18n="beamHeight">Înălțimea grinzii</span> <span class="rn">(h<sub>w</sub>)</span></div><div class="rc"><input type="number" id="hw" value="600"><span class="ru">mm</span></div></div>
+        <div class="row"><div class="rl"><span data-i18n="clearLength">Lungimea libera</span> <span class="rn">(l<sub>cl</sub>)</span></div><div class="rc"><input type="number" id="lcl" value="1100"><span class="ru">mm</span></div></div>
+        <div class="row"><div class="rl"><span data-i18n="nomCover">Acoperire nominala</span> <span class="rn">(c<sub>nom</sub>)</span></div><div class="rc"><input type="number" id="cnom" value="45"><span class="ru">mm</span></div></div>
+        <div class="row"><div class="rl"><span data-i18n="stirrupDia">Diametru etrier</span> <span class="rn">(Ø<sub>sw</sub>)</span></div><div class="rc"><input type="number" id="dsw" value="12"><span class="ru">mm</span></div></div>
       </div>
     </div>
 
     <div class="ip">
-      <div class="ph">2. Materiale</div>
+      <div class="ph" data-i18n="s2materials">2. Materiale</div>
       <div class="pb">
-        <div class="sel-field"><label>Clasa beton</label><div class="sel-wrap">
+        <div class="sel-field"><label data-i18n="concClass">Clasa beton</label><div class="sel-wrap">
           <select id="conc">
             <option>C12/15</option><option>C16/20</option><option>C20/25</option>
             <option>C25/30</option><option selected>C30/37</option><option>C35/45</option>
             <option>C40/50</option><option>C45/55</option><option>C50/60</option></select></div></div>
-        <div class="sel-field"><label>Clasa oțel</label><div class="sel-wrap">
+        <div class="sel-field"><label data-i18n="steelClass">Clasa oțel</label><div class="sel-wrap">
           <select id="steel">
             <option>OB37 (S 235)</option><option>OB37 (S 255)</option>
             <option>PC50 (S 345)</option><option>PC50 (S 355)</option>
@@ -178,28 +185,28 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
     </div>
 
     <div class="ip">
-      <div class="ph">3. Ductilitate și eforturi</div>
+      <div class="ph" data-i18n="s3ductForces">3. Ductilitate și eforturi</div>
       <div class="pb">
-      <div class="fs-lbl">Clasă de ductilitate</div>
+      <div class="fs-lbl" data-i18n="ductClass">Clasă de ductilitate</div>
         <div class="seg" id="seg-duct">
           <button data-v="DCM" class="on">DCM</button><button data-v="DCH">DCH</button>
         </div>
 
       <div class="fieldset">
-        <div class="fs-lbl">Armare longitudinală sus / jos <span class="mini" id="m-long">min</span></div>
-        <div class="row"><div class="rl">Număr bare</div><div class="rc"><input type="number" id="nlong" value="3"><span class="ru">buc</span></div></div>
-        <div class="row"><div class="rl">Diametru bare <span class="rn">(Ø)</span></div><div class="rc"><input type="number" id="dlong" value="16"><span class="ru">mm</span></div></div>
+        <div class="fs-lbl"><span data-i18n="longReinfTopBot">Armare longitudinală sus / jos</span> <span class="mini" id="m-long">min</span></div>
+        <div class="row"><div class="rl" data-i18n="nBars">Număr bare</div><div class="rc"><input type="number" id="nlong" value="3"><span class="ru" data-i18n="pcs">buc</span></div></div>
+        <div class="row"><div class="rl"><span data-i18n="barDia">Diametru bare</span> <span class="rn">(Ø)</span></div><div class="rc"><input type="number" id="dlong" value="16"><span class="ru">mm</span></div></div>
       </div>
 
       <div class="fieldset">
-        <div class="fs-lbl">Forța tăietoare V<sub>Ed</sub></div>
+        <div class="fs-lbl"><span data-i18n="shearForceLbl">Forța tăietoare</span> V<sub>Ed</sub></div>
         <div class="seg" id="seg-ved">
-          <button data-v="cap" class="on">Capacitate (M<sub>Rd,b</sub>)</button><button data-v="gs">Seismic (GS)</button>
+          <button data-v="cap" class="on" data-i18n-sym="capacityOpt">Capacitate (M<sub>Rd,b</sub>)</button><button data-v="gs" data-i18n="seismicOpt">Seismic (GS)</button>
         </div>
         <div id="ved-gs" style="margin-top:4px;display:none">
-          <div class="row"><div class="rl">V<sub>Ed,GS</sub> din combinația seismică</div><div class="rc"><input type="number" id="vgs" value="1068"><span class="ru">kN</span></div></div>
+          <div class="row"><div class="rl"><span data-i18n="vedGsLbl">V<sub>Ed,GS</sub> din combinația seismică</span></div><div class="rc"><input type="number" id="vgs" value="1068"><span class="ru">kN</span></div></div>
         </div>
-        <div class="note" style="margin-top:12px">
+        <div class="note" style="margin-top:12px" data-i18n="vedNote">
           V<sub>Ed</sub> = 1.25·(M<sub>Rd,b</sub><sup>l</sup>+M<sub>Rd,b</sub><sup>r</sup>)/l<sub>cl</sub>. La carcasă diagonală, V<sub>Ed</sub> se ia automat din combinația seismică (GS).
         </div>
       </div>
@@ -207,65 +214,65 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
     </div>
 
     <div class="ip">
-      <div class="ph">4. Armare transversală</div>
+      <div class="ph" data-i18n="s4transvReinf">4. Armare transversală</div>
       <div class="pb">
       <!-- ORTHOGONAL CASING inputs -->
       <div id="ortho-inputs">
-        <div class="fs-lbl">Carcasă ortogonală — etrieri <span class="mini" id="m-stir">min</span></div>
-        <div class="row"><div class="rl">Diametru etrieri <span class="rn">(Ø)</span></div><div class="rc"><input type="number" id="dstir" value="12"><span class="ru">mm</span></div></div>
-        <div class="row"><div class="rl">Ramuri etrieri</div><div class="rc"><input type="number" id="nleg" value="2"><span class="ru">buc</span></div></div>
-        <div class="row"><div class="rl">Pas etrieri <span class="rn">(s)</span></div><div class="rc"><input type="number" id="sstir" value="100"><span class="ru">mm</span></div></div>
-        <div class="fs-lbl">Armare intermediară orizontală <span class="mini" id="m-int">min</span></div>
-        <div class="row"><div class="rl">Număr bare</div><div class="rc"><input type="number" id="nint" value="2"><span class="ru">buc</span></div></div>
-        <div class="row"><div class="rl">Diametru bare <span class="rn">(Ø)</span></div><div class="rc"><input type="number" id="dint" value="14"><span class="ru">mm</span></div></div>
-        <div class="row"><div class="rl">Pas bare <span class="rn">(s)</span></div><div class="rc"><input type="number" id="sint" value="200"><span class="ru">mm</span></div></div>
+        <div class="fs-lbl"><span data-i18n="orthoStirrups">Carcasă ortogonală — etrieri</span> <span class="mini" id="m-stir">min</span></div>
+        <div class="row"><div class="rl"><span data-i18n="stirrupDiaShort">Diametru etrieri</span> <span class="rn">(Ø)</span></div><div class="rc"><input type="number" id="dstir" value="12"><span class="ru">mm</span></div></div>
+        <div class="row"><div class="rl" data-i18n="stirrupLegs">Ramuri etrieri</div><div class="rc"><input type="number" id="nleg" value="2"><span class="ru" data-i18n="pcs">buc</span></div></div>
+        <div class="row"><div class="rl"><span data-i18n="stirrupSpacing">Pas etrieri</span> <span class="rn">(s)</span></div><div class="rc"><input type="number" id="sstir" value="100"><span class="ru">mm</span></div></div>
+        <div class="fs-lbl"><span data-i18n="intermHorizReinf">Armare intermediară orizontală</span> <span class="mini" id="m-int">min</span></div>
+        <div class="row"><div class="rl" data-i18n="nBars">Număr bare</div><div class="rc"><input type="number" id="nint" value="2"><span class="ru" data-i18n="pcs">buc</span></div></div>
+        <div class="row"><div class="rl"><span data-i18n="barDia">Diametru bare</span> <span class="rn">(Ø)</span></div><div class="rc"><input type="number" id="dint" value="14"><span class="ru">mm</span></div></div>
+        <div class="row"><div class="rl"><span data-i18n="barSpacing">Pas bare</span> <span class="rn">(s)</span></div><div class="rc"><input type="number" id="sint" value="200"><span class="ru">mm</span></div></div>
       </div>
 
       <!-- DIAGONAL CASING inputs (appear when needed) -->
       <div class="fieldset hidden" id="diag-inputs">
-        <div class="fs-lbl" style="color:var(--bad)">Bare diagonale</div>
-        <div class="row"><div class="rl">Bare per direcție</div><div class="rc"><input type="number" id="ndiag" value="4"><span class="ru">buc</span></div></div>
-        <div class="row"><div class="rl">Diametru bare <span class="rn">(Ø)</span></div><div class="rc"><input type="number" id="ddiag" value="28"><span class="ru">mm</span></div></div>
-        <div class="row"><div class="rl">Unghi înclinare <span class="rn">(α)</span></div><div class="rc"><input type="number" id="alpha" value="29.5"><span class="ru">°</span></div></div>
-        <div class="fs-lbl">Bare longitudinale perimetrale <span class="mini" id="m-dlong">min</span></div>
-        <div class="row"><div class="rl">Număr bare</div><div class="rc"><input type="number" id="d_plong_n" value="12"><span class="ru">buc</span></div></div>
-        <div class="row"><div class="rl">Diametru bare <span class="rn">(Ø)</span></div><div class="rc"><input type="number" id="d_plong_dia" value="12"><span class="ru">mm</span></div></div>
-        <div class="row"><div class="rl">Pas maxim <span class="rn">(s)</span></div><div class="rc"><input type="number" id="d_plong_s" value="150"><span class="ru">mm</span></div></div>
-        <div class="fs-lbl">Etrieri perimetrali <span class="mini" id="m-dstir">min</span></div>
-        <div class="row"><div class="rl">Diametru etrieri <span class="rn">(Ø)</span></div><div class="rc"><input type="number" id="d_estir_dia" value="10"><span class="ru">mm</span></div></div>
-        <div class="row"><div class="rl">Ramuri etrieri</div><div class="rc"><input type="number" id="d_estir_n" value="2"><span class="ru">buc</span></div></div>
-        <div class="row"><div class="rl">Pas etrieri <span class="rn">(s)</span></div><div class="rc"><input type="number" id="d_estir_s" value="100"><span class="ru">mm</span></div></div>
+        <div class="fs-lbl" style="color:var(--bad)" data-i18n="diagonalBars">Bare diagonale</div>
+        <div class="row"><div class="rl" data-i18n="barsPerDir">Bare per direcție</div><div class="rc"><input type="number" id="ndiag" value="4"><span class="ru" data-i18n="pcs">buc</span></div></div>
+        <div class="row"><div class="rl"><span data-i18n="barDia">Diametru bare</span> <span class="rn">(Ø)</span></div><div class="rc"><input type="number" id="ddiag" value="28"><span class="ru">mm</span></div></div>
+        <div class="row"><div class="rl"><span data-i18n="inclAngle">Unghi înclinare</span> <span class="rn">(α)</span></div><div class="rc"><input type="number" id="alpha" value="29.5"><span class="ru">°</span></div></div>
+        <div class="fs-lbl"><span data-i18n="perimLongBars">Bare longitudinale perimetrale</span> <span class="mini" id="m-dlong">min</span></div>
+        <div class="row"><div class="rl" data-i18n="nBars">Număr bare</div><div class="rc"><input type="number" id="d_plong_n" value="12"><span class="ru" data-i18n="pcs">buc</span></div></div>
+        <div class="row"><div class="rl"><span data-i18n="barDia">Diametru bare</span> <span class="rn">(Ø)</span></div><div class="rc"><input type="number" id="d_plong_dia" value="12"><span class="ru">mm</span></div></div>
+        <div class="row"><div class="rl"><span data-i18n="maxSpacing">Pas maxim</span> <span class="rn">(s)</span></div><div class="rc"><input type="number" id="d_plong_s" value="150"><span class="ru">mm</span></div></div>
+        <div class="fs-lbl"><span data-i18n="perimStirrups">Etrieri perimetrali</span> <span class="mini" id="m-dstir">min</span></div>
+        <div class="row"><div class="rl"><span data-i18n="stirrupDiaShort">Diametru etrieri</span> <span class="rn">(Ø)</span></div><div class="rc"><input type="number" id="d_estir_dia" value="10"><span class="ru">mm</span></div></div>
+        <div class="row"><div class="rl" data-i18n="stirrupLegs">Ramuri etrieri</div><div class="rc"><input type="number" id="d_estir_n" value="2"><span class="ru" data-i18n="pcs">buc</span></div></div>
+        <div class="row"><div class="rl"><span data-i18n="stirrupSpacing">Pas etrieri</span> <span class="rn">(s)</span></div><div class="rc"><input type="number" id="d_estir_s" value="100"><span class="ru">mm</span></div></div>
       </div>
       </div>
     </div>
     </div>
 
 <div>
-    <div class="slabel">Rezultate</div>
+    <div class="slabel" data-i18n="results">Rezultate</div>
 
     <div class="op">
-      <div class="ph">Verdict</div>
+      <div class="ph" data-i18n="verdict">Verdict</div>
       <div class="pb">
         <div id="verdict"></div>
       </div>
     </div>
 
     <div class="op">
-      <div class="ph">Marimi de baza</div>
+      <div class="ph" data-i18n="baseQuantities">Marimi de baza</div>
       <div class="pb" id="res-basics"></div>
     </div>
 
     <div class="op">
-      <div class="ph" id="res-checks-title">Verificari</div>
+      <div class="ph" id="res-checks-title" data-i18n="checks">Verificari</div>
       <div class="pb" id="res-checks"></div>
     </div>
 
     <div class="op">
-      <div class="ph">Raport</div>
+      <div class="ph" data-i18n="report">Raport</div>
       <div class="pb">
         <div class="report-bar" style="flex-direction:column;gap:8px">
-          <span class="report-lbl">Export nota de calcul (PDF)</span>
-          <button class="report-btn" id="rptBtn" onclick="generatePdf()">Descarca PDF</button>
+          <span class="report-lbl" data-i18n="exportCalcNote">Export nota de calcul (PDF)</span>
+          <button class="report-btn" id="rptBtn" onclick="generatePdf()" data-i18n="downloadPdf">Descarca PDF</button>
         </div>
         <div class="report-status" id="rptStatus"></div>
       </div>
@@ -273,29 +280,29 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
   </div>
 
   <div class="sketch-card">
-    <h2>Schiță de armare</h2>
+    <h2 data-i18n="reinfSketch">Schiță de armare</h2>
     <div class="leg" id="sketch-sub"></div>
     <div class="svg-host" id="svg-host"></div>
     <div class="legend">
-      <div class="li"><span class="sw" style="border-color:#1d1d1f"></span>contur grindă</div>
-      <div class="li"><span class="sw" style="border-color:#0071e3"></span>etrieri</div>
-      <div class="li"><span class="sw" style="border-color:#8a8a8e"></span>bare longitudinale</div>
-      <div class="li" id="leg-diag"><span class="sw" style="border-color:#d8341f"></span>bare diagonale (α)</div>
+      <div class="li"><span class="sw" style="border-color:#1d1d1f"></span><span data-i18n="legBeamOutline">contur grindă</span></div>
+      <div class="li"><span class="sw" style="border-color:#0071e3"></span><span data-i18n="legStirrups">etrieri</span></div>
+      <div class="li"><span class="sw" style="border-color:#8a8a8e"></span><span data-i18n="legLongBars">bare longitudinale</span></div>
+      <div class="li" id="leg-diag"><span class="sw" style="border-color:#d8341f"></span><span data-i18n="legDiagBars">bare diagonale (α)</span></div>
     </div>
     <div class="note" id="anchor-note"></div>
   </div>
 
 </div>
 </div>
-<div class="author-footer">Lucrare de disertație — Janos Patrik · UTCN · Facultatea de Construcții · 2026</div>
+<div class="author-footer" data-i18n="footer">Lucrare de disertație — Janos Patrik · UTCN · Facultatea de Construcții · 2026</div>
 
 <div class="modal-overlay" id="exportModal">
   <div class="modal">
-    <h3>Export PDF — selecteaza peretii</h3>
+    <h3 data-i18n="exportSelectWalls">Export PDF — selecteaza peretii</h3>
     <div class="modal-presets" id="modalPresets"></div>
     <div class="modal-btns">
-      <button class="m-cancel" onclick="closeExportModal()">Anuleaza</button>
-      <button class="m-export" id="modalExportBtn" onclick="exportSelected()">Exporta</button>
+      <button class="m-cancel" onclick="closeExportModal()" data-i18n="cancel">Anuleaza</button>
+      <button class="m-export" id="modalExportBtn" onclick="exportSelected()" data-i18n="export">Exporta</button>
     </div>
   </div>
 </div>
@@ -316,6 +323,157 @@ const num=id=>parseFloat($(id).value)||0;
 const fmt=(x,d=1)=>(x==null||isNaN(x))?'—':Number(x).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
 
 let ductMode='DCM', vedMode='cap';
+
+// ═══════════════ i18n ═══════════════
+let LANG=(function(){try{return localStorage.getItem('sw_lang')||'ro';}catch(e){return 'ro';}})();
+const T={
+  backAll:{ro:'Toate modulele',en:'All modules'},
+  wallLabel:{ro:'Perete:',en:'Wall:'},
+  inputs:{ro:'Intrări',en:'Inputs'},
+  results:{ro:'Rezultate',en:'Results'},
+  s1geom:{ro:'1. Geometrie',en:'1. Geometry'},
+  s2materials:{ro:'2. Materiale',en:'2. Materials'},
+  s3ductForces:{ro:'3. Ductilitate și eforturi',en:'3. Ductility and forces'},
+  s4transvReinf:{ro:'4. Armare transversală',en:'4. Transverse reinforcement'},
+  beamWidth:{ro:'Lățimea grinzii',en:'Beam width'},
+  beamHeight:{ro:'Înălțimea grinzii',en:'Beam height'},
+  clearLength:{ro:'Lungimea libera',en:'Clear length'},
+  nomCover:{ro:'Acoperire nominala',en:'Nominal cover'},
+  stirrupDia:{ro:'Diametru etrier',en:'Stirrup diameter'},
+  concClass:{ro:'Clasa beton',en:'Concrete class'},
+  steelClass:{ro:'Clasa oțel',en:'Steel class'},
+  ductClass:{ro:'Clasă de ductilitate',en:'Ductility class'},
+  longReinfTopBot:{ro:'Armare longitudinală sus / jos',en:'Longitudinal reinforcement top / bottom'},
+  nBars:{ro:'Număr bare',en:'No. bars'},
+  barDia:{ro:'Diametru bare',en:'Bar diameter'},
+  pcs:{ro:'buc',en:'pcs'},
+  shearForceLbl:{ro:'Forța tăietoare',en:'Shear force'},
+  capacityOpt:{ro:'Capacitate (M<sub>Rd,b</sub>)',en:'Capacity (M<sub>Rd,b</sub>)'},
+  seismicOpt:{ro:'Seismic (GS)',en:'Seismic (SC)'},
+  vedGsLbl:{ro:'V<sub>Ed,GS</sub> din combinația seismică',en:'V<sub>Ed,SC</sub> from the seismic combination'},
+  vedNote:{ro:'V<sub>Ed</sub> = 1.25·(M<sub>Rd,b</sub><sup>l</sup>+M<sub>Rd,b</sub><sup>r</sup>)/l<sub>cl</sub>. La carcasă diagonală, V<sub>Ed</sub> se ia automat din combinația seismică (GS).',en:'V<sub>Ed</sub> = 1.25·(M<sub>Rd,b</sub><sup>l</sup>+M<sub>Rd,b</sub><sup>r</sup>)/l<sub>cl</sub>. For a diagonal cage, V<sub>Ed</sub> is taken automatically from the seismic combination (SC).'},
+  orthoStirrups:{ro:'Carcasă ortogonală — etrieri',en:'Orthogonal cage — stirrups'},
+  stirrupDiaShort:{ro:'Diametru etrieri',en:'Stirrup diameter'},
+  stirrupLegs:{ro:'Ramuri etrieri',en:'Stirrup legs'},
+  stirrupSpacing:{ro:'Pas etrieri',en:'Stirrup spacing'},
+  intermHorizReinf:{ro:'Armare intermediară orizontală',en:'Intermediate horizontal reinforcement'},
+  barSpacing:{ro:'Pas bare',en:'Bar spacing'},
+  diagonalBars:{ro:'Bare diagonale',en:'Diagonal bars'},
+  barsPerDir:{ro:'Bare per direcție',en:'Bars per direction'},
+  inclAngle:{ro:'Unghi înclinare',en:'Inclination angle'},
+  perimLongBars:{ro:'Bare longitudinale perimetrale',en:'Perimeter longitudinal bars'},
+  maxSpacing:{ro:'Pas maxim',en:'Maximum spacing'},
+  perimStirrups:{ro:'Etrieri perimetrali',en:'Perimeter stirrups'},
+  verdict:{ro:'Verdict',en:'Verdict'},
+  baseQuantities:{ro:'Marimi de baza',en:'Base quantities'},
+  checks:{ro:'Verificari',en:'Checks'},
+  report:{ro:'Raport',en:'Report'},
+  exportCalcNote:{ro:'Export nota de calcul (PDF)',en:'Export calculation report (PDF)'},
+  downloadPdf:{ro:'Descarca PDF',en:'Download PDF'},
+  generating:{ro:'Se genereaza...',en:'Generating...'},
+  reinfSketch:{ro:'Schiță de armare',en:'Reinforcement sketch'},
+  legBeamOutline:{ro:'contur grindă',en:'beam outline'},
+  legStirrups:{ro:'etrieri',en:'stirrups'},
+  legLongBars:{ro:'bare longitudinale',en:'longitudinal bars'},
+  legDiagBars:{ro:'bare diagonale (α)',en:'diagonal bars (α)'},
+  footer:{ro:'Lucrare de disertație — Janos Patrik · UTCN · Facultatea de Construcții · 2026',en:'Dissertation — Janos Patrik · UTCN · Faculty of Civil Engineering · 2026'},
+  exportSelectWalls:{ro:'Export PDF — selecteaza peretii',en:'Export PDF — select walls'},
+  cancel:{ro:'Anuleaza',en:'Cancel'},
+  export:{ro:'Exporta',en:'Export'},
+  presetEmpty:{ro:'(gol)',en:'(empty)'},
+  // verdict
+  verdictDiagPass:{ro:'CARCASĂ DIAGONALĂ — SE VERIFICĂ',en:'DIAGONAL CAGE — PASS'},
+  verdictDiagFail:{ro:'CARCASĂ DIAGONALĂ — NU SE VERIFICĂ',en:'DIAGONAL CAGE — FAIL'},
+  verdictOrthoPass:{ro:'CARCASĂ ORTOGONALĂ — SE VERIFICĂ',en:'ORTHOGONAL CAGE — PASS'},
+  verdictOrthoFail:{ro:'CARCASĂ ORTOGONALĂ — NU SE VERIFICĂ',en:'ORTHOGONAL CAGE — FAIL'},
+  // basics
+  bRatio:{ro:'l<sub>cl</sub>/h<sub>w</sub> (regim grindă scurtă)',en:'l<sub>cl</sub>/h<sub>w</sub> (short-beam regime)'},
+  bMrd:{ro:(n,d)=>`M<sub>Rd,b</sub> capabil (${n}Ø${d})`,en:(n,d)=>`M<sub>Rd,b</sub> resistance (${n}Ø${d})`},
+  bVedApplied:{ro:need=>`V<sub>Ed</sub> aplicat${need?' (seismic)':''}`,en:need=>`V<sub>Ed</sub> applied${need?' (seismic)':''}`},
+  // checks titles
+  checksOrtho:{ro:'Verificari — carcasa ortogonala',en:'Checks — orthogonal cage'},
+  checksDiag:{ro:'Verificari — carcasa diagonala',en:'Checks — diagonal cage'},
+  // check rows
+  cCompStrut:{ro:'Bielă comprimată (beton)',en:'Compression strut (concrete)'},
+  cCompStrutSubO:{ro:cFac=>`V<sub>Ed</sub> ≤ ${cFac}·b<sub>w</sub>·d·f<sub>ctd</sub>`,en:cFac=>`V<sub>Ed</sub> ≤ ${cFac}·b<sub>w</sub>·d·f<sub>ctd</sub>`},
+  cStirrupsSteel:{ro:'Etrieri (oțel)',en:'Stirrups (steel)'},
+  cStirrupsSub:{ro:'V<sub>Ed</sub> ≤ V<sub>Rd,s</sub>',en:'V<sub>Ed</sub> ≤ V<sub>Rd,s</sub>'},
+  cStirrupPct:{ro:'Procent etrieri',en:'Stirrup ratio'},
+  cHorizPct:{ro:'Procent armătură orizontală',en:'Horizontal reinforcement ratio'},
+  cLongPct:{ro:'Procent longitudinal',en:'Longitudinal ratio'},
+  cCompStrutSubD:{ro:'V<sub>Ed,GS</sub> ≤ V<sub>Rd,max</sub>',en:'V<sub>Ed,SC</sub> ≤ V<sub>Rd,max</sub>'},
+  cDiagBarsSteel:{ro:'Bare diagonale (oțel)',en:'Diagonal bars (steel)'},
+  cDiagBarsSub:{ro:'V<sub>Ed,GS</sub> ≤ 2·A<sub>si</sub>·f<sub>yd</sub>·sin α',en:'V<sub>Ed,SC</sub> ≤ 2·A<sub>si</sub>·f<sub>yd</sub>·sin α'},
+  cPerimLongBars:{ro:'Bare long. perimetrale',en:'Perimeter long. bars'},
+  cPerimLongSub:{ro:(n,d,mn)=>`${n}Ø${d} (min ${mn})`,en:(n,d,mn)=>`${n}Ø${d} (min ${mn})`},
+  cPerimStirrups:{ro:'Etrieri perimetrali',en:'Perimeter stirrups'},
+  cPerimStirrupsSub:{ro:(d,s)=>`Ø${d}/${s}`,en:(d,s)=>`Ø${d}/${s}`},
+  // sketch subtitles / notes
+  skSubDiag:{ro:'<span style="color:var(--bad);font-weight:600">Carcasă diagonală</span> — bare diagonale la α, bare longitudinale perimetrale + etrieri perimetrali.',en:'<span style="color:var(--bad);font-weight:600">Diagonal cage</span> — diagonal bars at α, perimeter longitudinal bars + perimeter stirrups.'},
+  skSubOrtho:{ro:'<span style="color:var(--ok);font-weight:600">Carcasă ortogonală</span> — etrieri ortogonali + armătură orizontală în inimă.',en:'<span style="color:var(--ok);font-weight:600">Orthogonal cage</span> — orthogonal stirrups + horizontal web reinforcement.'},
+  skAnchorNote:{ro:(nd,dd,al,lb,dpN,dpL,deD,deS)=>`<b>Carcasă diagonală:</b> bare ${nd}×Ø${dd} la α=${al}°, ancorate l<sub>b</sub>=36·Ø${dd}=${lb} mm în pereți. Bare longitudinale perimetrale ${dpN}Ø${dpL} mm și etrieri perimetrali Ø${deD}/${deS} mm.`,en:(nd,dd,al,lb,dpN,dpL,deD,deS)=>`<b>Diagonal cage:</b> ${nd}×Ø${dd} bars at α=${al}°, anchored l<sub>b</sub>=36·Ø${dd}=${lb} mm into the walls. Perimeter longitudinal bars ${dpN}Ø${dpL} mm and perimeter stirrups Ø${deD}/${deS} mm.`},
+  // PDF
+  pdfHeaderTitle:{ro:'NOTA DE CALCUL \u2014 GRINZI DE CUPLARE',en:'CALCULATION REPORT \u2014 COUPLING BEAMS'},
+  pdfWallData:{ro:'Perete: ',en:'Wall: '},
+  pdfDate:{ro:'Data: ',en:'Date: '},
+  pdfBigTitle:{ro:'GRINZI DE CUPLARE',en:'COUPLING BEAMS'},
+  pdfSubtitle:{ro:'Verificare la forta taietoare \u2014 CR 2-1-1.1/2022 cap. 2.3.5',en:'Shear verification \u2014 CR 2-1-1.1/2022 ch. 2.3.5'},
+  pdfAppLine:{ro:'Aplicatie dezvoltata in cadrul lucrarii de disertatie \u2014 Janos Patrik',en:'Application developed within the dissertation \u2014 Janos Patrik'},
+  pdfVerdictDiagPass:{ro:'CARCASA DIAGONALA - SE VERIFICA',en:'DIAGONAL CAGE - PASS'},
+  pdfVerdictDiagFail:{ro:'CARCASA DIAGONALA - NU SE VERIFICA',en:'DIAGONAL CAGE - FAIL'},
+  pdfVerdictOrthoPass:{ro:'CARCASA ORTOGONALA - SE VERIFICA',en:'ORTHOGONAL CAGE - PASS'},
+  pdfVerdictOrthoFail:{ro:'CARCASA ORTOGONALA - NU SE VERIFICA',en:'ORTHOGONAL CAGE - FAIL'},
+  pdfColParam:{ro:'Parametru',en:'Parameter'},
+  pdfColNot:{ro:'Notatie',en:'Notation'},
+  pdfColVal:{ro:'Valoare',en:'Value'},
+  pdfColMarime:{ro:'Marime',en:'Quantity'},
+  pdfColCheck:{ro:'Verificare',en:'Check'},
+  pdfColCondition:{ro:'Conditie',en:'Condition'},
+  pdfColUtil:{ro:'Util.',en:'Util.'},
+  pdfColState:{ro:'Stare',en:'State'},
+  pdfSec1:{ro:'1. DATE DE INTRARE',en:'1. INPUT DATA'},
+  pdfSec2:{ro:'2. MOMENT CAPABIL SI FORTA TAIETOARE',en:'2. MOMENT RESISTANCE AND SHEAR FORCE'},
+  pdfSec3ortho:{ro:'3. VERIFICARI CARCASA ORTOGONALA',en:'3. ORTHOGONAL CAGE CHECKS'},
+  pdfSec3diag:{ro:'3. VERIFICARI CARCASA DIAGONALA',en:'3. DIAGONAL CAGE CHECKS'},
+  pdfInBeamWidth:{ro:'Latimea grinzii',en:'Beam width'},
+  pdfInBeamHeight:{ro:'Inaltimea grinzii',en:'Beam height'},
+  pdfInClearLen:{ro:'Lungimea libera',en:'Clear length'},
+  pdfInEffDepth:{ro:'Inaltimea utila',en:'Effective depth'},
+  pdfInConcClass:{ro:'Clasa beton',en:'Concrete class'},
+  pdfInSteelClass:{ro:'Clasa otel',en:'Steel class'},
+  pdfInDuctility:{ro:'Ductilitate',en:'Ductility'},
+  pdfVedApplied:{ro:need=>'V_Ed aplicat'+(need?' (seismic GS)':''),en:need=>'V_Ed applied'+(need?' (seismic SC)':'')},
+  pdfCheckCompStrut:{ro:'Biela comprimata',en:'Compression strut'},
+  pdfCheckStirrupsSteel:{ro:'Etrieri (otel)',en:'Stirrups (steel)'},
+  pdfCheckStirrupPct:{ro:'Procent etrieri',en:'Stirrup ratio'},
+  pdfCheckHorizPct:{ro:'Procent orizontal',en:'Horizontal ratio'},
+  pdfCheckLongPct:{ro:'Procent longitudinal',en:'Longitudinal ratio'},
+  pdfCheckDiagBars:{ro:'Bare diagonale',en:'Diagonal bars'},
+  pdfCheckPerimBars:{ro:'Bare perimetrale',en:'Perimeter bars'},
+  pdfCheckPerimStirrups:{ro:'Etrieri perimetrali',en:'Perimeter stirrups'},
+  pdfStateOK:{ro:'OK',en:'OK'},
+  pdfStateNO:{ro:'NU',en:'NO'},
+  pdfDisc1:{ro:'Responsabilitatea pentru rezultatele obtinute revine in exclusivitate utilizatorului.',en:'Responsibility for the obtained results rests solely with the user.'},
+  pdfDisc2:{ro:'Toate valorile trebuie verificate inainte de utilizare.',en:'All values must be verified before use.'},
+  pdfPage:{ro:(i,n)=>'Pagina '+i+' din '+n,en:(i,n)=>'Page '+i+' of '+n},
+  pdfGenerated:{ro:'Generat: ',en:'Generated: '},
+  pdfFnamePrefix:{ro:'Raport_grinzi_cuplare_',en:'Report_coupling_beams_'}
+};
+function t(key,...args){
+  const e=T[key];
+  if(!e)return key;
+  const v=e[LANG]!==undefined?e[LANG]:e.ro;
+  return typeof v==='function'?v(...args):v;
+}
+function applyStaticLang(){
+  document.documentElement.lang=LANG;
+  document.querySelectorAll('[data-i18n],[data-i18n-sym]').forEach(el=>{
+    const k=el.getAttribute('data-i18n')||el.getAttribute('data-i18n-sym');
+    if(T[k]){const v=T[k][LANG];if(v!==undefined&&typeof v!=='function')el.innerHTML=v;}
+  });
+  document.querySelectorAll('#langSeg button').forEach(b=>b.classList.toggle('on',b.dataset.lang===LANG));
+}
+function setLangMod(l){LANG=l;try{localStorage.setItem('sw_lang',l);}catch(e){}applyStaticLang();compute();}
 document.querySelectorAll('#seg-duct button').forEach(b=>b.onclick=()=>{
   document.querySelectorAll('#seg-duct button').forEach(x=>x.classList.remove('on'));b.classList.add('on');ductMode=b.dataset.v;compute();});
 document.querySelectorAll('#seg-ved button').forEach(b=>b.onclick=()=>{
@@ -419,18 +577,18 @@ function render(){
   let vOk,vText;
   if(m.needDiagonal){
     vOk=m.diagVerifies;
-    vText=vOk?'CARCASĂ DIAGONALĂ — SE VERIFICĂ':'CARCASĂ DIAGONALĂ — NU SE VERIFICĂ';
+    vText=vOk?t('verdictDiagPass'):t('verdictDiagFail');
   } else {
     vOk=m.o_conc_ok&&m.o_steel_ok;
-    vText=vOk?'CARCASĂ ORTOGONALĂ — SE VERIFICĂ':'CARCASĂ ORTOGONALĂ — NU SE VERIFICĂ';
+    vText=vOk?t('verdictOrthoPass'):t('verdictOrthoFail');
   }
   $('verdict').innerHTML=`<div class="verdict-box ${vOk?'ok':'warn'}">${vOk?'✓':'⚠'} ${vText}</div>`;
 
   // Basics
   let b='';
-  b+=`<div class="res-row"><span class="rr-lbl">l<sub>cl</sub>/h<sub>w</sub> (regim grindă scurtă)</span><span class="rr-val">${fmt(m.ratio,2)} ${m.regimeOK?'✓':'⚠'}</span></div>`;
-  b+=`<div class="res-row"><span class="rr-lbl">M<sub>Rd,b</sub> capabil (${m.nL}Ø${m.dL})</span><span class="rr-val">${fmt(m.Mrd_b)} kNm</span></div>`;
-  b+=`<div class="res-row"><span class="rr-lbl">V<sub>Ed</sub> aplicat${m.needDiagonal?' (seismic)':''}</span><span class="rr-val">${fmt(m.Ved)} kN</span></div>`;
+  b+=`<div class="res-row"><span class="rr-lbl">${t('bRatio')}</span><span class="rr-val">${fmt(m.ratio,2)} ${m.regimeOK?'✓':'⚠'}</span></div>`;
+  b+=`<div class="res-row"><span class="rr-lbl">${t('bMrd',m.nL,m.dL)}</span><span class="rr-val">${fmt(m.Mrd_b)} kNm</span></div>`;
+  b+=`<div class="res-row"><span class="rr-lbl">${t('bVedApplied',m.needDiagonal)}</span><span class="rr-val">${fmt(m.Ved)} kN</span></div>`;
   $('res-basics').innerHTML=b;
 
   // Checks
@@ -445,18 +603,18 @@ function render(){
 
   let h='';
   if(!m.needDiagonal){
-    $('res-checks-title').textContent='Verificari — carcasa ortogonala';
-    h+=chkRow(m.o_conc_ok,'Bielă comprimată (beton)',`V<sub>Ed</sub> ≤ ${m.cFac}·b<sub>w</sub>·d·f<sub>ctd</sub>`,`${fmt(m.Ved_ortho)} / ${fmt(m.VRd_max_o)} kN`,m.o_conc_util);
-    h+=chkRow(m.o_steel_ok,'Etrieri (oțel)',`V<sub>Ed</sub> ≤ V<sub>Rd,s</sub>`,`${fmt(m.Ved_ortho)} / ${fmt(m.VRd_s_o)} kN`,m.o_steel_util);
-    h+=chkRow(m.stirOK,'Procent etrieri',`ρ ≥ 0.20%`,`${(m.rhoST*100).toFixed(2)}%`,m.rhoST>0?0.002/m.rhoST:999);
-    h+=chkRow(m.intOK,'Procent armătură orizontală',`ρ ≥ ${(m.rhoI_min*100).toFixed(2)}%`,`${(m.rhoI*100).toFixed(2)}%`,m.rhoI>0?m.rhoI_min/m.rhoI:999);
-    h+=chkRow(m.longOK,'Procent longitudinal',`ρ ≥ ${(m.rhoL_req*100).toFixed(2)}%`,`${(m.rhoL*100).toFixed(2)}%`,m.rhoL>0?m.rhoL_req/m.rhoL:999);
+    $('res-checks-title').textContent=t('checksOrtho');
+    h+=chkRow(m.o_conc_ok,t('cCompStrut'),t('cCompStrutSubO',m.cFac),`${fmt(m.Ved_ortho)} / ${fmt(m.VRd_max_o)} kN`,m.o_conc_util);
+    h+=chkRow(m.o_steel_ok,t('cStirrupsSteel'),t('cStirrupsSub'),`${fmt(m.Ved_ortho)} / ${fmt(m.VRd_s_o)} kN`,m.o_steel_util);
+    h+=chkRow(m.stirOK,t('cStirrupPct'),`ρ ≥ 0.20%`,`${(m.rhoST*100).toFixed(2)}%`,m.rhoST>0?0.002/m.rhoST:999);
+    h+=chkRow(m.intOK,t('cHorizPct'),`ρ ≥ ${(m.rhoI_min*100).toFixed(2)}%`,`${(m.rhoI*100).toFixed(2)}%`,m.rhoI>0?m.rhoI_min/m.rhoI:999);
+    h+=chkRow(m.longOK,t('cLongPct'),`ρ ≥ ${(m.rhoL_req*100).toFixed(2)}%`,`${(m.rhoL*100).toFixed(2)}%`,m.rhoL>0?m.rhoL_req/m.rhoL:999);
   } else {
-    $('res-checks-title').textContent='Verificari — carcasa diagonala';
-    h+=chkRow(m.d_conc_ok,'Bielă comprimată (beton)',`V<sub>Ed,GS</sub> ≤ V<sub>Rd,max</sub>`,`${fmt(m.Ved_gs)} / ${fmt(m.VRd_max_d)} kN`,m.d_conc_util);
-    h+=chkRow(m.d_steel_ok,'Bare diagonale (oțel)',`V<sub>Ed,GS</sub> ≤ 2·A<sub>si</sub>·f<sub>yd</sub>·sin α`,`${fmt(m.Ved_gs)} / ${fmt(m.VRd_s_d)} kN`,m.d_steel_util);
-    h+=chkRow(m.dpL_ok,'Bare long. perimetrale',`${m.dpN}Ø${m.dpL} (min ${m.nPerim_req})`,`ρ=${(m.rho_pL*100).toFixed(2)}%`,m.rho_pL>0?m.rho_pL_min/m.rho_pL:999);
-    h+=chkRow(m.de_ok,'Etrieri perimetrali',`Ø${m.deD}/${fmt(m.deS,0)}`,`ρ=${(m.rho_de*100).toFixed(2)}%`,m.rho_de>0?m.rho_de_min/m.rho_de:999);
+    $('res-checks-title').textContent=t('checksDiag');
+    h+=chkRow(m.d_conc_ok,t('cCompStrut'),t('cCompStrutSubD'),`${fmt(m.Ved_gs)} / ${fmt(m.VRd_max_d)} kN`,m.d_conc_util);
+    h+=chkRow(m.d_steel_ok,t('cDiagBarsSteel'),t('cDiagBarsSub'),`${fmt(m.Ved_gs)} / ${fmt(m.VRd_s_d)} kN`,m.d_steel_util);
+    h+=chkRow(m.dpL_ok,t('cPerimLongBars'),t('cPerimLongSub',m.dpN,m.dpL,m.nPerim_req),`ρ=${(m.rho_pL*100).toFixed(2)}%`,m.rho_pL>0?m.rho_pL_min/m.rho_pL:999);
+    h+=chkRow(m.de_ok,t('cPerimStirrups'),t('cPerimStirrupsSub',m.deD,fmt(m.deS,0)),`ρ=${(m.rho_de*100).toFixed(2)}%`,m.rho_de>0?m.rho_de_min/m.rho_de:999);
   }
   $('res-checks').innerHTML=h;
   drawSketch();
@@ -507,75 +665,73 @@ function drawSketch(){
   s.push(`</svg>`);
   $('svg-host').innerHTML=s.join('');
 
-  $('sketch-sub').innerHTML=need
-    ? `<span style="color:var(--bad);font-weight:600">Carcasă diagonală</span> — bare diagonale la α, bare longitudinale perimetrale + etrieri perimetrali.`
-    : `<span style="color:var(--ok);font-weight:600">Carcasă ortogonală</span> — etrieri ortogonali + armătură orizontală în inimă.`;
+  $('sketch-sub').innerHTML=need?t('skSubDiag'):t('skSubOrtho');
   $('leg-diag').style.display=need?'flex':'none';
   $('anchor-note').style.display=need?'block':'none';
-  if(need)$('anchor-note').innerHTML=`<b>Carcasă diagonală:</b> bare ${m.nd}×Ø${m.dd} la α=${fmt(m.alpha,1)}°, ancorate l<sub>b</sub>=36·Ø${m.dd}=${fmt(36*m.dd,0)} mm în pereți. Bare longitudinale perimetrale ${m.dpN}Ø${m.dpL} mm și etrieri perimetrali Ø${m.deD}/${fmt(m.deS,0)} mm.`;
+  if(need)$('anchor-note').innerHTML=t('skAnchorNote',m.nd,m.dd,fmt(m.alpha,1),fmt(36*m.dd,0),m.dpN,m.dpL,m.deD,fmt(m.deS,0));
 }
 
 function exportPDF(){
   const m=M;const {jsPDF}=window.jspdf;const doc=new jsPDF({unit:'mm',format:'a4'});const pW=210,ml=15,mr=15,cw=pW-ml-mr;let y=0;
-  const ds=new Date().toLocaleDateString('ro-RO');
-  function hdr(){doc.setFillColor(40,80,140);doc.rect(0,0,210,14,'F');doc.setTextColor(255,255,255);doc.setFontSize(11);doc.setFont('helvetica','bold');doc.text('NOTA DE CALCUL \u2014 GRINZI DE CUPLARE',ml,9);doc.setFontSize(8);doc.setFont('helvetica','normal');doc.text('CR 2-1-1.1/2022 cap. 2.3.5',ml,13);doc.text('Perete: '+currentPreset+'  |  Data: '+ds,pW-mr,9,{align:'right'});doc.setTextColor(0,0,0);y=20;}
+  const ds=new Date().toLocaleDateString(LANG==='en'?'en-GB':'ro-RO');
+  function hdr(){doc.setFillColor(40,80,140);doc.rect(0,0,210,14,'F');doc.setTextColor(255,255,255);doc.setFontSize(11);doc.setFont('helvetica','bold');doc.text(t('pdfHeaderTitle'),ml,9);doc.setFontSize(8);doc.setFont('helvetica','normal');doc.text('CR 2-1-1.1/2022 cap. 2.3.5',ml,13);doc.text(t('pdfWallData')+currentPreset+'  |  '+t('pdfDate')+ds,pW-mr,9,{align:'right'});doc.setTextColor(0,0,0);y=20;}
   function cy(n){n=n||10;if(y+n>275){doc.addPage();hdr();}}
-  function sT(t){cy(12);doc.setFillColor(240,245,250);doc.rect(ml,y-4,cw,8,'F');doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor(0,102,204);doc.text(t,ml+2,y+1);doc.setTextColor(0,0,0);doc.setFont('helvetica','normal');y+=8;}
+  function sT(txt){cy(12);doc.setFillColor(240,245,250);doc.rect(ml,y-4,cw,8,'F');doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor(0,102,204);doc.text(txt,ml+2,y+1);doc.setTextColor(0,0,0);doc.setFont('helvetica','normal');y+=8;}
   hdr();
   doc.autoTable({startY:22,body:[
-    [{content:'GRINZI DE CUPLARE',colSpan:2,styles:{fontSize:14,fontStyle:'bold',halign:'center',textColor:[28,28,30],fillColor:[255,255,255],cellPadding:{top:6,bottom:2}}}],
-    [{content:'Verificare la forta taietoare \u2014 CR 2-1-1.1/2022 cap. 2.3.5',colSpan:2,styles:{fontSize:9.5,halign:'center',textColor:[0,0,0],fillColor:[255,255,255],cellPadding:{top:1,bottom:2}}}],
-    [{content:'Aplicatie dezvoltata in cadrul lucrarii de disertatie \u2014 Janos Patrik',colSpan:2,styles:{fontSize:8,fontStyle:'italic',halign:'center',textColor:[0,0,0],fillColor:[255,255,255],cellPadding:{top:1,bottom:4}}}],
-    ['Perete: '+currentPreset,'Data: '+ds],
+    [{content:t('pdfBigTitle'),colSpan:2,styles:{fontSize:14,fontStyle:'bold',halign:'center',textColor:[28,28,30],fillColor:[255,255,255],cellPadding:{top:6,bottom:2}}}],
+    [{content:t('pdfSubtitle'),colSpan:2,styles:{fontSize:9.5,halign:'center',textColor:[0,0,0],fillColor:[255,255,255],cellPadding:{top:1,bottom:2}}}],
+    [{content:t('pdfAppLine'),colSpan:2,styles:{fontSize:8,fontStyle:'italic',halign:'center',textColor:[0,0,0],fillColor:[255,255,255],cellPadding:{top:1,bottom:4}}}],
+    [t('pdfWallData')+currentPreset,t('pdfDate')+ds],
   ],margin:{left:ml,right:mr},tableWidth:cw,theme:'plain',styles:{lineColor:[0,102,204],lineWidth:0},
   columnStyles:{0:{fontStyle:'bold',fontSize:9,textColor:[0,102,204]},1:{halign:'right',fontSize:9,textColor:[0,0,0]}},
   didParseCell:function(data){if(data.row.index===3){data.cell.styles.lineWidth={top:0.4,bottom:0.4};data.cell.styles.lineColor=[0,102,204];}},
   });
   y=doc.lastAutoTable.finalY+6;
   const diagPass=m.needDiagonal?m.diagVerifies:(m.o_conc_ok&&m.o_steel_ok);
-  const vt=m.needDiagonal?('CARCASA DIAGONALA - '+(m.diagVerifies?'SE VERIFICA':'NU SE VERIFICA')):('CARCASA ORTOGONALA - '+(diagPass?'SE VERIFICA':'NU SE VERIFICA'));
+  const vt=m.needDiagonal?(m.diagVerifies?t('pdfVerdictDiagPass'):t('pdfVerdictDiagFail')):(diagPass?t('pdfVerdictOrthoPass'):t('pdfVerdictOrthoFail'));
   doc.setFillColor(diagPass?234:253,diagPass?246:236,diagPass?238:227);doc.roundedRect(ml,y,cw,10,2,2,'F');
   doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor(diagPass?46:198,diagPass?125:57,diagPass?50:43);doc.text(vt,ml+4,y+7);doc.setTextColor(0,0,0);doc.setFont('helvetica','normal');y+=16;
-  sT('1. DATE DE INTRARE');
-  doc.autoTable({startY:y,head:[['Parametru','Notatie','Valoare']],body:[
-    ['Latimea grinzii','b_w',fmt(m.bw,0)+' mm'],['Inaltimea grinzii','h_w',fmt(m.hw,0)+' mm'],['Lungimea libera','l_cl',fmt(m.lcl,0)+' mm'],
-    ['Inaltimea utila','d',fmt(m.d,0)+' mm'],['Clasa beton','-',m.conc],['Clasa otel','-',m.steel],
-    ['f_cd','-',fmt(m.fcd)+' MPa'],['f_yd','-',fmt(m.fyd)+' MPa'],['Ductilitate','-',m.ductMode],
+  sT(t('pdfSec1'));
+  doc.autoTable({startY:y,head:[[t('pdfColParam'),t('pdfColNot'),t('pdfColVal')]],body:[
+    [t('pdfInBeamWidth'),'b_w',fmt(m.bw,0)+' mm'],[t('pdfInBeamHeight'),'h_w',fmt(m.hw,0)+' mm'],[t('pdfInClearLen'),'l_cl',fmt(m.lcl,0)+' mm'],
+    [t('pdfInEffDepth'),'d',fmt(m.d,0)+' mm'],[t('pdfInConcClass'),'-',m.conc],[t('pdfInSteelClass'),'-',m.steel],
+    ['f_cd','-',fmt(m.fcd)+' MPa'],['f_yd','-',fmt(m.fyd)+' MPa'],[t('pdfInDuctility'),'-',m.ductMode],
     ['l_cl/h_w','-',fmt(m.ratio,2)],
   ],margin:{left:ml,right:mr},tableWidth:cw,theme:'grid',styles:{lineColor:[180,200,220],lineWidth:0.3,fontSize:8.5,textColor:[0,0,0]},headStyles:{fillColor:[200,215,235],textColor:[0,0,0],fontStyle:'bold',lineColor:[200,215,235]},alternateRowStyles:{fillColor:[240,245,252]},columnStyles:{0:{cellWidth:95},1:{cellWidth:35,fontStyle:'italic'},2:{halign:'right'}}});
   y=doc.lastAutoTable.finalY+6;
-  sT('2. MOMENT CAPABIL SI FORTA TAIETOARE');
-  doc.autoTable({startY:y,head:[['Marime','Valoare']],body:[
+  sT(t('pdfSec2'));
+  doc.autoTable({startY:y,head:[[t('pdfColMarime'),t('pdfColVal')]],body:[
     ['M_Rd,b ('+m.nL+'xO'+m.dL+')',fmt(m.Mrd_b)+' kNm'],
-    ['V_Ed aplicat'+(m.needDiagonal?' (seismic GS)':''),fmt(m.Ved)+' kN'],
+    [t('pdfVedApplied',m.needDiagonal),fmt(m.Ved)+' kN'],
   ],margin:{left:ml,right:mr},tableWidth:cw,theme:'grid',styles:{lineColor:[180,200,220],lineWidth:0.3,fontSize:8.5,textColor:[0,0,0]},headStyles:{fillColor:[200,215,235],textColor:[0,0,0],fontStyle:'bold',lineColor:[200,215,235]},alternateRowStyles:{fillColor:[240,245,252]}});
   y=doc.lastAutoTable.finalY+6;
   if(!m.needDiagonal){
-    sT('3. VERIFICARI CARCASA ORTOGONALA');
-    doc.autoTable({startY:y,head:[['Verificare','Conditie','V_Ed / V_Rd','Util.','Stare']],body:[
-      ['Biela comprimata',m.cFac+'*bw*d*fctd',fmt(m.Ved_ortho)+' / '+fmt(m.VRd_max_o)+' kN',(m.o_conc_util*100).toFixed(0)+'%',m.o_conc_ok?'OK':'NU'],
-      ['Etrieri (otel)','V_Rd,s',fmt(m.Ved_ortho)+' / '+fmt(m.VRd_s_o)+' kN',(m.o_steel_util*100).toFixed(0)+'%',m.o_steel_ok?'OK':'NU'],
-      ['Procent etrieri','rho>=0.20%',(m.rhoST*100).toFixed(2)+'%','-',m.stirOK?'OK':'NU'],
-      ['Procent orizontal','rho>='+(m.rhoI_min*100).toFixed(2)+'%',(m.rhoI*100).toFixed(2)+'%','-',m.intOK?'OK':'NU'],
-      ['Procent longitudinal','rho>='+(m.rhoL_req*100).toFixed(2)+'%',(m.rhoL*100).toFixed(2)+'%','-',m.longOK?'OK':'NU'],
+    sT(t('pdfSec3ortho'));
+    doc.autoTable({startY:y,head:[[t('pdfColCheck'),t('pdfColCondition'),'V_Ed / V_Rd',t('pdfColUtil'),t('pdfColState')]],body:[
+      [t('pdfCheckCompStrut'),m.cFac+'*bw*d*fctd',fmt(m.Ved_ortho)+' / '+fmt(m.VRd_max_o)+' kN',(m.o_conc_util*100).toFixed(0)+'%',m.o_conc_ok?t('pdfStateOK'):t('pdfStateNO')],
+      [t('pdfCheckStirrupsSteel'),'V_Rd,s',fmt(m.Ved_ortho)+' / '+fmt(m.VRd_s_o)+' kN',(m.o_steel_util*100).toFixed(0)+'%',m.o_steel_ok?t('pdfStateOK'):t('pdfStateNO')],
+      [t('pdfCheckStirrupPct'),'rho>=0.20%',(m.rhoST*100).toFixed(2)+'%','-',m.stirOK?t('pdfStateOK'):t('pdfStateNO')],
+      [t('pdfCheckHorizPct'),'rho>='+(m.rhoI_min*100).toFixed(2)+'%',(m.rhoI*100).toFixed(2)+'%','-',m.intOK?t('pdfStateOK'):t('pdfStateNO')],
+      [t('pdfCheckLongPct'),'rho>='+(m.rhoL_req*100).toFixed(2)+'%',(m.rhoL*100).toFixed(2)+'%','-',m.longOK?t('pdfStateOK'):t('pdfStateNO')],
     ],margin:{left:ml,right:mr},tableWidth:cw,theme:'grid',styles:{lineColor:[180,200,220],lineWidth:0.3,fontSize:8,textColor:[0,0,0]},headStyles:{fillColor:[200,215,235],textColor:[0,0,0],fontStyle:'bold',lineColor:[200,215,235]},alternateRowStyles:{fillColor:[240,245,252]}});
   } else {
-    sT('3. VERIFICARI CARCASA DIAGONALA');
-    doc.autoTable({startY:y,head:[['Verificare','Conditie','V_Ed / V_Rd','Util.','Stare']],body:[
-      ['Biela comprimata','acw*bw*z*nu1*fcd',fmt(m.Ved_gs)+' / '+fmt(m.VRd_max_d)+' kN',(m.d_conc_util*100).toFixed(0)+'%',m.d_conc_ok?'OK':'NU'],
-      ['Bare diagonale','2*Asi*fyd*sin a',fmt(m.Ved_gs)+' / '+fmt(m.VRd_s_d)+' kN',(m.d_steel_util*100).toFixed(0)+'%',m.d_steel_ok?'OK':'NU'],
-      ['Bare perimetrale',m.dpN+'xO'+m.dpL,(m.rho_pL*100).toFixed(2)+'%','-',m.dpL_ok?'OK':'NU'],
-      ['Etrieri perimetrali','O'+m.deD+'/'+fmt(m.deS,0),(m.rho_de*100).toFixed(2)+'%','-',m.de_ok?'OK':'NU'],
+    sT(t('pdfSec3diag'));
+    doc.autoTable({startY:y,head:[[t('pdfColCheck'),t('pdfColCondition'),'V_Ed / V_Rd',t('pdfColUtil'),t('pdfColState')]],body:[
+      [t('pdfCheckCompStrut'),'acw*bw*z*nu1*fcd',fmt(m.Ved_gs)+' / '+fmt(m.VRd_max_d)+' kN',(m.d_conc_util*100).toFixed(0)+'%',m.d_conc_ok?t('pdfStateOK'):t('pdfStateNO')],
+      [t('pdfCheckDiagBars'),'2*Asi*fyd*sin a',fmt(m.Ved_gs)+' / '+fmt(m.VRd_s_d)+' kN',(m.d_steel_util*100).toFixed(0)+'%',m.d_steel_ok?t('pdfStateOK'):t('pdfStateNO')],
+      [t('pdfCheckPerimBars'),m.dpN+'xO'+m.dpL,(m.rho_pL*100).toFixed(2)+'%','-',m.dpL_ok?t('pdfStateOK'):t('pdfStateNO')],
+      [t('pdfCheckPerimStirrups'),'O'+m.deD+'/'+fmt(m.deS,0),(m.rho_de*100).toFixed(2)+'%','-',m.de_ok?t('pdfStateOK'):t('pdfStateNO')],
     ],margin:{left:ml,right:mr},tableWidth:cw,theme:'grid',styles:{lineColor:[180,200,220],lineWidth:0.3,fontSize:8,textColor:[0,0,0]},headStyles:{fillColor:[200,215,235],textColor:[0,0,0],fontStyle:'bold',lineColor:[200,215,235]},alternateRowStyles:{fillColor:[240,245,252]}});
   }
   y=doc.lastAutoTable.finalY+6;
   doc.setFontSize(7.5);doc.setFont('helvetica','italic');doc.setTextColor(0,0,0);
-  doc.text('Responsabilitatea pentru rezultatele obtinute revine in exclusivitate utilizatorului.',ml,276);
-  doc.text('Toate valorile trebuie verificate inainte de utilizare.',ml,280);
+  doc.text(t('pdfDisc1'),ml,276);
+  doc.text(t('pdfDisc2'),ml,280);
   doc.setFont('helvetica','normal');
   const tp=doc.internal.getNumberOfPages();
-  for(let i=1;i<=tp;i++){doc.setPage(i);doc.setFontSize(7.5);doc.setTextColor(0,0,0);doc.setDrawColor(40,80,140);doc.setFont('helvetica','normal');doc.line(ml,285,ml+cw,285);doc.text('CR 2-1-1.1/2022',ml,289);doc.text('Pagina '+i+' din '+tp,pW-mr,289,{align:'right'});doc.text('Generat: '+ds,pW/2,289,{align:'center'});}
-  doc.save('Raport_grinzi_cuplare_'+currentPreset+'.pdf');
+  for(let i=1;i<=tp;i++){doc.setPage(i);doc.setFontSize(7.5);doc.setTextColor(0,0,0);doc.setDrawColor(40,80,140);doc.setFont('helvetica','normal');doc.line(ml,285,ml+cw,285);doc.text('CR 2-1-1.1/2022',ml,289);doc.text(t('pdfPage',i,tp),pW-mr,289,{align:'right'});doc.text(t('pdfGenerated')+ds,pW/2,289,{align:'center'});}
+  doc.save(t('pdfFnamePrefix')+currentPreset+'.pdf');
 }
 
 
@@ -586,7 +742,7 @@ function generatePdf(){
   ['P1','P2','P3','P4','P5'].forEach(p=>{
     const saved=loadPreset(p);
     const hasData=!!saved;
-    const info=hasData?describePreset(saved):'(gol)';
+    const info=hasData?describePreset(saved):t('presetEmpty');
     html+=`<div class="modal-preset${p===currentPreset?' sel':''}${!hasData?' empty':''}" data-p="${p}" onclick="toggleModalPreset(this)"><div class="mp-check"></div><span class="mp-name">${p}</span><span class="mp-info">${info}</span></div>`;
   });
   container.innerHTML=html;
@@ -615,6 +771,8 @@ function switchPreset(p){saveCurrentPreset();currentPreset=p;try{localStorage.se
 function loadPreset(p){try{const s=localStorage.getItem(getKey(p));return s?JSON.parse(s):null;}catch(e){return null;}}
 (function(){try{const ap=localStorage.getItem('sw_mod5_active');if(ap)currentPreset=ap;}catch(e){}document.getElementById('presetSel').value=currentPreset;const saved=loadPreset(currentPreset);if(saved)applyState(saved);document.addEventListener('input',saveCurrentPreset);document.addEventListener('change',saveCurrentPreset);document.addEventListener('click',e=>{if(e.target.closest('.seg'))setTimeout(saveCurrentPreset,50);});})();
 
+document.querySelectorAll('#langSeg button').forEach(b=>b.addEventListener('click',()=>setLangMod(b.dataset.lang)));
+applyStaticLang();
 compute();
 </script>
 </body>

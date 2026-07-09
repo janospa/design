@@ -102,6 +102,10 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
 .back-btn svg{width:16px;height:16px;stroke:#8E8E93;stroke-width:2.5;fill:none;stroke-linecap:round;stroke-linejoin:round}
 .back-btn:hover{color:#1C1C1E}
 .back-btn:hover svg{stroke:#1C1C1E}
+.lang-seg{display:inline-flex;background:#E0E0E5;border-radius:8px;padding:2px;gap:2px;margin-left:auto}
+.lang-seg button{padding:5px 11px;font-size:12px;font-weight:600;border:none;border-radius:6px;background:transparent;color:#8E8E93;cursor:pointer;font-family:'Inter',sans-serif;transition:all .12s;letter-spacing:.02em}
+.lang-seg button.on{background:#fff;color:#1C1C1E;box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.topbar{display:flex;align-items:center;gap:8px;padding-right:12px}
 .preset-bar{display:flex;align-items:center;gap:10px;padding:0 16px 10px}
 .preset-bar label{font-size:14px;font-weight:500;color:#8E8E93}
 .preset-bar select{padding:6px 28px 6px 10px;font-size:14px;border:1px solid #C7C7CC;border-radius:8px;background:#fff;color:#1C1C1E;font-family:'Inter',sans-serif;-webkit-appearance:none;appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238E8E93'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
@@ -129,9 +133,12 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
 </head>
 <body>
 
-<a href="index.html" class="back-btn"><svg viewBox="0 0 16 16"><polyline points="10,3 4,8 10,13"/></svg>Toate modulele</a>
+<div class="topbar">
+<a href="index.html" class="back-btn"><svg viewBox="0 0 16 16"><polyline points="10,3 4,8 10,13"/></svg><span data-i18n="backAll">Toate modulele</span></a>
+<div class="lang-seg" id="langSeg"><button data-lang="ro">RO</button><button data-lang="en">EN</button></div>
+</div>
 <div class="preset-bar">
-  <label>Perete:</label>
+  <label data-i18n="wallLabel">Perete:</label>
   <select id="presetSel" onchange="switchPreset(this.value)">
     <option value="P1">P1</option>
     <option value="P2">P2</option>
@@ -144,28 +151,35 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
 <div class="wrap">
 <div class="cols">
 <div>
-  <div class="slabel">Intrari</div>
+  <div class="slabel" data-i18n="inputs">Intrari</div>
 
   <div class="ip">
-    <div class="ph">Geometrie</div>
+    <div class="ph" data-i18n="geometry">Geometrie</div>
     <div class="pb">
-      <div class="row"><div class="rl">Lungimea peretelui <span class="rn">(b)</span></div><div class="rc"><input type="number" inputmode="numeric" id="b" value="1300" min="100" step="10" oninput="calc()"><span class="ru">mm</span></div></div>
-      <div class="row"><div class="rl">Grosimea peretelui <span class="rn">(h)</span></div><div class="rc"><input type="number" inputmode="numeric" id="h" value="300" min="50" step="10" oninput="calc()"><span class="ru">mm</span></div></div>
-      <div class="row"><div class="rl">Acoperire cu beton <span class="rn">(c<sub>nom</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="cnom" value="25" min="10" step="5" oninput="calc()"><span class="ru">mm</span></div></div>
-      <div class="row"><div class="rl">Pas etrieri <span class="rn">(s)</span></div><div class="rc"><input type="number" inputmode="numeric" id="s" value="100" min="50" step="10" oninput="calc()"><span class="ru">mm</span></div></div>
+      <div class="toggle-row">
+        <span data-i18n="confinedZoneType">Tip zona confinata</span>
+        <div class="seg" id="seg-zona">
+          <button id="seg-bulb" class="on" data-v="bulb" onclick="setZona('bulb')" data-i18n="be">Bulb</button>
+          <button id="seg-inima" data-v="inima" onclick="setZona('inima')" data-i18n="web">Inima</button>
+        </div>
+      </div>
+      <div class="row"><div class="rl"><span data-i18n="wallLen">Lungimea peretelui</span> <span class="rn">(b)</span></div><div class="rc"><input type="number" inputmode="numeric" id="b" value="1300" min="100" step="10" oninput="calc()"><span class="ru">mm</span></div></div>
+      <div class="row"><div class="rl"><span data-i18n="wallThick">Grosimea peretelui</span> <span class="rn">(h)</span></div><div class="rc"><input type="number" inputmode="numeric" id="h" value="300" min="50" step="10" oninput="calc()"><span class="ru">mm</span></div></div>
+      <div class="row"><div class="rl"><span data-i18n="concCover">Acoperire cu beton</span> <span class="rn">(c<sub>nom</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="cnom" value="25" min="10" step="5" oninput="calc()"><span class="ru">mm</span></div></div>
+      <div class="row"><div class="rl"><span data-i18n="stirrupSpacing">Pas etrieri</span> <span class="rn">(s)</span></div><div class="rc"><input type="number" inputmode="numeric" id="s" value="100" min="50" step="10" oninput="calc()"><span class="ru">mm</span></div></div>
     </div>
   </div>
 
   <div class="ip">
-    <div class="ph">Materiale</div>
+    <div class="ph" data-i18n="materials">Materiale</div>
     <div class="pb">
-      <div class="sel-field"><label>Clasa beton</label><div class="sel-wrap">
+      <div class="sel-field"><label data-i18n="concClass">Clasa beton</label><div class="sel-wrap">
         <select id="cp" onchange="curC=this.value;updMat();calc()">
           <option>C12/15</option><option>C16/20</option><option>C20/25</option><option>C25/30</option>
           <option selected>C30/37</option><option>C35/45</option><option>C40/50</option><option>C45/55</option>
           <option>C50/60</option><option>C55/67</option><option>C60/75</option>
         </select></div></div>
-      <div class="sel-field"><label>Clasa otel</label><div class="sel-wrap">
+      <div class="sel-field"><label data-i18n="steelClass">Clasa otel</label><div class="sel-wrap">
         <select id="sp" onchange="curS=this.value;updMat();calc()">
           <option>S240B</option><option>S400B</option><option>S500B</option><option selected>S 500</option>
         </select></div></div>
@@ -179,40 +193,40 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
   </div>
 
   <div class="ip">
-    <div class="ph">Armare transversala - directia X (lungul b)</div>
+    <div class="ph" data-i18n="transvReinfX">Armare transversala - directia X (lungul b)</div>
     <div class="pb">
-      <div class="sub">Etrieri perimetrali</div>
-      <div class="row"><div class="rl">Diametru <span class="rn">(&Oslash;<sub>sw,p</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="xpd" value="10" min="4" step="2" oninput="calc()"><span class="ru">mm</span></div></div>
-      <div class="row"><div class="rl">Nr. ramuri <span class="rn">(n<sub>p</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="xpn" value="2" min="2" oninput="calc()"></div></div>
-      <div class="sub">Etrieri intermediari</div>
-      <div class="row"><div class="rl">Diametru <span class="rn">(&Oslash;<sub>sw</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="xmd" value="8" min="4" step="2" oninput="calc()"><span class="ru">mm</span></div></div>
-      <div class="row"><div class="rl">Nr. ramuri <span class="rn">(n)</span></div><div class="rc"><input type="number" inputmode="numeric" id="xmn" value="6" min="0" oninput="calc()"></div></div>
+      <div class="sub" data-i18n="perimStirrups">Etrieri perimetrali</div>
+      <div class="row"><div class="rl"><span data-i18n="diameter">Diametru</span> <span class="rn">(&Oslash;<sub>sw,p</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="xpd" value="10" min="4" step="2" oninput="calc()"><span class="ru">mm</span></div></div>
+      <div class="row"><div class="rl"><span data-i18n="nLegs">Nr. ramuri</span> <span class="rn">(n<sub>p</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="xpn" value="2" min="2" oninput="calc()"></div></div>
+      <div class="sub" data-i18n="intermStirrups">Etrieri intermediari</div>
+      <div class="row"><div class="rl"><span data-i18n="diameter">Diametru</span> <span class="rn">(&Oslash;<sub>sw</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="xmd" value="8" min="4" step="2" oninput="calc()"><span class="ru">mm</span></div></div>
+      <div class="row"><div class="rl"><span data-i18n="nLegs">Nr. ramuri</span> <span class="rn">(n)</span></div><div class="rc"><input type="number" inputmode="numeric" id="xmn" value="6" min="0" oninput="calc()"></div></div>
     </div>
   </div>
 
   <div class="ip">
-    <div class="ph">Armare transversala - directia Y (lungul h)</div>
+    <div class="ph" data-i18n="transvReinfY">Armare transversala - directia Y (lungul h)</div>
     <div class="pb">
-      <div class="sub">Etrieri perimetrali</div>
-      <div class="row"><div class="rl">Diametru <span class="rn">(&Oslash;<sub>sw,p</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="ypd" value="10" min="4" step="2" oninput="calc()"><span class="ru">mm</span></div></div>
-      <div class="row"><div class="rl">Nr. ramuri <span class="rn">(n<sub>p</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="ypn" value="2" min="2" oninput="calc()"></div></div>
-      <div class="sub">Etrieri intermediari</div>
-      <div class="row"><div class="rl">Diametru <span class="rn">(&Oslash;<sub>sw</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="ymd" value="8" min="4" step="2" oninput="calc()"><span class="ru">mm</span></div></div>
-      <div class="row"><div class="rl">Nr. ramuri <span class="rn">(n)</span></div><div class="rc"><input type="number" inputmode="numeric" id="ymn" value="0" min="0" oninput="calc()"></div></div>
+      <div class="sub" data-i18n="perimStirrups">Etrieri perimetrali</div>
+      <div class="row"><div class="rl"><span data-i18n="diameter">Diametru</span> <span class="rn">(&Oslash;<sub>sw,p</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="ypd" value="10" min="4" step="2" oninput="calc()"><span class="ru">mm</span></div></div>
+      <div class="row"><div class="rl"><span data-i18n="nLegs">Nr. ramuri</span> <span class="rn">(n<sub>p</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="ypn" value="2" min="2" oninput="calc()"></div></div>
+      <div class="sub" data-i18n="intermStirrups">Etrieri intermediari</div>
+      <div class="row"><div class="rl"><span data-i18n="diameter">Diametru</span> <span class="rn">(&Oslash;<sub>sw</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="ymd" value="8" min="4" step="2" oninput="calc()"><span class="ru">mm</span></div></div>
+      <div class="row"><div class="rl"><span data-i18n="nLegs">Nr. ramuri</span> <span class="rn">(n)</span></div><div class="rc"><input type="number" inputmode="numeric" id="ymn" value="0" min="0" oninput="calc()"></div></div>
     </div>
   </div>
 
   <div class="ip">
-    <div class="ph">Distante b<sub>i</sub></div>
+    <div class="ph" data-i18n="distancesBi">Distante b<sub>i</sub></div>
     <div class="pb">
       <div class="toggle-row">
-        <span>Mod de calcul al distantelor</span>
+        <span data-i18n="distCalcMode">Mod de calcul al distantelor</span>
         <div class="seg">
-          <button id="seg-auto" class="on" onclick="setMode('auto')">Automat</button>
-          <button id="seg-man" onclick="setMode('manual')">Manual</button>
+          <button id="seg-auto" class="on" onclick="setMode('auto')" data-i18n="autoMode">Automat</button>
+          <button id="seg-man" onclick="setMode('manual')" data-i18n="manualMode">Manual</button>
         </div>
       </div>
-      <div id="auto-note" style="font-size:12px;color:#8E8E93">Distante egale, calculate automat din numarul de ramuri.</div>
+      <div id="auto-note" style="font-size:12px;color:#8E8E93" data-i18n="autoNote">Distante egale, calculate automat din numarul de ramuri.</div>
       <div id="man-x" style="display:none"></div>
       <div id="man-y" style="display:none;margin-top:10px"></div>
     </div>
@@ -220,10 +234,10 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
 </div>
 
 <div>
-  <div class="slabel">Rezultate</div>
+  <div class="slabel" data-i18n="results">Rezultate</div>
 
   <div class="op">
-    <div class="ph">Geometria miezului confinat</div>
+    <div class="ph" data-i18n="confinedCoreGeom">Geometria miezului confinat</div>
     <div class="pb">
       <div class="res-grid">
         <div class="rc2"><div class="rl2">b<sub>0</sub></div><div class="rv" id="b0_r">&mdash;</div><div class="ru2">mm</div></div>
@@ -233,18 +247,18 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
   </div>
 
   <div class="op">
-    <div class="ph">Schita sectiune confinata</div>
+    <div class="ph" data-i18n="confinedSectionSketch">Schita sectiune confinata</div>
     <div class="pb" style="padding-bottom:10px">
       <svg id="sketch" viewBox="0 0 420 240" width="100%" style="display:block"></svg>
     </div>
   </div>
 
   <div class="op">
-    <div class="ph">Distante b<sub>i</sub></div>
+    <div class="ph" data-i18n="distancesBi">Distante b<sub>i</sub></div>
     <div class="pb">
       <div class="res-grid" style="margin-bottom:8px">
-        <div class="rc2"><div class="rl2">b<sub>i</sub> (dir. X)</div><div class="rv" id="bix_r">&mdash;</div><div class="ru2">mm</div></div>
-        <div class="rc2"><div class="rl2">b<sub>i</sub> (dir. Y)</div><div class="rv" id="biy_r">&mdash;</div><div class="ru2">mm</div></div>
+        <div class="rc2"><div class="rl2">b<sub>i</sub> (<span data-i18n="dirX">dir. X</span>)</div><div class="rv" id="bix_r">&mdash;</div><div class="ru2">mm</div></div>
+        <div class="rc2"><div class="rl2">b<sub>i</sub> (<span data-i18n="dirY">dir. Y</span>)</div><div class="rv" id="biy_r">&mdash;</div><div class="ru2">mm</div></div>
       </div>
       <div id="bi-detail-x" class="bi-info" style="margin-bottom:8px"></div>
       <div id="bi-detail-y" class="bi-info"></div>
@@ -252,7 +266,7 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
   </div>
 
   <div class="op">
-    <div class="ph">Arii armatura &amp; armare volumetrica</div>
+    <div class="ph" data-i18n="rebarAreasVol">Arii armatura &amp; armare volumetrica</div>
     <div class="pb">
       <div class="res-grid" style="margin-bottom:8px">
         <div class="rc2"><div class="rl2">A<sub>st,perim</sub></div><div class="rv" id="Ap_r">&mdash;</div><div class="ru2">mm&sup2;</div></div>
@@ -260,13 +274,13 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
       </div>
       <div class="res-grid">
         <div class="rc2"><div class="rl2">&omega;<sub>wk</sub></div><div class="rv" id="wwk_r">&mdash;</div><div class="ru2">&mdash;</div></div>
-        <div class="rc2"><div class="rl2">&sigma;<sub>2,b</sub></div><div class="rv" id="s2b_r">&mdash;</div><div class="ru2">MPa</div></div>
+        <div class="rc2"><div class="rl2">&sigma;<sub><span id="s2_sub">2,b</span></sub></div><div class="rv" id="s2b_r">&mdash;</div><div class="ru2">MPa</div></div>
       </div>
     </div>
   </div>
 
   <div class="op">
-    <div class="ph">Factor de eficienta &alpha;</div>
+    <div class="ph" data-i18n="effFactor">Factor de eficienta &alpha;</div>
     <div class="pb">
       <div class="alfa-box">
         <div class="ar"><span class="al">&Sigma;(J &middot; b<sub>i</sub>&sup2;)</span><span class="av" id="sumb_r">&mdash;</span></div>
@@ -278,41 +292,41 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
   </div>
 
   <div class="op">
-    <div class="ph">Rezistenta betonului confinat</div>
+    <div class="ph" data-i18n="confinedStrength">Rezistenta betonului confinat</div>
     <div class="pb">
-      <div id="ftag" class="ftag f2">Formula 2</div>
+      <div id="ftag" class="ftag f2" data-i18n="formula2">Formula 2</div>
       <div class="res-grid-3">
         <div class="rc2"><div class="rl2">0.05 &middot; f<sub>ck</sub></div><div class="rv" id="chk_r">&mdash;</div><div class="ru2">MPa</div></div>
         <div class="rc2 hl"><div class="rl2">f<sub>ck,c</sub></div><div class="rv" id="fckc_r">&mdash;</div><div class="ru2">MPa</div></div>
         <div class="rc2 hl"><div class="rl2">f<sub>cd,c</sub></div><div class="rv" id="fcdc_r">&mdash;</div><div class="ru2">MPa</div></div>
       </div>
       <div class="res-grid" style="margin-top:8px">
-        <div class="rc2 gr"><div class="rl2">Crestere f<sub>ck,c</sub> vs f<sub>ck</sub></div><div class="rv" id="inc_r">&mdash;</div><div class="ru2">%</div></div>
-        <div class="rc2"><div class="rl2">f<sub>ck</sub> neconfinat</div><div class="rv" id="fckref_r">&mdash;</div><div class="ru2">MPa</div></div>
+        <div class="rc2 gr"><div class="rl2"><span data-i18n="increase">Crestere</span> f<sub>ck,c</sub> vs f<sub>ck</sub></div><div class="rv" id="inc_r">&mdash;</div><div class="ru2">%</div></div>
+        <div class="rc2"><div class="rl2">f<sub>ck</sub> <span data-i18n="unconfined">neconfinat</span></div><div class="rv" id="fckref_r">&mdash;</div><div class="ru2">MPa</div></div>
       </div>
     </div>
   </div>
 
   <div class="op">
-    <div class="ph">Deformatii specifice</div>
+    <div class="ph" data-i18n="specificStrains">Deformatii specifice</div>
     <div class="pb">
       <div class="res-grid" style="margin-bottom:8px">
-        <div class="rc2"><div class="rl2">&epsilon;<sub>c2,c</sub> (confinat)</div><div class="rv" id="ec2c_r">&mdash;</div><div class="ru2">&permil;</div></div>
-        <div class="rc2"><div class="rl2">&epsilon;<sub>cu2,c</sub> (confinat)</div><div class="rv" id="ecu2c_r">&mdash;</div><div class="ru2">&permil;</div></div>
+        <div class="rc2"><div class="rl2">&epsilon;<sub>c2,c</sub> (<span data-i18n="confined">confinat</span>)</div><div class="rv" id="ec2c_r">&mdash;</div><div class="ru2">&permil;</div></div>
+        <div class="rc2"><div class="rl2">&epsilon;<sub>cu2,c</sub> (<span data-i18n="confined">confinat</span>)</div><div class="rv" id="ecu2c_r">&mdash;</div><div class="ru2">&permil;</div></div>
       </div>
       <div class="res-grid" style="margin-bottom:8px">
-        <div class="rc2"><div class="rl2">&epsilon;<sub>c2</sub> (neconfinat)</div><div class="rv" id="ec2_r">&mdash;</div><div class="ru2">&permil;</div></div>
-        <div class="rc2"><div class="rl2">&epsilon;<sub>cu2</sub> (neconfinat)</div><div class="rv" id="ecu2_r">3.50</div><div class="ru2">&permil;</div></div>
+        <div class="rc2"><div class="rl2">&epsilon;<sub>c2</sub> (<span data-i18n="unconfined">neconfinat</span>)</div><div class="rv" id="ec2_r">&mdash;</div><div class="ru2">&permil;</div></div>
+        <div class="rc2"><div class="rl2">&epsilon;<sub>cu2</sub> (<span data-i18n="unconfined">neconfinat</span>)</div><div class="rv" id="ecu2_r">3.50</div><div class="ru2">&permil;</div></div>
       </div>
       <div class="res-grid">
-        <div class="rc2 gr"><div class="rl2">Crestere &epsilon;<sub>c2,c</sub></div><div class="rv" id="inc_ec2_r">&mdash;</div><div class="ru2">%</div></div>
-        <div class="rc2 gr"><div class="rl2">Crestere &epsilon;<sub>cu2,c</sub> (ductilitate)</div><div class="rv" id="inc_ecu2_r">&mdash;</div><div class="ru2">&times;</div></div>
+        <div class="rc2 gr"><div class="rl2"><span data-i18n="increase">Crestere</span> &epsilon;<sub>c2,c</sub></div><div class="rv" id="inc_ec2_r">&mdash;</div><div class="ru2">%</div></div>
+        <div class="rc2 gr"><div class="rl2"><span data-i18n="increase">Crestere</span> &epsilon;<sub>cu2,c</sub> (<span data-i18n="ductility">ductilitate</span>)</div><div class="rv" id="inc_ecu2_r">&mdash;</div><div class="ru2">&times;</div></div>
       </div>
     </div>
   </div>
 
   <div class="op">
-    <div class="ph">Diagrama &sigma;&ndash;&epsilon;</div>
+    <div class="ph" data-i18n="stressStrainDiag">Diagrama &sigma;&ndash;&epsilon;</div>
     <div class="pb">
       <div class="cleg" id="cleg"></div>
       <div style="position:relative;width:100%;height:230px"><canvas id="sc"></canvas></div>
@@ -322,8 +336,8 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
   <div class="op">
     <div class="pb">
       <div class="report-bar">
-        <span class="report-lbl">Export raport de calcul (PDF)</span>
-        <button class="report-btn" id="rptBtn" onclick="generatePdf()">Descarca PDF</button>
+        <span class="report-lbl" data-i18n="exportCalcReport">Export raport de calcul (PDF)</span>
+        <button class="report-btn" id="rptBtn" onclick="generatePdf()" data-i18n="downloadPdf">Descarca PDF</button>
       </div>
       <div class="report-status" id="rptStatus"></div>
     </div>
@@ -331,15 +345,15 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
 </div>
 </div>
 </div>
-<div class="author-footer">Lucrare de disertație — Janos Patrik · UTCN · Facultatea de Construcții · 2026</div>
+<div class="author-footer" data-i18n="footer">Lucrare de disertație — Janos Patrik · UTCN · Facultatea de Construcții · 2026</div>
 
 <div class="modal-overlay" id="exportModal">
   <div class="modal">
-    <h3>Export PDF — selecteaza peretii</h3>
+    <h3 data-i18n="exportSelectWalls">Export PDF — selecteaza peretii</h3>
     <div class="modal-presets" id="modalPresets"></div>
     <div class="modal-btns">
-      <button class="m-cancel" onclick="closeExportModal()">Anuleaza</button>
-      <button class="m-export" id="modalExportBtn" onclick="exportSelected()">Exporta</button>
+      <button class="m-cancel" onclick="closeExportModal()" data-i18n="cancel">Anuleaza</button>
+      <button class="m-export" id="modalExportBtn" onclick="exportSelected()" data-i18n="export">Exporta</button>
     </div>
   </div>
 </div>
@@ -350,8 +364,156 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
 <script>
 const CONC={'C12/15':{fck:12,fcd:8,ec2:0.002},'C16/20':{fck:16,fcd:10.67,ec2:0.002},'C20/25':{fck:20,fcd:13.33,ec2:0.002},'C25/30':{fck:25,fcd:16.67,ec2:0.002},'C30/37':{fck:30,fcd:20,ec2:0.002},'C35/45':{fck:35,fcd:23.33,ec2:0.002},'C40/50':{fck:40,fcd:26.67,ec2:0.002},'C45/55':{fck:45,fcd:30,ec2:0.002},'C50/60':{fck:50,fcd:33.33,ec2:0.002},'C55/67':{fck:55,fcd:36.67,ec2:0.0022},'C60/75':{fck:60,fcd:40,ec2:0.0023}};
 const STEEL={'S240B':{fyk:240,fyd:208.7},'S400B':{fyk:400,fyd:347.8},'S500B':{fyk:500,fyd:434.8},'S 500':{fyk:500,fyd:434.8}};
-let curC='C30/37',curS='S 500',chart=null,lastCalc={},biMode='auto';
+let curC='C30/37',curS='S 500',chart=null,lastCalc={},biMode='auto',zonaMode='bulb';
 let manX={n:7,vals:[]},manY={n:0,vals:[]};
+
+// ═══════════════ i18n ═══════════════
+let LANG=(function(){try{return localStorage.getItem('sw_lang')||'ro';}catch(e){return 'ro';}})();
+const T={
+  backAll:{ro:'Toate modulele',en:'All modules'},
+  wallLabel:{ro:'Perete:',en:'Wall:'},
+  inputs:{ro:'Intrari',en:'Inputs'},
+  results:{ro:'Rezultate',en:'Results'},
+  geometry:{ro:'Geometrie',en:'Geometry'},
+  confinedZoneType:{ro:'Tip zona confinata',en:'Confined zone type'},
+  be:{ro:'Bulb',en:'BE'},
+  web:{ro:'Inima',en:'Web'},
+  wallLen:{ro:'Lungimea peretelui',en:'Wall length'},
+  wallThick:{ro:'Grosimea peretelui',en:'Wall thickness'},
+  concCover:{ro:'Acoperire cu beton',en:'Concrete cover'},
+  stirrupSpacing:{ro:'Pas etrieri',en:'Stirrup spacing'},
+  materials:{ro:'Materiale',en:'Materials'},
+  concClass:{ro:'Clasa beton',en:'Concrete class'},
+  steelClass:{ro:'Clasa otel',en:'Steel class'},
+  transvReinfX:{ro:'Armare transversala - directia X (lungul b)',en:'Transverse reinforcement - direction X (along b)'},
+  transvReinfY:{ro:'Armare transversala - directia Y (lungul h)',en:'Transverse reinforcement - direction Y (along h)'},
+  perimStirrups:{ro:'Etrieri perimetrali',en:'Perimeter stirrups'},
+  intermStirrups:{ro:'Etrieri intermediari',en:'Intermediate stirrups'},
+  diameter:{ro:'Diametru',en:'Diameter'},
+  nLegs:{ro:'Nr. ramuri',en:'No. legs'},
+  distancesBi:{ro:'Distante b<sub>i</sub>',en:'Distances b<sub>i</sub>'},
+  distCalcMode:{ro:'Mod de calcul al distantelor',en:'Distance calculation mode'},
+  autoMode:{ro:'Automat',en:'Automatic'},
+  manualMode:{ro:'Manual',en:'Manual'},
+  autoNote:{ro:'Distante egale, calculate automat din numarul de ramuri.',en:'Equal distances, computed automatically from the number of legs.'},
+  confinedCoreGeom:{ro:'Geometria miezului confinat',en:'Confined core geometry'},
+  confinedSectionSketch:{ro:'Schita sectiune confinata',en:'Confined section sketch'},
+  dirX:{ro:'dir. X',en:'dir. X'},
+  dirY:{ro:'dir. Y',en:'dir. Y'},
+  rebarAreasVol:{ro:'Arii armatura &amp; armare volumetrica',en:'Rebar areas &amp; volumetric ratio'},
+  effFactor:{ro:'Factor de eficienta &alpha;',en:'Efficiency factor &alpha;'},
+  confinedStrength:{ro:'Rezistenta betonului confinat',en:'Confined concrete strength'},
+  formula1:{ro:'Formula 1',en:'Formula 1'},
+  formula2:{ro:'Formula 2',en:'Formula 2'},
+  increase:{ro:'Crestere',en:'Increase'},
+  unconfined:{ro:'neconfinat',en:'unconfined'},
+  confined:{ro:'confinat',en:'confined'},
+  ductility:{ro:'ductilitate',en:'ductility'},
+  specificStrains:{ro:'Deformatii specifice',en:'Specific strains'},
+  stressStrainDiag:{ro:'Diagrama &sigma;&ndash;&epsilon;',en:'&sigma;&ndash;&epsilon; diagram'},
+  exportCalcReport:{ro:'Export raport de calcul (PDF)',en:'Export calculation report (PDF)'},
+  downloadPdf:{ro:'Descarca PDF',en:'Download PDF'},
+  generating:{ro:'Se genereaza...',en:'Generating...'},
+  pdfLoading:{ro:'Libraria PDF se incarca... incearca din nou.',en:'PDF library is loading... try again.'},
+  footer:{ro:'Lucrare de disertație — Janos Patrik · UTCN · Facultatea de Construcții · 2026',en:'Dissertation — Janos Patrik · UTCN · Faculty of Civil Engineering · 2026'},
+  exportSelectWalls:{ro:'Export PDF — selecteaza peretii',en:'Export PDF — select walls'},
+  cancel:{ro:'Anuleaza',en:'Cancel'},
+  export:{ro:'Exporta',en:'Export'},
+  presetEmpty:{ro:'(gol)',en:'(empty)'},
+  // chart legend
+  legUnconf:{ro:fck=>`Neconfinat &mdash; f<sub>ck</sub>=${fck} MPa`,en:fck=>`Unconfined &mdash; f<sub>ck</sub>=${fck} MPa`},
+  legConf:{ro:fckc=>`Confinat &mdash; f<sub>ck,c</sub>=${fckc} MPa`,en:fckc=>`Confined &mdash; f<sub>ck,c</sub>=${fckc} MPa`},
+  chartUnconf:{ro:'Neconfinat',en:'Unconfined'},
+  chartConf:{ro:'Confinat',en:'Confined'},
+  // bi detail
+  biDetailX:{ro:(n,mode)=>`Directia X &mdash; ${n} distante${mode==='auto'?' egale':' (manual)'}`,en:(n,mode)=>`Direction X &mdash; ${n} distance${n===1?'':'s'}${mode==='auto'?' equal':' (manual)'}`},
+  biDetailY:{ro:(n,mode)=>`Directia Y &mdash; ${n} distante${mode==='auto'?' egale':' (manual)'}`,en:(n,mode)=>`Direction Y &mdash; ${n} distance${n===1?'':'s'}${mode==='auto'?' equal':' (manual)'}`},
+  biDetailYnone:{ro:'Directia Y &mdash; fara ramuri intermediare',en:'Direction Y &mdash; no intermediate legs'},
+  manDistLabel:{ro:l=>`Distante b<sub>i</sub> directia ${l}`,en:l=>`Distances b<sub>i</sub> direction ${l}`},
+  // PDF
+  pdfHeaderTitle:{ro:'NOTA DE CALCUL \u2014 BETON CONFINAT',en:'CALCULATION REPORT \u2014 CONFINED CONCRETE'},
+  pdfWallData:{ro:'Perete: ',en:'Wall: '},
+  pdfDate:{ro:'Data: ',en:'Date: '},
+  pdfBigTitle:{ro:'REZISTENTA BETONULUI CONFINAT',en:'CONFINED CONCRETE STRENGTH'},
+  pdfSubtitle:{ro:'Model Mander \u2014 CR 2-1-1.1/2022 si SR EN 1992-1-1 cap. 3',en:'Mander model \u2014 CR 2-1-1.1/2022 and SR EN 1992-1-1 ch. 3'},
+  pdfAppLine:{ro:'Aplicatie dezvoltata in cadrul lucrarii de disertatie \u2014 Janos Patrik',en:'Application developed within the dissertation \u2014 Janos Patrik'},
+  pdfColParam:{ro:'Parametru',en:'Parameter'},
+  pdfColNot:{ro:'Notatie',en:'Notation'},
+  pdfColVal:{ro:'Valoare',en:'Value'},
+  pdfSec1:{ro:'1. DATE DE INTRARE',en:'1. INPUT DATA'},
+  pdfSec2:{ro:'2. SECTIUNE CONFINATA',en:'2. CONFINED SECTION'},
+  pdfSec3:{ro:'3. GEOMETRIA MIEZULUI CONFINAT',en:'3. CONFINED CORE GEOMETRY'},
+  pdfSec4:{ro:'4. ARII DE ARMATURA',en:'4. REINFORCEMENT AREAS'},
+  pdfSec5:{ro:mode=>'5. DISTANTE bi ('+(mode==='auto'?'egale':'manual')+')',en:mode=>'5. DISTANCES bi ('+(mode==='auto'?'equal':'manual')+')'},
+  pdfSec6:{ro:'6. COEFICIENT DE ARMARE VOLUMETRICA',en:'6. VOLUMETRIC REINFORCEMENT RATIO'},
+  pdfSec7:{ro:'7. FACTOR DE EFICIENTA AL CONFINARII',en:'7. CONFINEMENT EFFICIENCY FACTOR'},
+  pdfSec8:{ro:zb=>'8. EFORT EFECTIV DE COMPRESIUNE LATERALA ('+(zb?'INIMA':'BULB / ZONA DE CAPAT')+')',en:zb=>'8. EFFECTIVE LATERAL COMPRESSION STRESS ('+(zb?'WEB':'BOUNDARY ELEMENT')+')'},
+  pdfSec9:{ro:f1=>'9. REZISTENTA BETONULUI CONFINAT - '+(f1?'FORMULA 1':'FORMULA 2'),en:f1=>'9. CONFINED CONCRETE STRENGTH - '+(f1?'FORMULA 1':'FORMULA 2')},
+  pdfSec10:{ro:'10. DEFORMATII SPECIFICE SI DUCTILITATE',en:'10. SPECIFIC STRAINS AND DUCTILITY'},
+  pdfSec11:{ro:'11. DIAGRAMA TENSIUNE-DEFORMATIE',en:'11. STRESS-STRAIN DIAGRAM'},
+  pdfZoneTypeInima:{ro:'Inima perete',en:'Wall web'},
+  pdfZoneTypeBulb:{ro:'Bulb / zona de capat',en:'Boundary element'},
+  pdfInWallLen:{ro:'Lungimea peretelui',en:'Wall length'},
+  pdfInWallThick:{ro:'Grosimea peretelui',en:'Wall thickness'},
+  pdfInCover:{ro:'Acoperire cu beton',en:'Concrete cover'},
+  pdfInStirrupSp:{ro:'Pas etrieri',en:'Stirrup spacing'},
+  pdfInConcClass:{ro:'Clasa beton',en:'Concrete class'},
+  pdfInConcCharStr:{ro:'Rezistenta caracteristica beton',en:'Characteristic concrete strength'},
+  pdfInConcDesStr:{ro:'Rezistenta de calcul beton',en:'Design concrete strength'},
+  pdfInSteelClass:{ro:'Clasa otel',en:'Steel class'},
+  pdfInSteelCharStr:{ro:'Rezistenta caracteristica otel',en:'Characteristic steel strength'},
+  pdfInSteelDesStr:{ro:'Rezistenta de calcul otel',en:'Design steel strength'},
+  pdfInPerimDia:{ro:'Diametru etrier perimetral',en:'Perimeter stirrup diameter'},
+  pdfInPerimLegs:{ro:'Nr. ramuri perimetrale',en:'No. perimeter legs'},
+  pdfInIntermDia:{ro:'Diametru etrier intermediar',en:'Intermediate stirrup diameter'},
+  pdfInIntermLegsX:{ro:'Nr. ramuri intermediare (X)',en:'No. intermediate legs (X)'},
+  pdfInIntermLegsY:{ro:'Nr. ramuri intermediare (Y)',en:'No. intermediate legs (Y)'},
+  pdfInBiMode:{ro:'Mod distante bi',en:'bi distance mode'},
+  pdfBiModeAuto:{ro:'Automat (egale)',en:'Automatic (equal)'},
+  pdfBiModeMan:{ro:'Manual',en:'Manual'},
+  pdfCoreWidth:{ro:'Latimea miezului confinat',en:'Confined core width'},
+  pdfCoreHeight:{ro:'Inaltimea miezului confinat',en:'Confined core height'},
+  pdfAreaPerim:{ro:'Aria etrier perimetral',en:'Perimeter stirrup area'},
+  pdfAreaInterm:{ro:'Aria etrier intermediar',en:'Intermediate stirrup area'},
+  pdfSumJbi:{ro:'Suma J*bi^2',en:'Sum J*bi^2'},
+  pdfVolCoef:{ro:'Coeficient volumetric',en:'Volumetric ratio'},
+  pdfFactSpacing:{ro:'Factor pas etrieri',en:'Stirrup spacing factor'},
+  pdfFactDistrib:{ro:'Factor distributie bare',en:'Bar distribution factor'},
+  pdfFactEff:{ro:'Factor de eficienta',en:'Efficiency factor'},
+  pdfLatComp:{ro:'Compresiune laterala efectiva',en:'Effective lateral compression'},
+  pdfLimit005:{ro:'Limita 0.05*f_ck',en:'Limit 0.05*f_ck'},
+  pdfCharConfStr:{ro:'Rezistenta caracteristica confinata',en:'Characteristic confined strength'},
+  pdfDesConfStr:{ro:'Rezistenta de calcul confinata',en:'Design confined strength'},
+  pdfIncFckc:{ro:'Crestere f_ck,c vs f_ck',en:'Increase f_ck,c vs f_ck'},
+  pdfStrainPeakConf:{ro:'Def. la efort maxim (confinat)',en:'Strain at peak stress (confined)'},
+  pdfStrainPeakUnconf:{ro:'Def. la efort maxim (neconfinat)',en:'Strain at peak stress (unconfined)'},
+  pdfIncEc2:{ro:'Crestere e_c2,c',en:'Increase e_c2,c'},
+  pdfStrainUltConf:{ro:'Def. ultima (confinat)',en:'Ultimate strain (confined)'},
+  pdfStrainUltUnconf:{ro:'Def. ultima (neconfinat)',en:'Ultimate strain (unconfined)'},
+  pdfDeformCap:{ro:'Cap. de deformare (ductilitate)',en:'Deformation capacity (ductility)'},
+  pdfPromile:{ro:'promile',en:'per mille'},
+  pdfDisc1:{ro:'Responsabilitatea pentru rezultatele obtinute revine in exclusivitate utilizatorului.',en:'Responsibility for the obtained results rests solely with the user.'},
+  pdfDisc2:{ro:'Toate valorile trebuie verificate inainte de utilizare.',en:'All values must be verified before use.'},
+  pdfPage:{ro:(i,n)=>'Pagina '+i+' din '+n,en:(i,n)=>'Page '+i+' of '+n},
+  pdfGenerated:{ro:'Generat: ',en:'Generated: '},
+  pdfFnamePrefix:{ro:'Raport_beton_confinat_',en:'Report_confined_concrete_'},
+  statusDownloaded:{ro:n=>`Raport descarcat (${n} perete/pereti).`,en:n=>`Report downloaded (${n} wall${n>1?'s':''}).`}
+};
+function t(key,...args){
+  const e=T[key];
+  if(!e)return key;
+  const v=e[LANG]!==undefined?e[LANG]:e.ro;
+  return typeof v==='function'?v(...args):v;
+}
+function applyStaticLang(){
+  document.documentElement.lang=LANG;
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const k=el.getAttribute('data-i18n');
+    if(T[k]){const v=T[k][LANG];if(v!==undefined&&typeof v!=='function')el.innerHTML=v;}
+  });
+  document.querySelectorAll('#langSeg button').forEach(b=>b.classList.toggle('on',b.dataset.lang===LANG));
+}
+function setLang(l){LANG=l;try{localStorage.setItem('sw_lang',l);}catch(e){}applyStaticLang();if(biMode==='manual')buildManual();calc();}
 
 function updMat(){
   const c=CONC[curC],s=STEEL[curS];
@@ -373,6 +535,14 @@ function setMode(m){
   calc();
 }
 
+function setZona(z){
+  zonaMode=z;
+  document.getElementById('seg-bulb').classList.toggle('on',z==='bulb');
+  document.getElementById('seg-inima').classList.toggle('on',z==='inima');
+  document.getElementById('s2_sub').textContent=z==='bulb'?'2,b':'2,i';
+  calc();
+}
+
 function buildManual(){
   const b=gv('b'),h=gv('h'),cnom=gv('cnom'),xpd=gv('xpd'),ypd=gv('ypd');
   const b0=b-2*cnom-xpd,h0=h-2*cnom-ypd;
@@ -388,7 +558,7 @@ function buildManual(){
 function renderManual(dir,obj,letter){
   const el=document.getElementById('man-'+dir);
   const maxN=dir==='x'?10:6;
-  let h=`<div class="bi-sel-wrap"><label>Distante b<sub>i</sub> directia ${letter}</label><select onchange="setN('${dir}',this.value)">`;
+  let h=`<div class="bi-sel-wrap"><label>${t('manDistLabel',letter)}</label><select onchange="setN('${dir}',this.value)">`;
   for(let i=0;i<=maxN;i++) h+=`<option value="${i}" ${i===obj.n?'selected':''}>${i}</option>`;
   h+=`</select></div>`;
   if(obj.n>0){
@@ -507,15 +677,15 @@ function calc(){
     document.getElementById('bix_r').textContent=biX.length?'man.':'\u2014';
     document.getElementById('biy_r').textContent=biY.length?'man.':'\u2014';
   }
-  let tbx=`<div style="font-size:11px;color:#8E8E93;margin-bottom:4px">Directia X &mdash; ${biX.length} distante${biMode==='auto'?' egale':' (manual)'}</div><table>`;
+  let tbx=`<div style="font-size:11px;color:#8E8E93;margin-bottom:4px">${t('biDetailX',biX.length,biMode)}</div><table>`;
   biX.forEach((v,i)=>tbx+=`<tr><td>b<sub>${i+1}</sub></td><td>${v.toFixed(1)} mm</td><td>J = 2</td></tr>`);
   document.getElementById('bi-detail-x').innerHTML=tbx+`</table>`;
   const dyEl=document.getElementById('bi-detail-y');
   if(biY.length){
-    let tby=`<div style="font-size:11px;color:#8E8E93;margin-bottom:4px">Directia Y &mdash; ${biY.length} distante${biMode==='auto'?' egale':' (manual)'}</div><table>`;
+    let tby=`<div style="font-size:11px;color:#8E8E93;margin-bottom:4px">${t('biDetailY',biY.length,biMode)}</div><table>`;
     biY.forEach((v,i)=>tby+=`<tr><td>b<sub>${i+1}</sub></td><td>${v.toFixed(1)} mm</td><td>J = 2</td></tr>`);
     dyEl.innerHTML=tby+`</table>`;
-  } else dyEl.innerHTML='<div style="font-size:11px;color:#8E8E93">Directia Y &mdash; fara ramuri intermediare</div>';
+  } else dyEl.innerHTML='<div style="font-size:11px;color:#8E8E93">'+t('biDetailYnone')+'</div>';
 
   const sumb=biX.reduce((a,v)=>a+2*v*v,0)+biY.reduce((a,v)=>a+2*v*v,0);
   document.getElementById('sumb_r').textContent=sumb.toFixed(0)+' mm\u00B2';
@@ -531,12 +701,13 @@ function calc(){
   document.getElementById('alfas_r').textContent=alfa_s.toFixed(4);
   document.getElementById('alfan_r').textContent=alfa_n.toFixed(4);
   document.getElementById('alfa_r').textContent=alfa.toFixed(4);
-  const s2b=0.5*alfa*wwk*fck,chk05=0.05*fck;
+  const kz=zonaMode==='bulb'?0.5:1.0;
+  const s2b=kz*alfa*wwk*fck,chk05=0.05*fck;
   document.getElementById('s2b_r').textContent=s2b.toFixed(4);
   document.getElementById('chk_r').textContent=chk05.toFixed(2);
   const f1=s2b<=chk05;
   const ft=document.getElementById('ftag');
-  ft.textContent=f1?'Formula 1':'Formula 2';ft.className='ftag '+(f1?'f1':'f2');
+  ft.textContent=f1?t('formula1'):t('formula2');ft.className='ftag '+(f1?'f1':'f2');
   const fckc=f1?fck*(1+5*(s2b/fck)):fck*(1.125+2.5*(s2b/fck));
   const fcdc=fckc/1.5,inc=(fckc/fck-1)*100;
   const ec2c=ec2*(fckc/fck)*(fckc/fck),ecu2c=0.0035+0.2*(s2b/fck);
@@ -552,13 +723,13 @@ function calc(){
   document.getElementById('inc_ec2_r').textContent='+'+incEc2.toFixed(1);
   document.getElementById('inc_ecu2_r').textContent=ratioEcu2.toFixed(2);
   document.getElementById('cleg').innerHTML=`
-    <span><span style="width:14px;height:0;display:inline-block;border-top:2px dashed #AEAEB2"></span> Neconfinat &mdash; f<sub>ck</sub>=${fck} MPa</span>
-    <span><span style="width:14px;height:2px;display:inline-block;background:#0066CC"></span> Confinat &mdash; f<sub>ck,c</sub>=${fckc.toFixed(2)} MPa</span>`;
+    <span><span style="width:14px;height:0;display:inline-block;border-top:2px dashed #AEAEB2"></span> ${t('legUnconf',fck)}</span>
+    <span><span style="width:14px;height:2px;display:inline-block;background:#0066CC"></span> ${t('legConf',fckc.toFixed(2))}</span>`;
   drawSketch(b,h,cnom,xpd,ypd,b0,h0,biX.length?biX:[b0],biY);
   drawChart(fck,ec2,fckc,ec2c,ecu2c);
   lastCalc={b,h,cnom,s,concrete:curC,fck,fcd,ec2,steel:curS,fyk,fyd,
     xpd,xpn,xmd,xmn,ypd,ypn,ymd,ymn,b0,h0,nX,nY,biMode,biX,biY,
-    sumb,Ast_perim:Ap,Ast_mid:Am,wwk,alfa_s,alfa_n,alfa,s2b,fckc,fcdc,inc,ec2c,ecu2c,incEc2,ratioEcu2,f1};
+    sumb,Ast_perim:Ap,Ast_mid:Am,wwk,alfa_s,alfa_n,alfa,s2b,fckc,fcdc,inc,ec2c,ecu2c,incEc2,ratioEcu2,f1,zona:zonaMode,kz};
 }
 
 function sigPts(fck,ec2,ecu2,n){
@@ -568,8 +739,8 @@ function drawChart(fck,ec2,fckc,ec2c,ecu2c){
   if(chart){chart.destroy();chart=null;}
   chart=new Chart(document.getElementById('sc'),{type:'line',
     data:{datasets:[
-      {label:'Neconfinat',data:sigPts(fck,ec2,0.0035,60),borderColor:'#AEAEB2',borderWidth:1.5,pointRadius:0,tension:0.3,borderDash:[5,4],fill:false},
-      {label:'Confinat',data:sigPts(fckc,ec2c,ecu2c,80),borderColor:'#0066CC',borderWidth:2,pointRadius:0,tension:0.3,fill:false}]},
+      {label:t('chartUnconf'),data:sigPts(fck,ec2,0.0035,60),borderColor:'#AEAEB2',borderWidth:1.5,pointRadius:0,tension:0.3,borderDash:[5,4],fill:false},
+      {label:t('chartConf'),data:sigPts(fckc,ec2c,ecu2c,80),borderColor:'#0066CC',borderWidth:2,pointRadius:0,tension:0.3,fill:false}]},
     options:{responsive:true,maintainAspectRatio:false,parsing:{xAxisKey:'x',yAxisKey:'y'},
       plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`${c.dataset.label}: \u03C3=${c.parsed.y.toFixed(1)} MPa, \u03B5=${c.parsed.x.toFixed(2)}\u2030`}}},
       scales:{x:{type:'linear',title:{display:true,text:'\u03B5 (\u2030)',color:'#1C1C1E',font:{size:12,family:'Inter,sans-serif'}},grid:{color:'rgba(0,0,0,0.05)'},ticks:{color:'#8E8E93',font:{size:11}}},
@@ -593,7 +764,7 @@ function generatePdf(){
   ['P1','P2','P3','P4','P5'].forEach(p=>{
     const saved=loadPreset(p);
     const hasData=!!saved;
-    const info=hasData?describePreset(saved):'(gol)';
+    const info=hasData?describePreset(saved):t('presetEmpty');
     html+=`<div class="modal-preset${p===currentPreset?' sel':''}${!hasData?' empty':''}" data-p="${p}" onclick="toggleModalPreset(this)">
       <div class="mp-check"></div>
       <span class="mp-name">${p}</span>
@@ -624,8 +795,8 @@ function exportSelected(){
   if(!selected.length)return;
   closeExportModal();
   const btn=document.getElementById('rptBtn'),status=document.getElementById('rptStatus');
-  if(typeof window.jspdf==='undefined'){status.textContent='Libraria PDF se incarca... incearca din nou.';return;}
-  btn.disabled=true;btn.textContent='Se genereaza...';
+  if(typeof window.jspdf==='undefined'){status.textContent=t('pdfLoading');return;}
+  btn.disabled=true;btn.textContent=t('generating');
   const origPreset=currentPreset;
   const{jsPDF}=window.jspdf;
   const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
@@ -633,14 +804,14 @@ function exportSelected(){
   let queue=[...selected];
   function processNext(){
     if(queue.length===0){
-      const pW=210,ml=15,mr=15,cw=pW-ml-mr,ds=new Date().toLocaleDateString('ro-RO');
+      const pW=210,ml=15,mr=15,cw=pW-ml-mr,ds=new Date().toLocaleDateString(LANG==='en'?'en-GB':'ro-RO');
       const tp=doc.internal.getNumberOfPages();
-      for(let i=1;i<=tp;i++){doc.setPage(i);doc.setFontSize(7.5);doc.setTextColor(0,0,0);doc.setDrawColor(40,80,140);doc.setFont('helvetica','normal');doc.line(ml,285,ml+cw,285);doc.text('CR 2-1-1.1/2022 / SR EN 1992-1-1',ml,289);doc.text('Pagina '+i+' din '+tp,pW-mr,289,{align:'right'});doc.text('Generat: '+ds,pW/2,289,{align:'center'});}
-      const fname=selected.length===1?'Raport_beton_confinat_'+selected[0]+'.pdf':'Raport_beton_confinat_'+selected.join('_')+'.pdf';
+      for(let i=1;i<=tp;i++){doc.setPage(i);doc.setFontSize(7.5);doc.setTextColor(0,0,0);doc.setDrawColor(40,80,140);doc.setFont('helvetica','normal');doc.line(ml,285,ml+cw,285);doc.text('CR 2-1-1.1/2022 / SR EN 1992-1-1',ml,289);doc.text(t('pdfPage',i,tp),pW-mr,289,{align:'right'});doc.text(t('pdfGenerated')+ds,pW/2,289,{align:'center'});}
+      const fname=selected.length===1?t('pdfFnamePrefix')+selected[0]+'.pdf':t('pdfFnamePrefix')+selected.join('_')+'.pdf';
       doc.save(fname);
       switchPreset(origPreset);
-      btn.disabled=false;btn.textContent='Descarca PDF';
-      status.textContent='Raport descarcat ('+selected.length+' perete/pereti).';
+      btn.disabled=false;btn.textContent=t('downloadPdf');
+      status.textContent=t('statusDownloaded',selected.length);
       setTimeout(()=>status.textContent='',4000);
       return;
     }
@@ -659,8 +830,8 @@ function exportSelected(){
 function buildPdfPage(doc,chartImg,sketchImg,pName){
   pName=pName||currentPreset;
   const d=lastCalc;const pW=210,ml=15,mr=15,cw=pW-ml-mr;
-  const ds=new Date().toLocaleDateString('ro-RO');let y=0;
-  function hdr(){doc.setFillColor(40,80,140);doc.rect(0,0,210,14,'F');doc.setTextColor(255,255,255);doc.setFontSize(11);doc.setFont('helvetica','bold');doc.text('NOTA DE CALCUL \u2014 BETON CONFINAT',ml,9);doc.setFontSize(8);doc.setFont('helvetica','normal');doc.text('CR 2-2022 / SR EN 1992-1-1',ml,13);doc.text('Perete: '+pName+'  |  Data: '+ds,pW-mr,9,{align:'right'});doc.setTextColor(0,0,0);y=20;}
+  const ds=new Date().toLocaleDateString(LANG==='en'?'en-GB':'ro-RO');let y=0;
+  function hdr(){doc.setFillColor(40,80,140);doc.rect(0,0,210,14,'F');doc.setTextColor(255,255,255);doc.setFontSize(11);doc.setFont('helvetica','bold');doc.text(t('pdfHeaderTitle'),ml,9);doc.setFontSize(8);doc.setFont('helvetica','normal');doc.text('CR 2-2022 / SR EN 1992-1-1',ml,13);doc.text(t('pdfWallData')+pName+'  |  '+t('pdfDate')+ds,pW-mr,9,{align:'right'});doc.setTextColor(0,0,0);y=20;}
   function cy(n=10){if(y+n>275){doc.addPage();hdr();}}
   function sT(t){cy(12);doc.setFillColor(240,245,250);doc.rect(ml,y-4,cw,8,'F');doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor(0,102,204);doc.text(t,ml+2,y+1);doc.setTextColor(0,0,0);doc.setFont('helvetica','normal');y+=8;}
   function row(l,f,v,hl){cy(6);doc.setFontSize(8.5);doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);doc.text(l,ml,y);if(f){doc.setTextColor(0,0,0);doc.setFontSize(7.5);doc.text(f,ml+70,y);}doc.setFontSize(9);doc.setFont('helvetica','bold');if(hl)doc.setTextColor(0,102,204);else doc.setTextColor(0,0,0);doc.text(v,pW-mr,y,{align:'right'});doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);y+=5.5;}
@@ -668,10 +839,10 @@ function buildPdfPage(doc,chartImg,sketchImg,pName){
   hdr();
   // Tabular header
   doc.autoTable({startY:22,body:[
-    [{content:'REZISTENTA BETONULUI CONFINAT',colSpan:2,styles:{fontSize:14,fontStyle:'bold',halign:'center',textColor:[28,28,30],fillColor:[255,255,255],cellPadding:{top:6,bottom:2}}}],
-    [{content:'Model Mander \u2014 CR 2-1-1.1/2022 si SR EN 1992-1-1 cap. 3',colSpan:2,styles:{fontSize:9.5,halign:'center',textColor:[0,0,0],fillColor:[255,255,255],cellPadding:{top:1,bottom:2}}}],
-    [{content:'Aplicatie dezvoltata in cadrul lucrarii de disertatie \u2014 Janos Patrik',colSpan:2,styles:{fontSize:8,fontStyle:'italic',halign:'center',textColor:[0,0,0],fillColor:[255,255,255],cellPadding:{top:1,bottom:4}}}],
-    ['Perete: '+pName,'Data: '+ds],
+    [{content:t('pdfBigTitle'),colSpan:2,styles:{fontSize:14,fontStyle:'bold',halign:'center',textColor:[28,28,30],fillColor:[255,255,255],cellPadding:{top:6,bottom:2}}}],
+    [{content:t('pdfSubtitle'),colSpan:2,styles:{fontSize:9.5,halign:'center',textColor:[0,0,0],fillColor:[255,255,255],cellPadding:{top:1,bottom:2}}}],
+    [{content:t('pdfAppLine'),colSpan:2,styles:{fontSize:8,fontStyle:'italic',halign:'center',textColor:[0,0,0],fillColor:[255,255,255],cellPadding:{top:1,bottom:4}}}],
+    [t('pdfWallData')+pName,t('pdfDate')+ds],
   ],margin:{left:ml,right:mr},tableWidth:cw,
   theme:'plain',
   styles:{lineColor:[0,102,204],lineWidth:0},
@@ -679,39 +850,40 @@ function buildPdfPage(doc,chartImg,sketchImg,pName){
   didParseCell:function(data){if(data.row.index===3){data.cell.styles.lineWidth={top:0.4,bottom:0.4};data.cell.styles.lineColor=[0,102,204];}},
   });
   y=doc.lastAutoTable.finalY+6;
-  sT('1. DATE DE INTRARE');
-  doc.autoTable({startY:y,head:[['Parametru','Notatie','Valoare']],body:[['Lungimea peretelui','b',d.b+' mm'],['Grosimea peretelui','h',d.h+' mm'],['Acoperire cu beton','c_nom',d.cnom+' mm'],['Pas etrieri','s',d.s+' mm'],['Clasa beton','-',d.concrete],['Rezistenta caracteristica beton','f_ck',d.fck+' MPa'],['Rezistenta de calcul beton','f_cd',d.fcd.toFixed(2)+' MPa'],['Clasa otel','-',d.steel],['Rezistenta caracteristica otel','f_yk',d.fyk+' MPa'],['Rezistenta de calcul otel','f_yd',d.fyd.toFixed(2)+' MPa'],['Diametru etrier perimetral','O_sw,p',d.xpd+' mm'],['Nr. ramuri perimetrale','n_p',''+d.xpn],['Diametru etrier intermediar','O_sw',d.xmd+' mm'],['Nr. ramuri intermediare (X)','n',''+d.xmn],['Nr. ramuri intermediare (Y)','n',''+d.ymn],['Mod distante bi','-',d.biMode==='auto'?'Automat (egale)':'Manual']],margin:{left:ml,right:mr},tableWidth:cw,theme:'grid',styles:{lineColor:[180,200,220],lineWidth:0.3,fontSize:8.5,textColor:[0,0,0]},headStyles:{fillColor:[200,215,235],textColor:[0,0,0],fontStyle:'bold',lineColor:[200,215,235]},alternateRowStyles:{fillColor:[240,245,252]},columnStyles:{0:{cellWidth:95},1:{cellWidth:35,fontStyle:'italic'},2:{halign:'right'}}});
+  sT(t('pdfSec1'));
+  doc.autoTable({startY:y,head:[[t('pdfColParam'),t('pdfColNot'),t('pdfColVal')]],body:[[t('confinedZoneType'),'-',d.zona==='inima'?t('pdfZoneTypeInima'):t('pdfZoneTypeBulb')],[t('pdfInWallLen'),'b',d.b+' mm'],[t('pdfInWallThick'),'h',d.h+' mm'],[t('pdfInCover'),'c_nom',d.cnom+' mm'],[t('pdfInStirrupSp'),'s',d.s+' mm'],[t('pdfInConcClass'),'-',d.concrete],[t('pdfInConcCharStr'),'f_ck',d.fck+' MPa'],[t('pdfInConcDesStr'),'f_cd',d.fcd.toFixed(2)+' MPa'],[t('pdfInSteelClass'),'-',d.steel],[t('pdfInSteelCharStr'),'f_yk',d.fyk+' MPa'],[t('pdfInSteelDesStr'),'f_yd',d.fyd.toFixed(2)+' MPa'],[t('pdfInPerimDia'),'O_sw,p',d.xpd+' mm'],[t('pdfInPerimLegs'),'n_p',''+d.xpn],[t('pdfInIntermDia'),'O_sw',d.xmd+' mm'],[t('pdfInIntermLegsX'),'n',''+d.xmn],[t('pdfInIntermLegsY'),'n',''+d.ymn],[t('pdfInBiMode'),'-',d.biMode==='auto'?t('pdfBiModeAuto'):t('pdfBiModeMan')]],margin:{left:ml,right:mr},tableWidth:cw,theme:'grid',styles:{lineColor:[180,200,220],lineWidth:0.3,fontSize:8.5,textColor:[0,0,0]},headStyles:{fillColor:[200,215,235],textColor:[0,0,0],fontStyle:'bold',lineColor:[200,215,235]},alternateRowStyles:{fillColor:[240,245,252]},columnStyles:{0:{cellWidth:95},1:{cellWidth:35,fontStyle:'italic'},2:{halign:'right'}}});
   y=doc.lastAutoTable.finalY+6;
-  if(sketchImg){cy(64);sT('2. SECTIUNE CONFINATA');const iw=140,ih=80;doc.addImage(sketchImg,'PNG',(pW-iw)/2,y,iw,ih);y+=ih+6;}
-  cy(30);sT('3. GEOMETRIA MIEZULUI CONFINAT');doc.setFontSize(8);doc.setTextColor(0,0,0);doc.setFont('helvetica','italic');doc.text('b_0 = b - 2*c_nom - O_sw,p     h_0 = h - 2*c_nom - O_sw,p',ml,y);doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);y+=6;
-  row('Latimea miezului confinat','b_0',d.b0+' mm',true);row('Inaltimea miezului confinat','h_0',d.h0+' mm',true);hl();
-  cy(20);sT('4. ARII DE ARMATURA');doc.setFontSize(8);doc.setTextColor(0,0,0);doc.setFont('helvetica','italic');doc.text('A_st = O^2 * pi / 4',ml,y);doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);y+=6;
-  row('Aria etrier perimetral','A_st,perim',d.Ast_perim.toFixed(2)+' mm2');row('Aria etrier intermediar','A_st',d.Ast_mid.toFixed(2)+' mm2');hl();
-  cy(24);sT('5. DISTANTE bi ('+(d.biMode==='auto'?'egale':'manual')+')');
+  if(sketchImg){cy(64);sT(t('pdfSec2'));const iw=140,ih=80;doc.addImage(sketchImg,'PNG',(pW-iw)/2,y,iw,ih);y+=ih+6;}
+  cy(30);sT(t('pdfSec3'));doc.setFontSize(8);doc.setTextColor(0,0,0);doc.setFont('helvetica','italic');doc.text('b_0 = b - 2*c_nom - O_sw,p     h_0 = h - 2*c_nom - O_sw,p',ml,y);doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);y+=6;
+  row(t('pdfCoreWidth'),'b_0',d.b0+' mm',true);row(t('pdfCoreHeight'),'h_0',d.h0+' mm',true);hl();
+  cy(20);sT(t('pdfSec4'));doc.setFontSize(8);doc.setTextColor(0,0,0);doc.setFont('helvetica','italic');doc.text('A_st = O^2 * pi / 4',ml,y);doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);y+=6;
+  row(t('pdfAreaPerim'),'A_st,perim',d.Ast_perim.toFixed(2)+' mm2');row(t('pdfAreaInterm'),'A_st',d.Ast_mid.toFixed(2)+' mm2');hl();
+  cy(24);sT(t('pdfSec5',d.biMode));
   if(d.biMode==='auto'){doc.setFontSize(8);doc.setTextColor(0,0,0);doc.setFont('helvetica','italic');doc.text('bi = b_0 / (n_total - 1)',ml,y);doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);y+=6;}
   d.biX.forEach((v,i)=>row('bi,X #'+(i+1),'',v.toFixed(1)+' mm'));
   if(d.biY.length) d.biY.forEach((v,i)=>row('bi,Y #'+(i+1),'',v.toFixed(1)+' mm'));
-  row('Suma J*bi^2','S(J*bi2)',d.sumb.toFixed(0)+' mm2',true);hl();
-  cy(18);sT('6. COEFICIENT DE ARMARE VOLUMETRICA');doc.setFontSize(7.5);doc.setTextColor(0,0,0);doc.setFont('helvetica','italic');doc.text('w_wk = [(n_p*A_p + n*A_st)*b_0 + (n_p*A_p)*h_0] / (s*b_0*h_0) * f_yk/f_ck',ml,y);doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);y+=6;
-  row('Coeficient volumetric','w_wk',d.wwk.toFixed(4),true);hl();
-  cy(24);sT('7. FACTOR DE EFICIENTA AL CONFINARII');doc.setFontSize(7.5);doc.setTextColor(0,0,0);doc.setFont('helvetica','italic');doc.text('alfa = (1 - s/2b_0)(1 - s/2h_0)(1 - S bi2 / 6h_0 b_0)',ml,y);doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);y+=6;
-  row('Factor pas etrieri','alfa_s',d.alfa_s.toFixed(4));row('Factor distributie bare','alfa_n',d.alfa_n.toFixed(4));row('Factor de eficienta','alfa',d.alfa.toFixed(4),true);hl();
-  cy(18);sT('8. EFORT EFECTIV DE COMPRESIUNE LATERALA');doc.setFontSize(8);doc.setTextColor(0,0,0);doc.setFont('helvetica','italic');doc.text('sigma_2,b = 0.5 * alfa * w_wk * f_ck',ml,y);doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);y+=6;
-  row('Compresiune laterala efectiva','sigma_2,b',d.s2b.toFixed(4)+' MPa',true);row('Limita 0.05*f_ck','-',(0.05*d.fck).toFixed(2)+' MPa');hl();
-  cy(22);sT('9. REZISTENTA BETONULUI CONFINAT - '+(d.f1?'FORMULA 1':'FORMULA 2'));doc.setFontSize(8);doc.setTextColor(0,0,0);doc.setFont('helvetica','italic');doc.text(d.f1?'f_ck,c = f_ck * (1 + 5 * sigma2/f_ck)':'f_ck,c = f_ck * (1.125 + 2.5 * sigma2/f_ck)',ml,y);doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);y+=6;
-  row('Rezistenta caracteristica confinata','f_ck,c',d.fckc.toFixed(2)+' MPa',true);row('Rezistenta de calcul confinata','f_cd,c',d.fcdc.toFixed(2)+' MPa',true);row('Crestere f_ck,c vs f_ck','-','+'+d.inc.toFixed(2)+' %',true);hl();
-  cy(24);sT('10. DEFORMATII SPECIFICE SI DUCTILITATE');doc.setFontSize(7.5);doc.setTextColor(0,0,0);doc.setFont('helvetica','italic');doc.text('e_c2,c = e_c2 * (f_ck,c/f_ck)^2     e_cu2,c = 0.0035 + 0.2*sigma2/f_ck',ml,y);doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);y+=6;
-  row('Def. la efort maxim (confinat)','e_c2,c',(d.ec2c*1000).toFixed(4)+' promile',true);
-  row('Def. la efort maxim (neconfinat)','e_c2',(d.ec2*1000).toFixed(2)+' promile');
-  row('Crestere e_c2,c','-','+'+d.incEc2.toFixed(1)+' %',true);
-  row('Def. ultima (confinat)','e_cu2,c',(d.ecu2c*1000).toFixed(4)+' promile',true);
-  row('Def. ultima (neconfinat)','e_cu2','3.50 promile');
-  row('Cap. de deformare (ductilitate)','e_cu2,c/e_cu2','x '+d.ratioEcu2.toFixed(2),true);hl();
-  if(chartImg){cy(80);sT('11. DIAGRAMA TENSIUNE-DEFORMATIE');const iw=150,ih=75;doc.addImage(chartImg,'PNG',(pW-iw)/2,y,iw,ih);y+=ih+4;}
+  row(t('pdfSumJbi'),'S(J*bi2)',d.sumb.toFixed(0)+' mm2',true);hl();
+  cy(18);sT(t('pdfSec6'));doc.setFontSize(7.5);doc.setTextColor(0,0,0);doc.setFont('helvetica','italic');doc.text('w_wk = [(n_p*A_p + n*A_st)*b_0 + (n_p*A_p)*h_0] / (s*b_0*h_0) * f_yk/f_ck',ml,y);doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);y+=6;
+  row(t('pdfVolCoef'),'w_wk',d.wwk.toFixed(4),true);hl();
+  cy(24);sT(t('pdfSec7'));doc.setFontSize(7.5);doc.setTextColor(0,0,0);doc.setFont('helvetica','italic');doc.text('alfa = (1 - s/2b_0)(1 - s/2h_0)(1 - S bi2 / 6h_0 b_0)',ml,y);doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);y+=6;
+  row(t('pdfFactSpacing'),'alfa_s',d.alfa_s.toFixed(4));row(t('pdfFactDistrib'),'alfa_n',d.alfa_n.toFixed(4));row(t('pdfFactEff'),'alfa',d.alfa.toFixed(4),true);hl();
+  {const zb=d.zona==='inima';const s2sym=zb?'sigma_2,i':'sigma_2,b';const s2f=zb?'sigma_2,i = alfa * w_wk * f_ck':'sigma_2,b = 0.5 * alfa * w_wk * f_ck';
+  cy(18);sT(t('pdfSec8',zb));doc.setFontSize(8);doc.setTextColor(0,0,0);doc.setFont('helvetica','italic');doc.text(s2f,ml,y);doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);y+=6;
+  row(t('pdfLatComp'),s2sym,d.s2b.toFixed(4)+' MPa',true);row(t('pdfLimit005'),'-',(0.05*d.fck).toFixed(2)+' MPa');hl();}
+  cy(22);sT(t('pdfSec9',d.f1));doc.setFontSize(8);doc.setTextColor(0,0,0);doc.setFont('helvetica','italic');doc.text(d.f1?'f_ck,c = f_ck * (1 + 5 * sigma2/f_ck)':'f_ck,c = f_ck * (1.125 + 2.5 * sigma2/f_ck)',ml,y);doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);y+=6;
+  row(t('pdfCharConfStr'),'f_ck,c',d.fckc.toFixed(2)+' MPa',true);row(t('pdfDesConfStr'),'f_cd,c',d.fcdc.toFixed(2)+' MPa',true);row(t('pdfIncFckc'),'-','+'+d.inc.toFixed(2)+' %',true);hl();
+  cy(24);sT(t('pdfSec10'));doc.setFontSize(7.5);doc.setTextColor(0,0,0);doc.setFont('helvetica','italic');doc.text('e_c2,c = e_c2 * (f_ck,c/f_ck)^2     e_cu2,c = 0.0035 + 0.2*sigma2/f_ck',ml,y);doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);y+=6;
+  row(t('pdfStrainPeakConf'),'e_c2,c',(d.ec2c*1000).toFixed(4)+' '+t('pdfPromile'),true);
+  row(t('pdfStrainPeakUnconf'),'e_c2',(d.ec2*1000).toFixed(2)+' '+t('pdfPromile'));
+  row(t('pdfIncEc2'),'-','+'+d.incEc2.toFixed(1)+' %',true);
+  row(t('pdfStrainUltConf'),'e_cu2,c',(d.ecu2c*1000).toFixed(4)+' '+t('pdfPromile'),true);
+  row(t('pdfStrainUltUnconf'),'e_cu2','3.50 '+t('pdfPromile'));
+  row(t('pdfDeformCap'),'e_cu2,c/e_cu2','x '+d.ratioEcu2.toFixed(2),true);hl();
+  if(chartImg){cy(80);sT(t('pdfSec11'));const iw=150,ih=75;doc.addImage(chartImg,'PNG',(pW-iw)/2,y,iw,ih);y+=ih+4;}
   // Disclaimer at bottom of last page
   doc.setFontSize(7.5);doc.setFont('helvetica','italic');doc.setTextColor(0,0,0);
-  doc.text('Responsabilitatea pentru rezultatele obtinute revine in exclusivitate utilizatorului.',ml,276);
-  doc.text('Toate valorile trebuie verificate inainte de utilizare.',ml,280);
+  doc.text(t('pdfDisc1'),ml,276);
+  doc.text(t('pdfDisc2'),ml,280);
   doc.setFont('helvetica','normal');
 }
 
@@ -745,6 +917,7 @@ function applyState(state){
       b.classList.toggle('on',match);
       if(match){
         if(seg.id==='seg-bi'){biMode=sv==='Automat'?'auto':'manual';toggleBiMode();}
+        if(seg.id==='seg-zona'){zonaMode=sv;document.getElementById('s2_sub').textContent=sv==='bulb'?'2,b':'2,i';}
       }
     });
   });
@@ -776,6 +949,8 @@ function loadPreset(p){
   document.addEventListener('click',e=>{if(e.target.closest('.seg'))setTimeout(saveCurrentPreset,50);});
 })();
 
+document.querySelectorAll('#langSeg button').forEach(b=>b.addEventListener('click',()=>setLang(b.dataset.lang)));
+applyStaticLang();
 updMat();calc();
 </script>
 </body>
