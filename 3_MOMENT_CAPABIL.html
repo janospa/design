@@ -334,9 +334,22 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
 <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
 <script>
 const CONC={'C12/15':{fck:12},'C16/20':{fck:16},'C20/25':{fck:20},'C25/30':{fck:25},'C30/37':{fck:30},'C35/45':{fck:35},'C40/50':{fck:40},'C45/55':{fck:45},'C50/60':{fck:50},'C55/67':{fck:55},'C60/75':{fck:60}};
-const STEEL={'S240B':{fyk:240},'S400B':{fyk:400},'S500B':{fyk:500},'S 500':{fyk:500}};
+// euk = alungirea caracteristica la forta maxima; eud = 0,9*euk (SR EN 1992-1-1).
+// Limiteaza deformatia otelului pe ramura de intindere a diagramei N-M.
+const STEEL={'S240B':{fyk:240,euk:0.05},'S400B':{fyk:400,euk:0.05},
+             'S500B':{fyk:500,euk:0.05},'S 500':{fyk:500,euk:0.05}};
 let curC='C50/60',curS='S 500',confMode='none',nmchart=null,lastCalc={};
-const NF=1000;
+// NF = numarul de fibre de integrare pe inaltimea sectiunii.
+// Integrarea este in trepte: fortele se schimba discret cand axa neutra
+// traverseaza o fibra. Un NF prea mic subestimeaza M_Rd si lasa un rezidual de
+// echilibru care NU poate fi eliminat prin mai multe iteratii de bisectie
+// (functia sare peste tinta), ci doar marind NF.
+// Convergenta pe un perete tipic (l_w=2750, bulbi 650x400, C50/60):
+//   NF=100 -> M_Rd=10271 kNm (rezidual -223 kN)   [valoare veche, imprecisa]
+//   NF=1000 -> M_Rd=10578 kNm (rezidual  -37 kN)
+//   NF=5000 -> M_Rd=10619 kNm (rezidual   -6 kN)
+//   NF=20000-> M_Rd=10625 kNm (rezidual   -2 kN)  [diferenta 0,06% fata de 5000]
+const NF=5000;
 
 // ═══════════════ i18n ═══════════════
 let LANG=(function(){try{return localStorage.getItem('sw_lang')||'ro';}catch(e){return 'ro';}})();
@@ -526,6 +539,7 @@ function buildModel(){
   const fck=CONC[curC].fck, fcd=fck/1.5;
   const fckc=gv('fckc'), fcdc=fckc/1.5;
   const fyd=STEEL[curS].fyk/1.15;
+  const eud=0.9*STEEL[curS].euk;   // deformatia ultima de calcul a otelului
   const Es=200000;
   const ec2_nc=0.002, ecu_nc=0.0035;
   const ec2_c=gv('ec2c')/1000, ecu_c=gv('ecu2c')/1000;
@@ -572,7 +586,7 @@ function buildModel(){
   const cntWeb = nWeb * in_r;
 
   return {lw,bw0,bf1,lf1,li1,bf2,lf2,li2,lwi,cnom,detr,
-    fck,fcd,fckc,fcdc,fyd,Es,ec2_nc,ecu_nc,ec2_c,ecu_c,fckcw,fcdcw,ec2_cw,ecu_cw,
+    fck,fcd,fckc,fcdc,fyd,eud,Es,ec2_nc,ecu_nc,ec2_c,ecu_c,fckcw,fcdcw,ec2_cw,ecu_cw,
     steelFibers,As_b1,As_b2,As_web,As_tot,Ac,cntB1,cntB2,cntWeb,
     bars:{b1c_n,b1c_d,b1s_n,b1s_d,b1l_n,b1l_d,b1l_r,b2c_n,b2c_d,b2s_n,b2s_d,b2l_n,b2l_d,b2l_r,in_d,in_s,in_r,nWeb}};
 }
@@ -634,6 +648,10 @@ function sectionForces(X,m,compFromRef){
     if(e<epsEdge) epsEdge=e;     // tightest governs
   }
   if(!isFinite(epsEdge)) epsEdge=0;
+  // La X foarte mic nicio fibra nu are shp>0 si epsEdge ramane 0 => toate
+  // fortele ies nule, deci N_int sare artificial la 0. Este o degenerare
+  // numerica, nu o stare fizica: sectiunea complet intinsa are N = N_Rd,t, nu 0.
+  // Se evita pornind bisectia de la X >= 1 mm (vezi solveX).
   let Fb=0,Fbl=0;
   for(let i=0;i<NF;i++){
     const lc=(i+0.5)*dx;
@@ -655,44 +673,55 @@ function sectionForces(X,m,compFromRef){
   return {Fb:Fb/1e3,Fa:Fa/1e3,Fbl,Fal,Nint:(Fb+Fa)/1e3,epsEdge};
 }
 function solveX(Ntarget,m,compFromRef){
+  const F=X=>sectionForces(X,m,compFromRef).Nint-Ntarget;
+  // Bisectie pe X (pozitia axei neutre, mm de la marginea comprimata).
+  // ATENTIE: la X -> 0 sectiunea degenereaza (nicio fibra nu mai are shp>0,
+  // epsEdge devine 0 si toate fortele ies nule) => N_int sare artificial la 0.
+  // Capatul inferior TREBUIE luat la X mic dar nenul (1 mm), unde sectiunea este
+  // efectiv toata intinsa si N_int ~ N_Rd,t. Pornind de la X=1e-3 (punct
+  // degenerat) bisectia esua pentru N negativ, desi solutia exista.
   let lo=1,hi=m.lw*6;
-  let flo=sectionForces(lo,m,compFromRef).Nint-Ntarget;
-  let fhi=sectionForces(hi,m,compFromRef).Nint-Ntarget;
-  if(flo*fhi>0){if(Math.abs(flo)<Math.abs(fhi))return{X:lo,...sectionForces(lo,m,compFromRef)};return{X:hi,...sectionForces(hi,m,compFromRef)};}
-  for(let it=0;it<80;it++){const mid=(lo+hi)/2;const fm=sectionForces(mid,m,compFromRef).Nint-Ntarget;if(flo*fm<=0){hi=mid;fhi=fm;}else{lo=mid;flo=fm;}}
-  const X=(lo+hi)/2;return{X,...sectionForces(X,m,compFromRef)};
+  let flo=F(lo),fhi=F(hi);
+  let guard=0;
+  while(flo*fhi>0 && guard++<200){
+    if(Math.abs(flo)<Math.abs(fhi)){lo/=2; if(lo<1e-6) break; flo=F(lo);}
+    else{hi*=2; if(hi>m.lw*1e6) break; fhi=F(hi);}
+  }
+  if(flo*fhi>0){
+    // tinta in afara capacitatii sectiunii (N_Ed < N_Rd,t sau > N_Rd,c)
+    const X=(Math.abs(flo)<Math.abs(fhi))?lo:hi;
+    return{X,...sectionForces(X,m,compFromRef),converged:false};
+  }
+  for(let it=0;it<200;it++){
+    const mid=(lo+hi)/2, fm=F(mid);
+    if(flo*fm<=0){hi=mid;fhi=fm;}else{lo=mid;flo=fm;}
+    if(Math.abs(fm)<1e-9) break;
+  }
+  const X=(lo+hi)/2;
+  return{X,...sectionForces(X,m,compFromRef),converged:true};
 }
-// Centrul fortelor plastice al sectiunii, masurat de la marginea de referinta
-// (l=0). Este axa fata de care se raporteaza momentul capabil: ponderarea se
-// face cu f_cd al FIECAREI zone (bulbii confinati au f_cdc, inima f_cd sau
-// f_cdcw) si cu f_yd pentru otel. Numai fata de aceasta axa compresiunea si
-// intinderea centrica dau M=0, deci diagrama de interactiune se inchide corect
-// la sectiune nesimetrica (bulbi armati diferit). Mijlocul geometric l_w/2 este
-// valabil doar pentru sectiuni simetrice.
-function plasticCG(m){
-  const bulbConf=(confMode==='bulb'||confMode==='all');
-  const webConf=(confMode==='all');
-  const fb=bulbConf?m.fcdc:m.fcd;
-  const fw=webConf?m.fcdcw:m.fcd;
-  const zones=[[0,m.bf2,m.lf2,fb],[m.bf2,m.li2,m.bw0,fw],
-               [m.bf2+m.li2,m.lwi,m.bw0,fw],
-               [m.bf2+m.li2+m.lwi,m.li1,m.bw0,fw],
-               [m.bf2+m.li2+m.lwi+m.li1,m.bf1,m.lf1,fb]];
-  let SF=0,SM=0;
-  for(const [l0,len,w,f] of zones){
+// Centrul de greutate GEOMETRIC al sectiunii de beton, masurat de la marginea
+// de referinta (l=0). Este axa fata de care ETABS raporteaza eforturile pe
+// *pier*, deci M_Rd trebuie raportat la aceeasi axa pentru consistenta cu
+// modelul. Se calculeaza doar din forma sectiunii de beton (fara armatura si
+// fara ponderare cu f_cd). La sectiune simetrica coincide cu mijlocul geometric
+// l_w/2; la bulbi diferiti geometric este deplasat spre bulbul mai mare.
+function geomCG(m){
+  const zones=[[0,m.bf2,m.lf2],[m.bf2,m.li2,m.bw0],
+               [m.bf2+m.li2,m.lwi,m.bw0],
+               [m.bf2+m.li2+m.lwi,m.li1,m.bw0],
+               [m.bf2+m.li2+m.lwi+m.li1,m.bf1,m.lf1]];
+  let SA=0,SS=0;
+  for(const [l0,len,w] of zones){
     if(len<=0) continue;
-    const F=len*w*f;
-    SF+=F; SM+=F*(l0+len/2);
+    const A=len*w;
+    SA+=A; SS+=A*(l0+len/2);
   }
-  for(const sf of m.steelFibers){
-    const F=sf.A*m.fyd;
-    SF+=F; SM+=F*sf.l;
-  }
-  return SM/SF;
+  return SS/SA;
 }
 function momentRd(res,m){
   const Mfb=res.Fbl/1e6,Mfa=res.Fal/1e6,N=res.Nint;
-  return -Mfa-Mfb+N*(plasticCG(m)/1e3);
+  return -Mfa-Mfb+N*(geomCG(m)/1e3);
 }
 
 function calc(){
@@ -708,7 +737,15 @@ function calc(){
   document.getElementById('x_r').textContent=res.X.toFixed(1);
   document.getElementById('nint_r').textContent=res.Nint.toFixed(1);
   document.getElementById('next_r').textContent=Ned.toFixed(1);
-  document.getElementById('diff_r').textContent=(Ned-res.Nint).toFixed(2);
+  const dEq=Ned-res.Nint;
+  const diffEl=document.getElementById('diff_r');
+  diffEl.textContent=dEq.toFixed(2);
+  // Echilibrul trebuie satisfacut exact (rezidual ~0). Un rezidual semnificativ
+  // inseamna ca N_Ed depaseste capacitatea sectiunii (in afara curbei N-M) sau
+  // ca solverul nu a convergit: rezultatul M_Rd NU este valabil.
+  const eqBad=(res.converged===false)||Math.abs(dEq)>Math.max(0.01,Math.abs(Ned)*1e-5);
+  diffEl.style.color=eqBad?'#C0392B':'';
+  diffEl.title=eqBad?'Echilibru nesatisfacut: N_Ed in afara capacitatii sectiunii sau solver neconvergent. M_Rd nu este valabil.':'';
   document.getElementById('fb_r').textContent=res.Fb.toFixed(1);
   document.getElementById('fa_r').textContent=res.Fa.toFixed(1);
   const util=Math.abs(Med)/Mrd*100;
@@ -726,7 +763,7 @@ function calc(){
   // Sectiune nesimetrica (bulbi armati diferit): M_Rd(+) != M_Rd(-) la acelasi N.
   // Se genereaza DOUA ramuri distincte, baleiate dupa X (nu dupa N), fiecare cu
   // semnul ei; unite dau conturul inchis, asimetric, al diagramei de interactiune.
-  const nDiv=200,xStart=m.cnom*1.2,xEnd=m.lw*60;
+  const nDiv=120,xStart=1,xEnd=m.lw*60;
   const branch=[[],[]];   // 0 = M pozitiv (compFromRef=true), 1 = M negativ
   for(let side=0;side<=1;side++){
     const cfr=(side===0);
