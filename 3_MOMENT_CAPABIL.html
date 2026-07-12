@@ -600,10 +600,16 @@ function sigC(eps,m,zone){
   if(zone==='bulb'&&bulbConf){ fcd=m.fcdc; ec2=m.ec2_c; ecu=m.ecu_c; }
   else if(zone==='web'&&webConf){ fcd=m.fcdcw; ec2=m.ec2_cw; ecu=m.ecu_cw; }
   else { fcd=m.fcd; ec2=(zone==='bulb')?m.ec2_nc:m.ec2_nc; ecu=m.ecu_nc; }
-  if(eps>ecu) return 0;
   const r=eps/ec2;
   // Lege parabola-dreptunghi (SR EN 1992-1-1:2004 / Encipedia Anexa A):
   // parabola pana la ec2, apoi palier constant la fcd pana la ecu.
+  // NU se anuleaza tensiunea peste ecu ("if(eps>ecu) return 0"): epsEdge este
+  // calibrat astfel incat fibra critica sa fie EXACT la ecu, iar erorile de
+  // virgula mobila o pot plasa cu un ulp deasupra pragului. Tensiunea ei ar
+  // sari atunci de la fcd la 0 (salt de fcd*w*dx ~ 7 kN pe o fibra de bulb),
+  // ceea ce introducea dinti de fierastrau in N(X) si impiedica bisectia sa
+  // atinga echilibrul exact. ecu este limita domeniului, nu un prag peste care
+  // contributia dispare: fibra ramane la palierul fcd.
   if(eps<=ec2) return fcd*(2*r-r*r);
   return fcd;
 }
