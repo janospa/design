@@ -467,6 +467,11 @@ const T={
   pdfColCondition:{ro:'Conditie',en:'Condition'},
   pdfColUtil:{ro:'Util.',en:'Util.'},
   pdfColState:{ro:'Stare',en:'State'},
+  pdfSec4:{ro:'4. SCHITE DE ARMARE',en:'4. REINFORCEMENT SKETCHES'},
+  pdfImgElev:{ro:'Schita de armare (elevatie)',en:'Reinforcement sketch (elevation)'},
+  pdfImgSect:{ro:'Sectiune transversala A-A',en:'Cross section A-A'},
+  pdfImgCapOrtho:{ro:'Carcasa ortogonala: bare longitudinale la extremitatile sectiunii, bare intermediare distribuite uniform pe miez, etrieri perimetrali si agrafe cu ciocuri la 135 grade.',en:'Orthogonal cage: longitudinal bars at the section ends, intermediate bars uniformly distributed over the core, perimeter stirrups and ties with 135 degree hooks.'},
+  pdfImgCapDiag:{ro:'Bare diagonale si confinare perimetrala: bare longitudinale distribuite pe perimetru, etrieri perimetrali de confinare, agrafe cu ciocuri la 135 grade. Barele diagonale apar in sectiune ca doua carcase, sus si jos.',en:'Diagonal bars and perimeter confinement: longitudinal bars distributed around the perimeter, perimeter confining stirrups, ties with 135 degree hooks. Diagonal bars appear in the section as two cages, top and bottom.'},
   pdfSec1:{ro:'1. DATE DE INTRARE',en:'1. INPUT DATA'},
   pdfSec2:{ro:'2. MOMENT CAPABIL SI FORTA TAIETOARE',en:'2. MOMENT RESISTANCE AND SHEAR FORCE'},
   pdfSec3ortho:{ro:'3. VERIFICARI CARCASA ORTOGONALA',en:'3. ORTHOGONAL CAGE CHECKS'},
@@ -912,13 +917,49 @@ function drawSketch(){
   if(need)$('anchor-note').innerHTML=t('skAnchorNote',m.nd,m.dd,fmt(m.alpha,1),fmt(36*m.dd,0),m.dpN,m.dpL,m.deD,fmt(m.deS,0));
 }
 
-function exportPDF(sharedDoc,isLast){
+
+// ===== SVG -> PNG pentru raport =====
+function svgToPng(hostId,scale){
+  return new Promise(function(res){
+    try{
+      const host=document.getElementById(hostId);
+      const svg=host?host.querySelector('svg'):null;
+      if(!svg){res(null);return;}
+      const clone=svg.cloneNode(true);
+      const vb=(svg.getAttribute('viewBox')||'0 0 440 360').split(/\s+/).map(Number);
+      const w=vb[2]||440, h=vb[3]||360, k=scale||3;
+      clone.setAttribute('width',w);clone.setAttribute('height',h);
+      clone.setAttribute('xmlns','http://www.w3.org/2000/svg');
+      const bg=document.createElementNS('http://www.w3.org/2000/svg','rect');
+      bg.setAttribute('x',vb[0]||0);bg.setAttribute('y',vb[1]||0);
+      bg.setAttribute('width',w);bg.setAttribute('height',h);bg.setAttribute('fill','#FFFFFF');
+      clone.insertBefore(bg,clone.firstChild);
+      const src=new XMLSerializer().serializeToString(clone);
+      const url='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(src);
+      const img=new Image();
+      img.onload=function(){
+        const c=document.createElement('canvas');
+        c.width=w*k;c.height=h*k;
+        const ctx=c.getContext('2d');
+        ctx.fillStyle='#FFFFFF';ctx.fillRect(0,0,c.width,c.height);
+        ctx.drawImage(img,0,0,c.width,c.height);
+        res({data:c.toDataURL('image/png'),w:w,h:h});
+      };
+      img.onerror=function(){res(null);};
+      img.src=url;
+    }catch(e){res(null);}
+  });
+}
+function getSketchImages(){return Promise.all([svgToPng('svg-host',3),svgToPng('xs-host',3)]);}
+
+async function exportPDF(sharedDoc,isLast){
   const m=M;const {jsPDF}=window.jspdf;
   const doc=sharedDoc||new jsPDF({unit:'mm',format:'a4'});
   if(sharedDoc && sharedDoc.__started){doc.addPage();}
   if(sharedDoc)sharedDoc.__started=true;
   const pW=210,ml=15,mr=15,cw=pW-ml-mr;let y=0;
   const ds=new Date().toLocaleDateString(LANG==='en'?'en-GB':'ro-RO');
+  const IMGS=await getSketchImages();
   function hdr(){doc.setFillColor(40,80,140);doc.rect(0,0,210,14,'F');doc.setTextColor(255,255,255);doc.setFontSize(11);doc.setFont('helvetica','bold');doc.text(t('pdfHeaderTitle'),ml,9);doc.setFontSize(8);doc.setFont('helvetica','normal');doc.text('CR 2-1-1.1/2022 cap. 2.3.5',ml,13);doc.text(t('pdfWallData')+currentPreset+'  |  '+t('pdfDate')+ds,pW-mr,9,{align:'right'});doc.setTextColor(0,0,0);y=20;}
   function cy(n){n=n||10;if(y+n>275){doc.addPage();hdr();}}
   function sT(txt){cy(12);doc.setFillColor(240,245,250);doc.rect(ml,y-4,cw,8,'F');doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor(0,102,204);doc.text(txt,ml+2,y+1);doc.setTextColor(0,0,0);doc.setFont('helvetica','normal');y+=8;}
@@ -982,7 +1023,32 @@ function exportPDF(sharedDoc,isLast){
       [t('pdfCheckPerimStirrups'),'O'+m.deD+'/'+fmt(m.deS,0),(m.rho_de*100).toFixed(2)+'%','-',m.de_ok?t('pdfStateOK'):t('pdfStateNO')],
     ],margin:{left:ml,right:mr},tableWidth:cw,theme:'grid',styles:{lineColor:[180,200,220],lineWidth:0.3,fontSize:8,textColor:[0,0,0]},headStyles:{fillColor:[200,215,235],textColor:[0,0,0],fontStyle:'bold',lineColor:[200,215,235]},alternateRowStyles:{fillColor:[240,245,252]}});
   }
-  y=doc.lastAutoTable.finalY+6;
+  y=doc.lastAutoTable.finalY+8;
+
+  // ===== 4. SCHITE DE ARMARE =====
+  const imgW=(cw-6)/2;
+  const put=(im,x,yy)=>{ if(!im)return 0; const hh=imgW*im.h/im.w; doc.addImage(im.data,'PNG',x,yy,imgW,hh); return hh; };
+  if(IMGS[0]||IMGS[1]){
+    const hA=IMGS[0]?imgW*IMGS[0].h/IMGS[0].w:0;
+    const hB=IMGS[1]?imgW*IMGS[1].h/IMGS[1].w:0;
+    const need=Math.max(hA,hB)+18;
+    if(y+need>268){doc.addPage();hdr();}
+    sT(t('pdfSec4'));
+    doc.setFontSize(8);doc.setFont('helvetica','bold');doc.setTextColor(0,0,0);
+    if(IMGS[0])doc.text(t('pdfImgElev'),ml,y+3);
+    if(IMGS[1])doc.text(t('pdfImgSect'),ml+imgW+6,y+3);
+    doc.setFont('helvetica','normal');
+    const yImg=y+5;
+    doc.setDrawColor(200,215,235);
+    if(IMGS[0]){doc.rect(ml,yImg,imgW,hA);put(IMGS[0],ml,yImg);}
+    if(IMGS[1]){doc.rect(ml+imgW+6,yImg,imgW,hB);put(IMGS[1],ml+imgW+6,yImg);}
+    y=yImg+Math.max(hA,hB)+5;
+    doc.setFontSize(7.5);doc.setFont('helvetica','italic');doc.setTextColor(90,90,95);
+    const cap=m.needDiagonal?t('pdfImgCapDiag'):t('pdfImgCapOrtho');
+    doc.text(doc.splitTextToSize(cap,cw),ml,y+2);
+    doc.setTextColor(0,0,0);doc.setFont('helvetica','normal');
+  }
+
   doc.setFontSize(7.5);doc.setFont('helvetica','italic');doc.setTextColor(0,0,0);
   doc.text(t('pdfDisc1'),ml,276);
   doc.text(t('pdfDisc2'),ml,280);
@@ -1022,8 +1088,13 @@ function exportSelected(){
   const doc=new jsPDF({unit:'mm',format:'a4'});
   doc.__started=false;
   doc.__names=selected.join('-');
-  selected.forEach((p,i)=>{switchPreset(p);exportPDF(doc,i===selected.length-1);});
-  switchPreset(origPreset);
+  (async()=>{
+    for(let i=0;i<selected.length;i++){
+      switchPreset(selected[i]);
+      await exportPDF(doc,i===selected.length-1);
+    }
+    switchPreset(origPreset);
+  })();
 }
 
 let currentPreset='P1';
