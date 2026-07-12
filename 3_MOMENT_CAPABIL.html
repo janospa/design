@@ -336,7 +336,7 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
 const CONC={'C12/15':{fck:12},'C16/20':{fck:16},'C20/25':{fck:20},'C25/30':{fck:25},'C30/37':{fck:30},'C35/45':{fck:35},'C40/50':{fck:40},'C45/55':{fck:45},'C50/60':{fck:50},'C55/67':{fck:55},'C60/75':{fck:60}};
 const STEEL={'S240B':{fyk:240},'S400B':{fyk:400},'S500B':{fyk:500},'S 500':{fyk:500}};
 let curC='C50/60',curS='S 500',confMode='none',nmchart=null,lastCalc={};
-const NF=100;
+const NF=1000;
 
 // ═══════════════ i18n ═══════════════
 let LANG=(function(){try{return localStorage.getItem('sw_lang')||'ro';}catch(e){return 'ro';}})();
@@ -662,9 +662,37 @@ function solveX(Ntarget,m,compFromRef){
   for(let it=0;it<80;it++){const mid=(lo+hi)/2;const fm=sectionForces(mid,m,compFromRef).Nint-Ntarget;if(flo*fm<=0){hi=mid;fhi=fm;}else{lo=mid;flo=fm;}}
   const X=(lo+hi)/2;return{X,...sectionForces(X,m,compFromRef)};
 }
+// Centrul fortelor plastice al sectiunii, masurat de la marginea de referinta
+// (l=0). Este axa fata de care se raporteaza momentul capabil: ponderarea se
+// face cu f_cd al FIECAREI zone (bulbii confinati au f_cdc, inima f_cd sau
+// f_cdcw) si cu f_yd pentru otel. Numai fata de aceasta axa compresiunea si
+// intinderea centrica dau M=0, deci diagrama de interactiune se inchide corect
+// la sectiune nesimetrica (bulbi armati diferit). Mijlocul geometric l_w/2 este
+// valabil doar pentru sectiuni simetrice.
+function plasticCG(m){
+  const bulbConf=(confMode==='bulb'||confMode==='all');
+  const webConf=(confMode==='all');
+  const fb=bulbConf?m.fcdc:m.fcd;
+  const fw=webConf?m.fcdcw:m.fcd;
+  const zones=[[0,m.bf2,m.lf2,fb],[m.bf2,m.li2,m.bw0,fw],
+               [m.bf2+m.li2,m.lwi,m.bw0,fw],
+               [m.bf2+m.li2+m.lwi,m.li1,m.bw0,fw],
+               [m.bf2+m.li2+m.lwi+m.li1,m.bf1,m.lf1,fb]];
+  let SF=0,SM=0;
+  for(const [l0,len,w,f] of zones){
+    if(len<=0) continue;
+    const F=len*w*f;
+    SF+=F; SM+=F*(l0+len/2);
+  }
+  for(const sf of m.steelFibers){
+    const F=sf.A*m.fyd;
+    SF+=F; SM+=F*sf.l;
+  }
+  return SM/SF;
+}
 function momentRd(res,m){
   const Mfb=res.Fbl/1e6,Mfa=res.Fal/1e6,N=res.Nint;
-  return -Mfa-Mfb+N*(m.lw/1e3/2);
+  return -Mfa-Mfb+N*(plasticCG(m)/1e3);
 }
 
 function calc(){
@@ -695,17 +723,19 @@ function calc(){
   // or web ecu_nc) crushes first. Sweeping X from small (bending) to large
   // (compression) traces the whole envelope; as X grows the section tends to
   // uniform strain and N approaches the squash apex naturally.
-  const pts=[];
-  pts.push({M:0,N:NRdt});
-  const nDiv=34,xStart=m.cnom*1.2,xEnd=m.lw*4;
+  // Sectiune nesimetrica (bulbi armati diferit): M_Rd(+) != M_Rd(-) la acelasi N.
+  // Se genereaza DOUA ramuri distincte, baleiate dupa X (nu dupa N), fiecare cu
+  // semnul ei; unite dau conturul inchis, asimetric, al diagramei de interactiune.
+  const nDiv=200,xStart=m.cnom*1.2,xEnd=m.lw*60;
+  const branch=[[],[]];   // 0 = M pozitiv (compFromRef=true), 1 = M negativ
   for(let side=0;side<=1;side++){
     const cfr=(side===0);
-    for(let i=1;i<=nDiv;i++){
-      // geometric spacing so points cluster where curvature changes fastest
+    for(let i=0;i<=nDiv;i++){
       const f=i/nDiv;
       const X=xStart*Math.pow(xEnd/xStart,f);
       const r=sectionForces(X,m,cfr);
-      pts.push({M:Math.abs(momentRd(r,m)),N:r.Nint});
+      const Mabs=Math.abs(momentRd(r,m));
+      branch[side].push({M:(side===0? Mabs : -Mabs),N:r.Nint});
     }
   }
   // Apex N_Rd,c = squash load with the parabola-rectangle plateau: each zone
@@ -728,20 +758,24 @@ function calc(){
   document.getElementById('ecu_bulb_r').textContent=((bulbConfD?m.ecu_c:m.ecu_nc)*1000).toFixed(2);
   document.getElementById('ecu_web_lbl').innerHTML=webConfD?t('ecuWebConf'):t('ecuWebUnconf');
   document.getElementById('ecu_bulb_lbl').innerHTML=bulbConfD?t('ecuBulbConf'):t('ecuBulbUnconf');
-  pts.push({M:0,N:NRdc});
-  // single-valued in N: keep highest M per N-band
-  pts.sort((a,b)=>a.N-b.N);
-  const bands={};
-  for(const p of pts){
-    const key=Math.round(p.N/600);
-    if(!bands[key]||p.M>bands[key].M) bands[key]=p;
+  // Curatare pe fiecare ramura separat: sortare dupa N, un punct per banda de N,
+  // apoi monotonizare in jurul punctului de balans (|M| maxim) al ramurii.
+  // Baleiajul dupa X produce puncte ordonate natural dupa N (X creste => N
+  // creste monoton). Nu se filtreaza si nu se monotonizeaza nimic: fiecare
+  // punct este o solutie exacta a echilibrului sectiunii.
+  // ATENTIE: la sectiune NESIMETRICA nu se adauga puncte terminale cu M=0.
+  // Momentul este raportat la mijlocul geometric (l_w/2), deci compresiunea
+  // centrica NU are M=0, ci M = N*e, unde e este excentricitatea centrului de
+  // greutate al sectiunii fata de mijloc. Fortarea unui punct M=0 ar introduce
+  // exact cotitura artificiala de la capatul curbei. Apexul rezulta din
+  // integrare, prin baleiaj pana la X mare (deformatie cvasi-uniforma).
+  function cleanBranch(arr,sgn){
+    return arr.slice().sort((a,b)=>a.N-b.N);
   }
-  const ptsClean=Object.values(bands).sort((a,b)=>a.N-b.N);
-  // light monotone cleanup each side of the balance point (max M)
-  let bi=0;
-  for(let i=1;i<ptsClean.length;i++) if(ptsClean[i].M>ptsClean[bi].M) bi=i;
-  for(let i=bi+1;i<ptsClean.length;i++) if(ptsClean[i].M>ptsClean[i-1].M) ptsClean[i].M=ptsClean[i-1].M;
-  for(let i=bi-1;i>=0;i--) if(ptsClean[i].M>ptsClean[i+1].M) ptsClean[i].M=ptsClean[i+1].M;
+  // Se afiseaza o singura ramura: cea corespunzatoare sensului lui M_Ed
+  // (compFromRef). Valorile se raporteaza in modul, ca in varianta initiala.
+  const brSel=cleanBranch(branch[compFromRef?0:1],compFromRef?+1:-1);
+  const ptsClean=brSel.map(p=>({M:Math.abs(p.M),N:p.N}));
   drawSketch(m,res.X,compFromRef);
   drawNM(ptsClean,{M:Math.abs(Med),N:Ned},{M:Mrd,N:Ned});
   lastCalc={m,Ned,Med,Mrd,X:res.X,Nint:res.Nint,Fb:res.Fb,Fa:res.Fa,util,NRdc,NRdt,pts:ptsClean,compFromRef,confMode,concrete:curC,steel:curS};
@@ -836,7 +870,7 @@ function drawNM(pts,extPt,rdPt){
   const curve=pts.map(p=>({x:p.M,y:p.N}));
   nmchart=new Chart(document.getElementById('nmchart'),{type:'scatter',
     data:{datasets:[
-      {label:t('chartCurve'),data:curve,showLine:true,borderColor:'#0066CC',borderWidth:2,pointRadius:2,pointBackgroundColor:'#0066CC',tension:0,fill:false,order:2},
+      {label:t('chartCurve'),data:curve,showLine:true,borderColor:'#0066CC',borderWidth:2,pointRadius:0,pointHitRadius:6,pointBackgroundColor:'#0066CC',tension:0,fill:false,order:2},
       {label:'Ext',data:[{x:extPt.M,y:extPt.N}],borderColor:'#C0392B',backgroundColor:'#C0392B',pointRadius:6,pointStyle:'rectRot',showLine:false,order:1},
       {label:'Rd',data:[{x:rdPt.M,y:rdPt.N}],borderColor:'#2E7D32',backgroundColor:'#2E7D32',pointRadius:5,pointStyle:'circle',showLine:false,order:1}
     ]},
