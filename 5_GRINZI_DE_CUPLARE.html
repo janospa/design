@@ -643,20 +643,15 @@ function render(){
   $('ortho-inputs').classList.toggle('hidden',m.needDiagonal);
   const bCap=document.querySelector('#seg-ved button[data-v="cap"]');
   const bGs=document.querySelector('#seg-ved button[data-v="gs"]');
+  // vedMode este impus in compute() de criteriul carcasei; aici doar reflectam starea in UI
+  bCap.classList.toggle('on', vedMode==='cap');
+  bGs.classList.toggle('on', vedMode==='gs');
   if(!m.crit_ok){
     // criteriu > 100% -> carcasa diagonala obligatorie -> doar combinatia seismica
-    if(vedMode!=='gs'){vedMode='gs';document.querySelectorAll('#seg-ved button').forEach(x=>x.classList.remove('on'));bGs.classList.add('on');}
-    bCap.disabled=true; bCap.classList.remove('on'); bCap.style.opacity='.4'; bCap.style.cursor='not-allowed';
+    bCap.disabled=true; bCap.style.opacity='.4'; bCap.style.cursor='not-allowed';
     bCap.title=t('capLocked');
-    bGs.classList.add('on');
   } else {
     bCap.disabled=false; bCap.style.opacity=''; bCap.style.cursor=''; bCap.title='';
-    // carcasa ortogonala posibila -> se revine automat la V_Ed din capacitate
-    if(vedMode!=='cap'){
-      vedMode='cap';
-      document.querySelectorAll('#seg-ved button').forEach(x=>x.classList.remove('on'));
-      bCap.classList.add('on');
-    }
   }
   $('ved-gs').style.display=vedMode==='gs'?'flex':'none';
   const dso=$('d_plong_s_out'); if(dso)dso.value=fmt(m.dpS,0);
@@ -1100,11 +1095,32 @@ function exportSelected(){
 let currentPreset='P1';
 function getKey(p){return 'sw_mod5_'+p;}
 function captureState(){const state={};document.querySelectorAll('input[id],select[id]').forEach(el=>{if(el.id!=='presetSel')state[el.id]=el.value;});document.querySelectorAll('.seg').forEach((seg,i)=>{const on=seg.querySelector('.on');if(on)state['_seg_'+i]=on.dataset.v||on.textContent;});return state;}
-function applyState(state){if(!state)return;document.querySelectorAll('input[id],select[id]').forEach(el=>{if(el.id!=='presetSel'&&state[el.id]!==undefined)el.value=state[el.id];});document.querySelectorAll('.seg').forEach((seg,i)=>{const sv=state['_seg_'+i];if(!sv)return;seg.querySelectorAll('button').forEach(b=>{b.classList.toggle('on',(b.dataset.v||b.textContent)===sv);});});}
+function applyState(state){
+  if(!state)return;
+  document.querySelectorAll('input[id],select[id]').forEach(el=>{
+    if(el.id!=='presetSel'&&state[el.id]!==undefined)el.value=state[el.id];
+  });
+  document.querySelectorAll('.seg').forEach((seg,i)=>{
+    const sv=state['_seg_'+i];
+    if(!sv)return;
+    seg.querySelectorAll('button').forEach(b=>{
+      b.classList.toggle('on',(b.dataset.v||b.textContent)===sv);
+    });
+  });
+  syncSegState();
+}
+// resincronizeaza variabilele globale cu butoanele active (altfel presetul restaureaza
+// doar aspectul toggle-ului, nu si valoarea folosita in calcul)
+function syncSegState(){
+  const d=document.querySelector('#seg-duct button.on');
+  if(d && d.dataset.v) ductMode=d.dataset.v;
+  const v=document.querySelector('#seg-ved button.on');
+  if(v && v.dataset.v) vedMode=v.dataset.v;
+}
 function saveCurrentPreset(){try{localStorage.setItem(getKey(currentPreset),JSON.stringify(captureState()));}catch(e){}}
 function switchPreset(p){saveCurrentPreset();currentPreset=p;try{localStorage.setItem('sw_mod5_active',p);}catch(e){}document.getElementById('presetSel').value=p;const saved=loadPreset(p);if(saved)applyState(saved);compute();}
 function loadPreset(p){try{const s=localStorage.getItem(getKey(p));return s?JSON.parse(s):null;}catch(e){return null;}}
-(function(){try{const ap=localStorage.getItem('sw_mod5_active');if(ap)currentPreset=ap;}catch(e){}document.getElementById('presetSel').value=currentPreset;const saved=loadPreset(currentPreset);if(saved)applyState(saved);document.addEventListener('input',saveCurrentPreset);document.addEventListener('change',saveCurrentPreset);document.addEventListener('click',e=>{if(e.target.closest('.seg'))setTimeout(saveCurrentPreset,50);});})();
+(function(){try{const ap=localStorage.getItem('sw_mod5_active');if(ap)currentPreset=ap;}catch(e){}document.getElementById('presetSel').value=currentPreset;const saved=loadPreset(currentPreset);if(saved)applyState(saved);else syncSegState();document.addEventListener('input',saveCurrentPreset);document.addEventListener('change',saveCurrentPreset);document.addEventListener('click',e=>{if(e.target.closest('.seg'))setTimeout(saveCurrentPreset,50);});})();
 
 document.querySelectorAll('#langSeg button').forEach(b=>b.addEventListener('click',()=>setLangMod(b.dataset.lang)));
 applyStaticLang();
