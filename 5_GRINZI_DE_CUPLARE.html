@@ -480,6 +480,8 @@ const T={
   cStirrupsSub:{ro:'V<sub>Ed</sub> ≤ V<sub>Rd,s</sub>',en:'V<sub>Ed</sub> ≤ V<sub>Rd,s</sub>'},
   cStirrupPct:{ro:'Procent etrieri',en:'Stirrup ratio'},
   cHorizPct:{ro:'Procent armătură orizontală',en:'Horizontal reinforcement ratio'},
+  branchLong:{ro:'l<sub>cl</sub> ≥ 1,5·h<sub>w</sub>',en:'l<sub>cl</sub> ≥ 1.5·h<sub>w</sub>'},
+  branchShort:{ro:'l<sub>cl</sub> &lt; 1,5·h<sub>w</sub>',en:'l<sub>cl</sub> &lt; 1.5·h<sub>w</sub>'},
   cLongPct:{ro:'Procent longitudinal',en:'Longitudinal ratio'},
   cCompStrutSubD:{ro:'V<sub>Ed,GS</sub> ≤ V<sub>Rd,max</sub>',en:'V<sub>Ed,SC</sub> ≤ V<sub>Rd,max</sub>'},
   cDiagBarsSteel:{ro:'Bare diagonale (oțel)',en:'Diagonal bars (steel)'},
@@ -629,7 +631,8 @@ function compute(){
   // CR2: rho_int = aria unui rand de bare intermediare / aria de beton aferenta randului
   const rhoI=(2*dI*dI*PI/4)/(bw*sI);
   const dchDCH = ductMode==='DCH';
-  const rhoI_min = (lcl>=1.5*hw) ? (dchDCH?0.0025:0.0020) : (dchDCH?0.0040:0.0030);
+  const longSpan_I = lcl>=1.5*hw;   // ramura geometrica: l_cl >= 1.5·h_w
+  const rhoI_min = longSpan_I ? (dchDCH?0.0025:0.0020) : (dchDCH?0.0040:0.0030);
   const intOK=rhoI>=rhoI_min && dI>=12;
   // SigmaAsw = aria totala a ramurilor taiate de fisura = Asw_leg × (h_w/s)
   const SigAsw=Asw_leg*(hw/sST);
@@ -694,7 +697,7 @@ function compute(){
      anchK,anch_ext,anch_int,anchKd,anch_diag,anch_ortho,CR2_FAC,
      nL,dL,As_top,rhoL,rhoL_req,longOK,Mrd_b,Ved_cap,Ved_gs,Ved_ortho,Ved,vedMode,
      ratio,hOverL,regimeOK,isLongBeam,isVeryShort,ductMode,cFac,VRd_max_o,needDiagonal,crit_util,crit_ok,
-     dST,nLeg,sST,rhoST,s_min_st,stirOK,nI,dI,sI,nRowsI,rhoI,rhoI_min,intOK,
+     dST,nLeg,sST,rhoST,s_min_st,stirOK,nI,dI,sI,nRowsI,rhoI,rhoI_min,longSpan_I,intOK,
      VRd_s_o,steelMode,o_conc_util,o_steel_util,o_conc_ok,o_steel_ok,
      nd,dd,alpha,VRd_max_d,Asi,VRd_s_d,d_conc_util,d_steel_util,d_conc_ok,d_steel_ok,
      dpN,dpL,dpS,dpS_max,nPerim_req,b0,h0,nPerLong,nShort,needShortSide,sLong,sShort,As_pL,rho_pL,rho_pL_min,dpL_ok,
@@ -810,7 +813,7 @@ function render(){
     h+=chkRow(m.o_conc_ok,t('cCompStrut'),t('cCompStrutSubO',m.cFac),`${fmt(m.Ved_ortho)} / ${fmt(m.VRd_max_o)} kN`,m.o_conc_util);
     h+=chkRow(m.o_steel_ok,t('cStirrupsSteel'),t('cStirrupsSub'),`${fmt(m.Ved_ortho)} / ${fmt(m.VRd_s_o)} kN`,m.o_steel_util);
     h+=chkRow(m.stirOK,t('cStirrupPct'),`ρ ≥ 0.20% · n<sub>leg</sub>=${m.nLeg}`,`${(m.rhoST*100).toFixed(2)}%`,m.rhoST>0?0.002/m.rhoST:999);
-    h+=chkRow(m.intOK,t('cHorizPct'),`ρ ≥ ${(m.rhoI_min*100).toFixed(2)}% (${m.ductMode}) · Ø ≥ 12 mm · s=${fmt(m.sI,0)} mm`,`${(m.rhoI*100).toFixed(2)}%`,m.rhoI>0?m.rhoI_min/m.rhoI:999);
+    h+=chkRow(m.intOK,t('cHorizPct'),`ρ ≥ ${(m.rhoI_min*100).toFixed(2)}% (${m.ductMode}, ${m.longSpan_I?t('branchLong'):t('branchShort')}) · Ø ≥ 12 mm · s=${fmt(m.sI,0)} mm`,`${(m.rhoI*100).toFixed(2)}%`,m.rhoI>0?m.rhoI_min/m.rhoI:999);
     h+=chkRow(m.longOK,t('cLongPct'),`ρ ≥ ${(m.rhoL_req*100).toFixed(2)}%`,`${(m.rhoL*100).toFixed(2)}%`,m.rhoL>0?m.rhoL_req/m.rhoL:999);
     h+=chkRow(true,t('anchExtreme'),`k=${fmt(m.anchK,0)} · 1,35 · Ø${m.dL}`,`${fmt(m.anch_ext,0)} mm`,null,true);
     h+=chkRow(true,t('anchInterm'),`k=${fmt(m.anchK,0)} · 1,35 · Ø${m.dI}`,`${fmt(m.anch_int,0)} mm`,null,true);
@@ -1120,7 +1123,7 @@ async function exportPDF(sharedDoc,isLast){
       [t('pdfCheckCompStrut'),m.cFac+'*bw*d*fctd',fmt(m.Ved_ortho)+' / '+fmt(m.VRd_max_o)+' kN',(m.o_conc_util*100).toFixed(0)+'%',m.o_conc_ok?t('pdfStateOK'):t('pdfStateNO')],
       [t('pdfCheckStirrupsSteel'),'V_Rd,s (nleg='+m.nLeg+')',fmt(m.Ved_ortho)+' / '+fmt(m.VRd_s_o)+' kN',(m.o_steel_util*100).toFixed(0)+'%',m.o_steel_ok?t('pdfStateOK'):t('pdfStateNO')],
       [t('pdfCheckStirrupPct'),'rho>=0.20%',(m.rhoST*100).toFixed(2)+'%','-',m.stirOK?t('pdfStateOK'):t('pdfStateNO')],
-      [t('pdfCheckHorizPct'),'rho>='+(m.rhoI_min*100).toFixed(2)+'%',(m.rhoI*100).toFixed(2)+'%','-',m.intOK?t('pdfStateOK'):t('pdfStateNO')],
+      [t('pdfCheckHorizPct'),'rho>='+(m.rhoI_min*100).toFixed(2)+'% ('+m.ductMode+', '+(m.longSpan_I?'lcl>=1.5hw':'lcl<1.5hw')+')',(m.rhoI*100).toFixed(2)+'%','-',m.intOK?t('pdfStateOK'):t('pdfStateNO')],
       [t('pdfCheckLongPct'),'rho>='+(m.rhoL_req*100).toFixed(2)+'%',(m.rhoL*100).toFixed(2)+'%','-',m.longOK?t('pdfStateOK'):t('pdfStateNO')],
       [t('anchExtreme'),m.anchK+'*1.35*O'+m.dL,fmt(m.anch_ext,0)+' mm','-','-'],
       [t('anchInterm'),m.anchK+'*1.35*O'+m.dI,fmt(m.anch_int,0)+' mm','-','-'],
