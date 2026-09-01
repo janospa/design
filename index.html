@@ -18,9 +18,14 @@ body{font-family:'Inter',sans-serif;background:#F5F5F7;color:#1C1C1E;min-height:
 .lang-seg button.on{background:#fff;color:#1C1C1E;box-shadow:0 1px 2px rgba(0,0,0,.08)}
 .suite-label{font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:#8E8E93;margin-bottom:16px;text-align:center}
 .modules{display:flex;flex-direction:column;gap:10px}
-.mod{background:#fff;border:1px solid #E5E5EA;border-radius:14px;padding:14px 16px;text-decoration:none;color:inherit;display:flex;align-items:center;gap:14px;transition:box-shadow .15s,transform .12s}
+.group-divider{display:flex;align-items:center;gap:10px;margin:18px 0 2px}
+.group-divider:first-child{margin-top:0}
+.group-divider span{font-size:10px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:#AEAEB2;white-space:nowrap}
+.group-divider::before,.group-divider::after{content:'';flex:1;height:1px;background:#E5E5EA}
+.mod{background:#fff;border:1px solid #E5E5EA;border-radius:14px;padding:14px 16px;text-decoration:none;color:inherit;display:flex;align-items:center;gap:14px;transition:box-shadow .15s,transform .12s;position:relative}
 .mod:hover{box-shadow:0 4px 16px rgba(0,0,0,.08);transform:translateY(-1px)}
 .mod:active{transform:translateY(0)}
+.mod-badge{position:absolute;top:-7px;right:12px;font-size:9px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#0066CC;background:#EBF3FF;border:1px solid #B8D4F8;border-radius:5px;padding:2px 6px;line-height:1.3}
 .mod-icon{width:52px;height:40px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
 .mod-num{font-size:11px;font-weight:600;color:#8E8E93;flex-shrink:0;text-align:right;width:18px}
 .mod-text{flex:1;min-width:0}
@@ -43,6 +48,8 @@ body{font-family:'Inter',sans-serif;background:#F5F5F7;color:#1C1C1E;min-height:
 <div class="wrap">
   <div class="suite-label" data-i18n="suiteLabel">SW Design · CR 2/2022</div>
   <div class="modules">
+
+    <div class="group-divider"><span data-i18n="groupWalls">Pereti</span></div>
 
     <!-- 01 Predimensionare -->
     <a class="mod" href="1_PREDIMENSIONARE.html">
@@ -166,6 +173,36 @@ body{font-family:'Inter',sans-serif;background:#F5F5F7;color:#1C1C1E;min-height:
       <span class="mod-arrow"><svg viewBox="0 0 16 16"><polyline points="5,3 11,8 5,13"/></svg></span>
     </a>
 
+    <div class="group-divider"><span data-i18n="groupColumns">Stalpi</span></div>
+
+    <!-- 06 Stalp biaxial -->
+    <a class="mod" href="6_STALP_BIAXIAL.html">
+      <span class="mod-badge" data-i18n="badgeNew">Nou</span>
+      <span class="mod-num">06</span>
+      <div class="mod-icon">
+        <svg width="52" height="40" viewBox="0 0 52 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="14" y="4" width="24" height="32" rx="1.5" fill="#EAF3EA" stroke="#2E7D32" stroke-width="1.3"/>
+          <circle cx="18.5" cy="8.5" r="1.7" fill="#2E7D32"/>
+          <circle cx="26" cy="8.5" r="1.7" fill="#2E7D32"/>
+          <circle cx="33.5" cy="8.5" r="1.7" fill="#2E7D32"/>
+          <circle cx="18.5" cy="31.5" r="1.7" fill="#2E7D32"/>
+          <circle cx="26" cy="31.5" r="1.7" fill="#2E7D32"/>
+          <circle cx="33.5" cy="31.5" r="1.7" fill="#2E7D32"/>
+          <circle cx="18.5" cy="20" r="1.7" fill="#2E7D32"/>
+          <circle cx="33.5" cy="20" r="1.7" fill="#2E7D32"/>
+          <line x1="26" y1="20" x2="26" y2="4" stroke="#2E7D32" stroke-width="1" stroke-dasharray="2,1.6" opacity="0.55"/>
+          <line x1="26" y1="20" x2="41" y2="20" stroke="#2E7D32" stroke-width="1" stroke-dasharray="2,1.6" opacity="0.55"/>
+          <polyline points="23,7 26,4 29,7" stroke="#2E7D32" stroke-width="1" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/>
+          <polyline points="38,17 41,20 38,23" stroke="#2E7D32" stroke-width="1" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/>
+        </svg>
+      </div>
+      <div class="mod-text">
+        <span class="mod-title" data-i18n-sym="m6title">Stalp &mdash; verificare biaxiala</span>
+        <div class="mod-desc" data-i18n-sym="m6desc">Diagrama de interactiune M<sub>y</sub>&ndash;M<sub>z</sub> &mdash; metoda fibrelor 2D</div>
+      </div>
+      <span class="mod-arrow"><svg viewBox="0 0 16 16"><polyline points="5,3 11,8 5,13"/></svg></span>
+    </a>
+
   </div>
   <div class="author" data-i18n="author">Lucrare de disertație — Janos Patrik · UTCN · Facultatea de Construcții · 2026</div>
 </div>
@@ -184,6 +221,11 @@ const I18N={
   m4desc:{ro:'V<sub>Rd,max</sub>, V<sub>Rd,s</sub>, V<sub>Rd,i</sub> — zone critice și non-critice', en:'V<sub>Rd,max</sub>, V<sub>Rd,s</sub>, V<sub>Rd,i</sub> — critical and non-critical zones'},
   m5title:{ro:'Grinzi de cuplare', en:'Coupling beams'},
   m5desc:{ro:'Verificare moment și forță tăietoare grinzi scurte', en:'Moment and shear check for short beams'},
+  m6title:{ro:'Stâlp &mdash; verificare biaxială', en:'Column &mdash; biaxial check'},
+  m6desc:{ro:'Diagramă de interacțiune M<sub>y</sub>&ndash;M<sub>z</sub> &mdash; metoda fibrelor 2D', en:'M<sub>y</sub>&ndash;M<sub>z</sub> interaction diagram &mdash; 2D fibre method'},
+  groupWalls:{ro:'Pereți', en:'Walls'},
+  groupColumns:{ro:'Stâlpi', en:'Columns'},
+  badgeNew:{ro:'Nou', en:'New'},
   author:{ro:'Lucrare de disertație — Janos Patrik · UTCN · Facultatea de Construcții · 2026', en:'Dissertation — Janos Patrik · UTCN · Faculty of Civil Engineering · 2026'}
 };
 function getLang(){try{return localStorage.getItem('sw_lang')||'ro';}catch(e){return 'ro';}}
