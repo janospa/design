@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="ro">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#F5F5F7">
 <meta name="description" content="Aplicație de calcul pentru pereți structurali din beton armat cu bulbi — CR 2-1-1.1/2022">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='2' y='4' width='8' height='24' rx='1.5' fill='%238E8E93'/><rect x='10' y='11' width='12' height='10' rx='1' fill='%23C7C7CC'/><rect x='22' y='4' width='8' height='24' rx='1.5' fill='%238E8E93'/></svg>">
-<title>SW Design</title>
+<title>JP Design</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -25,7 +25,10 @@ body{font-family:'Inter',sans-serif;background:#F5F5F7;color:#1C1C1E;min-height:
 .mod{background:#fff;border:1px solid #E5E5EA;border-radius:14px;padding:14px 16px;text-decoration:none;color:inherit;display:flex;align-items:center;gap:14px;transition:box-shadow .15s,transform .12s;position:relative}
 .mod:hover{box-shadow:0 4px 16px rgba(0,0,0,.08);transform:translateY(-1px)}
 .mod:active{transform:translateY(0)}
+.mod-disabled{cursor:default;opacity:.62;background:#FAFAFB}
+.mod-disabled:hover{box-shadow:none;transform:none}
 .mod-badge{position:absolute;top:-7px;right:12px;font-size:9px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#0066CC;background:#EBF3FF;border:1px solid #B8D4F8;border-radius:5px;padding:2px 6px;line-height:1.3}
+.mod-badge.soon{color:#8E6C1A;background:#FBF3DE;border-color:#EAD9A8}
 .mod-icon{width:52px;height:40px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
 .mod-num{font-size:11px;font-weight:600;color:#8E8E93;flex-shrink:0;text-align:right;width:18px}
 .mod-text{flex:1;min-width:0}
@@ -46,7 +49,7 @@ body{font-family:'Inter',sans-serif;background:#F5F5F7;color:#1C1C1E;min-height:
   </div>
 </div>
 <div class="wrap">
-  <div class="suite-label" data-i18n="suiteLabel">SW Design · CR 2/2022</div>
+  <div class="suite-label" data-i18n="suiteLabel">JP Design</div>
   <div class="modules">
 
     <div class="group-divider"><span data-i18n="groupWalls">Pereti</span></div>
@@ -203,6 +206,54 @@ body{font-family:'Inter',sans-serif;background:#F5F5F7;color:#1C1C1E;min-height:
       <span class="mod-arrow"><svg viewBox="0 0 16 16"><polyline points="5,3 11,8 5,13"/></svg></span>
     </a>
 
+    <!-- 07 Stalp verificare tabel -->
+    <a class="mod" href="7_STALP_TABEL.html">
+      <span class="mod-badge" data-i18n="badgeNew">Nou</span>
+      <span class="mod-num">07</span>
+      <div class="mod-icon">
+        <svg width="52" height="40" viewBox="0 0 52 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="14" y="4" width="24" height="32" rx="1.5" fill="#ECE8F5" stroke="#5E4FA2" stroke-width="1.3"/>
+          <circle cx="18.5" cy="8.5" r="1.7" fill="#5E4FA2"/>
+          <circle cx="26" cy="8.5" r="1.7" fill="#5E4FA2"/>
+          <circle cx="33.5" cy="8.5" r="1.7" fill="#5E4FA2"/>
+          <circle cx="18.5" cy="31.5" r="1.7" fill="#5E4FA2"/>
+          <circle cx="26" cy="31.5" r="1.7" fill="#5E4FA2"/>
+          <circle cx="33.5" cy="31.5" r="1.7" fill="#5E4FA2"/>
+          <circle cx="18.5" cy="20" r="1.7" fill="#5E4FA2"/>
+          <circle cx="33.5" cy="20" r="1.7" fill="#5E4FA2"/>
+          <line x1="26" y1="20" x2="26" y2="4" stroke="#5E4FA2" stroke-width="1" stroke-dasharray="2,1.6" opacity="0.55"/>
+          <line x1="26" y1="20" x2="41" y2="20" stroke="#5E4FA2" stroke-width="1" stroke-dasharray="2,1.6" opacity="0.55"/>
+          <polyline points="23,7 26,4 29,7" stroke="#5E4FA2" stroke-width="1" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/>
+          <polyline points="38,17 41,20 38,23" stroke="#5E4FA2" stroke-width="1" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/>
+        </svg>
+      </div>
+      <div class="mod-text">
+        <span class="mod-title" data-i18n="m7title">Stalp &mdash; verificare biaxiala (batch)</span>
+        <div class="mod-desc" data-i18n="m7desc">Import combinatii de incarcare din Excel/ETABS, verificare in lot</div>
+      </div>
+      <span class="mod-arrow"><svg viewBox="0 0 16 16"><polyline points="5,3 11,8 5,13"/></svg></span>
+    </a>
+
+    <!-- 08 Node design (coming soon, disabled) -->
+    <div class="mod mod-disabled">
+      <span class="mod-badge soon" data-i18n="badgeSoon">In curand</span>
+      <span class="mod-num">08</span>
+      <div class="mod-icon">
+        <svg width="52" height="40" viewBox="0 0 52 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- column (vertical) -->
+          <rect x="21" y="2" width="10" height="36" rx="1" fill="#EDECEF" stroke="#9A9AA0" stroke-width="1.2"/>
+          <!-- beam (horizontal) -->
+          <rect x="2" y="15" width="48" height="10" rx="1" fill="#E4E3E7" stroke="#9A9AA0" stroke-width="1.2"/>
+          <!-- joint core highlight -->
+          <rect x="21" y="15" width="10" height="10" fill="#D8D6DE" stroke="#9A9AA0" stroke-width="1.2"/>
+        </svg>
+      </div>
+      <div class="mod-text">
+        <span class="mod-title" data-i18n="m8title">Nod &mdash; verificare</span>
+        <div class="mod-desc" data-i18n="m8desc">Verificare nod grinda-stalp (in dezvoltare)</div>
+      </div>
+    </div>
+
   </div>
   <div class="author" data-i18n="author">Lucrare de disertație — Janos Patrik · UTCN · Facultatea de Construcții · 2026</div>
 </div>
@@ -210,7 +261,7 @@ body{font-family:'Inter',sans-serif;background:#F5F5F7;color:#1C1C1E;min-height:
 <script>
 // ─── Shared language system (persisted across all pages via localStorage key 'sw_lang') ───
 const I18N={
-  suiteLabel:{ro:'SW Design · CR 2/2022', en:'SW Design · CR 2/2022'},
+  suiteLabel:{ro:'JP Design', en:'JP Design'},
   m1title:{ro:'Predimensionarea pereților', en:'Preliminary wall design'},
   m1desc:{ro:'Condiții minime geometrie și armare — CR 2/2022 §7', en:'Minimum geometry &amp; reinforcement conditions — CR 2/2022 §7'},
   m2title:{ro:'Beton confinat', en:'Confined concrete'},
@@ -223,12 +274,17 @@ const I18N={
   m5desc:{ro:'Verificare moment și forță tăietoare grinzi scurte', en:'Moment and shear check for short beams'},
   m6title:{ro:'Stâlp &mdash; verificare biaxială', en:'Column &mdash; biaxial check'},
   m6desc:{ro:'Diagramă de interacțiune M<sub>y</sub>&ndash;M<sub>z</sub> &mdash; metoda fibrelor 2D', en:'M<sub>y</sub>&ndash;M<sub>z</sub> interaction diagram &mdash; 2D fibre method'},
+  m7title:{ro:'Stâlp &mdash; verificare biaxială (batch)', en:'Column &mdash; biaxial check (batch)'},
+  m7desc:{ro:'Import combinații de încărcare din Excel/ETABS, verificare în lot', en:'Import load combinations from Excel/ETABS, batch check'},
+  m8title:{ro:'Nod &mdash; verificare', en:'Node &mdash; check'},
+  m8desc:{ro:'Verificare nod grindă-stâlp (în dezvoltare)', en:'Beam-column joint check (in development)'},
   groupWalls:{ro:'Pereți', en:'Walls'},
   groupColumns:{ro:'Stâlpi', en:'Columns'},
   badgeNew:{ro:'Nou', en:'New'},
+  badgeSoon:{ro:'În curând', en:'Coming soon'},
   author:{ro:'Lucrare de disertație — Janos Patrik · UTCN · Facultatea de Construcții · 2026', en:'Dissertation — Janos Patrik · UTCN · Faculty of Civil Engineering · 2026'}
 };
-function getLang(){try{return localStorage.getItem('sw_lang')||'ro';}catch(e){return 'ro';}}
+function getLang(){try{return localStorage.getItem('sw_lang')||'en';}catch(e){return 'en';}}
 function setLang(l){try{localStorage.setItem('sw_lang',l);}catch(e){}applyLang(l);}
 function applyLang(l){
   document.documentElement.lang=l;

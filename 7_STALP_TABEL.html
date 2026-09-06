@@ -1,0 +1,1177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#F5F5F7">
+<meta name="description" content="Verificare biaxiala in tabel — import combinatii de incarcare din ETABS/Excel, verificare in lot pentru o sectiune de stalp fixa">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='4' y='6' width='24' height='4' rx='1' fill='%238E8E93'/><rect x='4' y='14' width='24' height='4' rx='1' fill='%23C7C7CC'/><rect x='4' y='22' width='24' height='4' rx='1' fill='%238E8E93'/></svg>">
+<title>Stalp — verificare biaxiala batch — JP Design</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1C1E}
+.wrap{max-width:1240px;margin:0 auto;padding:20px 16px}
+.slabel{font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:#1C1C1E;padding:0 0 7px;margin-top:14px}
+.slabel:first-child{margin-top:0}
+.ip{background:#EFEFEF;border:1px solid #DCDCE0;border-radius:12px;overflow:hidden;margin-bottom:13px}
+.op{background:#fff;border:1px solid #DCDCE0;border-radius:12px;overflow:hidden;margin-bottom:13px}
+.ph{padding:12px 15px;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:#1C1C1E;display:flex;align-items:center;gap:6px;cursor:pointer;user-select:none}
+.ph .chev{margin-left:auto;width:9px;height:9px;border-right:1.6px solid #8E8E93;border-bottom:1.6px solid #8E8E93;transform:rotate(45deg);transition:transform .15s;flex-shrink:0}
+.ip.collapsed .ph .chev{transform:rotate(-45deg)}
+.ip.collapsed .pb-outer{display:none}
+.info-wrap{position:relative;display:inline-flex;flex-shrink:0}
+.info-btn{width:16px;height:16px;border-radius:50%;border:1.3px solid #AEAEB2;background:transparent;color:transparent;font-size:0;line-height:1;cursor:pointer;padding:0;position:relative;transition:all .12s}
+.info-btn::before{content:'';position:absolute;left:50%;top:3.5px;width:1.6px;height:1.6px;background:#8E8E93;border-radius:50%;transform:translateX(-50%)}
+.info-btn::after{content:'';position:absolute;left:50%;top:6.3px;width:1.6px;height:5.2px;background:#8E8E93;border-radius:.8px;transform:translateX(-50%)}
+.info-btn:hover,.info-btn.on{border-color:#007AFF;background:#EBF3FF}
+.info-btn:hover::before,.info-btn:hover::after,.info-btn.on::before,.info-btn.on::after{background:#007AFF}
+.info-pop{display:none;position:fixed;z-index:1200;width:260px;max-width:78vw;background:#fff;border:1px solid #DCDCE0;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.18);padding:10px 12px;font-size:12px;font-weight:400;color:#6C6C70;line-height:1.5;text-transform:none;letter-spacing:0;cursor:default}
+.info-pop.show{display:block}
+.info-pop::before{content:'';position:fixed;width:9px;height:9px;background:#fff;border-left:1px solid #DCDCE0;border-top:1px solid #DCDCE0;left:var(--arrow-left);top:var(--arrow-top);transform:var(--arrow-rot)}
+.pb{padding:8px 15px 14px}
+.row{display:flex;align-items:center;padding:7px 0;border-bottom:1px solid #E0E0E5;gap:8px}
+.row:last-child{border-bottom:none}
+.rl{flex:1;font-size:13px;color:#1C1C1E;min-width:0}
+.rn{font-size:12px;color:#8E8E93;margin-left:4px}
+.rc{display:flex;align-items:center;gap:5px;flex-shrink:0}
+.rc input[type=number]{width:78px;padding:5px 8px;font-size:13px;border:1px solid #C7C7CC;border-radius:7px;background:#fff;color:#1C1C1E;font-family:'Inter',sans-serif;-moz-appearance:textfield;appearance:textfield;text-align:right}
+.rc input[type=number]::-webkit-inner-spin-button,.rc input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.rc input:focus{outline:none;box-shadow:0 0 0 2px rgba(0,122,255,.2);border-color:#007AFF}
+.ru{font-size:12px;color:#8E8E93;min-width:30px}
+.sel-field{margin-bottom:10px}
+.sel-field label{display:block;font-size:12px;color:#8E8E93;margin-bottom:5px;font-weight:500}
+.sel-wrap{position:relative}
+.sel-wrap::after{content:'';position:absolute;right:13px;top:50%;width:7px;height:7px;border-right:2px solid #8E8E93;border-bottom:2px solid #8E8E93;transform:translateY(-65%) rotate(45deg);pointer-events:none}
+.sel-field select{width:100%;padding:8px 34px 8px 11px;font-size:13px;border:1px solid #C7C7CC;border-radius:8px;background:#fff;color:#1C1C1E;font-family:'Inter',sans-serif;cursor:pointer;-webkit-appearance:none;appearance:none}
+.sel-field select:focus{outline:none;box-shadow:0 0 0 2px rgba(0,122,255,.2);border-color:#007AFF}
+.mat-vals{display:flex;gap:6px;padding:6px 0 2px;flex-wrap:wrap}
+.mv{flex:1;min-width:60px;text-align:center;background:#E8E8ED;border-radius:7px;padding:8px 4px}
+.mvl{font-size:11px;color:#8E8E93;margin-bottom:2px}
+.mvv{font-size:14px;font-weight:500;color:#1C1C1E}
+.mvu{font-size:10px;color:#8E8E93}
+.sub{font-size:11px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;color:#8E8E93;padding:9px 0 5px}
+.toggle-row{display:flex;align-items:center;gap:10px;padding:4px 0 10px}
+.toggle-row span{font-size:13px;color:#1C1C1E;flex:1}
+.seg{display:inline-flex;background:#E0E0E5;border-radius:8px;padding:2px;gap:2px}
+.seg button{padding:6px 13px;font-size:12px;font-weight:500;border:none;border-radius:6px;background:transparent;color:#8E8E93;cursor:pointer;font-family:'Inter',sans-serif;transition:all .12s}
+.seg button.on{background:#fff;color:#1C1C1E;box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.count-box{background:#EBF3FF;border:1px solid #B8D4F8;border-radius:8px;padding:8px 12px;margin-top:6px;display:flex;justify-content:space-between;font-size:12px}
+.count-box span{color:#0066CC;font-weight:500}
+.note{font-size:12px;color:#8E8E93;line-height:1.5}
+.conf-fields{display:none;background:#EAF6EC;border-radius:8px;padding:4px 11px;margin-top:8px}
+.conf-fields.on{display:block}
+.geom-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}
+.geom-grid .row{border-bottom:1px solid #E0E0E5}
+@media(max-width:680px){.geom-grid{grid-template-columns:1fr}}
+
+/* ── paste / table section ── */
+.paste-zone{border:2px dashed #B8D4F8;border-radius:12px;background:#F5F9FF;padding:22px 16px;text-align:center;cursor:text;transition:all .15s}
+.paste-zone:hover,.paste-zone.focus{border-color:#007AFF;background:#EBF3FF}
+.paste-zone .pz-icon{width:30px;height:30px;margin:0 auto 8px;opacity:.55}
+.paste-zone .pz-title{font-size:14px;font-weight:500;color:#1C1C1E;margin-bottom:3px}
+.paste-zone .pz-sub{font-size:12px;color:#8E8E93}
+.paste-input{position:absolute;opacity:0;pointer-events:none;width:1px;height:1px}
+.table-toolbar{display:flex;align-items:center;gap:10px;padding:12px 15px;flex-wrap:wrap;border-bottom:1px solid #E0E0E5}
+.table-toolbar .ttl{font-size:13px;font-weight:500;color:#1C1C1E;margin-right:auto}
+.btn-sm{padding:8px 14px;font-size:13px;font-weight:500;font-family:'Inter',sans-serif;border:1px solid #C7C7CC;border-radius:8px;background:#fff;color:#1C1C1E;cursor:pointer;transition:all .12s}
+.btn-sm:hover{background:#F5F5F7}
+.btn-sm.primary{background:#1C1C1E;color:#fff;border-color:#1C1C1E}
+.btn-sm.primary:hover{opacity:.85}
+.btn-sm.danger{color:#C0392B;border-color:#F2C2C2}
+.btn-sm.danger:hover{background:#FCECEC}
+.btn-sm:disabled{opacity:.4;cursor:default}
+.summary-bar{display:flex;gap:10px;padding:12px 15px;flex-wrap:wrap;border-bottom:1px solid #E0E0E5}
+.sum-chip{flex:1;min-width:110px;background:#F2F2F7;border-radius:8px;padding:8px 12px}
+.sum-chip.ok{background:#EAF6EC}
+.sum-chip.no{background:#FCECEC}
+.sum-chip .sc-l{font-size:11px;color:#8E8E93;margin-bottom:2px}
+.sum-chip .sc-v{font-size:17px;font-weight:500;color:#1C1C1E}
+.sum-chip.ok .sc-v{color:#2E7D32}
+.sum-chip.no .sc-v{color:#C0392B}
+.tbl-wrap{overflow-x:auto}
+table.results{width:100%;border-collapse:collapse;font-size:12.5px;white-space:nowrap}
+table.results th{background:#F2F2F7;color:#6C6C70;font-weight:500;font-size:10.5px;letter-spacing:.03em;text-transform:uppercase;padding:8px 10px;text-align:right;position:sticky;top:0;border-bottom:1px solid #DCDCE0}
+table.results th:first-child,table.results td:first-child{text-align:left;position:sticky;left:0;background:#F2F2F7;z-index:2}
+table.results td:first-child{background:#fff}
+table.results td.lbl-col,table.results th:nth-child(-n+4){text-align:left}
+.lbl-col{color:#1C1C1E;max-width:150px;overflow:hidden;text-overflow:ellipsis}
+table.results th.grp-start{border-left:1px solid #DCDCE0}
+table.results td.grp-start{border-left:1px solid #E0E0E5}
+table.results td{padding:7px 10px;text-align:right;border-bottom:1px solid #EFEFEF;color:#1C1C1E;font-feature-settings:"tnum" 1}
+table.results tr:hover td{background:#FAFAFB}
+table.results tr:hover td:first-child{background:#F5F5F7}
+table.results tr.row-ok td{background:#F3FAF4}
+table.results tr.row-ok td:first-child{background:#EDF7EE}
+table.results tr.row-fail td{background:#FDF1F1}
+table.results tr.row-fail td:first-child{background:#FBE8E8}
+table.results tr.row-pending td{color:#AEAEB2}
+.verdict-pill{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600}
+.verdict-pill.ok{background:#D9F0DB;color:#1E6B26}
+.verdict-pill.no{background:#F7D6D6;color:#A32626}
+.verdict-pill.pending{background:#EEEEEE;color:#AEAEB2}
+.editable-row-actions{text-align:center!important}
+.row-del{width:20px;height:20px;border-radius:6px;border:none;background:transparent;color:#C7C7CC;cursor:pointer;font-size:14px;line-height:1;display:inline-flex;align-items:center;justify-content:center}
+.row-del:hover{background:#FCECEC;color:#C0392B}
+.empty-state{padding:40px 20px;text-align:center;color:#8E8E93;font-size:13px}
+.progress-bar{height:3px;background:#E0E0E5;overflow:hidden}
+.progress-fill{height:100%;background:#007AFF;width:0%;transition:width .15s}
+@media(max-width:680px){.wrap{padding:14px 10px}.rc input[type=number],.sel-field select{font-size:16px}.rl{font-size:14px}.ph{font-size:12px}table.results{font-size:11.5px}}
+.back-btn{display:inline-flex;align-items:center;gap:5px;font-family:'Inter',sans-serif;font-size:14px;font-weight:500;color:#8E8E93;background:transparent;border:none;cursor:pointer;padding:12px 16px;text-decoration:none;line-height:1}
+.back-btn svg{width:16px;height:16px;stroke:#8E8E93;stroke-width:2.5;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.back-btn:hover{color:#1C1C1E}
+.back-btn:hover svg{stroke:#1C1C1E}
+.lang-seg{display:inline-flex;background:#E0E0E5;border-radius:8px;padding:2px;gap:2px;margin-left:auto}
+.lang-seg button{padding:5px 11px;font-size:12px;font-weight:600;border:none;border-radius:6px;background:transparent;color:#8E8E93;cursor:pointer;font-family:'Inter',sans-serif;transition:all .12s;letter-spacing:.02em}
+.lang-seg button.on{background:#fff;color:#1C1C1E;box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.topbar{display:flex;align-items:center;gap:8px;padding-right:12px}
+.author-footer{text-align:center;font-size:11px;font-weight:500;color:#8E8E93;padding:16px 16px 24px;letter-spacing:.02em}
+.preset-bar{display:flex;align-items:center;gap:10px;padding:0 16px 10px;max-width:1240px;margin:0 auto}
+.preset-bar label{font-size:14px;font-weight:500;color:#8E8E93}
+.preset-bar select{padding:6px 28px 6px 10px;font-size:14px;border:1px solid #C7C7CC;border-radius:8px;background:#fff;color:#1C1C1E;font-family:'Inter',sans-serif;-webkit-appearance:none;appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238E8E93'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
+.preset-bar select:focus{outline:none;box-shadow:0 0 0 2px rgba(0,122,255,.2);border-color:#007AFF}
+@media(max-width:680px){.preset-bar select{font-size:16px}}
+.report-bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:12px 15px}
+.report-lbl{font-size:13px;color:#1C1C1E;flex:1;min-width:120px}
+.report-btn{padding:11px 18px;font-size:14px;font-weight:500;font-family:'Inter',sans-serif;border:none;border-radius:10px;background:#1C1C1E;color:#fff;cursor:pointer;transition:opacity .15s}
+.report-btn:active{opacity:.7}
+.report-btn:disabled{opacity:.4}
+.report-status{font-size:12px;color:#8E8E93;text-align:center;padding:0 15px 10px;min-height:16px}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+<a href="index.html" class="back-btn"><svg viewBox="0 0 16 16"><polyline points="10,3 4,8 10,13"/></svg><span data-i18n="backAll">Toate modulele</span></a>
+<div class="lang-seg" id="langSeg"><button data-lang="ro">RO</button><button data-lang="en">EN</button></div>
+</div>
+<div class="preset-bar">
+  <label data-i18n="sectionLabel">Sectiune:</label>
+  <select id="presetSel" onchange="switchPreset(this.value)">
+    <option value="S1">S1</option>
+    <option value="S2">S2</option>
+    <option value="S3">S3</option>
+    <option value="S4">S4</option>
+    <option value="S5">S5</option>
+  </select>
+</div>
+
+<div class="wrap">
+  <div class="slabel" data-i18n="pageLabel">Verificare biaxiala in tabel</div>
+
+  <!-- ═══ SECTION DEFINITION (collapsible) ═══ -->
+  <div class="ip" id="sectionPanel">
+    <div class="ph" onclick="toggleSectionPanel()"><span data-i18n="secDefTitle">Sectiune, materiale &amp; armare (comuna pentru tot tabelul)</span><span class="chev"></span></div>
+    <div class="pb-outer">
+    <div class="pb">
+      <div class="geom-grid">
+        <div class="row"><div class="rl"><span data-i18n="dimB">Latime</span> <span class="rn">(b)</span></div><div class="rc"><input type="number" inputmode="numeric" id="bcol" value="300" step="10" oninput="onSectionChange()"><span class="ru">mm</span></div></div>
+        <div class="row"><div class="rl"><span data-i18n="dimH">Inaltime</span> <span class="rn">(h)</span></div><div class="rc"><input type="number" inputmode="numeric" id="hcol" value="300" step="10" oninput="onSectionChange()"><span class="ru">mm</span></div></div>
+      </div>
+
+      <div class="sub" style="padding-top:12px" data-i18n="s2materials">Materiale</div>
+      <div class="geom-grid">
+        <div class="sel-field"><label data-i18n="concClass">Clasa beton</label><div class="sel-wrap">
+          <select id="cp" onchange="curC=this.value;updMat();onSectionChange()">
+            <option>C12/15</option><option>C16/20</option><option>C20/25</option><option>C25/30</option>
+            <option selected>C30/37</option><option>C35/45</option><option>C40/50</option><option>C45/55</option>
+            <option>C50/60</option><option>C55/67</option><option>C60/75</option>
+          </select></div></div>
+        <div class="sel-field"><label data-i18n="steelClass">Clasa otel</label><div class="sel-wrap">
+          <select id="sp" onchange="curS=this.value;updMat();onSectionChange()">
+            <option>S240B</option><option>S400B</option><option>S500B</option><option selected>S 500</option>
+          </select></div></div>
+      </div>
+      <div class="mat-vals">
+        <div class="mv"><div class="mvl">f<sub>cd</sub></div><div class="mvv" id="fcd_d">20.00</div><div class="mvu">MPa</div></div>
+        <div class="mv"><div class="mvl">f<sub>yd</sub></div><div class="mvv" id="fyd_d">434.8</div><div class="mvu">MPa</div></div>
+        <div class="mv"><div class="mvl">&epsilon;<sub>cu2</sub></div><div class="mvv" id="ecu_d">3.50</div><div class="mvu">&permil;</div></div>
+        <div class="mv"><div class="mvl">&epsilon;<sub>c2</sub></div><div class="mvv" id="ec2_d">2.00</div><div class="mvu">&permil;</div></div>
+      </div>
+      <div class="toggle-row" style="margin-top:8px;border-top:1px solid #E0E0E5;padding-top:12px">
+        <span data-i18n="confinedConc">Beton confinat</span>
+        <div class="seg">
+          <button id="seg-nc" class="on" data-v="none" onclick="setConf('none')" data-i18n="unconfined">Neconfinat</button>
+          <button id="seg-cc" data-v="all" onclick="setConf('all')" data-i18n="confinedOpt">Confinat</button>
+        </div>
+      </div>
+      <div class="conf-fields" id="conf-fields">
+        <div class="row"><div class="rl"><span data-i18n="charConfStr">Rez. caract. confinata</span> <span class="rn">(f<sub>ck,c</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="fckc" value="35" step="0.1" oninput="onSectionChange()"><span class="ru">MPa</span></div></div>
+        <div class="row"><div class="rl"><span data-i18n="strainPeak">Def. la efort max</span> <span class="rn">(&epsilon;<sub>c2,c</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="ec2c" value="2.20" step="0.01" oninput="onSectionChange()"><span class="ru">&permil;</span></div></div>
+        <div class="row"><div class="rl"><span data-i18n="strainUlt">Def. ultima</span> <span class="rn">(&epsilon;<sub>cu2,c</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="ecu2c" value="5.50" step="0.1" oninput="onSectionChange()"><span class="ru">&permil;</span></div></div>
+      </div>
+
+      <div class="sub" style="padding-top:12px" data-i18n="s3longReinf">Armare longitudinala (pe contur)</div>
+      <div class="row"><div class="rl"><span data-i18n="atCorners">La colturi</span> <span class="rn">(<span data-i18n="pcsDia">buc / &Oslash;</span>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="cor_n" value="4" step="4" min="4" oninput="onSectionChange()" style="width:48px"><input type="number" inputmode="numeric" id="cor_d" value="16" step="1" oninput="onSectionChange()" style="width:48px"><span class="ru">mm</span></div></div>
+      <div class="row"><div class="rl"><span data-i18n="latHoriz">Lateral, latura b (sus/jos)</span> <span class="rn">(<span data-i18n="pcsDiaSide">buc/latura / &Oslash;</span>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="topb_n" value="1" step="1" oninput="onSectionChange()" style="width:48px"><input type="number" inputmode="numeric" id="topb_d" value="16" step="1" oninput="onSectionChange()" style="width:48px"><span class="ru">mm</span></div></div>
+      <div class="row"><div class="rl"><span data-i18n="latVert">Lateral, latura h (stanga/dreapta)</span> <span class="rn">(<span data-i18n="pcsDiaSide">buc/latura / &Oslash;</span>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="sidh_n" value="1" step="1" oninput="onSectionChange()" style="width:48px"><input type="number" inputmode="numeric" id="sidh_d" value="16" step="1" oninput="onSectionChange()" style="width:48px"><span class="ru">mm</span></div></div>
+      <div class="count-box"><span data-i18n="totalBars">Total bare</span><span id="cnt_tot">&mdash;</span></div>
+      <div class="count-box"><span data-i18n="reinfRatio">Procent armare</span><span id="rho_r">&mdash;</span></div>
+
+      <div class="sub" style="padding-top:12px" data-i18n="s4coverStirrups">Acoperire &amp; etrieri</div>
+      <div class="geom-grid">
+        <div class="row"><div class="rl"><span data-i18n="cover">Acoperire</span> <span class="rn">(c<sub>nom</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="cnom" value="30" step="5" oninput="onSectionChange()"><span class="ru">mm</span></div></div>
+        <div class="row"><div class="rl"><span data-i18n="stirrupDia">Diametru etrier</span> <span class="rn">(&Oslash;<sub>etr</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="detr" value="8" step="2" oninput="onSectionChange()"><span class="ru">mm</span></div></div>
+      </div>
+      <div class="note" id="sectionSummaryNote" style="padding-top:10px"></div>
+      <div style="margin-top:6px;background:#fff;border:1px solid #E0E0E5;border-radius:10px;padding:8px">
+        <svg id="sketch" viewBox="0 0 460 260" width="100%" style="display:block;max-width:420px;margin:0 auto"></svg>
+      </div>
+    </div>
+    </div>
+  </div>
+
+  <!-- ═══ PASTE ZONE ═══ -->
+  <div class="op">
+    <div class="ph"><span data-i18n="pasteTitle">Import combinatii de incarcare</span><span class="info-wrap"><button class="info-btn" type="button" onclick="toggleInfo(this,event)">i</button><div class="info-pop" onclick="event.stopPropagation()" data-i18n="pasteInfo">Copiaza din Excel/ETABS un bloc de date FARA antet, cu coloanele in aceasta ordine: Story, Column, Output Case, Station, N, M2, M3. Valorile trebuie separate prin Tab (formatul implicit la copiere din Excel). Semnul lui N se stabileste din comutatorul de mai sus.</div></span></div>
+    <div class="pb" style="padding-top:4px">
+      <div class="toggle-row" style="padding-bottom:10px">
+        <span data-i18n="mapLabel">Convenție axe ETABS</span>
+        <div class="seg">
+          <button id="seg-map-std" class="on" data-v="std" onclick="setAxisMap('std')" data-i18n="mapStd">M2&rarr;Mz, M3&rarr;My</button>
+          <button id="seg-map-swap" data-v="swap" onclick="setAxisMap('swap')" data-i18n="mapSwap">M2&rarr;My, M3&rarr;Mz</button>
+        </div>
+      </div>
+      <div class="toggle-row" style="padding-bottom:12px;border-bottom:1px solid #E0E0E5;margin-bottom:14px">
+        <span data-i18n="signLabel">Convenție semn N</span>
+        <div class="seg">
+          <button id="seg-sign-pos" class="on" data-v="pos" onclick="setSignConv('pos')" data-i18n="signPos">N&gt;0 compresiune</button>
+          <button id="seg-sign-neg" data-v="neg" onclick="setSignConv('neg')" data-i18n="signNeg">N&lt;0 compresiune</button>
+        </div>
+      </div>
+      <div class="paste-zone" id="pasteZone" onclick="focusPasteInput()" tabindex="0">
+        <svg class="pz-icon" viewBox="0 0 24 24" fill="none" stroke="#0066CC" stroke-width="1.4"><rect x="4" y="3" width="13" height="17" rx="1.5"/><path d="M8 8h5M8 11.5h5M8 15h3"/><path d="M15 3v3a1 1 0 0 0 1 1h3"/></svg>
+        <div class="pz-title" data-i18n="pasteZoneTitle">Click aici, apoi Ctrl+V</div>
+        <div class="pz-sub" data-i18n="pasteZoneSub">Story &middot; Column &middot; Output Case &middot; Station &middot; N &middot; M2 &middot; M3 (fara antet, separate prin Tab)</div>
+      </div>
+      <textarea class="paste-input" id="pasteInput" onpaste="handlePaste(event)"></textarea>
+    </div>
+  </div>
+
+  <!-- ═══ RESULTS TABLE ═══ -->
+  <div class="op" id="resultsPanel" style="display:none">
+    <div class="summary-bar" id="summaryBar"></div>
+    <div class="table-toolbar">
+      <span class="ttl" id="tableTitle"></span>
+      <button class="btn-sm" id="recalcBtn" onclick="recalcAll()" data-i18n="recalcAllBtn">Recalculeaza tot</button>
+      <button class="btn-sm" id="copyBtn" onclick="copyTable()" data-i18n="copyBtn">Copiaza tabelul</button>
+      <button class="btn-sm danger" onclick="clearTable()" data-i18n="clearBtn">Sterge tabelul</button>
+    </div>
+    <div class="progress-bar" id="progressBar" style="display:none"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="tbl-wrap">
+      <table class="results" id="resultsTable">
+        <thead><tr id="theadRow"></tr></thead>
+        <tbody id="tbodyRows"></tbody>
+      </table>
+    </div>
+    <div class="report-bar">
+      <span class="report-lbl" data-i18n="exportCalcReport">Export raport de calcul (PDF)</span>
+      <button class="report-btn" id="rptBtn" onclick="generatePdf()" data-i18n="downloadPdf">Descarca PDF</button>
+    </div>
+    <div class="report-status" id="rptStatus"></div>
+  </div>
+
+  <div class="op" id="emptyPanel">
+    <div class="empty-state" data-i18n="emptyStateMsg">Nicio combinatie importata inca. Defineste sectiunea mai sus, apoi lipeste datele din Excel/ETABS.</div>
+  </div>
+
+</div>
+<div class="author-footer" data-i18n="footer">Lucrare de disertație — Janos Patrik · UTCN · Facultatea de Construcții · 2026</div>
+
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
+<script>
+const CONC={'C12/15':{fck:12},'C16/20':{fck:16},'C20/25':{fck:20},'C25/30':{fck:25},'C30/37':{fck:30},'C35/45':{fck:35},'C40/50':{fck:40},'C45/55':{fck:45},'C50/60':{fck:50},'C55/67':{fck:55},'C60/75':{fck:60}};
+const STEEL={'S240B':{fyk:240,euk:0.05},'S400B':{fyk:400,euk:0.05},
+             'S500B':{fyk:500,euk:0.05},'S 500':{fyk:500,euk:0.05}};
+let curC='C30/37',curS='S 500',confMode='none';
+let axisMap=(function(){try{return localStorage.getItem('sw_col_axismap')||'std';}catch(e){return 'std';}})();
+let signConv=(function(){try{return localStorage.getItem('sw_col_signconv')||'pos';}catch(e){return 'pos';}})();
+// Same discretization as Module 06 (validated against XD-CoSec within ~0.7%,
+// conservative direction). Kept identical so batch results match the
+// single-column module exactly for the same section/loads.
+const NGY=40, NGZ=40, NANG=24;
+let rows=[]; // {story,column,outputCase,station,N,My,Mz, result:{...}|null, status:'pending'|'done'|'error'}
+let currentModel=null;
+
+// ═══════════════════ i18n ═══════════════════
+let LANG=(function(){try{return localStorage.getItem('sw_lang')||'en';}catch(e){return 'en';}})();
+const T={
+  backAll:{ro:'Toate modulele',en:'All modules'},
+  pageLabel:{ro:'Verificare biaxiala in tabel',en:'Biaxial check — table'},
+  sectionLabel:{ro:'Secțiune:',en:'Section:'},
+  secDefTitle:{ro:'Sectiune, materiale &amp; armare (comuna pentru tot tabelul)',en:'Section, materials &amp; reinforcement (shared by the whole table)'},
+  dimB:{ro:'Latime',en:'Width'},
+  dimH:{ro:'Inaltime',en:'Height'},
+  s2materials:{ro:'Materiale',en:'Materials'},
+  concClass:{ro:'Clasa beton',en:'Concrete class'},
+  steelClass:{ro:'Clasa otel',en:'Steel class'},
+  confinedConc:{ro:'Beton confinat',en:'Confined concrete'},
+  unconfined:{ro:'Neconfinat',en:'Unconfined'},
+  confinedOpt:{ro:'Confinat',en:'Confined'},
+  charConfStr:{ro:'Rez. caract. confinata',en:'Char. confined strength'},
+  strainPeak:{ro:'Def. la efort max',en:'Strain at peak stress'},
+  strainUlt:{ro:'Def. ultima',en:'Ultimate strain'},
+  s3longReinf:{ro:'Armare longitudinala (pe contur)',en:'Longitudinal reinforcement (perimeter)'},
+  atCorners:{ro:'La colturi',en:'At corners'},
+  latHoriz:{ro:'Lateral, latura b (sus/jos)',en:'Lateral, side b (top/bottom)'},
+  latVert:{ro:'Lateral, latura h (stanga/dreapta)',en:'Lateral, side h (left/right)'},
+  pcsDia:{ro:'buc / &Oslash;',en:'pcs / &Oslash;'},
+  pcsDiaSide:{ro:'buc/latura / &Oslash;',en:'pcs/side / &Oslash;'},
+  totalBars:{ro:'Total bare',en:'Total bars'},
+  reinfRatio:{ro:'Procent armare',en:'Reinforcement ratio'},
+  s4coverStirrups:{ro:'Acoperire &amp; etrieri',en:'Cover &amp; stirrups'},
+  cover:{ro:'Acoperire',en:'Cover'},
+  stirrupDia:{ro:'Diametru etrier',en:'Stirrup diameter'},
+  cornerRoundNote:{ro:n=>`Rotunjit la ${n} bare (multiplu de 4, cate 1 identica in fiecare colt).`,en:n=>`Rounded to ${n} bars (multiple of 4, one identical bar per corner).`},
+  mapLabel:{ro:'Conventie axe ETABS',en:'ETABS axis convention'},
+  signLabel:{ro:'Conventie semn N',en:'N sign convention'},
+  signPos:{ro:'N&gt;0 compresiune',en:'N&gt;0 compression'},
+  signNeg:{ro:'N&lt;0 compresiune',en:'N&lt;0 compression'},
+  mapStd:{ro:'M2&rarr;Mz, M3&rarr;My',en:'M2&rarr;Mz, M3&rarr;My'},
+  mapSwap:{ro:'M2&rarr;My, M3&rarr;Mz',en:'M2&rarr;My, M3&rarr;Mz'},
+  pasteTitle:{ro:'Import combinatii de incarcare',en:'Import load combinations'},
+  pasteInfo:{ro:'Copiaza din Excel/ETABS un bloc de date FARA antet, cu coloanele in aceasta ordine: Story, Column, Output Case, Station, N, M2, M3. Valorile trebuie separate prin Tab (formatul implicit la copiere din Excel). Semnul lui N se stabileste din comutatorul de mai sus.',en:'Copy a block of data from Excel/ETABS WITHOUT a header row, with columns in this order: Story, Column, Output Case, Station, N, M2, M3. Values must be Tab-separated (the default when copying from Excel). The sign of N is set by the toggle above.'},
+  pasteZoneTitle:{ro:'Click aici, apoi Ctrl+V',en:'Click here, then Ctrl+V'},
+  pasteZoneSub:{ro:'Story &middot; Column &middot; Output Case &middot; Station &middot; N &middot; M2 &middot; M3 (fara antet, separate prin Tab)',en:'Story &middot; Column &middot; Output Case &middot; Station &middot; N &middot; M2 &middot; M3 (no header, Tab-separated)'},
+  recalcAllBtn:{ro:'Recalculeaza tot',en:'Recalculate all'},
+  copyBtn:{ro:'Copiaza tabelul',en:'Copy table'},
+  copiedBtn:{ro:'Copiat ✓',en:'Copied ✓'},
+  clearBtn:{ro:'Sterge tabelul',en:'Clear table'},
+  emptyStateMsg:{ro:'Nicio combinatie importata inca. Defineste sectiunea mai sus, apoi lipeste datele din Excel/ETABS.',en:'No combinations imported yet. Define the section above, then paste data from Excel/ETABS.'},
+  exportCalcReport:{ro:'Export raport de calcul (PDF)',en:'Export calculation report (PDF)'},
+  downloadPdf:{ro:'Descarca PDF',en:'Download PDF'},
+  generating:{ro:'Se genereaza...',en:'Generating...'},
+  pdfLoading:{ro:'Libraria PDF se incarca...',en:'PDF library is loading...'},
+  footer:{ro:'Lucrare de disertație — Janos Patrik · UTCN · Facultatea de Construcții · 2026',en:'Dissertation — Janos Patrik · UTCN · Faculty of Civil Engineering · 2026'},
+  barsWord:{ro:'bare',en:'bars'},
+  skBars:{ro:(n)=>`${n} bare`,en:(n)=>`${n} bars`},
+  colStory:{ro:'Nivel',en:'Story'},
+  colColumn:{ro:'Stalp',en:'Column'},
+  colCase:{ro:'Combinatie',en:'Case'},
+  colStation:{ro:'Statie',en:'Station'},
+  colN:{ro:'N (kN)',en:'N (kN)'},
+  colM2:{ro:'M2 (kNm)',en:'M2 (kNm)'},
+  colM3:{ro:'M3 (kNm)',en:'M3 (kNm)'},
+  colMyRd:{ro:'My,Rd (kNm)',en:'My,Rd (kNm)'},
+  colMzRd:{ro:'Mz,Rd (kNm)',en:'Mz,Rd (kNm)'},
+  colUtil:{ro:'Utilizare',en:'Utilization'},
+  colVerdict:{ro:'Verdict',en:'Verdict'},
+  verdictOk:{ro:'VERIFICA',en:'PASS'},
+  verdictFail:{ro:'NU VERIFICA',en:'FAIL'},
+  verdictOutOfRange:{ro:'N in afara capacitatii sectiunii (sub N_Rd,t sau peste N_Rd,c) — combinatia nu poate fi verificata pentru aceasta sectiune.',en:'N outside the section capacity (below N_Rd,t or above N_Rd,c) — this combination cannot be checked for this section.'},
+  verdictPending:{ro:'&mdash;',en:'&mdash;'},
+  sumTotal:{ro:'Total combinatii',en:'Total combinations'},
+  sumOk:{ro:'Verifica',en:'Pass'},
+  sumFail:{ro:'Nu verifica',en:'Fail'},
+  sumWorst:{ro:'Cea mai defavorabila',en:'Governing (worst)'},
+  sumOutOfRange:{ro:'In afara intervalului',en:'Out of range'},
+  tableTitleN:{ro:n=>`${n} combinatii importate`,en:n=>`${n} combinations imported`},
+  sectionSummary:{ro:(b,h,tot,rho)=>`Sectiune curenta: ${b}\u00d7${h} mm, ${tot} bare, \u03C1 = ${rho}%. Se aplica identic tuturor r\u00e2ndurilor din tabel.`,en:(b,h,tot,rho)=>`Current section: ${b}\u00d7${h} mm, ${tot} bars, \u03C1 = ${rho}%. Applied identically to every row in the table.`},
+  confirmClear:{ro:'Sigur vrei sa stergi toate combinatiile importate?',en:'Are you sure you want to clear all imported combinations?'},
+  pasteParseError:{ro:n=>`${n} rand(uri) nu au putut fi interpretate si au fost ignorate (verifica formatul: Story, Column, Output Case, Station, N, M2, M3).`,en:n=>`${n} row(s) could not be parsed and were skipped (check the format: Story, Column, Output Case, Station, N, M2, M3).`},
+  calculating:{ro:n=>`Se calculeaza... ${n}`,en:n=>`Calculating... ${n}`},
+  pdfTitle:{ro:'VERIFICARE BIAXIALA IN TABEL — COMBINATII DE INCARCARE',en:'BIAXIAL CHECK — TABLE OF LOAD COMBINATIONS'},
+  pdfSub:{ro:'Metoda fibrelor 2D - CR 2-2022 / SR EN 1992-1-1',en:'2D fibre method - CR 2-2022 / SR EN 1992-1-1'},
+  pdfAppLine:{ro:'Aplicatie dezvoltata in cadrul lucrarii de disertatie \u2014 Janos Patrik',en:'Application developed within the dissertation \u2014 Janos Patrik'},
+  pdfDate:{ro:'Data: ',en:'Date: '},
+  pdfSecTitle:{ro:'SECTIUNE (comuna pentru toate combinatiile)',en:'SECTION (shared by all combinations)'},
+  pdfColParam:{ro:'Parametru',en:'Parameter'},
+  pdfColVal:{ro:'Valoare',en:'Value'},
+  pdfInWidth:{ro:'Latime b',en:'Width b'},
+  pdfInHeight:{ro:'Inaltime h',en:'Height h'},
+  pdfInTotBars:{ro:'Total bare',en:'Total bars'},
+  pdfInReinfRatio:{ro:'Procent armare',en:'Reinforcement ratio'},
+  pdfInConcClass:{ro:'Clasa beton',en:'Concrete class'},
+  pdfInSteelClass:{ro:'Clasa otel',en:'Steel class'},
+  pdfConfAll:{ro:' (confinat)',en:' (confined)'},
+  pdfResultsTitle:{ro:'REZULTATE PE COMBINATII',en:'RESULTS PER COMBINATION'},
+  pdfError:{ro:'Eroare la generare:',en:'Generation error:'},
+  pdfOOR:{ro:'N in afara',en:'N out of range'},
+  pdfGenerated:{ro:'Generat: ',en:'Generated: '},
+  pdfPage:{ro:(i,n)=>'Pagina '+i+' din '+n,en:(i,n)=>'Page '+i+' of '+n},
+  pdfDisc1:{ro:'Responsabilitatea pentru rezultatele obtinute revine in exclusivitate utilizatorului.',en:'Responsibility for the obtained results rests solely with the user.'},
+  pdfDisc2:{ro:'Toate valorile trebuie verificate inainte de utilizare.',en:'All values must be verified before use.'},
+  pdfFname:{ro:'Raport_stalp_biaxial_batch.pdf',en:'Report_column_biaxial_batch.pdf'},
+  statusDownloaded:{ro:'Raport descarcat.',en:'Report downloaded.'}
+};
+function t(key,...args){
+  const e=T[key];
+  if(!e)return key;
+  const v=e[LANG]!==undefined?e[LANG]:e.ro;
+  return typeof v==='function'?v(...args):v;
+}
+function applyStaticLang(){
+  document.documentElement.lang=LANG;
+  document.querySelectorAll('[data-i18n],[data-i18n-sym]').forEach(el=>{
+    const k=el.getAttribute('data-i18n')||el.getAttribute('data-i18n-sym');
+    if(T[k]){const v=T[k][LANG];if(v!==undefined&&typeof v!=='function')el.innerHTML=v;}
+  });
+  document.querySelectorAll('#langSeg button').forEach(b=>b.classList.toggle('on',b.dataset.lang===LANG));
+}
+function setLang(l){LANG=l;try{localStorage.setItem('sw_lang',l);}catch(e){}applyStaticLang();renderTable();updSectionSummary();}
+
+// ═══════════════════ info popovers ═══════════════════
+function toggleInfo(btn,ev){
+  ev.stopPropagation();
+  const pop=btn.nextElementSibling;
+  const wasOpen=pop.classList.contains('show');
+  closeAllInfo();
+  if(!wasOpen){positionInfoPop(btn,pop);pop.classList.add('show');btn.classList.add('on');}
+}
+function positionInfoPop(btn,pop){
+  const r=btn.getBoundingClientRect();
+  const vw=window.innerWidth, vh=window.innerHeight;
+  const popW=Math.min(260,vw*0.78);
+  let left=r.left+r.width/2-popW/2;
+  left=Math.max(10,Math.min(left,vw-popW-10));
+  pop.style.width=popW+'px';pop.style.left=left+'px';
+  pop.style.visibility='hidden';pop.style.display='block';
+  const popH=pop.offsetHeight;
+  pop.style.display='';pop.style.visibility='';
+  let top=r.bottom+8, arrowTop, arrowRot, popTopFinal;
+  if(top+popH>vh-10 && r.top-popH-8>10){
+    popTopFinal=r.top-popH-8; arrowTop=r.top-8-1; arrowRot='rotate(225deg)';
+  } else { popTopFinal=top; arrowTop=r.bottom+3; arrowRot='rotate(45deg)'; }
+  pop.style.top=popTopFinal+'px';
+  const arrowLeft=Math.max(left+10,Math.min(r.left+r.width/2-4.5,left+popW-18));
+  pop.style.setProperty('--arrow-left',arrowLeft+'px');
+  pop.style.setProperty('--arrow-top',arrowTop+'px');
+  pop.style.setProperty('--arrow-rot',arrowRot);
+}
+function closeAllInfo(){
+  document.querySelectorAll('.info-pop.show').forEach(p=>p.classList.remove('show'));
+  document.querySelectorAll('.info-btn.on').forEach(b=>b.classList.remove('on'));
+}
+document.addEventListener('click',closeAllInfo);
+window.addEventListener('scroll',closeAllInfo,true);
+window.addEventListener('resize',closeAllInfo);
+
+function toggleSectionPanel(){document.getElementById('sectionPanel').classList.toggle('collapsed');}
+
+// ═══════════════════ ETABS axis mapping ═══════════════════
+// ETABS local-axis convention for columns is not universal — it depends on
+// how the local axes were set (or overridden) in the model. Default ("std")
+// follows the common case M2->Mz, M3->My; "swap" covers the flipped case.
+// Kept as raw M2/M3 per row so switching the toggle re-maps existing data
+// without requiring the person to re-paste from Excel.
+function mapMy(M2,M3){return axisMap==='swap'?M2:M3;}
+function mapMz(M2,M3){return axisMap==='swap'?M3:M2;}
+function setAxisMap(mode){
+  axisMap=mode;
+  try{localStorage.setItem('sw_col_axismap',mode);}catch(e){}
+  document.getElementById('seg-map-std').classList.toggle('on',mode==='std');
+  document.getElementById('seg-map-swap').classList.toggle('on',mode==='swap');
+  if(rows.length){
+    rows.forEach(r=>{
+      r.My=mapMy(r.M2,r.M3);
+      r.Mz=mapMz(r.M2,r.M3);
+      r.status='pending';r.result=null;
+    });
+    recalcAll();
+  }
+  saveCurrentPreset();
+}
+// N sign convention: ETABS typically reports compression as NEGATIVE axial
+// force, while this tool's engine treats N>0 as compression. When "neg" is
+// selected, the raw pasted N is negated so the engine receives compression as
+// positive. Stored as raw Nraw per row so the toggle can be flipped later
+// without re-pasting.
+function convN(Nraw){return signConv==='neg'?-Nraw:Nraw;}
+function setSignConv(mode){
+  signConv=mode;
+  try{localStorage.setItem('sw_col_signconv',mode);}catch(e){}
+  document.getElementById('seg-sign-pos').classList.toggle('on',mode==='pos');
+  document.getElementById('seg-sign-neg').classList.toggle('on',mode==='neg');
+  if(rows.length){
+    rows.forEach(r=>{
+      r.N=convN(r.Nraw);
+      r.status='pending';r.result=null;
+    });
+    recalcAll();
+  }
+  saveCurrentPreset();
+}
+
+function gv(id){return parseFloat(document.getElementById(id)?.value)||0;}
+function updMat(){
+  const fck=CONC[curC].fck, fyk=STEEL[curS].fyk;
+  document.getElementById('fcd_d').textContent=(fck/1.5).toFixed(2);
+  document.getElementById('fyd_d').textContent=(fyk/1.15).toFixed(1);
+}
+function setConf(mode){
+  setConfUI(mode);
+  onSectionChange();
+  saveCurrentPreset();
+}
+
+// ═══════════════════ Section model (identical engine to Module 06) ═══════════════════
+function buildModel(){
+  const b=gv('bcol'),h=gv('hcol');
+  const cnom=gv('cnom'),detr=gv('detr');
+  const fck=CONC[curC].fck, fcd=fck/1.5;
+  const fckc=gv('fckc'), fcdc=fckc/1.5;
+  const fyd=STEEL[curS].fyk/1.15;
+  const eud=0.9*STEEL[curS].euk;
+  const Es=200000;
+  const ec2_nc=0.002, ecu_nc=0.0035;
+  const ec2_c=gv('ec2c')/1000, ecu_c=gv('ecu2c')/1000;
+  const PI=Math.PI;
+  function barA(d){return d*d*PI/4;}
+
+  const cor_n=gv('cor_n'),cor_d=gv('cor_d');
+  const topb_n=Math.max(0,gv('topb_n')),topb_d=gv('topb_d');
+  const sidh_n=Math.max(0,gv('sidh_n')),sidh_d=gv('sidh_d');
+
+  const inset=cnom+detr;
+  const halfY=b/2-inset;
+  const halfZ=h/2-inset;
+
+  const steelFibers=[];
+  const cornersXY=[[-halfY,-halfZ],[halfY,-halfZ],[halfY,halfZ],[-halfY,halfZ]];
+  const Acorner=barA(cor_d);
+  const perCorner=Math.max(0,Math.round(cor_n/4));
+  cornersXY.forEach(([y,z])=>{steelFibers.push({y,z,A:Acorner*perCorner});});
+
+  const Atop=barA(topb_d);
+  if(topb_n>0){
+    for(let s=0;s<2;s++){
+      const z=(s===0)?-halfZ:halfZ;
+      for(let i=0;i<topb_n;i++){
+        const y=-halfY+(halfY*2)*(i+1)/(topb_n+1);
+        steelFibers.push({y,z,A:Atop});
+      }
+    }
+  }
+  const Aside=barA(sidh_d);
+  if(sidh_n>0){
+    for(let s=0;s<2;s++){
+      const y=(s===0)?-halfY:halfY;
+      for(let i=0;i<sidh_n;i++){
+        const z=-halfZ+(halfZ*2)*(i+1)/(sidh_n+1);
+        steelFibers.push({y,z,A:Aside});
+      }
+    }
+  }
+  const As_tot=steelFibers.reduce((s,f)=>s+f.A,0);
+  const Ac=b*h;
+  const cntCorner=perCorner*4;
+  const cntTop=topb_n*2, cntSide=sidh_n*2;
+  const cntTot=cntCorner+cntTop+cntSide;
+
+  const dAg=(b/NGY)*(h/NGZ);
+  const cFibers=[];
+  for(let i=0;i<NGY;i++){
+    const y=-b/2+(i+0.5)*(b/NGY);
+    for(let j=0;j<NGZ;j++){
+      const z=-h/2+(j+0.5)*(h/NGZ);
+      cFibers.push({y,z});
+    }
+  }
+
+  return {b,h,cnom,detr,fck,fcd,fckc,fcdc,fyd,eud,Es,ec2_nc,ecu_nc,ec2_c,ecu_c,
+    steelFibers,cFibers,dAg,As_tot,Ac,cntTot,cntCorner,cntTop,cntSide,
+    bars:{cor_n,cor_d,topb_n,topb_d,sidh_n,sidh_d,halfY,halfZ}};
+}
+
+function sigC(eps,m){
+  if(eps<=0) return 0;
+  const conf=(confMode==='all');
+  const fcd=conf?m.fcdc:m.fcd, ec2=conf?m.ec2_c:m.ec2_nc, ecu=conf?m.ecu_c:m.ecu_nc;
+  const r=eps/ec2;
+  if(eps<=ec2) return fcd*(2*r-r*r);
+  return fcd;
+}
+function sigS(eps,m){let s=eps*m.Es;if(s>m.fyd)s=m.fyd;if(s<-m.fyd)s=-m.fyd;return s;}
+
+function dmaxTheta(theta,b,h){
+  const cx=Math.cos(theta), cz=Math.sin(theta);
+  const corners=[[-b/2,-h/2],[b/2,-h/2],[b/2,h/2],[-b/2,h/2]];
+  let dmax=-Infinity;
+  for(const [y,z] of corners){const d=y*cx+z*cz; if(d>dmax)dmax=d;}
+  return dmax;
+}
+
+function sectionForces(X,theta,m){
+  const cx=Math.cos(theta), cz=Math.sin(theta);
+  const conf=(confMode==='all');
+  const ecu=conf?m.ecu_c:m.ecu_nc;
+  const epsEdge=ecu;
+  const dmax=dmaxTheta(theta,m.b,m.h);
+  const na=dmax-X;
+  let Fc=0,Mcy=0,Mcz=0;
+  for(const f of m.cFibers){
+    const d=f.y*cx+f.z*cz;
+    const eps=epsEdge*(d-na)/X;
+    if(eps<=0) continue;
+    const sig=sigC(eps,m);
+    const F=sig*m.dAg;
+    Fc+=F; Mcy+=F*f.z; Mcz+=F*f.y;
+  }
+  let Fs=0,Msy=0,Msz=0;
+  for(const s of m.steelFibers){
+    const d=s.y*cx+s.z*cz;
+    const eps=epsEdge*(d-na)/X;
+    const sigSt=sigS(eps,m);
+    // Subtract the concrete stress displaced by the bar (same location/strain)
+    // so steel and concrete never overlap physically — see Module 06 fix.
+    const sigDisp=sigC(eps,m);
+    const F=(sigSt-sigDisp)*s.A;
+    Fs+=F; Msy+=F*s.z; Msz+=F*s.y;
+  }
+  const N=(Fc+Fs)/1e3;
+  const My=(Mcy+Msy)/1e6, Mz=(Mcz+Msz)/1e6;
+  return {N,My,Mz,Fc:Fc/1e3,Fs:Fs/1e3};
+}
+
+function solveX(theta,Ntarget,m){
+  const maxSpan=Math.max(m.b,m.h)*2;
+  const F=X=>sectionForces(X,theta,m).N-Ntarget;
+  let lo=1,hi=maxSpan*4;
+  let flo=F(lo),fhi=F(hi);
+  let guard=0;
+  while(flo*fhi>0 && guard++<200){
+    if(Math.abs(flo)<Math.abs(fhi)){lo/=2; if(lo<1e-6) break; flo=F(lo);}
+    else{hi*=2; if(hi>maxSpan*1e6) break; fhi=F(hi);}
+  }
+  if(flo*fhi>0){
+    const X=(Math.abs(flo)<Math.abs(fhi))?lo:hi;
+    return{X,...sectionForces(X,theta,m),converged:false};
+  }
+  for(let it=0;it<45;it++){
+    const mid=(lo+hi)/2, fm=F(mid);
+    if(flo*fm<=0){hi=mid;fhi=fm;}else{lo=mid;flo=fm;}
+    if(Math.abs(fm)<1e-6) break;
+  }
+  const X=(lo+hi)/2;
+  return{X,...sectionForces(X,theta,m),converged:true};
+}
+
+function findThetaForDirection(dirAngle,Ntarget,m){
+  function angAt(th){
+    const r=solveX(th,Ntarget,m);
+    return {ang:Math.atan2(r.Mz,r.My),r};
+  }
+  const TWO_PI=2*Math.PI;
+  let target=dirAngle;
+  while(target<=-Math.PI) target+=TWO_PI;
+  while(target>Math.PI) target-=TWO_PI;
+  let lo=0,hi=TWO_PI;
+  for(let it=0;it<38;it++){
+    const mid=(lo+hi)/2;
+    const {ang}=angAt(mid);
+    let diff=ang-target;
+    while(diff>Math.PI) diff-=TWO_PI;
+    while(diff<=-Math.PI) diff+=TWO_PI;
+    if(diff>0){lo=mid;} else {hi=mid;}
+  }
+  const thFinal=(lo+hi)/2;
+  const {r:rFinal}=angAt(thFinal);
+  return {theta:thFinal,...rFinal};
+}
+
+// Evaluate one load combination against the current model. Returns null-safe
+// result object; never throws (defensive, since this runs unattended over
+// many pasted rows that could contain degenerate/out-of-range values).
+function evalCombo(m,N,MyEd,MzEd){
+  try{
+    const dirAngle=Math.atan2(MzEd,MyEd);
+    const res=findThetaForDirection(dirAngle,N,m);
+    const MyRd=res.My, MzRd=res.Mz;
+    const dEd=Math.hypot(MyEd,MzEd);
+    const dRd=Math.hypot(MyRd,MzRd);
+    const util=dRd>1e-9?(dEd/dRd*100):0;
+    const eqOk=(res.converged!==false)&&Math.abs(N-res.N)<=Math.max(0.05,Math.abs(N)*1e-4);
+    return {MyRd,MzRd,util,X:res.X,thetaDeg:res.theta*180/Math.PI,Nint:res.N,eqOk,ok:util<=100&&eqOk,error:false};
+  }catch(e){
+    return {error:true,errorMsg:String(e&&e.message||e)};
+  }
+}
+
+// ═══════════════════ Section change → invalidate results, update summary ═══════════════════
+function onSectionChange(){
+  currentModel=buildModel();
+  updSectionSummary();
+  drawSketch(currentModel);
+  document.getElementById('cnt_tot').textContent=currentModel.cntTot+' '+t('barsWord');
+  document.getElementById('rho_r').textContent=(100*currentModel.As_tot/currentModel.Ac).toFixed(2)+' %';
+  const corInputEl=document.getElementById('cor_n');
+  const corRaw=gv('cor_n');
+  corInputEl.style.borderColor=(corRaw!==currentModel.cntCorner)?'#C0392B':'';
+  corInputEl.title=(corRaw!==currentModel.cntCorner)?t('cornerRoundNote',currentModel.cntCorner):'';
+  if(rows.length){
+    // section changed → all previous results are stale, recompute the batch
+    recalcAll();
+  }
+}
+function drawSketch(m){
+  const svg=document.getElementById('sketch');
+  if(!svg)return;
+  const VW=460,VH=260,PL=30,PR=30,PT=30,PB=44;
+  const scl=Math.min((VW-PL-PR)/m.b,(VH-PT-PB)/m.h);
+  const dark='#1C1C1E',dim='#AEAEB2',lbl='#6C6C70';
+  const cx0=VW/2, cy0=(PT+VH-PB)/2;
+  function X2(y){return cx0+y*scl;}
+  function Y2(z){return cy0-z*scl;}
+  let o='';
+  const fillCol=(confMode==='all')?'#DDEEFF':'#E8E8ED';
+  o+=`<rect x="${X2(-m.b/2)}" y="${Y2(m.h/2)}" width="${m.b*scl}" height="${m.h*scl}" fill="${fillCol}" stroke="${dark}" stroke-width="1.2"/>`;
+  const R=2.6;
+  m.steelFibers.forEach(f=>{o+=`<circle cx="${X2(f.y)}" cy="${Y2(f.z)}" r="${R}" fill="${dark}"/>`;});
+  o+=`<text x="${cx0}" y="${Y2(m.h/2)-10}" text-anchor="middle" font-size="8" fill="${lbl}" font-family="Inter,sans-serif">${t('skBars',m.cntTot)}</text>`;
+  const dy=Y2(-m.h/2)+20;
+  o+=`<line x1="${X2(-m.b/2)}" y1="${dy}" x2="${X2(m.b/2)}" y2="${dy}" stroke="${dim}" stroke-width="0.7"/>`;
+  o+=`<line x1="${X2(-m.b/2)}" y1="${dy-3}" x2="${X2(-m.b/2)}" y2="${dy+3}" stroke="${dim}" stroke-width="0.7"/>`;
+  o+=`<line x1="${X2(m.b/2)}" y1="${dy-3}" x2="${X2(m.b/2)}" y2="${dy+3}" stroke="${dim}" stroke-width="0.7"/>`;
+  o+=`<text x="${cx0}" y="${dy+12}" text-anchor="middle" font-size="8" fill="${lbl}" font-family="Inter,sans-serif">b = ${m.b} mm</text>`;
+  const dx=X2(m.b/2)+18;
+  o+=`<line x1="${dx}" y1="${Y2(-m.h/2)}" x2="${dx}" y2="${Y2(m.h/2)}" stroke="${dim}" stroke-width="0.7"/>`;
+  o+=`<line x1="${dx-3}" y1="${Y2(-m.h/2)}" x2="${dx+3}" y2="${Y2(-m.h/2)}" stroke="${dim}" stroke-width="0.7"/>`;
+  o+=`<line x1="${dx-3}" y1="${Y2(m.h/2)}" x2="${dx+3}" y2="${Y2(m.h/2)}" stroke="${dim}" stroke-width="0.7"/>`;
+  o+=`<text x="${dx+8}" y="${cy0}" text-anchor="start" font-size="8" fill="${lbl}" font-family="Inter,sans-serif" transform="rotate(90 ${dx+8} ${cy0})">h = ${m.h} mm</text>`;
+  const ax0=X2(-m.b/2)-16,ay0=Y2(m.h/2)+16;
+  o+=`<line x1="${ax0}" y1="${ay0}" x2="${ax0+14}" y2="${ay0}" stroke="#0066CC" stroke-width="1"/><text x="${ax0+17}" y="${ay0+3}" font-size="7" fill="#0066CC" font-family="Inter,sans-serif">y</text>`;
+  o+=`<line x1="${ax0}" y1="${ay0}" x2="${ax0}" y2="${ay0-14}" stroke="#0066CC" stroke-width="1"/><text x="${ax0-3}" y="${ay0-17}" font-size="7" fill="#0066CC" font-family="Inter,sans-serif">z</text>`;
+  svg.innerHTML=o;
+}
+function updSectionSummary(){
+  if(!currentModel)return;
+  const m=currentModel;
+  document.getElementById('sectionSummaryNote').textContent=
+    t('sectionSummary',m.b,m.h,m.cntTot,(100*m.As_tot/m.Ac).toFixed(2));
+}
+
+// ═══════════════════ Paste handling ═══════════════════
+function focusPasteInput(){document.getElementById('pasteInput').focus();}
+document.getElementById('pasteZone')?.addEventListener?.('focus',()=>{});
+function handlePaste(ev){
+  ev.preventDefault();
+  const text=(ev.clipboardData||window.clipboardData).getData('text');
+  parseAndAppend(text);
+  ev.target.value='';
+}
+function parseAndAppend(text){
+  const lines=text.split(/\r\n|\n|\r/).map(l=>l.trim()).filter(l=>l.length>0);
+  let errCount=0;
+  const newRows=[];
+  for(const line of lines){
+    const cols=line.split('\t');
+    if(cols.length<7){errCount++;continue;}
+    const [story,column,outputCase,station,nStr,m2Str,m3Str]=cols;
+    const N=parseFloat(nStr.replace(',','.'));
+    const M2=parseFloat(m2Str.replace(',','.'));
+    const M3=parseFloat(m3Str.replace(',','.'));
+    if(!isFinite(N)||!isFinite(M2)||!isFinite(M3)){errCount++;continue;}
+    newRows.push({story:story||'',column:column||'',outputCase:outputCase||'',station:station||'',
+      Nraw:N,M2,M3, // raw ETABS values kept so axis/sign conventions can change later without re-pasting
+      N:convN(N),My:mapMy(M2,M3),Mz:mapMz(M2,M3),
+      result:null,status:'pending'});
+  }
+  if(newRows.length===0 && errCount>0){
+    alert(t('pasteParseError',errCount));
+    return;
+  }
+  rows=rows.concat(newRows);
+  if(errCount>0){
+    // non-blocking notice
+    setTimeout(()=>alert(t('pasteParseError',errCount)),50);
+  }
+  document.getElementById('resultsPanel').style.display='';
+  document.getElementById('emptyPanel').style.display='none';
+  renderTable();
+  recalcAll();
+  saveCurrentPreset();
+}
+function clearTable(){
+  if(rows.length && !confirm(t('confirmClear')))return;
+  rows=[];
+  document.getElementById('resultsPanel').style.display='none';
+  document.getElementById('emptyPanel').style.display='';
+  saveCurrentPreset();
+}
+function deleteRow(idx){
+  rows.splice(idx,1);
+  if(rows.length===0){clearTableSilent();saveCurrentPreset();return;}
+  renderTable();
+  saveCurrentPreset();
+}
+function clearTableSilent(){
+  rows=[];
+  document.getElementById('resultsPanel').style.display='none';
+  document.getElementById('emptyPanel').style.display='';
+}
+
+// ═══════════════════ Batch calculation (async, chunked to keep UI responsive) ═══════════════════
+function recalcAll(){
+  if(!currentModel) currentModel=buildModel();
+  rows.forEach(r=>{r.status='pending';r.result=null;});
+  renderTable();
+  const btn=document.getElementById('recalcBtn');
+  btn.disabled=true;
+  const progBar=document.getElementById('progressBar'), progFill=document.getElementById('progressFill');
+  progBar.style.display='';
+  progFill.style.width='0%';
+  let i=0;
+  const m=currentModel;
+  function step(){
+    const CHUNK=1; // one row per animation frame keeps the tab responsive even on slow devices
+    for(let c=0;c<CHUNK && i<rows.length;c++,i++){
+      const row=rows[i];
+      const res=evalCombo(m,row.N,row.My,row.Mz);
+      if(res.error){row.status='error';row.result=res;}
+      else{row.status='done';row.result=res;}
+    }
+    progFill.style.width=(100*i/rows.length).toFixed(0)+'%';
+    renderTable();
+    if(i<rows.length){
+      requestAnimationFrame(step);
+    } else {
+      btn.disabled=false;
+      setTimeout(()=>{progBar.style.display='none';},400);
+    }
+  }
+  requestAnimationFrame(step);
+}
+
+// ═══════════════════ Table rendering ═══════════════════
+function renderTable(){
+  const thead=document.getElementById('theadRow');
+  thead.innerHTML=`
+    <th>${t('colStory')}</th><th>${t('colColumn')}</th><th>${t('colCase')}</th><th>${t('colStation')}</th>
+    <th class="grp-start">${t('colN')}</th><th>${t('colM2')}</th><th>${t('colM3')}</th>
+    <th class="grp-start">${t('colMyRd')}</th><th>${t('colMzRd')}</th><th>${t('colUtil')}</th><th>${t('colVerdict')}</th>
+    <th class="editable-row-actions"></th>`;
+  const tbody=document.getElementById('tbodyRows');
+  let html='';
+  rows.forEach((r,idx)=>{
+    const rowClass=r.status==='done'?(r.result.ok?'row-ok':'row-fail'):(r.status==='error'?'row-fail':'row-pending');
+    let myRd='&mdash;',mzRd='&mdash;',util='&mdash;',verdict=`<span class="verdict-pill pending">${t('verdictPending')}</span>`;
+    if(r.status==='done'){
+      if(r.result.eqOk===false){
+        myRd=mzRd=util='&mdash;';
+        verdict=`<span class="verdict-pill no" title="${esc(t('verdictOutOfRange'))}">${t('verdictFail')}</span>`;
+      } else {
+        myRd=r.result.MyRd.toFixed(1);
+        mzRd=r.result.MzRd.toFixed(1);
+        util=r.result.util.toFixed(1)+' %';
+        verdict=r.result.ok
+          ? `<span class="verdict-pill ok">${t('verdictOk')}</span>`
+          : `<span class="verdict-pill no">${t('verdictFail')}</span>`;
+      }
+    } else if(r.status==='error'){
+      myRd=mzRd=util='err';
+      verdict=`<span class="verdict-pill no" title="${esc(r.result&&r.result.errorMsg||'')}">${t('verdictFail')}</span>`;
+    }
+    html+=`<tr class="${rowClass}">
+      <td class="lbl-col">${esc(r.story)}</td><td class="lbl-col">${esc(r.column)}</td><td class="lbl-col">${esc(r.outputCase)}</td><td class="lbl-col">${esc(r.station)}</td>
+      <td class="grp-start">${r.N.toFixed(1)}</td><td>${r.Mz.toFixed(1)}</td><td>${r.My.toFixed(1)}</td>
+      <td class="grp-start">${myRd}</td><td>${mzRd}</td><td>${util}</td><td>${verdict}</td>
+      <td class="editable-row-actions"><button class="row-del" onclick="deleteRow(${idx})" title="Delete">&times;</button></td>
+    </tr>`;
+  });
+  tbody.innerHTML=html;
+  document.getElementById('tableTitle').textContent=t('tableTitleN',rows.length);
+  renderSummary();
+}
+function esc(s){return (s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+
+// Copy the full results table to the clipboard as Tab-separated values, ready to
+// paste straight back into Excel. Includes a header row and every column
+// (labels + inputs + computed My,Rd / Mz,Rd / utilization / verdict).
+function copyTable(){
+  const btn=document.getElementById('copyBtn');
+  const header=[t('colStory'),t('colColumn'),t('colCase'),t('colStation'),
+    'N (kN)','M2 (kNm)','M3 (kNm)','My,Rd (kNm)','Mz,Rd (kNm)',t('colUtil'),t('colVerdict')];
+  const stripHtml=s=>String(s).replace(/<[^>]*>/g,'').replace(/&mdash;/g,'-').replace(/&amp;/g,'&');
+  const lines=[header.join('\t')];
+  rows.forEach(r=>{
+    const isOOR=r.status==='done'&&r.result.eqOk===false;
+    const done=r.status==='done'&&!isOOR;
+    const myRd=done?r.result.MyRd.toFixed(1):(isOOR?t('pdfOOR'):'-');
+    const mzRd=done?r.result.MzRd.toFixed(1):(isOOR?t('pdfOOR'):'-');
+    const util=done?r.result.util.toFixed(1)+'%':(isOOR?t('pdfOOR'):'-');
+    const verdict=r.status==='done'?(isOOR?stripHtml(t('verdictFail')):(r.result.ok?stripHtml(t('verdictOk')):stripHtml(t('verdictFail')))):(r.status==='error'?stripHtml(t('verdictFail')):'-');
+    lines.push([r.story,r.column,r.outputCase,r.station,
+      r.N.toFixed(1),r.Mz.toFixed(1),r.My.toFixed(1),myRd,mzRd,util,verdict].join('\t'));
+  });
+  const tsv=lines.join('\n');
+  const done=()=>{const orig=btn.textContent;btn.textContent=t('copiedBtn');btn.disabled=true;
+    setTimeout(()=>{btn.textContent=t('copyBtn');btn.disabled=false;},1600);};
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(tsv).then(done).catch(()=>fallbackCopy(tsv,done));
+  } else {
+    fallbackCopy(tsv,done);
+  }
+}
+function fallbackCopy(text,cb){
+  const ta=document.createElement('textarea');
+  ta.value=text;ta.style.position='fixed';ta.style.left='-9999px';
+  document.body.appendChild(ta);ta.focus();ta.select();
+  try{document.execCommand('copy');cb&&cb();}catch(e){}
+  document.body.removeChild(ta);
+}
+function renderSummary(){
+  const bar=document.getElementById('summaryBar');
+  const done=rows.filter(r=>r.status==='done');
+  const outOfRange=done.filter(r=>r.result.eqOk===false);
+  const validDone=done.filter(r=>r.result.eqOk!==false);
+  const okCount=validDone.filter(r=>r.result.ok).length;
+  const failCount=validDone.length-okCount+rows.filter(r=>r.status==='error').length+outOfRange.length;
+  let worst=null;
+  validDone.forEach(r=>{if(!worst||r.result.util>worst.result.util)worst=r;});
+  let html=`
+    <div class="sum-chip"><div class="sc-l">${t('sumTotal')}</div><div class="sc-v">${rows.length}</div></div>
+    <div class="sum-chip ok"><div class="sc-l">${t('sumOk')}</div><div class="sc-v">${okCount}</div></div>
+    <div class="sum-chip no"><div class="sc-l">${t('sumFail')}</div><div class="sc-v">${failCount}</div></div>
+    <div class="sum-chip"><div class="sc-l">${t('sumWorst')}</div><div class="sc-v">${worst?worst.result.util.toFixed(1)+' %':'&mdash;'}</div></div>`;
+  if(outOfRange.length>0){
+    html+=`<div class="sum-chip no"><div class="sc-l">${t('sumOutOfRange')}</div><div class="sc-v">${outOfRange.length}</div></div>`;
+  }
+  bar.innerHTML=html;
+}
+
+// ═══════════════════ PDF export ═══════════════════
+function generatePdf(){
+  const btn=document.getElementById('rptBtn'),status=document.getElementById('rptStatus');
+  if(typeof window.jspdf==='undefined'){status.textContent=t('pdfLoading');return;}
+  if(!currentModel){return;}
+  if(!rows.length){return;}
+  btn.disabled=true;btn.textContent=t('generating');
+  setTimeout(()=>{
+    try{
+      buildPdfDoc();
+      status.textContent=t('statusDownloaded');
+      setTimeout(()=>status.textContent='',4000);
+    }catch(err){
+      console.error('PDF generation failed:',err);
+      status.textContent=t('pdfError')+' '+(err&&err.message||err);
+    }finally{
+      btn.disabled=false;btn.textContent=t('downloadPdf');
+    }
+  },30);
+}
+
+function buildPdfDoc(){
+  const{jsPDF}=window.jspdf;
+  const doc=new jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
+  const pW=297,pH=210,ml=12,mr=12,cw=pW-ml-mr;
+  const ds=new Date().toLocaleDateString(LANG==='en'?'en-GB':'ro-RO');
+  const m=currentModel;
+  function hdr(){
+    doc.setFillColor(40,80,140);doc.rect(0,0,pW,13,'F');
+    doc.setTextColor(255,255,255);doc.setFontSize(10);doc.setFont('helvetica','bold');
+    doc.text(t('pdfTitle'),ml,8);
+    doc.setFontSize(7.5);doc.setFont('helvetica','normal');
+    doc.text(t('pdfSub'),ml,12);
+    doc.text(t('pdfDate')+ds,pW-mr,8,{align:'right'});
+    doc.setTextColor(0,0,0);
+  }
+  hdr();
+  let y=19;
+
+  // ── Section summary (params table + sketch, side by side) ──
+  doc.setFontSize(9);doc.setFont('helvetica','bold');doc.setTextColor(0,102,204);
+  doc.text(t('pdfSecTitle'),ml,y);doc.setTextColor(0,0,0);doc.setFont('helvetica','normal');
+  y+=5;
+  const rho=(100*m.As_tot/m.Ac).toFixed(2);
+  const leftW=120;
+  doc.autoTable({
+    startY:y,
+    body:[
+      [t('pdfInWidth'),m.b+' mm'],
+      [t('pdfInHeight'),m.h+' mm'],
+      [t('pdfInConcClass'),curC+(confMode==='all'?t('pdfConfAll'):'')],
+      [t('pdfInSteelClass'),curS],
+      ['f_cd',(confMode==='all'?m.fcdc:m.fcd).toFixed(2)+' MPa'],
+      ['f_yd',m.fyd.toFixed(1)+' MPa'],
+      [t('pdfInTotBars'),m.cntTot+' '+t('barsWord')],
+      [t('pdfInReinfRatio'),rho+' %'],
+    ],
+    margin:{left:ml},tableWidth:leftW,theme:'grid',
+    styles:{lineColor:[180,200,220],lineWidth:0.25,fontSize:8,textColor:[0,0,0],cellPadding:1.5},
+    columnStyles:{0:{cellWidth:66,fontStyle:'normal'},1:{halign:'right',fontStyle:'bold'}},
+  });
+
+  // section sketch to the right of the params table
+  const secTableEndY=doc.lastAutoTable.finalY;
+  drawSectionInPdf(doc,m,ml+leftW+10,y,pW-mr-(ml+leftW+10));
+
+  // ── Results table (same page, below the section block) ──
+  let y2=secTableEndY+8;
+  doc.setFontSize(9);doc.setFont('helvetica','bold');doc.setTextColor(0,102,204);
+  doc.text(t('pdfResultsTitle'),ml,y2);doc.setTextColor(0,0,0);doc.setFont('helvetica','normal');
+  y2+=2;
+  const body=rows.map(r=>{
+    const isOOR=r.status==='done'&&r.result.eqOk===false;
+    return [
+      r.story,r.column,r.outputCase,r.station,
+      r.N.toFixed(1),r.Mz.toFixed(1),r.My.toFixed(1),
+      (r.status==='done'&&!isOOR)?r.result.MyRd.toFixed(1):'-',
+      (r.status==='done'&&!isOOR)?r.result.MzRd.toFixed(1):'-',
+      (r.status==='done'&&!isOOR)?r.result.util.toFixed(1)+'%':(isOOR?t('pdfOOR'):'-'),
+      r.status==='done'?(isOOR?t('verdictFail'):(r.result.ok?t('verdictOk'):t('verdictFail'))):(r.status==='error'?t('verdictFail'):'-')
+    ];
+  });
+  doc.autoTable({
+    startY:y2+2,
+    head:[[t('colStory'),t('colColumn'),t('colCase'),t('colStation'),t('colN'),t('colM2'),t('colM3'),t('colMyRd'),t('colMzRd'),t('colUtil'),t('colVerdict')]],
+    body,
+    margin:{left:ml,right:mr},tableWidth:cw,theme:'grid',
+    styles:{lineColor:[180,200,220],lineWidth:0.25,fontSize:7.5,textColor:[0,0,0],cellPadding:1.6},
+    headStyles:{fillColor:[200,215,235],textColor:[0,0,0],fontStyle:'bold',lineColor:[200,215,235],fontSize:7.5},
+    columnStyles:{4:{halign:'right'},5:{halign:'right'},6:{halign:'right'},7:{halign:'right'},8:{halign:'right'},9:{halign:'right'},10:{halign:'center',fontStyle:'bold'}},
+    didParseCell:function(data){
+      if(data.section==='body'){
+        const verdictText=body[data.row.index][10];
+        if(data.column.index===10){
+          if(verdictText===t('verdictOk')){data.cell.styles.textColor=[46,125,50];}
+          else if(verdictText===t('verdictFail')){data.cell.styles.textColor=[192,57,43];}
+        }
+      }
+    },
+    didDrawPage:function(){hdr();}
+  });
+
+  // ── footer on every page ──
+  const tp=doc.internal.getNumberOfPages();
+  for(let i=1;i<=tp;i++){
+    doc.setPage(i);
+    doc.setFontSize(7);doc.setTextColor(0,0,0);doc.setFont('helvetica','italic');
+    doc.text(t('pdfDisc1')+'  '+t('pdfDisc2'),ml,pH-5);
+    doc.setFont('helvetica','normal');
+    doc.text('CR 2-1-1.1/2022 / SR EN 1992-1-1',ml,pH-1.5);
+    doc.text(t('pdfPage',i,tp),pW-mr,pH-1.5,{align:'right'});
+    doc.text(t('pdfGenerated')+ds,pW/2,pH-1.5,{align:'center'});
+  }
+  doc.save(t('pdfFname'));
+}
+
+// Draw the section rectangle + reinforcement bars directly as PDF vector graphics.
+function drawSectionInPdf(doc,m,x0,y0,availW){
+  const maxW=availW, maxH=42;
+  const scl=Math.min(maxW/m.b,maxH/m.h)*0.8;
+  const w=m.b*scl, h=m.h*scl;
+  const cx=x0+maxW/2, cy=y0+maxH/2;
+  const rx=cx-w/2, ry=cy-h/2;
+  doc.setDrawColor(28,28,30);doc.setLineWidth(0.4);
+  if(confMode==='all'){doc.setFillColor(221,238,255);}else{doc.setFillColor(232,232,237);}
+  doc.rect(rx,ry,w,h,'FD');
+  doc.setFillColor(28,28,30);
+  function X2(yy){return cx+yy*scl;}
+  function Y2(zz){return cy-zz*scl;}
+  m.steelFibers.forEach(f=>{doc.circle(X2(f.y),Y2(f.z),0.7,'F');});
+  doc.setFontSize(6.5);doc.setTextColor(108,108,112);doc.setFont('helvetica','normal');
+  doc.text(`b=${m.b}`,cx,ry+h+3,{align:'center'});
+  doc.setTextColor(0,0,0);
+}
+
+// ═══════════════════ Section presets S1..S5 ═══════════════════
+// Each preset stores the full section definition (geometry, materials,
+// reinforcement, confinement) AND its own imported load-combination rows, so
+// the user can keep several different column sections side by side and switch
+// between them — the batch of combinations follows each section.
+let currentPreset='S1';
+function getKey(p){return 'sw_mod7_'+p;}
+function captureState(){
+  const st={inputs:{},segs:{}};
+  document.querySelectorAll('#sectionPanel input[id], #sectionPanel select[id]').forEach(el=>{st.inputs[el.id]=el.value;});
+  st.segs.conf=confMode;
+  st.segs.axisMap=axisMap;
+  st.segs.signConv=signConv;
+  // store only the raw pasted data per row (labels + raw N/M2/M3); results are
+  // recomputed on load, never persisted (they depend on the section anyway).
+  st.rows=rows.map(r=>({story:r.story,column:r.column,outputCase:r.outputCase,station:r.station,Nraw:r.Nraw,M2:r.M2,M3:r.M3}));
+  return st;
+}
+function applyState(st){
+  st=st||{};
+  if(st.inputs){
+    Object.keys(st.inputs).forEach(id=>{const el=document.getElementById(id);if(el)el.value=st.inputs[id];});
+  } else {
+    // empty preset → reset section inputs to defaults so a fresh section starts clean
+    const defs={bcol:'300',hcol:'300',cp:'C30/37',sp:'S 500',fckc:'35',ec2c:'2.20',ecu2c:'5.50',cor_n:'4',cor_d:'16',topb_n:'1',topb_d:'16',sidh_n:'1',sidh_d:'16',cnom:'30',detr:'8'};
+    Object.keys(defs).forEach(id=>{const el=document.getElementById(id);if(el)el.value=defs[id];});
+  }
+  curC=document.getElementById('cp').value;
+  curS=document.getElementById('sp').value;
+  confMode=(st.segs&&st.segs.conf)||'none';
+  axisMap=(st.segs&&st.segs.axisMap)||'std';
+  signConv=(st.segs&&st.segs.signConv)||'pos';
+  // rebuild rows from stored raw data, applying current conventions (empty if none)
+  rows=(st.rows||[]).map(r=>({
+    story:r.story,column:r.column,outputCase:r.outputCase,station:r.station,
+    Nraw:r.Nraw,M2:r.M2,M3:r.M3,
+    N:convN(r.Nraw),My:mapMy(r.M2,r.M3),Mz:mapMz(r.M2,r.M3),
+    result:null,status:'pending'
+  }));
+}
+function saveCurrentPreset(){
+  try{localStorage.setItem(getKey(currentPreset),JSON.stringify(captureState()));}catch(e){}
+}
+function loadPreset(p){
+  try{const s=localStorage.getItem(getKey(p));return s?JSON.parse(s):null;}catch(e){return null;}
+}
+function switchPreset(p){
+  saveCurrentPreset();
+  currentPreset=p;
+  try{localStorage.setItem('sw_mod7_active',p);}catch(e){}
+  document.getElementById('presetSel').value=p;
+  const st=loadPreset(p);
+  applyState(st);
+  // reflect restored toggle states in the UI
+  setConfUI(confMode);
+  document.getElementById('seg-map-std').classList.toggle('on',axisMap==='std');
+  document.getElementById('seg-map-swap').classList.toggle('on',axisMap==='swap');
+  document.getElementById('seg-sign-pos').classList.toggle('on',signConv==='pos');
+  document.getElementById('seg-sign-neg').classList.toggle('on',signConv==='neg');
+  updMat();
+  onSectionChange();
+  // show/hide results panel depending on whether this preset has rows
+  if(rows.length){
+    document.getElementById('resultsPanel').style.display='';
+    document.getElementById('emptyPanel').style.display='none';
+    renderTable();
+    recalcAll();
+  } else {
+    document.getElementById('resultsPanel').style.display='none';
+    document.getElementById('emptyPanel').style.display='';
+  }
+}
+// setConf splits into UI-only part so preset restore can reuse it without
+// re-triggering a section recompute mid-restore.
+function setConfUI(mode){
+  confMode=mode;
+  document.getElementById('seg-nc').classList.toggle('on',mode==='none');
+  document.getElementById('seg-cc').classList.toggle('on',mode==='all');
+  document.getElementById('conf-fields').classList.toggle('on',mode!=='none');
+}
+
+document.querySelectorAll('#langSeg button').forEach(b=>b.addEventListener('click',()=>setLang(b.dataset.lang)));
+applyStaticLang();
+// restore active preset (if any) before first render
+(function(){
+  try{const ap=localStorage.getItem('sw_mod7_active');if(ap)currentPreset=ap;}catch(e){}
+  document.getElementById('presetSel').value=currentPreset;
+  const st=loadPreset(currentPreset);
+  if(st) applyState(st);
+})();
+setConfUI(confMode);
+updMat();
+onSectionChange();
+if(rows.length){
+  document.getElementById('resultsPanel').style.display='';
+  document.getElementById('emptyPanel').style.display='none';
+  renderTable();
+  recalcAll();
+}
+// persist section-panel edits into the active preset as they happen
+document.querySelectorAll('#sectionPanel input, #sectionPanel select').forEach(el=>{
+  el.addEventListener('change',saveCurrentPreset);
+});
+document.getElementById('seg-map-std').classList.toggle('on',axisMap==='std');
+document.getElementById('seg-map-swap').classList.toggle('on',axisMap==='swap');
+document.getElementById('seg-sign-pos').classList.toggle('on',signConv==='pos');
+document.getElementById('seg-sign-neg').classList.toggle('on',signConv==='neg');
+</script>
+</body>
+</html>
