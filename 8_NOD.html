@@ -1,0 +1,1642 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#F5F5F7">
+<meta name="description" content="Verificare nod de cadru grinda-stalp conform P 100-1/2013 — suprarezistenta, forta taietoare in nod, compresiune diagonala, armatura transversala">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='13' y='2' width='6' height='28' rx='1' fill='%238E8E93'/><rect x='2' y='13' width='28' height='6' rx='1' fill='%23C7C7CC'/><rect x='13' y='13' width='6' height='6' fill='%238E8E93'/></svg>">
+<title>Nod de cadru — verificare — JP Design</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1C1E}
+.wrap{max-width:1240px;margin:0 auto;padding:20px 16px}
+.slabel{font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:#1C1C1E;padding:0 0 7px;margin-top:14px}
+.slabel:first-child{margin-top:0}
+/* Input panels sit in three independent columns, so opening a tall panel only pushes
+   down the panels below it in the same column instead of leaving a dead grid row. */
+.ip{background:#EFEFEF;border:1px solid #DCDCE0;border-radius:12px;overflow:hidden;margin-bottom:13px}
+.op{background:#fff;border:1px solid #DCDCE0;border-radius:12px;overflow:hidden;margin-bottom:13px}
+.ph{padding:12px 15px;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:#1C1C1E;display:flex;align-items:center;gap:6px;cursor:pointer;user-select:none}
+.ph .chev{margin-left:auto;width:9px;height:9px;border-right:1.6px solid #8E8E93;border-bottom:1.6px solid #8E8E93;transform:rotate(45deg);transition:transform .15s;flex-shrink:0}
+.ip.collapsed .ph .chev{transform:rotate(-45deg)}
+.ip.collapsed .pb-outer{display:none}
+.ph .badge{margin-left:auto;font-size:10px;font-weight:600;letter-spacing:.02em;text-transform:none;color:#6C6C70;background:#E4E4E9;border-radius:20px;padding:2px 9px;white-space:nowrap}
+.ph .badge+.chev{margin-left:8px}
+.info-wrap{position:relative;display:inline-flex;flex-shrink:0}
+.info-btn{width:16px;height:16px;border-radius:50%;border:1.3px solid #AEAEB2;background:transparent;color:transparent;font-size:0;line-height:1;cursor:pointer;padding:0;position:relative;transition:all .12s}
+.info-btn::before{content:'';position:absolute;left:50%;top:3.5px;width:1.6px;height:1.6px;background:#8E8E93;border-radius:50%;transform:translateX(-50%)}
+.info-btn::after{content:'';position:absolute;left:50%;top:6.3px;width:1.6px;height:5.2px;background:#8E8E93;border-radius:.8px;transform:translateX(-50%)}
+.info-btn:hover,.info-btn.on{border-color:#007AFF;background:#EBF3FF}
+.info-btn:hover::before,.info-btn:hover::after,.info-btn.on::before,.info-btn.on::after{background:#007AFF}
+.info-pop{display:none;position:fixed;z-index:1200;width:280px;max-width:80vw;background:#fff;border:1px solid #DCDCE0;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.18);padding:11px 13px;font-size:12px;font-weight:400;color:#6C6C70;line-height:1.55;text-transform:none;letter-spacing:0;cursor:default}
+.info-pop.wide{width:380px;max-width:92vw}
+.info-pop.show{display:block}
+.info-pop b{color:#1C1C1E;font-weight:600}
+.info-pop code{font-family:'Inter',sans-serif;background:#F2F2F7;border-radius:4px;padding:1px 4px;color:#1C1C1E}
+.info-pop::before{content:'';position:fixed;width:9px;height:9px;background:#fff;border-left:1px solid #DCDCE0;border-top:1px solid #DCDCE0;left:var(--arrow-left);top:var(--arrow-top);transform:var(--arrow-rot)}
+.pb{padding:8px 15px 14px}
+.row{display:flex;align-items:center;padding:7px 0;border-bottom:1px solid #E0E0E5;gap:8px}
+.row:last-child{border-bottom:none}
+.rl{flex:1;font-size:13px;color:#1C1C1E;min-width:0}
+.rn{font-size:12px;color:#8E8E93;margin-left:4px}
+.rc{display:flex;align-items:center;gap:5px;flex-shrink:0}
+.rc input[type=number]{width:78px;padding:5px 8px;font-size:13px;border:1px solid #C7C7CC;border-radius:7px;background:#fff;color:#1C1C1E;font-family:'Inter',sans-serif;-moz-appearance:textfield;appearance:textfield;text-align:right}
+.rc input[type=number]::-webkit-inner-spin-button,.rc input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.rc input:focus{outline:none;box-shadow:0 0 0 2px rgba(0,122,255,.2);border-color:#007AFF}
+.rc input.warn{border-color:#C0392B}
+.ru{font-size:12px;color:#8E8E93;min-width:30px}
+.sel-field{margin-bottom:10px}
+.sel-field label{display:block;font-size:12px;color:#8E8E93;margin-bottom:5px;font-weight:500}
+.sel-wrap{position:relative}
+.sel-wrap::after{content:'';position:absolute;right:13px;top:50%;width:7px;height:7px;border-right:2px solid #8E8E93;border-bottom:2px solid #8E8E93;transform:translateY(-65%) rotate(45deg);pointer-events:none}
+.sel-field select{width:100%;padding:8px 34px 8px 11px;font-size:13px;border:1px solid #C7C7CC;border-radius:8px;background:#fff;color:#1C1C1E;font-family:'Inter',sans-serif;cursor:pointer;-webkit-appearance:none;appearance:none}
+.sel-field select:focus{outline:none;box-shadow:0 0 0 2px rgba(0,122,255,.2);border-color:#007AFF}
+.mat-vals{display:flex;gap:6px;padding:6px 0 2px;flex-wrap:wrap}
+.mv{flex:1;min-width:58px;text-align:center;background:#E8E8ED;border-radius:7px;padding:8px 4px}
+.mvl{font-size:11px;color:#8E8E93;margin-bottom:2px}
+.mvv{font-size:14px;font-weight:500;color:#1C1C1E}
+.mvu{font-size:10px;color:#8E8E93}
+.sub{font-size:11px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;color:#8E8E93;padding:9px 0 5px;display:flex;align-items:center;gap:6px}
+.toggle-row{display:flex;align-items:center;gap:10px;padding:4px 0 10px}
+.toggle-row span.tlbl{font-size:13px;color:#1C1C1E;flex:1}
+.hint{display:block;font-size:11px;color:#0066CC;margin-top:2px;font-weight:500}
+.hint.no{color:#C0392B}
+.seg{display:inline-flex;background:#E0E0E5;border-radius:8px;padding:2px;gap:2px}
+.seg button{padding:6px 13px;font-size:12px;font-weight:500;border:none;border-radius:6px;background:transparent;color:#8E8E93;cursor:pointer;font-family:'Inter',sans-serif;transition:all .12s}
+.seg button.on{background:#fff;color:#1C1C1E;box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.count-box{background:#EBF3FF;border:1px solid #B8D4F8;border-radius:8px;padding:8px 12px;margin-top:6px;display:flex;justify-content:space-between;font-size:12px;gap:8px}
+.count-box span:last-child{color:#0066CC;font-weight:500;white-space:nowrap}
+.note{font-size:12px;color:#8E8E93;line-height:1.5}
+.mini-btn{padding:6px 13px;font-size:12px;font-weight:500;font-family:'Inter',sans-serif;border:1px solid #C7C7CC;border-radius:8px;background:#fff;color:#1C1C1E;cursor:pointer;transition:all .12s}
+.mini-btn:hover{background:#F5F5F7}
+.geom-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}
+@media(max-width:680px){.geom-grid{grid-template-columns:1fr}}
+.sk-box{margin-top:8px;background:#fff;border:1px solid #E0E0E5;border-radius:10px;padding:8px}
+.sk-box svg{display:block;width:100%;max-width:400px;margin:0 auto}
+
+/* ── interactive node view ── */
+.node-grid{display:grid;grid-template-columns:1.35fr 1fr;gap:0}
+.node-left{padding:10px 12px 14px;border-right:1px solid #E0E0E5}
+.node-right{padding:10px 14px 14px;min-width:0}
+@media(max-width:820px){.node-grid{grid-template-columns:1fr}.node-left{border-right:none;border-bottom:1px solid #E0E0E5}}
+#nodeSvg{display:block;width:100%;cursor:default}
+#nodeSvg .hit{cursor:pointer}
+#nodeSvg .hit:hover .hl{stroke:#007AFF;stroke-width:2}
+.detail-h{font-size:10.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#8E8E93;margin-bottom:8px}
+.dt-row{display:flex;justify-content:space-between;gap:10px;padding:4px 0;border-bottom:1px solid #ECECF0;font-size:12.5px}
+.dt-row:last-child{border-bottom:none}
+.dt-k{color:#6C6C70}
+.dt-v{font-weight:500;color:#1C1C1E;font-feature-settings:"tnum" 1;text-align:right;white-space:nowrap}
+.elem-tabs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:10px}
+.elem-tabs button{padding:5px 10px;font-size:11.5px;font-weight:500;border:1px solid #DCDCE0;border-radius:7px;background:#fff;color:#8E8E93;cursor:pointer;font-family:'Inter',sans-serif;transition:all .12s}
+.elem-tabs button.on{background:#1C1C1E;border-color:#1C1C1E;color:#fff}
+.elem-tabs button:disabled{opacity:.35;cursor:default}
+
+/* ── results ── */
+.summary-bar{display:flex;gap:10px;padding:12px 15px;flex-wrap:wrap}
+.sum-chip{flex:1;min-width:104px;background:#F2F2F7;border-radius:8px;padding:8px 12px}
+.sum-chip.ok{background:#EAF6EC}
+.sum-chip.no{background:#FCECEC}
+.sum-chip .sc-l{font-size:11px;color:#8E8E93;margin-bottom:2px}
+.sum-chip .sc-v{font-size:17px;font-weight:500;color:#1C1C1E}
+.sum-chip.ok .sc-v{color:#2E7D32}
+.sum-chip.no .sc-v{color:#C0392B}
+.rp{margin-bottom:9px}
+.rph{display:flex;align-items:center;gap:8px;padding:11px 14px;cursor:pointer;user-select:none}
+.rpt{font-size:13px;font-weight:500;color:#1C1C1E;flex:1;min-width:0}
+.rpt .cls{font-size:11px;color:#8E8E93;font-weight:400;margin-left:5px;white-space:nowrap}
+.rpv{font-size:13px;font-weight:500;color:#1C1C1E;font-feature-settings:"tnum" 1;white-space:nowrap}
+.rph .chev{width:9px;height:9px;border-right:1.6px solid #C7C7CC;border-bottom:1.6px solid #C7C7CC;transform:rotate(45deg);transition:transform .15s;flex-shrink:0;margin-left:2px}
+.rp.open .rph .chev{transform:rotate(-135deg)}
+.verdict-pill{display:inline-flex;align-items:center;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap}
+.verdict-pill.ok{background:#D9F0DB;color:#1E6B26}
+.verdict-pill.no{background:#F7D6D6;color:#A32626}
+.verdict-pill.na{background:#EEEEEE;color:#8E8E93}
+.ubar{height:3px;background:#E8E8ED;margin:0 14px 0}
+.ubar div{height:100%;background:#2E7D32;width:0;transition:width .2s}
+.ubar.no div{background:#C0392B}
+.rpd{display:none;padding:2px 14px 14px;border-top:1px solid #EFEFEF;margin-top:10px}
+.rp.open .rpd{display:block}
+table.der{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:8px}
+table.der th{background:#F7F7FA;color:#6C6C70;font-weight:500;font-size:10.5px;letter-spacing:.03em;text-transform:uppercase;padding:6px 9px;text-align:left;border-bottom:1px solid #E8E8ED}
+table.der th:last-child,table.der td:last-child{text-align:right}
+table.der td{padding:5px 9px;border-bottom:1px solid #F2F2F5;color:#1C1C1E;vertical-align:top}
+table.der td.f{color:#6C6C70;font-size:12px}
+table.der tr:last-child td{border-bottom:none}
+table.der tr.gov td{background:#F5F9FF}
+table.der caption{caption-side:top;text-align:left;font-size:10.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#8E8E93;padding:10px 0 2px}
+.warnbox{background:#FFF6E5;border:1px solid #F2DDA8;border-radius:8px;padding:8px 12px;margin:8px 0 0;font-size:12px;color:#7A5A12;line-height:1.5}
+.warnbox b{font-weight:600}
+
+.back-btn{display:inline-flex;align-items:center;gap:5px;font-family:'Inter',sans-serif;font-size:14px;font-weight:500;color:#8E8E93;background:transparent;border:none;cursor:pointer;padding:12px 16px;text-decoration:none;line-height:1}
+.back-btn svg{width:16px;height:16px;stroke:#8E8E93;stroke-width:2.5;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.back-btn:hover{color:#1C1C1E}
+.back-btn:hover svg{stroke:#1C1C1E}
+.lang-seg{display:inline-flex;background:#E0E0E5;border-radius:8px;padding:2px;gap:2px;margin-left:auto}
+.lang-seg button{padding:5px 11px;font-size:12px;font-weight:600;border:none;border-radius:6px;background:transparent;color:#8E8E93;cursor:pointer;font-family:'Inter',sans-serif;transition:all .12s;letter-spacing:.02em}
+.lang-seg button.on{background:#fff;color:#1C1C1E;box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.topbar{display:flex;align-items:center;gap:8px;padding-right:12px}
+.author-footer{text-align:center;font-size:11px;font-weight:500;color:#8E8E93;padding:16px 16px 24px;letter-spacing:.02em}
+.preset-bar{display:flex;align-items:center;gap:10px;padding:0 16px 10px;max-width:1240px;margin:0 auto}
+.preset-bar label{font-size:14px;font-weight:500;color:#8E8E93}
+.preset-bar select{padding:6px 28px 6px 10px;font-size:14px;border:1px solid #C7C7CC;border-radius:8px;background:#fff;color:#1C1C1E;font-family:'Inter',sans-serif;-webkit-appearance:none;appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238E8E93'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
+.preset-bar select:focus{outline:none;box-shadow:0 0 0 2px rgba(0,122,255,.2);border-color:#007AFF}
+.report-bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:12px 15px}
+.report-lbl{font-size:13px;color:#1C1C1E;flex:1;min-width:120px}
+.report-btn{padding:11px 18px;font-size:14px;font-weight:500;font-family:'Inter',sans-serif;border:none;border-radius:10px;background:#1C1C1E;color:#fff;cursor:pointer;transition:opacity .15s}
+.report-btn:active{opacity:.7}
+.report-btn:disabled{opacity:.4}
+.report-status{font-size:12px;color:#8E8E93;text-align:center;padding:0 15px 10px;min-height:16px}
+@media(max-width:680px){.wrap{padding:14px 10px}.rc input[type=number],.sel-field select{font-size:16px}.rl{font-size:14px}.ph{font-size:12px}.preset-bar select{font-size:16px}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+<a href="index.html" class="back-btn"><svg viewBox="0 0 16 16"><polyline points="10,3 4,8 10,13"/></svg><span data-i18n="backAll">Toate modulele</span></a>
+<div class="lang-seg" id="langSeg"><button data-lang="ro">RO</button><button data-lang="en">EN</button></div>
+</div>
+<div class="preset-bar">
+  <label data-i18n="presetLabel">Nod:</label>
+  <select id="presetSel" onchange="switchPreset(this.value)">
+    <option value="P1">P1</option><option value="P2">P2</option><option value="P3">P3</option>
+    <option value="P4">P4</option><option value="P5">P5</option>
+  </select>
+</div>
+
+<div class="wrap">
+  <div class="slabel" data-i18n="pageLabel">Nod de cadru grinda&ndash;stalp &mdash; P 100-1/2013</div>
+
+<div id="inputsWrap">
+  <!-- ══════ 1. GENERAL & MATERIALS ══════ -->
+  <div class="ip" id="pnl_gen">
+    <div class="ph" onclick="togglePanel('pnl_gen')"><span data-i18n="t_gen">Date generale &amp; materiale</span><span class="chev"></span></div>
+    <div class="pb-outer"><div class="pb">
+      <div class="geom-grid">
+        <div class="sel-field"><label data-i18n="concClass">Clasa beton</label><div class="sel-wrap">
+          <select id="cp" onchange="onChange()">
+            <option>C12/15</option><option>C16/20</option><option>C20/25</option><option>C25/30</option>
+            <option selected>C30/37</option><option>C35/45</option><option>C40/50</option><option>C45/55</option>
+            <option>C50/60</option><option>C55/67</option><option>C60/75</option>
+          </select></div></div>
+        <div class="sel-field"><label data-i18n="steelClass">Clasa otel longitudinal</label><div class="sel-wrap">
+          <select id="sp" onchange="onChange()">
+            <option>S240B</option><option>S400B</option><option selected>S500B</option>
+          </select></div></div>
+      </div>
+      <div class="sel-field"><label data-i18n="steelClassW">Clasa otel armatura transversala</label><div class="sel-wrap">
+        <select id="swp" onchange="onChange()">
+          <option>S240B</option><option>S400B</option><option selected>S500B</option>
+        </select></div></div>
+      <div class="mat-vals">
+        <div class="mv"><div class="mvl">f<sub>cd</sub></div><div class="mvv" id="fcd_d">20.00</div><div class="mvu">MPa</div></div>
+        <div class="mv"><div class="mvl">f<sub>yd</sub></div><div class="mvv" id="fyd_d">434.8</div><div class="mvu">MPa</div></div>
+        <div class="mv"><div class="mvl">f<sub>ywd</sub></div><div class="mvv" id="fywd_d">434.8</div><div class="mvu">MPa</div></div>
+        <div class="mv"><div class="mvl">&lambda;</div><div class="mvv" id="lam_d">0.80</div><div class="mvu">&mdash;</div></div>
+        <div class="mv"><div class="mvl">&eta;</div><div class="mvv" id="eta_d">1.00</div><div class="mvu">&mdash;</div></div>
+      </div>
+
+      <div class="sub" style="padding-top:12px"><span data-i18n="s_config">Configuratie</span></div>
+      <div class="toggle-row"><span class="tlbl" data-i18n="ductClass">Clasa de ductilitate</span>
+        <span class="info-wrap"><button class="info-btn" type="button" onclick="toggleInfo(this,event)">i</button><div class="info-pop" onclick="event.stopPropagation()" data-i18n="i_duct"></div></span>
+        <div class="seg" id="seg_duct">
+          <button data-v="DCH" onclick="setSeg('duct','DCH')">DCH</button>
+          <button data-v="DCM" class="on" onclick="setSeg('duct','DCM')">DCM</button>
+        </div></div>
+      <div class="toggle-row"><span class="tlbl" data-i18n="jointType">Tip nod</span>
+        <span class="info-wrap"><button class="info-btn" type="button" onclick="toggleInfo(this,event)">i</button><div class="info-pop" onclick="event.stopPropagation()" data-i18n="i_jtype"></div></span>
+        <div class="seg" id="seg_joint">
+          <button data-v="int" class="on" onclick="setSeg('joint','int')" data-i18n="jt_int">Interior</button>
+          <button data-v="end" onclick="setSeg('joint','end')" data-i18n="jt_end">De capat</button>
+        </div></div>
+      <div class="toggle-row"><span class="tlbl" data-i18n="levelLbl">Nivelul nodului</span>
+        <span class="info-wrap"><button class="info-btn" type="button" onclick="toggleInfo(this,event)">i</button><div class="info-pop" onclick="event.stopPropagation()" data-i18n="i_level"></div></span>
+        <div class="seg" id="seg_level">
+          <button data-v="base" onclick="setSeg('level','base')" data-i18n="lv_base">Baza</button>
+          <button data-v="cur" class="on" onclick="setSeg('level','cur')" data-i18n="lv_cur">Curent</button>
+        </div></div>
+      <div class="toggle-row"><span class="tlbl" data-i18n="signConv">Conventie semn N<sub>Ed</sub></span>
+        <div class="seg" id="seg_sign">
+          <button data-v="pos" onclick="setSeg('sign','pos')" data-i18n="sg_pos">N&gt;0 compresiune</button>
+          <button data-v="neg" class="on" onclick="setSeg('sign','neg')" data-i18n="sg_neg">N&lt;0 compresiune</button>
+        </div></div>
+      <div class="toggle-row" style="padding-bottom:2px"><span class="tlbl" data-i18n="lastLvl">Nod la ultimul nivel (capat superior stalp)</span>
+        <span class="info-wrap"><button class="info-btn" type="button" onclick="toggleInfo(this,event)">i</button><div class="info-pop" onclick="event.stopPropagation()" data-i18n="i_lastlvl"></div></span>
+        <div class="seg" id="seg_top">
+          <button data-v="no" class="on" onclick="setSeg('top','no')" data-i18n="no_">Nu</button>
+          <button data-v="yes" onclick="setSeg('top','yes')" data-i18n="yes_">Da</button>
+        </div></div>
+    </div></div>
+  </div>
+
+  <!-- ══════ 2. COLUMN SECTION ══════ -->
+  <div class="ip collapsed" id="pnl_colsec">
+    <div class="ph" onclick="togglePanel('pnl_colsec')"><span data-i18n="t_colsec">Stalp &mdash; sectiune &amp; geometrie</span><span class="badge" id="bdg_colsec">&mdash;</span><span class="chev"></span></div>
+    <div class="pb-outer"><div class="pb">
+      <div class="row"><div class="rl"><span data-i18n="hcLbl">Latura paralela cu grinzile</span> <span class="rn">(h<sub>c</sub>)</span>
+        <span class="info-wrap" style="margin-left:5px"><button class="info-btn" type="button" onclick="toggleInfo(this,event)">i</button><div class="info-pop wide" onclick="event.stopPropagation()" data-i18n="i_dir"></div></span></div>
+        <div class="rc"><input type="number" inputmode="numeric" id="hc" value="300" step="10" oninput="onChange()"><span class="ru">mm</span></div></div>
+      <div class="row"><div class="rl"><span data-i18n="bcLbl">Latura perpendiculara pe grinzi</span> <span class="rn">(b<sub>c</sub>)</span></div>
+        <div class="rc"><input type="number" inputmode="numeric" id="bc" value="1000" step="10" oninput="onChange()"><span class="ru">mm</span></div></div>
+      <div class="row" style="border-bottom:none;padding-bottom:2px"><div class="rl"></div><div class="rc">
+        <button class="mini-btn" onclick="swapCol()" data-i18n="swapBtn">&#8646; Schimba directia</button></div></div>
+      <div class="geom-grid" style="border-top:1px solid #E0E0E5;margin-top:6px">
+        <div class="row"><div class="rl"><span data-i18n="cover">Acoperire</span> <span class="rn">(c<sub>nom</sub>)</span></div>
+          <div class="rc"><input type="number" inputmode="numeric" id="c_cnom" value="35" step="5" oninput="onChange()"><span class="ru">mm</span></div></div>
+        <div class="row"><div class="rl"><span data-i18n="stirrupDia">Diametru etrier stalp</span> <span class="rn">(&Oslash;<sub>sw</sub>)</span></div>
+          <div class="rc"><input type="number" inputmode="numeric" id="c_dsw" value="8" step="2" oninput="onChange()"><span class="ru">mm</span></div></div>
+      </div>
+      <div class="row"><div class="rl"><span data-i18n="lclLbl">Inaltimea libera a stalpului de deasupra nodului</span> <span class="rn">(l<sub>cl</sub>)</span>
+        <span class="info-wrap" style="margin-left:5px"><button class="info-btn" type="button" onclick="toggleInfo(this,event)">i</button><div class="info-pop" onclick="event.stopPropagation()" data-i18n="i_lcl"></div></span></div>
+        <div class="rc"><input type="number" inputmode="numeric" id="lcl" value="3300" step="50" oninput="onChange()"><span class="ru">mm</span></div></div>
+      <div class="count-box"><span>b<sub>j</sub> = min(b<sub>c</sub>; b<sub>w</sub> + 0,5&middot;h<sub>c</sub>) <span data-i18n="cls528">(5.28)</span></span><span id="bj_r">&mdash;</span></div>
+      <div class="sk-box"><svg id="skColDir" viewBox="0 0 420 240"></svg></div>
+    </div></div>
+  </div>
+
+  <!-- ══════ 3. BEAM LEFT ══════ -->
+  <div class="ip collapsed" id="pnl_bL">
+    <div class="ph" onclick="togglePanel('pnl_bL')"><span data-i18n="t_bL">Grinda stanga</span><span class="badge" id="bdg_bL">&mdash;</span><span class="chev"></span></div>
+    <div class="pb-outer"><div class="pb" id="body_bL"></div></div>
+  </div>
+
+  <!-- ══════ 4. BEAM RIGHT ══════ -->
+  <div class="ip collapsed" id="pnl_bR">
+    <div class="ph" onclick="togglePanel('pnl_bR')"><span data-i18n="t_bR">Grinda dreapta</span><span class="badge" id="bdg_bR">&mdash;</span><span class="chev"></span></div>
+    <div class="pb-outer"><div class="pb" id="body_bR"></div></div>
+  </div>
+
+  <!-- ══════ 5. COLUMN BELOW ══════ -->
+  <div class="ip collapsed" id="pnl_cI">
+    <div class="ph" onclick="togglePanel('pnl_cI')"><span data-i18n="t_cI">Stalp inferior (sub nod)</span><span class="badge" id="bdg_cI">&mdash;</span><span class="chev"></span></div>
+    <div class="pb-outer"><div class="pb" id="body_cI"></div></div>
+  </div>
+
+  <!-- ══════ 6. COLUMN ABOVE ══════ -->
+  <div class="ip collapsed" id="pnl_cS">
+    <div class="ph" onclick="togglePanel('pnl_cS')"><span data-i18n="t_cS">Stalp superior (peste nod)</span><span class="badge" id="bdg_cS">&mdash;</span><span class="chev"></span></div>
+    <div class="pb-outer"><div class="pb" id="body_cS"></div></div>
+  </div>
+
+  <!-- ══════ 7. JOINT STIRRUPS ══════ -->
+  <div class="ip collapsed" id="pnl_st">
+    <div class="ph" onclick="togglePanel('pnl_st')"><span data-i18n="t_st">Armatura transversala in nod</span><span class="badge" id="bdg_st">&mdash;</span><span class="chev"></span></div>
+    <div class="pb-outer"><div class="pb">
+      <div class="sub"><span data-i18n="s_effLegs">Ramuri efective (paralele cu V<sub>jhd</sub>)</span>
+        <span class="info-wrap"><button class="info-btn" type="button" onclick="toggleInfo(this,event)">i</button><div class="info-pop wide" onclick="event.stopPropagation()" data-i18n="i_legs"></div></span></div>
+      <div class="row"><div class="rl"><span data-i18n="perimStir">Etrier perimetral</span> <span class="rn">(<span data-i18n="legsDia">ramuri / &Oslash;</span>)</span></div>
+        <div class="rc"><input type="number" inputmode="numeric" id="j_n1" value="2" step="1" min="0" oninput="onChange()" style="width:48px"><input type="number" inputmode="numeric" id="j_d1" value="10" step="1" oninput="onChange()" style="width:48px"><span class="ru">mm</span></div></div>
+      <div class="row"><div class="rl"><span data-i18n="innerTies">Agrafe / etrieri interiori</span> <span class="rn">(<span data-i18n="legsDia">ramuri / &Oslash;</span>)</span></div>
+        <div class="rc"><input type="number" inputmode="numeric" id="j_n2" value="2" step="1" min="0" oninput="onChange()" style="width:48px"><input type="number" inputmode="numeric" id="j_d2" value="8" step="1" oninput="onChange()" style="width:48px"><span class="ru">mm</span></div></div>
+      <div class="geom-grid" style="border-top:1px solid #E0E0E5;margin-top:6px">
+        <div class="row"><div class="rl"><span data-i18n="nSets">Nr. seturi in nod</span></div>
+          <div class="rc"><input type="number" inputmode="numeric" id="j_nset" value="5" step="1" min="1" oninput="onChange()" onchange="clampS()"><span class="ru" data-i18n="pcs">buc</span></div></div>
+        <div class="row"><div class="rl"><span data-i18n="sJoint">Pas etrieri in nod</span> <span class="rn">(s)</span>
+            <span class="info-wrap" style="margin-left:4px"><button class="info-btn" type="button" onclick="toggleInfo(this,event)">i</button><div class="info-pop" onclick="event.stopPropagation()" data-i18n="i_smax"></div></span>
+            <span class="hint" id="smax_hint"></span></div>
+          <div class="rc"><input type="number" inputmode="numeric" id="j_s" value="100" step="5" oninput="onChange()" onchange="clampS()"><span class="ru">mm</span></div></div>
+      </div>
+      <div class="count-box"><span>A<sub>sh</sub> <span data-i18n="provided">disponibil</span></span><span id="ash_prov_r">&mdash;</span></div>
+
+      <div class="sub" style="padding-top:12px"><span data-i18n="s_colCrit">Etrieri in zona critica a stalpului</span>
+        <span class="info-wrap"><button class="info-btn" type="button" onclick="toggleInfo(this,event)">i</button><div class="info-pop" onclick="event.stopPropagation()" data-i18n="i_colcrit"></div></span></div>
+      <div class="row"><div class="rl"><span data-i18n="colStir">Etrieri stalp</span> <span class="rn">(<span data-i18n="legsDia">ramuri / &Oslash;</span>)</span></div>
+        <div class="rc"><input type="number" inputmode="numeric" id="j_ncol" value="2" step="1" min="0" oninput="onChange()" style="width:48px"><input type="number" inputmode="numeric" id="j_dcol" value="8" step="1" oninput="onChange()" style="width:48px"><span class="ru">mm</span></div></div>
+      <div class="row"><div class="rl"><span data-i18n="sCol">Pas etrieri zona critica</span> <span class="rn">(s<sub>cr</sub>)</span></div>
+        <div class="rc"><input type="number" inputmode="numeric" id="j_scol" value="100" step="5" oninput="onChange()"><span class="ru">mm</span></div></div>
+      <div class="toggle-row" style="padding-top:8px"><span class="tlbl" data-i18n="fourBeams">Grinzi pe toate cele 4 laturi, b<sub>b</sub> &ge; 3/4 b<sub>c</sub></span>
+        <span class="info-wrap"><button class="info-btn" type="button" onclick="toggleInfo(this,event)">i</button><div class="info-pop" onclick="event.stopPropagation()" data-i18n="i_four"></div></span>
+        <div class="seg" id="seg_four">
+          <button data-v="no" class="on" onclick="setSeg('four','no')" data-i18n="no_">Nu</button>
+          <button data-v="yes" onclick="setSeg('four','yes')" data-i18n="yes_">Da</button>
+        </div></div>
+      <div class="sk-box"><svg id="skJoint" viewBox="0 0 420 260"></svg></div>
+    </div></div>
+  </div>
+
+</div><!-- /inputsWrap -->
+
+  <!-- ══════ INTERACTIVE NODE VIEW ══════ -->
+  <div class="slabel" data-i18n="s_nodeview">Vedere nod &mdash; armare</div>
+  <div class="op">
+    <div class="node-grid">
+      <div class="node-left"><svg id="nodeSvg" viewBox="0 0 560 400"></svg></div>
+      <div class="node-right">
+        <div class="elem-tabs" id="elemTabs">
+          <button data-e="bL" onclick="selElem('bL')" data-i18n="e_bL">Grinda stanga</button>
+          <button data-e="bR" onclick="selElem('bR')" data-i18n="e_bR">Grinda dreapta</button>
+          <button data-e="cI" onclick="selElem('cI')" data-i18n="e_cI">Stalp inf.</button>
+          <button data-e="cS" onclick="selElem('cS')" data-i18n="e_cS">Stalp sup.</button>
+          <button data-e="jt" onclick="selElem('jt')" data-i18n="e_jt">Nod</button>
+        </div>
+        <div class="detail-h" id="elemTitle">&mdash;</div>
+        <svg id="elemSvg" viewBox="0 0 300 220" style="display:block;width:100%;max-width:300px;margin:0 auto 10px"></svg>
+        <div id="elemVals"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════ RESULTS ══════ -->
+  <div class="slabel" data-i18n="s_checks">Verificari</div>
+  <div class="op" style="margin-bottom:13px"><div class="summary-bar" id="summaryBar"></div></div>
+  <div id="resWrap"></div>
+
+  <div class="op">
+    <div class="report-bar">
+      <span class="report-lbl" data-i18n="exportCalcReport">Export raport de calcul (PDF)</span>
+      <button class="report-btn" id="rptBtn" onclick="generatePdf()" data-i18n="downloadPdf">Descarca PDF</button>
+    </div>
+    <div class="report-status" id="rptStatus"></div>
+  </div>
+
+</div>
+<div class="author-footer" data-i18n="footer">Lucrare de disertație — Janos Patrik · UTCN · Facultatea de Construcții · 2026</div>
+
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
+<script>
+/* ════════════════════════════════════════════════════════════════════
+   MODULE 08 — BEAM-COLUMN JOINT (NOD DE CADRU), P 100-1/2013 §5.3.3.4,
+   §5.3.4.2.3, §5.2.3.3.3.  Column M_Rd uses the same 2D fibre engine as
+   modules 06/07, restricted to uniaxial bending about the axis whose
+   section depth is h_c (the column side parallel to the beams), so the
+   capacity and the joint always refer to the same direction.
+   ════════════════════════════════════════════════════════════════════ */
+
+const CONC={'C12/15':{fck:12},'C16/20':{fck:16},'C20/25':{fck:20},'C25/30':{fck:25},'C30/37':{fck:30},
+            'C35/45':{fck:35},'C40/50':{fck:40},'C45/55':{fck:45},'C50/60':{fck:50},'C55/67':{fck:55},'C60/75':{fck:60}};
+const STEEL={'S240B':{fyk:240},'S400B':{fyk:400},'S500B':{fyk:500}};
+const NGY=40,NGZ=40;                 // same discretisation as modules 06/07
+const PI=Math.PI;
+function barA(d){return d*d*PI/4;}
+function gv(id){const e=document.getElementById(id);const v=parseFloat(e&&e.value);return isFinite(v)?v:0;}
+function gvi(id){return Math.max(0,Math.round(gv(id)));}
+function sv(id){const e=document.getElementById(id);return e?e.value:'';}
+
+/* ── segmented-control state (data-v kept stable so presets survive a language switch) ── */
+let SEG={duct:'DCM',joint:'int',level:'cur',sign:'neg',top:'no',four:'no'};
+function setSeg(k,v){SEG[k]=v;paintSegs();onChange();saveCurrentPreset();}
+function paintSegs(){
+  const map={duct:'seg_duct',joint:'seg_joint',level:'seg_level',sign:'seg_sign',top:'seg_top',four:'seg_four'};
+  Object.keys(map).forEach(k=>{
+    const el=document.getElementById(map[k]);if(!el)return;
+    el.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.v===SEG[k]));
+  });
+  document.getElementById('pnl_bR').style.display=(SEG.joint==='end')?'none':'';
+  const tb=document.querySelector('#elemTabs button[data-e="bR"]');
+  if(tb){tb.disabled=(SEG.joint==='end');if(tb.disabled&&selected==='bR')selected='bL';}
+}
+
+/* ══════════════ i18n ══════════════ */
+let LANG=(function(){try{return localStorage.getItem('sw_lang')||'en';}catch(e){return 'en';}})();
+const T={
+ backAll:{ro:'Toate modulele',en:'All modules'},
+ pageLabel:{ro:'Nod de cadru grinda&ndash;stalp &mdash; P 100-1/2013',en:'Beam&ndash;column joint &mdash; P 100-1/2013'},
+ presetLabel:{ro:'Nod:',en:'Joint:'},
+ t_gen:{ro:'Date generale &amp; materiale',en:'General data &amp; materials'},
+ t_colsec:{ro:'Stalp &mdash; sectiune &amp; geometrie',en:'Column &mdash; section &amp; geometry'},
+ t_bL:{ro:'Grinda stanga',en:'Left beam'},
+ t_bR:{ro:'Grinda dreapta',en:'Right beam'},
+ t_cI:{ro:'Stalp inferior (sub nod)',en:'Lower column (below joint)'},
+ t_cS:{ro:'Stalp superior (peste nod)',en:'Upper column (above joint)'},
+ t_st:{ro:'Armatura transversala in nod',en:'Joint transverse reinforcement'},
+ concClass:{ro:'Clasa beton',en:'Concrete class'},
+ steelClass:{ro:'Clasa otel longitudinal',en:'Longitudinal steel class'},
+ steelClassW:{ro:'Clasa otel armatura transversala',en:'Transverse steel class'},
+ s_config:{ro:'Configuratie',en:'Configuration'},
+ ductClass:{ro:'Clasa de ductilitate',en:'Ductility class'},
+ jointType:{ro:'Tip nod',en:'Joint type'},
+ jt_int:{ro:'Interior',en:'Interior'},
+ jt_end:{ro:'De capat',en:'End'},
+ levelLbl:{ro:'Nivelul nodului',en:'Joint level'},
+ lv_base:{ro:'Baza',en:'Base'},
+ lv_cur:{ro:'Curent',en:'Typical'},
+ signConv:{ro:'Conventie semn N<sub>Ed</sub>',en:'N<sub>Ed</sub> sign convention'},
+ sg_pos:{ro:'N&gt;0 compresiune',en:'N&gt;0 compression'},
+ sg_neg:{ro:'N&lt;0 compresiune',en:'N&lt;0 compression'},
+ lastLvl:{ro:'Nod la ultimul nivel (capat superior stalp)',en:'Joint at top level (column upper end)'},
+ no_:{ro:'Nu',en:'No'}, yes_:{ro:'Da',en:'Yes'},
+ hcLbl:{ro:'Latura paralela cu grinzile',en:'Side parallel to the beams'},
+ bcLbl:{ro:'Latura perpendiculara pe grinzi',en:'Side perpendicular to the beams'},
+ swapBtn:{ro:'&#8646; Schimba directia',en:'&#8646; Swap direction'},
+ cover:{ro:'Acoperire',en:'Cover'},
+ stirrupDia:{ro:'Diametru etrier stalp',en:'Column stirrup diameter'},
+ lclLbl:{ro:'Inaltimea libera a stalpului de deasupra nodului',en:'Clear height of the column above the joint'},
+ cls528:{ro:'(5.28)',en:'(5.28)'},
+ width:{ro:'Latime',en:'Width'}, height:{ro:'Inaltime',en:'Height'},
+ stirrupDiaB:{ro:'Diametru etrier',en:'Stirrup diameter'},
+ topReinf:{ro:'Armatura superioara',en:'Top reinforcement'},
+ botReinf:{ro:'Armatura inferioara',en:'Bottom reinforcement'},
+ pcsDia:{ro:'buc / &Oslash;',en:'pcs / &Oslash;'},
+ pcsDiaSide:{ro:'buc/latura / &Oslash;',en:'pcs/side / &Oslash;'},
+ atCorners:{ro:'La colturi',en:'At corners'},
+ barsFb:{ro:'Pe fetele de lungime b<sub>c</sub>',en:'On the b<sub>c</sub>-long faces'},
+ barsFh:{ro:'Pe fetele de lungime h<sub>c</sub>',en:'On the h<sub>c</sub>-long faces'},
+ axialN:{ro:'Forta axiala',en:'Axial force'},
+ mrdOvr:{ro:'M<sub>Rd</sub> manual (IDEA / alt calcul)',en:'M<sub>Rd</sub> manual (IDEA / other)'},
+ mrdCalc:{ro:'M<sub>Rd</sub> calculat (metoda fibrelor)',en:'M<sub>Rd</sub> computed (fibre method)'},
+ mrdUsed:{ro:'M<sub>Rd</sub> folosit',en:'M<sub>Rd</sub> used'},
+ totalBars:{ro:'Total bare / A<sub>s</sub>',en:'Total bars / A<sub>s</sub>'},
+ reinfRatio:{ro:'Procent armare &rho;',en:'Reinforcement ratio &rho;'},
+ s_effLegs:{ro:'Ramuri efective (paralele cu V<sub>jhd</sub>)',en:'Effective legs (parallel to V<sub>jhd</sub>)'},
+ perimStir:{ro:'Etrier perimetral',en:'Perimeter stirrup'},
+ innerTies:{ro:'Agrafe / etrieri interiori',en:'Ties / inner stirrups'},
+ legsDia:{ro:'ramuri / &Oslash;',en:'legs / &Oslash;'},
+ nSets:{ro:'Nr. seturi in nod',en:'No. of sets in the joint'},
+ pcs:{ro:'buc',en:'pcs'},
+ sJoint:{ro:'Pas etrieri in nod',en:'Stirrup spacing in the joint'},
+ provided:{ro:'disponibil',en:'provided'},
+ s_colCrit:{ro:'Etrieri in zona critica a stalpului',en:'Stirrups in the column critical zone'},
+ colStir:{ro:'Etrieri stalp',en:'Column stirrups'},
+ sCol:{ro:'Pas etrieri zona critica',en:'Critical-zone spacing'},
+ fourBeams:{ro:'Grinzi pe toate cele 4 laturi, b<sub>b</sub> &ge; 3/4 b<sub>c</sub>',en:'Beams on all 4 sides, b<sub>b</sub> &ge; 3/4 b<sub>c</sub>'},
+ s_nodeview:{ro:'Vedere nod &mdash; armare',en:'Joint view &mdash; reinforcement'},
+ s_checks:{ro:'Verificari',en:'Checks'},
+ e_bL:{ro:'Grinda stanga',en:'Left beam'}, e_bR:{ro:'Grinda dreapta',en:'Right beam'},
+ e_cI:{ro:'Stalp inf.',en:'Lower col.'}, e_cS:{ro:'Stalp sup.',en:'Upper col.'}, e_jt:{ro:'Nod',en:'Joint'},
+ exportCalcReport:{ro:'Export raport de calcul (PDF)',en:'Export calculation report (PDF)'},
+ downloadPdf:{ro:'Descarca PDF',en:'Download PDF'},
+ generating:{ro:'Se genereaza...',en:'Generating...'},
+ pdfLoading:{ro:'Libraria PDF se incarca...',en:'PDF library is loading...'},
+ statusDownloaded:{ro:'Raport descarcat.',en:'Report downloaded.'},
+ footer:{ro:'Lucrare de disertație — Janos Patrik · UTCN · Facultatea de Construcții · 2026',en:'Dissertation — Janos Patrik · UTCN · Faculty of Civil Engineering · 2026'},
+ /* info popovers */
+ i_duct:{ro:'Determina factorii de suprarezistenta &gamma;<sub>Rd</sub>: <b>(5.4)</b> 1,3 DCH / 1,2 DCM; <b>(5.9)</b> grinzi 1,2 DCH / 1,0 DCM; <b>(5.10)</b> stalpi 1,3 baza si 1,2 restul nivelurilor la DCH, 1,0 la DCM; <b>(5.11)/(5.12)</b> 1,1 DCH / 1,0 DCM.',
+        en:'Sets the overstrength factors &gamma;<sub>Rd</sub>: <b>(5.4)</b> 1.3 DCH / 1.2 DCM; <b>(5.9)</b> beams 1.2 DCH / 1.0 DCM; <b>(5.10)</b> columns 1.3 at the base and 1.2 at other levels for DCH, 1.0 for DCM; <b>(5.11)/(5.12)</b> 1.1 DCH / 1.0 DCM.'},
+ i_jtype:{ro:'<b>Interior</b>: grinzi pe ambele fete &rarr; (5.11), (5.26) cu 0,30, (5.29).<br><b>De capat</b> (marginal sau de colt in directia analizata): o singura grinda &rarr; (5.12), (5.27) cu 0,25, (5.30) si sporirea cu 20% a lui A<sub>sh</sub>. Grinda dreapta se ascunde.',
+         en:'<b>Interior</b>: beams on both faces &rarr; (5.11), (5.26) with 0.30, (5.29).<br><b>End</b> (edge or corner in the direction considered): a single beam &rarr; (5.12), (5.27) with 0.25, (5.30) and the 20% increase of A<sub>sh</sub>. The right beam is hidden.'},
+ i_level:{ro:'Intervine numai in (5.10) la DCH: &gamma;<sub>Rd</sub> = 1,30 pentru nivelul de la baza constructiei si 1,20 pentru restul nivelurilor. La DCM, &gamma;<sub>Rd</sub> = 1,0 indiferent de nivel (5.4.3.3).',
+          en:'Affects (5.10) for DCH only: &gamma;<sub>Rd</sub> = 1.30 at the base level and 1.20 at all other levels. For DCM, &gamma;<sub>Rd</sub> = 1.0 regardless of level (5.4.3.3).'},
+ i_lastlvl:{ro:'Conform 5.2.3.3.3(3), relatia (5.4) nu se verifica la capatul superior al stalpilor de la ultimul nivel. Celelalte verificari raman active.',
+            en:'Per 5.2.3.3.3(3), expression (5.4) need not be checked at the upper end of the columns of the top level. The other checks remain active.'},
+ i_dir:{ro:'Verificarea nodului se face <b>intr-o singura directie</b>. <b>h<sub>c</sub></b> este latura stalpului paralela cu axa grinzilor &mdash; adica adancimea nodului pe directia lui V<sub>jhd</sub>. <b>b<sub>c</sub></b> este latura perpendiculara.<br><br>Aceeasi directie se foloseste si pentru M<sub>Rd</sub> al stalpilor: incovoierea are loc pe adancimea h<sub>c</sub>. Astfel capacitatea stalpului si nodul se refera intotdeauna la aceeasi axa.<br><br>Ex. stalp lamelar 300&times;1000 cu grinzi pe fata lunga: h<sub>c</sub> = 300, b<sub>c</sub> = 1000.',
+        en:'The joint is checked <b>in one direction at a time</b>. <b>h<sub>c</sub></b> is the column side parallel to the beam axis &mdash; the joint depth along V<sub>jhd</sub>. <b>b<sub>c</sub></b> is the perpendicular side.<br><br>The same direction drives the column M<sub>Rd</sub>: bending acts over the depth h<sub>c</sub>. Capacity and joint therefore always refer to the same axis.<br><br>E.g. a 300&times;1000 blade column with beams on the long face: h<sub>c</sub> = 300, b<sub>c</sub> = 1000.'},
+ i_lcl:{ro:'Folosita pentru V<sub>c</sub> = (M<sub>dc,inf</sub> + M<sub>dc,sup</sub>) / l<sub>cl</sub>, forta taietoare din stalpul de deasupra nodului (5.3.3.3(2) si (3)), care se scade in (5.11)/(5.12).',
+        en:'Used for V<sub>c</sub> = (M<sub>dc,inf</sub> + M<sub>dc,sup</sub>) / l<sub>cl</sub>, the shear in the column above the joint (5.3.3.3(2) and (3)), subtracted in (5.11)/(5.12).'},
+ i_vc:{ro:'V<sub>c</sub> <b>reduce</b> V<sub>jhd</sub>, deci o valoare supraestimata este neacoperitoare. Valoarea implicita rezulta din momentele de proiectare (5.10) si l<sub>cl</sub>. Introdu 0 pentru ipoteza acoperitoare, sau o valoare proprie din ETABS.',
+       en:'V<sub>c</sub> <b>reduces</b> V<sub>jhd</sub>, so an overestimate is unsafe. The default follows from the design moments (5.10) and l<sub>cl</sub>. Enter 0 for the safe-side assumption, or your own value from ETABS.'},
+ i_mrd:{ro:'Calculat cu metoda fibrelor (retea 40&times;40, lege parabola-dreptunghi SR EN 1992-1-1, otel elastic&ndash;perfect plastic), la N<sub>Ed</sub> introdus, pe directia nodului. Daca introduci o valoare manuala &ne; 0, aceasta este folosita in locul celei calculate.',
+        en:'Computed with the fibre method (40&times;40 mesh, parabola-rectangle law per SR EN 1992-1-1, elastic&ndash;perfectly plastic steel), at the given N<sub>Ed</sub>, in the joint direction. If a manual value &ne; 0 is entered, it is used instead.'},
+ i_mrb:{ro:'Sectiune simplu armata: x = A<sub>s</sub>f<sub>yd</sub> / (&lambda;&eta;f<sub>cd</sub>b<sub>w</sub>), z = d &minus; &lambda;x/2, M<sub>Rb</sub> = A<sub>s</sub>f<sub>yd</sub>z. Armatura comprimata si armatura din placa in latimea activa nu sunt luate in considerare.',
+        en:'Singly reinforced section: x = A<sub>s</sub>f<sub>yd</sub> / (&lambda;&eta;f<sub>cd</sub>b<sub>w</sub>), z = d &minus; &lambda;x/2, M<sub>Rb</sub> = A<sub>s</sub>f<sub>yd</sub>z. Compression steel and slab reinforcement within the effective width are not accounted for.'},
+ i_legs:{ro:'A<sub>sh</sub> din (5.29)/(5.30) este o <b>arie totala pe inaltimea nodului</b>, distribuita uniform (5.3.4.2.3(4)) &mdash; nu o numaratoare de ramuri taiate de o fisura la 45&deg; ca la forta taietoare in grinzi.<br><br>Singurul filtru este <b>directia</b>: conteaza numai ramurile <b>paralele cu axa grinzilor</b>, adica paralele cu V<sub>jhd</sub>. Ramurile perpendiculare apartin verificarii pe cealalta directie.<br><br>Etrierul perimetral contribuie cu cele <b>2 ramuri de lungime h<sub>c</sub></b>. Fiecare agrafa care traverseaza dimensiunea h<sub>c</sub> adauga 1 ramura. La stalpi lamelari cu grinzi pe fata lunga, acestea sunt ramurile scurte plus agrafele &mdash; vezi schita, ramurile efective sunt albastre.',
+         en:'A<sub>sh</sub> in (5.29)/(5.30) is a <b>total area over the joint height</b>, uniformly distributed (5.3.4.2.3(4)) &mdash; not a count of legs crossed by a 45&deg; crack as in beam shear.<br><br>The only filter is <b>direction</b>: only legs <b>parallel to the beam axis</b>, i.e. parallel to V<sub>jhd</sub>, count. Perpendicular legs belong to the check in the other direction.<br><br>The perimeter stirrup contributes its <b>2 legs of length h<sub>c</sub></b>. Every tie crossing the h<sub>c</sub> dimension adds 1 leg. For blade columns with beams on the long face these are the short legs plus the ties &mdash; see the sketch, effective legs are blue.'},
+ i_smax:{ro:'s<sub>max</sub> este pasul cel mai mare la care cele n seturi mai incap pe inaltimea utila a nodului: s<sub>max</sub> = h<sub>jw</sub>/(n&minus;1). Campul nu accepta valori peste aceasta limita &mdash; daca ai nevoie de un pas mai mare, reduce numarul de seturi.',
+         en:'s<sub>max</sub> is the largest spacing at which the n sets still fit within the usable joint height: s<sub>max</sub> = h<sub>jw</sub>/(n&minus;1). The field will not accept a larger value &mdash; if you need a wider spacing, reduce the number of sets.'},
+ smaxLbl:{ro:v=>`s<sub>max</sub> = ${v} mm`,en:v=>`s<sub>max</sub> = ${v} mm`},
+ i_colcrit:{ro:'Pentru verificarea 5.3.4.2.3(6): armatura orizontala a nodului nu va fi mai mica decat armatura transversala indesita din zonele critice ale stalpului. Compararea se face pe unitatea de lungime, A<sub>sw</sub>/s, pe aceeasi directie.',
+            en:'For check 5.3.4.2.3(6): the horizontal joint reinforcement shall not be less than the dense transverse reinforcement of the column critical zones. Compared per unit length, A<sub>sw</sub>/s, in the same direction.'},
+ i_four:{ro:'5.4.4.3(2): daca in nod intra grinzi pe toate cele 4 laturi si latimea lor este cel putin 3/4 din latimea stalpului, pasul etrierilor orizontali din nod se poate dubla fata de cel din zona critica, fara a depasi 150 mm.',
+         en:'5.4.4.3(2): if beams frame in on all 4 sides with a width of at least 3/4 of the column width, the joint hoop spacing may be doubled relative to the critical zone, but never beyond 150 mm.'},
+ i_54:{ro:'&Sigma;M<sub>Rc</sub> &ge; &gamma;<sub>Rd</sub>&Sigma;M<sub>Rb</sub>. &Sigma;M<sub>Rc</sub> este suma momentelor capabile ale stalpilor de sub si de peste nod; &Sigma;M<sub>Rb</sub> suma momentelor capabile ale grinzilor, pentru sensul considerat al actiunii seismice. Se verifica ambele sensuri.',
+       en:'&Sigma;M<sub>Rc</sub> &ge; &gamma;<sub>Rd</sub>&Sigma;M<sub>Rb</sub>. &Sigma;M<sub>Rc</sub> is the sum of the capable moments of the columns below and above the joint; &Sigma;M<sub>Rb</sub> that of the beams, for the sense of seismic action considered. Both senses are checked.'},
+ i_vjhd:{ro:'Nod interior (5.11): V<sub>jhd</sub> = &gamma;<sub>Rd</sub>(A<sub>s1</sub>+A<sub>s2</sub>)f<sub>yd</sub> &minus; V<sub>c</sub>, cu A<sub>s1</sub>, A<sub>s2</sub> ariile armaturilor <b>intinse</b> din grinzile care intra in nod pentru sensul considerat.<br>Nod de capat (5.12): V<sub>jhd</sub> = &gamma;<sub>Rd</sub>A<sub>s1</sub>f<sub>yd</sub> &minus; V<sub>c</sub>.',
+         en:'Interior joint (5.11): V<sub>jhd</sub> = &gamma;<sub>Rd</sub>(A<sub>s1</sub>+A<sub>s2</sub>)f<sub>yd</sub> &minus; V<sub>c</sub>, with A<sub>s1</sub>, A<sub>s2</sub> the <b>tensioned</b> beam reinforcement areas for the sense considered.<br>End joint (5.12): V<sub>jhd</sub> = &gamma;<sub>Rd</sub>A<sub>s1</sub>f<sub>yd</sub> &minus; V<sub>c</sub>.'},
+ i_diag:{ro:'5.3.4.2.3(1)&ndash;(2): forta de compresiune inclinata pe diagonala nodului nu va depasi rezistenta betonului in prezenta intinderilor transversale. V<sub>jhd</sub> &le; 0,30&middot;b<sub>j</sub>h<sub>c</sub>f<sub>cd</sub> (5.26) la nodurile interioare, respectiv 0,25 (5.27) la cele exterioare.',
+         en:'5.3.4.2.3(1)&ndash;(2): the diagonal compression in the joint shall not exceed the concrete strength in the presence of transverse tension. V<sub>jhd</sub> &le; 0.30&middot;b<sub>j</sub>h<sub>c</sub>f<sub>cd</sub> (5.26) at interior joints, 0.25 (5.27) at exterior ones.'},
+ i_ash:{ro:'(5.29) noduri interioare: A<sub>sh</sub>f<sub>ywd</sub> &ge; 0,8(A<sub>s1</sub>+A<sub>s2</sub>)f<sub>yd</sub>(1&minus;0,8&nu;<sub>d</sub>).<br>(5.30) noduri de capat: A<sub>sh</sub>f<sub>ywd</sub> &ge; 0,8A<sub>s2</sub>f<sub>yd</sub>(1&minus;0,8&nu;<sub>d</sub>), cu A<sub>s2</sub> armatura <b>comprimata</b> a grinzii; rezultatul se sporeste cu 20%.<br>&nu;<sub>d</sub> corespunde fortei axiale a <b>stalpului inferior</b>. Se retine infasuratoarea celor doua sensuri.',
+        en:'(5.29) interior joints: A<sub>sh</sub>f<sub>ywd</sub> &ge; 0.8(A<sub>s1</sub>+A<sub>s2</sub>)f<sub>yd</sub>(1&minus;0.8&nu;<sub>d</sub>).<br>(5.30) end joints: A<sub>sh</sub>f<sub>ywd</sub> &ge; 0.8A<sub>s2</sub>f<sub>yd</sub>(1&minus;0.8&nu;<sub>d</sub>), with A<sub>s2</sub> the beam <b>compression</b> reinforcement; the result is increased by 20%.<br>&nu;<sub>d</sub> corresponds to the axial force of the <b>lower column</b>. The envelope of both senses is retained.'},
+ i_asv:{ro:'(5.31): A<sub>sv</sub> &ge; (2/3)A<sub>sh</sub>(h<sub>jc</sub>/h<sub>jw</sub>). Se retine ca A<sub>sv</sub> disponibil armatura verticala a stalpului de pe <b>fetele paralele cu directia considerata</b> plus barele de colt &mdash; adica barele distribuite pe adancimea h<sub>c</sub>. Aria totala a stalpului este afisata alaturi, ca referinta.',
+        en:'(5.31): A<sub>sv</sub> &ge; (2/3)A<sub>sh</sub>(h<sub>jc</sub>/h<sub>jw</sub>). The provided A<sub>sv</sub> is taken as the column vertical bars on the <b>faces parallel to the direction considered</b> plus the corner bars &mdash; i.e. the bars distributed over the depth h<sub>c</sub>. The total column area is shown alongside for reference.'},
+ i_detail:{ro:'5.3.4.2.3(6): armatura orizontala a nodului nu va fi mai mica decat cea din zonele critice ale stalpului. 5.4.4.3(2) permite dublarea pasului daca intra grinzi pe toate cele 4 laturi cu b<sub>b</sub> &ge; 3/4 b<sub>c</sub>, fara a depasi 150 mm. 5.3.4.2.3(4): etrierii se distribuie uniform pe inaltimea nodului.',
+           en:'5.3.4.2.3(6): the horizontal joint reinforcement shall not be less than that of the column critical zones. 5.4.4.3(2) allows the spacing to be doubled if beams frame in on all 4 sides with b<sub>b</sub> &ge; 3/4 b<sub>c</sub>, never beyond 150 mm. 5.3.4.2.3(4): hoops are distributed uniformly over the joint height.'},
+ /* results */
+ chk54:{ro:'Stalp puternic &ndash; grinda slaba',en:'Strong column &ndash; weak beam'},
+ chkForces:{ro:'Eforturi de proiectare',en:'Design action effects'},
+ chkVjhd:{ro:'Forta taietoare in nod',en:'Joint shear force'},
+ chkDiag:{ro:'Compresiune diagonala in nod',en:'Diagonal compression in the joint'},
+ chkAsh:{ro:'Armatura transversala orizontala A<sub>sh</sub>',en:'Horizontal transverse reinforcement A<sub>sh</sub>'},
+ chkAsv:{ro:'Armatura verticala in nod A<sub>sv</sub>',en:'Vertical reinforcement in the joint A<sub>sv</sub>'},
+ chkDet:{ro:'Alcatuirea nodului',en:'Joint detailing'},
+ vOk:{ro:'VERIFICA',en:'PASS'}, vNo:{ro:'NU VERIFICA',en:'FAIL'}, vNa:{ro:'NU SE APLICA',en:'N/A'}, vInfo:{ro:'INFORMATIV',en:'INFO'},
+ sumTotal:{ro:'Verificari',en:'Checks'}, sumOk:{ro:'Verifica',en:'Pass'}, sumNo:{ro:'Nu verifica',en:'Fail'}, sumWorst:{ro:'Cea mai solicitata',en:'Governing'},
+ senseA:{ro:'Sens 1 (grinda stanga intinsa sus)',en:'Sense 1 (left beam in hogging)'},
+ senseB:{ro:'Sens 2 (grinda stanga intinsa jos)',en:'Sense 2 (left beam in sagging)'},
+ senseAe:{ro:'Sens 1 (intindere sus)',en:'Sense 1 (top in tension)'},
+ senseBe:{ro:'Sens 2 (intindere jos)',en:'Sense 2 (bottom in tension)'},
+ colParam:{ro:'Marime',en:'Quantity'}, colForm:{ro:'Relatie',en:'Expression'}, colVal:{ro:'Valoare',en:'Value'},
+ governing:{ro:'determinant',en:'governing'},
+ noBeamWarn:{ro:'Introdu armarea grinzii &mdash; A<sub>s</sub> = 0.',en:'Enter the beam reinforcement &mdash; A<sub>s</sub> = 0.'},
+ setsWarn:{ro:(n,s,h,sm)=>`Cele ${n} seturi la pas ${s} mm acopera (${n}&minus;1)&times;${s} = ${(n-1)*s} mm, peste inaltimea utila a nodului h<sub>jw</sub> = ${h} mm. Pas maxim admis: ${sm} mm.`,
+           en:(n,s,h,sm)=>`${n} sets at ${s} mm span (${n}&minus;1)&times;${s} = ${(n-1)*s} mm, more than the usable joint height h<sub>jw</sub> = ${h} mm. Maximum spacing: ${sm} mm.`},
+ ovrWarn:{ro:'M<sub>Rd</sub> manual difera cu peste 15% de valoarea calculata &mdash; verifica daca se refera la aceeasi directie de incovoiere.',
+          en:'The manual M<sub>Rd</sub> differs by more than 15% from the computed value &mdash; check that it refers to the same bending direction.'},
+ /* pdf */
+ pdfTitle:{ro:'NOTA DE CALCUL — NOD DE CADRU GRINDA-STALP',en:'CALCULATION REPORT — BEAM-COLUMN JOINT'},
+ pdfSub:{ro:'P 100-1/2013 (modificat si completat 2019) — sectiunile 5.2.3.3.3, 5.3.3.4, 5.3.4.2.3',en:'P 100-1/2013 (amended 2019) — clauses 5.2.3.3.3, 5.3.3.4, 5.3.4.2.3'},
+ pdfDate:{ro:'Data: ',en:'Date: '},
+ pdfS1:{ro:'1. DATE DE INTRARE',en:'1. INPUT DATA'},
+ pdfS2:{ro:'2. CAPACITATI',en:'2. CAPACITIES'},
+ pdfS3:{ro:'3. VERIFICARI',en:'3. CHECKS'},
+ pdfS4:{ro:'4. SECTIUNI SI VEDEREA NODULUI',en:'4. SECTIONS AND JOINT VIEW'},
+ pdfJointSec:{ro:'Sectiune nod - ramuri efective',en:'Joint section - effective legs'},
+ pdfNodeElev:{ro:'Vedere laterala nod',en:'Joint elevation'},
+ pdfLegLegend:{ro:'albastru = ramuri efective (paralele cu V_jhd) · gri = ramuri perpendiculare',
+               en:'blue = effective legs (parallel to V_jhd) · grey = perpendicular legs'},
+ pdfGenerated:{ro:'Generat: ',en:'Generated: '},
+ pdfPage:{ro:'Pagina',en:'Page'}, pdfOf:{ro:'din',en:'of'},
+ pdfDisc:{ro:'Responsabilitatea pentru rezultatele obtinute revine in exclusivitate utilizatorului. Toate valorile trebuie verificate inainte de utilizare.',
+          en:'Responsibility for the obtained results rests solely with the user. All values must be verified before use.'},
+ pdfFname:{ro:'Raport_nod_cadru.pdf',en:'Report_beam_column_joint.pdf'},
+ pdfError:{ro:'Eroare la generare:',en:'Generation error:'}
+};
+function t(k,...a){const e=T[k];if(!e)return k;const v=(e[LANG]!==undefined)?e[LANG]:e.ro;return typeof v==='function'?v(...a):v;}
+function tp(k){return String(t(k)).replace(/<[^>]*>/g,'').replace(/&minus;/g,'-').replace(/&middot;/g,'.').replace(/&times;/g,'x').replace(/&ge;/g,'>=').replace(/&le;/g,'<=').replace(/&Sigma;/g,'Sum').replace(/&gamma;/g,'g').replace(/&nu;/g,'v').replace(/&mdash;/g,'-').replace(/&ndash;/g,'-').replace(/&amp;/g,'&').replace(/&Oslash;/g,'D').replace(/&rho;/g,'rho').replace(/&lambda;/g,'lambda').replace(/&eta;/g,'eta');}
+function applyStaticLang(){
+  document.documentElement.lang=LANG;
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const k=el.getAttribute('data-i18n');
+    if(T[k]){const v=T[k][LANG];if(v!==undefined&&typeof v!=='function')el.innerHTML=v;}
+  });
+  document.querySelectorAll('#langSeg button').forEach(b=>b.classList.toggle('on',b.dataset.lang===LANG));
+}
+function setLang(l){LANG=l;try{localStorage.setItem('sw_lang',l);}catch(e){}buildDynamicPanels();applyStaticLang();paintSegs();onChange();}
+
+/* ══════════════ info popovers (click-toggle) ══════════════ */
+function toggleInfo(btn,ev){
+  ev.stopPropagation();
+  const pop=btn.nextElementSibling;
+  const was=pop.classList.contains('show');
+  closeAllInfo();
+  if(!was){positionInfoPop(btn,pop);pop.classList.add('show');btn.classList.add('on');}
+}
+function positionInfoPop(btn,pop){
+  const r=btn.getBoundingClientRect(), vw=innerWidth, vh=innerHeight;
+  const wide=pop.classList.contains('wide');
+  const w=Math.min(wide?380:280, vw*(wide?0.92:0.80));
+  let left=r.left+r.width/2-w/2;
+  left=Math.max(10,Math.min(left,vw-w-10));
+  pop.style.width=w+'px';pop.style.left=left+'px';
+  pop.style.visibility='hidden';pop.style.display='block';
+  const h=pop.offsetHeight;
+  pop.style.display='';pop.style.visibility='';
+  let top=r.bottom+8,aTop,aRot,fin;
+  if(top+h>vh-10 && r.top-h-8>10){fin=r.top-h-8;aTop=r.top-8-1;aRot='rotate(225deg)';}
+  else{fin=top;aTop=r.bottom+3;aRot='rotate(45deg)';}
+  pop.style.top=fin+'px';
+  pop.style.setProperty('--arrow-left',Math.max(left+10,Math.min(r.left+r.width/2-4.5,left+w-18))+'px');
+  pop.style.setProperty('--arrow-top',aTop+'px');
+  pop.style.setProperty('--arrow-rot',aRot);
+}
+function closeAllInfo(){
+  document.querySelectorAll('.info-pop.show').forEach(p=>p.classList.remove('show'));
+  document.querySelectorAll('.info-btn.on').forEach(b=>b.classList.remove('on'));
+}
+document.addEventListener('click',closeAllInfo);
+addEventListener('scroll',closeAllInfo,true);
+addEventListener('resize',closeAllInfo);
+function togglePanel(id){document.getElementById(id).classList.toggle('collapsed');}
+function toggleDet(id){document.getElementById(id).classList.toggle('open');}
+
+/* ══════════════ dynamic input panels (beams + columns) ══════════════ */
+function beamPanelHtml(p){
+  return `
+  <div class="geom-grid">
+    <div class="row"><div class="rl"><span>${t('width')}</span> <span class="rn">(b<sub>w</sub>)</span></div>
+      <div class="rc"><input type="number" inputmode="numeric" id="${p}_bw" value="250" step="10" oninput="onChange()"><span class="ru">mm</span></div></div>
+    <div class="row"><div class="rl"><span>${t('height')}</span> <span class="rn">(h<sub>b</sub>)</span></div>
+      <div class="rc"><input type="number" inputmode="numeric" id="${p}_hb" value="500" step="10" oninput="onChange()"><span class="ru">mm</span></div></div>
+    <div class="row"><div class="rl"><span>${t('cover')}</span> <span class="rn">(c<sub>nom</sub>)</span></div>
+      <div class="rc"><input type="number" inputmode="numeric" id="${p}_cnom" value="25" step="5" oninput="onChange()"><span class="ru">mm</span></div></div>
+    <div class="row"><div class="rl"><span>${t('stirrupDiaB')}</span> <span class="rn">(&Oslash;<sub>sw</sub>)</span></div>
+      <div class="rc"><input type="number" inputmode="numeric" id="${p}_dsw" value="8" step="2" oninput="onChange()"><span class="ru">mm</span></div></div>
+  </div>
+  <div class="sub" style="padding-top:10px"><span>${t('topReinf')} / ${t('botReinf')}</span>
+    <span class="info-wrap"><button class="info-btn" type="button" onclick="toggleInfo(this,event)">i</button><div class="info-pop wide" onclick="event.stopPropagation()">${t('i_mrb')}</div></span></div>
+  <div class="row"><div class="rl"><span>${t('topReinf')}</span> <span class="rn">(${t('pcsDia')})</span></div>
+    <div class="rc"><input type="number" inputmode="numeric" id="${p}_nt" value="2" step="1" min="0" oninput="onChange()" style="width:48px"><input type="number" inputmode="numeric" id="${p}_dt" value="18" step="1" oninput="onChange()" style="width:48px"><span class="ru">mm</span></div></div>
+  <div class="row"><div class="rl"><span>${t('botReinf')}</span> <span class="rn">(${t('pcsDia')})</span></div>
+    <div class="rc"><input type="number" inputmode="numeric" id="${p}_nb" value="3" step="1" min="0" oninput="onChange()" style="width:48px"><input type="number" inputmode="numeric" id="${p}_db" value="16" step="1" oninput="onChange()" style="width:48px"><span class="ru">mm</span></div></div>
+  <div class="count-box"><span>M<sub>Rb</sub><sup>&minus;</sup> (${LANG==='ro'?'sus':'top'}) / M<sub>Rb</sub><sup>+</sup> (${LANG==='ro'?'jos':'bottom'})</span><span id="${p}_mrb_r">&mdash;</span></div>
+  <div class="sk-box"><svg id="sk_${p}" viewBox="0 0 340 250"></svg></div>`;
+}
+function colPanelHtml(p){
+  return `
+  <div class="row"><div class="rl"><span>${t('axialN')}</span> <span class="rn">(N<sub>Ed</sub>)</span></div>
+    <div class="rc"><input type="number" inputmode="numeric" id="${p}_N" value="-1600" step="10" oninput="onChange()"><span class="ru">kN</span></div></div>
+  <div class="sub" style="padding-top:10px"><span>${LANG==='ro'?'Armare longitudinala':'Longitudinal reinforcement'}</span></div>
+  <div class="row"><div class="rl"><span>${t('atCorners')}</span> <span class="rn">(${t('pcsDia')})</span></div>
+    <div class="rc"><input type="number" inputmode="numeric" id="${p}_cn" value="4" step="4" min="4" oninput="onChange()" style="width:48px"><input type="number" inputmode="numeric" id="${p}_cd" value="20" step="1" oninput="onChange()" style="width:48px"><span class="ru">mm</span></div></div>
+  <div class="row"><div class="rl"><span>${t('barsFb')}</span> <span class="rn">(${t('pcsDiaSide')})</span></div>
+    <div class="rc"><input type="number" inputmode="numeric" id="${p}_fbn" value="2" step="1" min="0" oninput="onChange()" style="width:48px"><input type="number" inputmode="numeric" id="${p}_fbd" value="20" step="1" oninput="onChange()" style="width:48px"><span class="ru">mm</span></div></div>
+  <div class="row"><div class="rl"><span>${t('barsFh')}</span> <span class="rn">(${t('pcsDiaSide')})</span></div>
+    <div class="rc"><input type="number" inputmode="numeric" id="${p}_fhn" value="1" step="1" min="0" oninput="onChange()" style="width:48px"><input type="number" inputmode="numeric" id="${p}_fhd" value="20" step="1" oninput="onChange()" style="width:48px"><span class="ru">mm</span></div></div>
+  <div class="count-box"><span>${t('totalBars')}</span><span id="${p}_as_r">&mdash;</span></div>
+  <div class="count-box"><span>${t('reinfRatio')}</span><span id="${p}_rho_r">&mdash;</span></div>
+  <div class="sub" style="padding-top:12px"><span>M<sub>Rd</sub></span>
+    <span class="info-wrap"><button class="info-btn" type="button" onclick="toggleInfo(this,event)">i</button><div class="info-pop wide" onclick="event.stopPropagation()">${t('i_mrd')}</div></span></div>
+  <div class="count-box"><span>${t('mrdCalc')}</span><span id="${p}_mrdc_r">&mdash;</span></div>
+  <div class="row"><div class="rl"><span>${t('mrdOvr')}</span></div>
+    <div class="rc"><input type="number" inputmode="numeric" id="${p}_ovr" value="0" step="10" oninput="onChange()"><span class="ru">kNm</span></div></div>
+  <div class="count-box"><span>${t('mrdUsed')}</span><span id="${p}_mrdu_r">&mdash;</span></div>
+  <div class="fullspan" id="${p}_ovrwarn"></div>
+  <div class="sk-box"><svg id="sk_${p}" viewBox="0 0 340 250"></svg></div>`;
+}
+function buildDynamicPanels(){
+  document.getElementById('body_bL').innerHTML=beamPanelHtml('bL');
+  document.getElementById('body_bR').innerHTML=beamPanelHtml('bR');
+  document.getElementById('body_cI').innerHTML=colPanelHtml('cI');
+  document.getElementById('body_cS').innerHTML=colPanelHtml('cS');
+}
+
+/* ══════════════ ENGINE ══════════════ */
+function lamEta(fck){return fck<=50?{lam:0.8,eta:1.0}:{lam:0.8-(fck-50)/400,eta:1.0-(fck-50)/200};}
+
+function readMat(){
+  const fck=CONC[sv('cp')].fck, fyk=STEEL[sv('sp')].fyk, fywk=STEEL[sv('swp')].fyk;
+  const {lam,eta}=lamEta(fck);
+  return {fck,fcd:fck/1.5,fyk,fyd:fyk/1.15,fywk,fywd:fywk/1.15,lam,eta,Es:200000};
+}
+function readBeam(p,M){
+  const bw=gv(p+'_bw'),hb=gv(p+'_hb'),cn=gv(p+'_cnom'),dsw=gv(p+'_dsw');
+  const nt=gvi(p+'_nt'),dt=gv(p+'_dt'),nb=gvi(p+'_nb'),db=gv(p+'_db');
+  function cap(n,dia){
+    const As=n*barA(dia);
+    const d=hb-(cn+dsw+dia/2);
+    const x=(bw>0&&M.fcd>0)?As*M.fyd/(M.lam*M.eta*M.fcd*bw):0;
+    const z=d-M.lam*x/2;
+    return {As,d,x,z,M:As*M.fyd*z/1e6,n,dia};
+  }
+  return {bw,hb,cn,dsw,top:cap(nt,dt),bot:cap(nb,db)};
+}
+function buildColModel(bc,hc,cn,dsw,b,M){
+  const inset=cn+dsw;
+  const halfY=bc/2-inset, halfZ=hc/2-inset;
+  const sf=[];
+  const perCorner=Math.max(0,Math.round(b.cn_/4));
+  const Acor=barA(b.cd);
+  [[-halfY,-halfZ],[halfY,-halfZ],[halfY,halfZ],[-halfY,halfZ]].forEach(([y,z])=>sf.push({y,z,A:Acor*perCorner,grp:'cor'}));
+  const Afb=barA(b.fbd);
+  if(b.fbn>0)for(let s=0;s<2;s++){const z=(s===0)?-halfZ:halfZ;
+    for(let i=0;i<b.fbn;i++)sf.push({y:-halfY+(halfY*2)*(i+1)/(b.fbn+1),z,A:Afb,grp:'fb'});}
+  const Afh=barA(b.fhd);
+  if(b.fhn>0)for(let s=0;s<2;s++){const y=(s===0)?-halfY:halfY;
+    for(let i=0;i<b.fhn;i++)sf.push({y,z:-halfZ+(halfZ*2)*(i+1)/(b.fhn+1),A:Afh,grp:'fh'});}
+  const cF=[];
+  for(let i=0;i<NGY;i++){const y=-bc/2+(i+0.5)*(bc/NGY);
+    for(let j=0;j<NGZ;j++)cF.push({y,z:-hc/2+(j+0.5)*(hc/NGZ)});}
+  const As_tot=sf.reduce((s,f)=>s+f.A,0);
+  const As_dir=sf.filter(f=>f.grp!=='fb').reduce((s,f)=>s+f.A,0);  // corners + h_c-face bars
+  return {bc,hc,fcd:M.fcd,fyd:M.fyd,Es:M.Es,ec2:0.002,ecu:0.0035,
+          sf,cF,dAg:(bc/NGY)*(hc/NGZ),As_tot,As_dir,Ac:bc*hc,halfY,halfZ,
+          nBars:4*perCorner+2*b.fbn+2*b.fhn,cnt:{cor:4*perCorner,fb:2*b.fbn,fh:2*b.fhn},bars:b};
+}
+function sigC(e,m){if(e<=0)return 0;const r=e/m.ec2;return e<=m.ec2?m.fcd*(2*r-r*r):m.fcd;}
+function sigS(e,m){let s=e*m.Es;if(s>m.fyd)s=m.fyd;if(s<-m.fyd)s=-m.fyd;return s;}
+function dmaxT(th,b,h){const cx=Math.cos(th),cz=Math.sin(th);let d=-Infinity;
+  for(const[y,z]of[[-b/2,-h/2],[b/2,-h/2],[b/2,h/2],[-b/2,h/2]]){const v=y*cx+z*cz;if(v>d)d=v;}return d;}
+function secF(X,th,m){
+  const cx=Math.cos(th),cz=Math.sin(th),na=dmaxT(th,m.bc,m.hc)-X;
+  let Fc=0,Mc=0;
+  for(const f of m.cF){const d=f.y*cx+f.z*cz;const e=m.ecu*(d-na)/X;
+    if(e<=0)continue;const F=sigC(e,m)*m.dAg;Fc+=F;Mc+=F*f.z;}
+  let Fs=0,Ms=0;
+  for(const s of m.sf){const d=s.y*cx+s.z*cz;const e=m.ecu*(d-na)/X;
+    const F=(sigS(e,m)-sigC(e,m))*s.A;   // subtract the concrete displaced by the bar
+    Fs+=F;Ms+=F*s.z;}
+  return {N:(Fc+Fs)/1e3,My:(Mc+Ms)/1e6};
+}
+function solveX(th,Nt,m){
+  const F=X=>secF(X,th,m).N-Nt;
+  let lo=1,hi=Math.max(m.bc,m.hc)*8,flo=F(lo),fhi=F(hi),g=0;
+  while(flo*fhi>0&&g++<200){
+    if(Math.abs(flo)<Math.abs(fhi)){lo/=2;if(lo<1e-6)break;flo=F(lo);}
+    else{hi*=2;if(hi>1e9)break;fhi=F(hi);}
+  }
+  if(flo*fhi>0){const X=(Math.abs(flo)<Math.abs(fhi))?lo:hi;return{X,...secF(X,th,m),converged:false};}
+  for(let i=0;i<60;i++){const mid=(lo+hi)/2,fm=F(mid);
+    if(flo*fm<=0){hi=mid;fhi=fm;}else{lo=mid;flo=fm;}
+    if(Math.abs(fm)<1e-7)break;}
+  const X=(lo+hi)/2;
+  return{X,...secF(X,th,m),converged:true};
+}
+// uniaxial M_Rd about the axis whose section depth is h_c, both senses, minimum retained
+function MRdCol(m,N){
+  const a=solveX(PI/2,N,m), b=solveX(-PI/2,N,m);
+  const ok=a.converged&&b.converged;
+  return {MRd:Math.min(Math.abs(a.My),Math.abs(b.My)),x:Math.max(a.X,b.X),ok};
+}
+
+/* ══════════════ MAIN CALCULATION ══════════════ */
+let S=null, selected='bL';
+function compute(){
+  const M=readMat();
+  const end=(SEG.joint==='end');
+  const bc=gv('bc'),hc=gv('hc'),ccn=gv('c_cnom'),cdsw=gv('c_dsw'),lcl=gv('lcl');
+  const bL=readBeam('bL',M);
+  const bR=end?null:readBeam('bR',M);
+  const sgn=(SEG.sign==='neg')?-1:1;
+  function readCol(p){
+    const b={cn_:gvi(p+'_cn'),cd:gv(p+'_cd'),fbn:gvi(p+'_fbn'),fbd:gv(p+'_fbd'),fhn:gvi(p+'_fhn'),fhd:gv(p+'_fhd')};
+    const m=buildColModel(bc,hc,ccn,cdsw,b,M);
+    const N=sgn*gv(p+'_N');
+    const r=(bc>0&&hc>0)?MRdCol(m,N):{MRd:0,x:0,ok:false};
+    const ovr=gv(p+'_ovr');
+    return {m,N,MRdCalc:r.MRd,x:r.x,conv:r.ok,ovr,MRd:(ovr>0?ovr:r.MRd)};
+  }
+  const cI=readCol('cI'), cS=readCol('cS');
+
+  /* overstrength factors */
+  const DCH=(SEG.duct==='DCH');
+  const g54  = DCH?1.3:1.2;                       // (5.4)
+  const gb   = DCH?1.2:1.0;                       // (5.9)   5.4.3.2 -> 1.0 for DCM
+  const gc   = DCH?(SEG.level==='base'?1.3:1.2):1.0; // (5.10) base 1.3 / other 1.2 for DCH; 1.0 DCM
+  const gj   = DCH?1.1:1.0;                       // (5.11)/(5.12)  5.4.3.4 -> 1.0 for DCM
+
+  const SMRc = cI.MRd + cS.MRd;
+
+  /* two senses of seismic action */
+  function mkSense(name,lblKey){
+    let SMRb, As1, As2, Acomp, parts;
+    if(end){
+      if(name==='A'){SMRb=bL.top.M; As1=bL.top.As; As2=0; Acomp=bL.bot.As; parts=[['M_Rb,L,sup',bL.top.M]];}
+      else          {SMRb=bL.bot.M; As1=bL.bot.As; As2=0; Acomp=bL.top.As; parts=[['M_Rb,L,inf',bL.bot.M]];}
+    } else {
+      if(name==='A'){SMRb=bL.top.M+bR.bot.M; As1=bL.top.As; As2=bR.bot.As; Acomp=0;
+                     parts=[['M_Rb,L,sup',bL.top.M],['M_Rb,R,inf',bR.bot.M]];}
+      else          {SMRb=bL.bot.M+bR.top.M; As1=bR.top.As; As2=bL.bot.As; Acomp=0;
+                     parts=[['M_Rb,L,inf',bL.bot.M],['M_Rb,R,sup',bR.top.M]];}
+    }
+    const rat54 = SMRc>0 ? g54*SMRb/SMRc : Infinity;
+    const kRcRb = SMRb>0 ? Math.min(1,SMRc/SMRb) : 1;
+    const kRbRc = SMRc>0 ? Math.min(1,SMRb/SMRc) : 1;
+    const MdcI = gc*cI.MRd*kRbRc, MdcS = gc*cS.MRd*kRbRc;
+    const Vc   = lcl>0 ? (MdcI+MdcS)*1e6/lcl/1e3 : 0;
+    const Astens = end ? As1 : (As1+As2);
+    const Vjhd = gj*Astens*M.fyd/1e3 - Vc;
+    /* (5.29)/(5.30) */
+    const nud = (bc*hc*M.fcd)>0 ? Math.max(0,cI.N)*1e3/(bc*hc*M.fcd) : 0;
+    const Abase = end ? Acomp : (As1+As2);
+    const AshReq0 = M.fywd>0 ? 0.8*Abase*M.fyd*(1-0.8*nud)/M.fywd : 0;
+    const AshReq = end ? AshReq0*1.2 : AshReq0;
+    return {name,lblKey,SMRb,parts,As1,As2,Acomp,Astens,rat54,kRcRb,kRbRc,
+            MdbParts:parts.map(([k,v])=>[k,gb*v*kRcRb]),MdcI,MdcS,Vc,Vjhd,nud,Abase,AshReq};
+  }
+  const sA=mkSense('A',end?'senseAe':'senseA'), sB=mkSense('B',end?'senseBe':'senseB');
+  const senses=[sA,sB];
+
+  /* geometry of the joint */
+  const bwMin = end ? bL.bw : Math.min(bL.bw,bR.bw);
+  const bj = Math.min(bc, bwMin+0.5*hc);
+  const hjc = hc-2*ccn-2*cdsw-cI.m.bars.cd/2-cI.m.bars.cd/2;
+  function hjwOf(b){return b.hb-2*b.cn-2*b.dsw-b.top.dia/2-b.bot.dia/2;}
+  const hjw = end ? hjwOf(bL) : Math.min(hjwOf(bL),hjwOf(bR));
+
+  /* joint stirrups */
+  const n1=gvi('j_n1'),d1=gv('j_d1'),n2=gvi('j_n2'),d2=gv('j_d2');
+  const nSet=Math.max(1,gvi('j_nset')), sJ=gv('j_s');
+  const AshSet = n1*barA(d1)+n2*barA(d2);
+  /* largest spacing at which nSet hoops still fit inside the usable joint height */
+  const sMax = (nSet>1) ? Math.floor(hjw/(nSet-1)) : Math.floor(hjw);
+  const AshProv = AshSet*nSet;
+  const nCol=gvi('j_ncol'),dCol=gv('j_dcol'),sCol=gv('j_scol');
+  const AswCol = nCol*barA(dCol);
+
+  /* governing values (envelope of both senses) */
+  const govVj  = senses.reduce((a,b)=>b.Vjhd>a.Vjhd?b:a);
+  const govAsh = senses.reduce((a,b)=>b.AshReq>a.AshReq?b:a);
+  const gov54  = senses.reduce((a,b)=>b.rat54>a.rat54?b:a);
+
+  const kDiag = end?0.25:0.30;
+  const VRdj  = kDiag*bj*hc*M.fcd/1e3;
+
+  const AsvReq = hjw>0 ? (2/3)*AshProv*(hjc/hjw) : 0;
+  const AsvProv = Math.min(cI.m.As_dir, cS.m.As_dir);
+
+  /* detailing */
+  const ratJoint = sJ>0 ? AshSet/sJ : 0;
+  const ratCol   = sCol>0 ? AswCol/sCol : 0;
+  const sLimit   = (SEG.four==='yes') ? Math.min(2*sCol,150) : sCol;
+
+  S={M,end,bc,hc,ccn,cdsw,lcl,bL,bR,cI,cS,g54,gb,gc,gj,SMRc,senses,sA,sB,
+     bj,bwMin,hjc,hjw,n1,d1,n2,d2,nSet,sJ,sMax,AshSet,AshProv,nCol,dCol,sCol,AswCol,
+     govVj,govAsh,gov54,kDiag,VRdj,AsvReq,AsvProv,ratJoint,ratCol,sLimit,
+     skip54:(SEG.top==='yes')};
+  return S;
+}
+
+/* ══════════════ RENDER ══════════════ */
+const F1=v=>(isFinite(v)?v.toFixed(1):'—');
+const F2=v=>(isFinite(v)?v.toFixed(2):'—');
+const F0=v=>(isFinite(v)?v.toFixed(0):'—');
+const F3=v=>(isFinite(v)?v.toFixed(3):'—');
+const PCT=v=>(isFinite(v)?(v*100).toFixed(1)+' %':'—');
+
+function onChange(){
+  compute();
+  renderInputs();
+  drawAllSketches();
+  renderResults();
+  renderElem();
+  saveCurrentPreset();
+}
+function renderInputs(){
+  const M=S.M;
+  document.getElementById('fcd_d').textContent=F2(M.fcd);
+  document.getElementById('fyd_d').textContent=F1(M.fyd);
+  document.getElementById('fywd_d').textContent=F1(M.fywd);
+  document.getElementById('lam_d').textContent=F2(M.lam);
+  document.getElementById('eta_d').textContent=F2(M.eta);
+  document.getElementById('bj_r').textContent=F0(S.bj)+' mm';
+  document.getElementById('bdg_colsec').textContent=`${F0(S.hc)} × ${F0(S.bc)} mm`;
+  ['bL','bR'].forEach(p=>{
+    if(p==='bR'&&S.end)return;
+    const b=(p==='bL')?S.bL:S.bR; if(!b)return;
+    const el=document.getElementById(p+'_mrb_r');
+    if(el)el.textContent=`${F1(b.top.M)} / ${F1(b.bot.M)} kNm`;
+    document.getElementById('bdg_'+p).textContent=`${F0(b.bw)}×${F0(b.hb)} · ${F1(b.top.M)}/${F1(b.bot.M)} kNm`;
+  });
+  [['cI',S.cI],['cS',S.cS]].forEach(([p,c])=>{
+    const as=document.getElementById(p+'_as_r');
+    if(as)as.textContent=`${c.m.nBars} ${LANG==='ro'?'bare':'bars'} · ${F0(c.m.As_tot)} mm²`;
+    const rh=document.getElementById(p+'_rho_r');
+    if(rh)rh.textContent=(100*c.m.As_tot/c.m.Ac).toFixed(2)+' %';
+    const mc=document.getElementById(p+'_mrdc_r');
+    if(mc)mc.textContent=F1(c.MRdCalc)+' kNm'+(c.conv?'':' (!)');
+    const mu=document.getElementById(p+'_mrdu_r');
+    if(mu)mu.textContent=F1(c.MRd)+' kNm'+(c.ovr>0?(LANG==='ro'?' (manual)':' (manual)'):'');
+    const w=document.getElementById(p+'_ovrwarn');
+    if(w)w.innerHTML=(c.ovr>0&&c.MRdCalc>0&&Math.abs(c.ovr-c.MRdCalc)/c.MRdCalc>0.15)?`<div class="warnbox">${t('ovrWarn')}</div>`:'';
+    document.getElementById('bdg_'+p).textContent=`N=${F0(c.N)} kN · M_Rd=${F1(c.MRd)} kNm`;
+  });
+  document.getElementById('ash_prov_r').textContent=`${F0(S.AshProv)} mm² (${(S.AshProv/100).toFixed(2)} cm²)`;
+  document.getElementById('bdg_st').textContent=`${S.n1+S.n2} ${LANG==='ro'?'ramuri':'legs'} × ${S.nSet} · ${(S.AshProv/100).toFixed(2)} cm²`;
+  const sIn=document.getElementById('j_s'), hint=document.getElementById('smax_hint');
+  const over=S.sJ>S.sMax+1e-9;
+  if(sIn){sIn.max=S.sMax;sIn.classList.toggle('warn',over);}
+  if(hint){hint.innerHTML=t('smaxLbl',F0(S.sMax));hint.classList.toggle('no',over);}
+}
+/* keep s within the spacing that actually fits nSet hoops in the joint (clamped on commit,
+   not on every keystroke, so typing "100" doesn't get truncated mid-entry) */
+function clampS(){
+  if(!S)return;
+  const sIn=document.getElementById('j_s');
+  if(sIn&&parseFloat(sIn.value)>S.sMax){sIn.value=S.sMax;onChange();}
+  else onChange();
+}
+
+/* ── result panel builder ── */
+function rp(id,titleKey,cls,infoKey,val,verdict,util,det){
+  const pillCls=verdict==='ok'?'ok':(verdict==='no'?'no':(verdict==='na'?'na':'na'));
+  const pillTxt=verdict==='ok'?t('vOk'):(verdict==='no'?t('vNo'):(verdict==='na'?t('vNa'):t('vInfo')));
+  const u=Math.max(0,Math.min(100,(util||0)*100));
+  return `<div class="op rp" id="${id}">
+    <div class="rph" onclick="toggleDet('${id}')">
+      <span class="rpt">${t(titleKey)}<span class="cls">${cls}</span></span>
+      <span class="info-wrap"><button class="info-btn" type="button" onclick="toggleInfo(this,event)">i</button><div class="info-pop wide" onclick="event.stopPropagation()">${t(infoKey)}</div></span>
+      <span class="rpv">${val}</span>
+      <span class="verdict-pill ${pillCls}">${pillTxt}</span>
+      <span class="chev"></span>
+    </div>
+    <div class="ubar ${verdict==='no'?'no':''}"><div style="width:${u}%"></div></div>
+    <div class="rpd">${det}</div>
+  </div>`;
+}
+function tbl(rows,caption){
+  return `<table class="der">${caption?`<caption>${caption}</caption>`:''}
+  <thead><tr><th>${t('colParam')}</th><th>${t('colForm')}</th><th>${t('colVal')}</th></tr></thead>
+  <tbody>${rows.map(r=>`<tr class="${r[3]?'gov':''}"><td>${r[0]}</td><td class="f">${r[1]}</td><td>${r[2]}</td></tr>`).join('')}</tbody></table>`;
+}
+
+function renderResults(){
+  const s=S, M=s.M, out=[];
+  const sgn=v=>v;
+  let nOk=0,nNo=0,worst=0;
+
+  /* ── 5.4 ── */
+  {
+    const na=s.skip54;
+    const util=s.gov54.rat54;
+    const ok=util<=1.0000001;
+    const rows=[];
+    s.senses.forEach(x=>{
+      rows.push([`${t(x.lblKey)} — ΣM<sub>Rb</sub>`,x.parts.map(p=>`${p[0]} = ${F1(p[1])}`).join(' + '),`${F1(x.SMRb)} kNm`,x===s.gov54]);
+    });
+    rows.push(['ΣM<sub>Rc</sub>',`M<sub>Rd,inf</sub> + M<sub>Rd,sup</sub> = ${F1(s.cI.MRd)} + ${F1(s.cS.MRd)}`,`${F1(s.SMRc)} kNm`]);
+    rows.push(['γ<sub>Rd</sub>',SEG.duct==='DCH'?'1,30 (DCH)':'1,20 (DCM)',F2(s.g54)]);
+    rows.push(['γ<sub>Rd</sub>·ΣM<sub>Rb,max</sub>','(5.4)',`${F1(s.g54*s.gov54.SMRb)} kNm`,true]);
+    rows.push([LANG==='ro'?'Raport':'Ratio','γ<sub>Rd</sub>ΣM<sub>Rb</sub> / ΣM<sub>Rc</sub>',PCT(util),true]);
+    out.push(rp('r1','chk54','(5.4)','i_54',na?'—':PCT(util),na?'na':(ok?'ok':'no'),na?0:util,
+      (na?`<div class="warnbox">${t('i_lastlvl')}</div>`:'')+tbl(rows)));
+    if(!na){ok?nOk++:nNo++; worst=Math.max(worst,util);}
+  }
+
+  /* ── design action effects (5.9 / 5.10) ── */
+  {
+    const rows=[];
+    s.senses.forEach(x=>{
+      x.MdbParts.forEach(p=>rows.push([`M<sub>db</sub> — ${p[0].replace('M_Rb','')}`,
+        `γ<sub>Rd</sub>M<sub>Rb</sub>·min(1; ΣM<sub>Rc</sub>/ΣM<sub>Rb</sub>) = ${F2(s.gb)}·M<sub>Rb</sub>·${F3(x.kRcRb)}`,`${F1(p[1])} kNm`]));
+      rows.push([`M<sub>dc,inf</sub> — ${t(x.lblKey)}`,`γ<sub>Rd</sub>M<sub>Rc</sub>·min(1; ΣM<sub>Rb</sub>/ΣM<sub>Rc</sub>) = ${F2(s.gc)}·${F1(s.cI.MRd)}·${F3(x.kRbRc)}`,`${F1(x.MdcI)} kNm`]);
+      rows.push([`M<sub>dc,sup</sub> — ${t(x.lblKey)}`,`${F2(s.gc)}·${F1(s.cS.MRd)}·${F3(x.kRbRc)}`,`${F1(x.MdcS)} kNm`]);
+      rows.push([`V<sub>c</sub> — ${t(x.lblKey)}`,`(M<sub>dc,inf</sub>+M<sub>dc,sup</sub>)/l<sub>cl</sub> = (${F1(x.MdcI)}+${F1(x.MdcS)})·10⁶/${F0(s.lcl)}`,`${F1(x.Vc)} kN`]);
+    });
+    rows.push(['γ<sub>Rd</sub> '+(LANG==='ro'?'grinzi':'beams'),'(5.9) — 1,2 DCH / 1,0 DCM',F2(s.gb)]);
+    rows.push(['γ<sub>Rd</sub> '+(LANG==='ro'?'stalpi':'columns'),'(5.10) — '+(SEG.duct==='DCH'?(SEG.level==='base'?'1,30 '+(LANG==='ro'?'baza':'base'):'1,20 '+(LANG==='ro'?'nivel curent':'typical level')):'1,0 (DCM)'),F2(s.gc)]);
+    out.push(rp('r2','chkForces','(5.9) · (5.10)','i_vc',`V<sub>c</sub> = ${F1(s.govVj.Vc)} kN`,'info',0,tbl(rows)));
+  }
+
+  /* ── V_jhd (5.11/5.12) ── */
+  {
+    const rows=[];
+    s.senses.forEach(x=>{
+      const f=s.end?`γ<sub>Rd</sub>A<sub>s1</sub>f<sub>yd</sub> − V<sub>c</sub> = ${F2(s.gj)}·${F0(x.As1)}·${F1(M.fyd)}/10³ − ${F1(x.Vc)}`
+                   :`γ<sub>Rd</sub>(A<sub>s1</sub>+A<sub>s2</sub>)f<sub>yd</sub> − V<sub>c</sub> = ${F2(s.gj)}·(${F0(x.As1)}+${F0(x.As2)})·${F1(M.fyd)}/10³ − ${F1(x.Vc)}`;
+      rows.push([`V<sub>jhd</sub> — ${t(x.lblKey)}`,f,`${F1(x.Vjhd)} kN`,x===s.govVj]);
+    });
+    rows.push(['γ<sub>Rd</sub>',SEG.duct==='DCH'?'1,10 (DCH)':'1,00 (DCM)',F2(s.gj)]);
+    out.push(rp('r3','chkVjhd',s.end?'(5.12)':'(5.11)','i_vjhd',`${F1(s.govVj.Vjhd)} kN`,'info',0,tbl(rows)));
+  }
+
+  /* ── diagonal compression (5.26/5.27) ── */
+  {
+    const util=s.VRdj>0?s.govVj.Vjhd/s.VRdj:Infinity;
+    const ok=util<=1.0000001;
+    const rows=[
+      ['b<sub>j</sub>',`min(b<sub>c</sub>; b<sub>w</sub>+0,5h<sub>c</sub>) = min(${F0(s.bc)}; ${F0(s.bwMin)}+0,5·${F0(s.hc)}) &nbsp;(5.28)`,`${F0(s.bj)} mm`],
+      ['h<sub>c</sub>',LANG==='ro'?'latura paralela cu grinzile':'side parallel to the beams',`${F0(s.hc)} mm`],
+      ['f<sub>cd</sub>','f<sub>ck</sub>/1,5',`${F2(M.fcd)} MPa`],
+      [s.end?'0,25·b<sub>j</sub>h<sub>c</sub>f<sub>cd</sub>':'0,30·b<sub>j</sub>h<sub>c</sub>f<sub>cd</sub>',
+       `${F2(s.kDiag)}·${F0(s.bj)}·${F0(s.hc)}·${F2(M.fcd)}/10³ &nbsp;(${s.end?'5.27':'5.26'})`,`${F1(s.VRdj)} kN`,true],
+      ['V<sub>jhd</sub>',t(s.govVj.lblKey),`${F1(s.govVj.Vjhd)} kN`,true],
+      [LANG==='ro'?'Raport':'Ratio','V<sub>jhd</sub> / V<sub>Rd,j</sub>',PCT(util),true]
+    ];
+    out.push(rp('r4','chkDiag',s.end?'(5.27)':'(5.26)','i_diag',PCT(util),ok?'ok':'no',util,tbl(rows)));
+    ok?nOk++:nNo++; worst=Math.max(worst,util);
+  }
+
+  /* ── A_sh (5.29/5.30) ── */
+  {
+    const req=s.govAsh.AshReq;
+    const util=s.AshProv>0?req/s.AshProv:Infinity;
+    const ok=util<=1.0000001;
+    const rows=[];
+    rows.push(['ν<sub>d</sub>',`N<sub>Ed,inf</sub>/(b<sub>c</sub>h<sub>c</sub>f<sub>cd</sub>) = ${F0(s.cI.N)}·10³/(${F0(s.bc)}·${F0(s.hc)}·${F2(M.fcd)})`,F3(s.govAsh.nud)]);
+    s.senses.forEach(x=>{
+      const base=s.end?`0,8·A<sub>s2</sub>f<sub>yd</sub>(1−0,8ν<sub>d</sub>)/f<sub>ywd</sub> ·1,20`:`0,8(A<sub>s1</sub>+A<sub>s2</sub>)f<sub>yd</sub>(1−0,8ν<sub>d</sub>)/f<sub>ywd</sub>`;
+      rows.push([`A<sub>sh,nec</sub> — ${t(x.lblKey)}`,`${base} &nbsp;(A = ${F0(x.Abase)} mm²)`,`${F0(x.AshReq)} mm²`,x===s.govAsh]);
+    });
+    rows.push(['A<sub>sh</sub> / '+(LANG==='ro'?'set':'set'),
+      `${s.n1}×Ø${F0(s.d1)} + ${s.n2}×Ø${F0(s.d2)}`,`${F0(s.AshSet)} mm²`]);
+    rows.push(['A<sub>sh,ef</sub>',`${F0(s.AshSet)} × ${s.nSet} ${LANG==='ro'?'seturi':'sets'}`,`${F0(s.AshProv)} mm² = ${(s.AshProv/100).toFixed(2)} cm²`,true]);
+    rows.push([LANG==='ro'?'Raport':'Ratio','A<sub>sh,nec</sub> / A<sub>sh,ef</sub>',PCT(util),true]);
+    const warn=(s.sJ>s.sMax+1e-9)?`<div class="warnbox">${t('setsWarn',s.nSet,F0(s.sJ),F0(s.hjw),F0(s.sMax))}</div>`:'';
+    out.push(rp('r5','chkAsh',s.end?'(5.30)':'(5.29)','i_ash',PCT(util),ok?'ok':'no',util,warn+tbl(rows)));
+    ok?nOk++:nNo++; worst=Math.max(worst,util);
+  }
+
+  /* ── A_sv (5.31) ── */
+  {
+    const util=s.AsvProv>0?s.AsvReq/s.AsvProv:Infinity;
+    const ok=util<=1.0000001;
+    const rows=[
+      ['h<sub>jc</sub>',`h<sub>c</sub> − 2c<sub>nom</sub> − 2Ø<sub>sw</sub> − Ø<sub>bara</sub>`,`${F0(s.hjc)} mm`],
+      ['h<sub>jw</sub>',`h<sub>b</sub> − 2c<sub>nom</sub> − 2Ø<sub>sw</sub> − Ø<sub>sus</sub>/2 − Ø<sub>jos</sub>/2`,`${F0(s.hjw)} mm`],
+      ['A<sub>sv,nec</sub>',`(2/3)·A<sub>sh,ef</sub>·(h<sub>jc</sub>/h<sub>jw</sub>) = (2/3)·${F0(s.AshProv)}·${F3(s.hjc/s.hjw)}`,`${F0(s.AsvReq)} mm²`,true],
+      ['A<sub>sv,ef</sub>',LANG==='ro'?'bare de colt + bare pe fetele de lungime h<sub>c</sub>':'corner bars + bars on the h<sub>c</sub>-long faces',`${F0(s.AsvProv)} mm²`,true],
+      [LANG==='ro'?'A<sub>s</sub> total stalp (referinta)':'Total column A<sub>s</sub> (reference)','—',`${F0(Math.min(s.cI.m.As_tot,s.cS.m.As_tot))} mm²`],
+      [LANG==='ro'?'Raport':'Ratio','A<sub>sv,nec</sub> / A<sub>sv,ef</sub>',PCT(util),true]
+    ];
+    out.push(rp('r6','chkAsv','(5.31)','i_asv',PCT(util),ok?'ok':'no',util,tbl(rows)));
+    ok?nOk++:nNo++; worst=Math.max(worst,util);
+  }
+
+  /* ── detailing ── */
+  {
+    const okQty=s.ratJoint>=s.ratCol-1e-9;
+    const okSp=s.sJ<=s.sLimit+1e-9;
+    const ok=okQty&&okSp;
+    const util=s.ratJoint>0?Math.max(s.ratCol/s.ratJoint,s.sJ/(s.sLimit||1)):Infinity;
+    const rows=[
+      [`A<sub>sw</sub>/s ${LANG==='ro'?'nod':'joint'}`,`${F0(s.AshSet)} / ${F0(s.sJ)}`,`${F3(s.ratJoint)} mm²/mm`,true],
+      [`A<sub>sw</sub>/s ${LANG==='ro'?'zona critica stalp':'column critical zone'}`,`${s.nCol}×Ø${F0(s.dCol)} = ${F0(s.AswCol)} / ${F0(s.sCol)}`,`${F3(s.ratCol)} mm²/mm`,true],
+      [`5.3.4.2.3(6)`,`A<sub>sw</sub>/s|<sub>nod</sub> ≥ A<sub>sw</sub>/s|<sub>stalp</sub>`,okQty?t('vOk'):t('vNo')],
+      [`s ${LANG==='ro'?'admis':'allowed'}`,(SEG.four==='yes')?`min(2·s<sub>cr</sub>; 150) = min(${F0(2*s.sCol)}; 150) &nbsp;(5.4.4.3(2))`:`s<sub>cr</sub> = ${F0(s.sCol)}`,`${F0(s.sLimit)} mm`],
+      [`s ${LANG==='ro'?'prevazut':'provided'}`,'—',`${F0(s.sJ)} mm`,true],
+      [`5.3.4.2.3(4)`,LANG==='ro'?'etrierii se distribuie uniform pe inaltimea nodului: (n−1)·s ≤ h<sub>jw</sub>':'hoops uniformly distributed over the joint height: (n−1)·s ≤ h<sub>jw</sub>',`(${s.nSet}−1)×${F0(s.sJ)} = ${F0((s.nSet-1)*s.sJ)} ≤ ${F0(s.hjw)} mm`]
+    ];
+    out.push(rp('r7','chkDet','5.3.4.2.3(4)(6) · 5.4.4.3','i_detail',PCT(util),ok?'ok':'no',util,tbl(rows)));
+    ok?nOk++:nNo++; worst=Math.max(worst,util);
+  }
+
+  document.getElementById('resWrap').innerHTML=out.join('');
+  document.getElementById('summaryBar').innerHTML=`
+    <div class="sum-chip"><div class="sc-l">${t('sumTotal')}</div><div class="sc-v">${nOk+nNo}</div></div>
+    <div class="sum-chip ok"><div class="sc-l">${t('sumOk')}</div><div class="sc-v">${nOk}</div></div>
+    <div class="sum-chip ${nNo?'no':''}"><div class="sc-l">${t('sumNo')}</div><div class="sc-v">${nNo}</div></div>
+    <div class="sum-chip ${worst>1?'no':'ok'}"><div class="sc-l">${t('sumWorst')}</div><div class="sc-v">${PCT(worst)}</div></div>`;
+}
+
+/* ══════════════ SKETCHES ══════════════ */
+const CDK='#1C1C1E',CDM='#AEAEB2',CLB='#6C6C70',CBL='#0066CC',CRD='#C0392B',CGY='#E8E8ED';
+function svgText(x,y,s,o){o=o||{};return `<text x="${x}" y="${y}" text-anchor="${o.a||'middle'}" font-size="${o.s||8}" fill="${o.c||CLB}" font-family="Inter,sans-serif"${o.w?` font-weight="${o.w}"`:''}${o.r?` transform="rotate(${o.r} ${x} ${y})"`:''}>${s}</text>`;}
+function dimH(x1,x2,y,lbl){
+  return `<line x1="${x1}" y1="${y}" x2="${x2}" y2="${y}" stroke="${CDM}" stroke-width=".7"/>
+  <line x1="${x1}" y1="${y-3}" x2="${x1}" y2="${y+3}" stroke="${CDM}" stroke-width=".7"/>
+  <line x1="${x2}" y1="${y-3}" x2="${x2}" y2="${y+3}" stroke="${CDM}" stroke-width=".7"/>`+svgText((x1+x2)/2,y+11,lbl);
+}
+function dimV(y1,y2,x,lbl){
+  return `<line x1="${x}" y1="${y1}" x2="${x}" y2="${y2}" stroke="${CDM}" stroke-width=".7"/>
+  <line x1="${x-3}" y1="${y1}" x2="${x+3}" y2="${y1}" stroke="${CDM}" stroke-width=".7"/>
+  <line x1="${x-3}" y1="${y2}" x2="${x+3}" y2="${y2}" stroke="${CDM}" stroke-width=".7"/>`+svgText(x+9,(y1+y2)/2,lbl,{r:90});
+}
+
+/* beam cross-section */
+function drawBeamSection(svgId,b,title){
+  const el=document.getElementById(svgId); if(!el)return;
+  const VW=340,VH=250,PL=42,PR=48,PT=26,PB=44;
+  const scl=Math.min((VW-PL-PR)/b.bw,(VH-PT-PB)/b.hb);
+  const w=b.bw*scl,h=b.hb*scl, x0=(VW-w)/2, y0=PT+((VH-PT-PB)-h)/2;
+  let o=`<rect x="${x0}" y="${y0}" width="${w}" height="${h}" fill="${CGY}" stroke="${CDK}" stroke-width="1.2"/>`;
+  const ins=(b.cn+b.dsw)*scl;
+  o+=`<rect x="${x0+b.cn*scl}" y="${y0+b.cn*scl}" width="${w-2*b.cn*scl}" height="${h-2*b.cn*scl}" fill="none" stroke="${CLB}" stroke-width="1" rx="${3}"/>`;
+  function bars(n,dia,yy){
+    if(n<=0)return'';
+    let s='';const r=Math.max(2.2,dia*scl/2);
+    for(let i=0;i<n;i++){
+      const xx=(n===1)?x0+w/2:x0+ins+r+(w-2*ins-2*r)*i/(n-1);
+      s+=`<circle cx="${xx}" cy="${yy}" r="${r}" fill="${CDK}"/>`;
+    }
+    return s;
+  }
+  const yTop=y0+ins+Math.max(2.2,b.top.dia*scl/2);
+  const yBot=y0+h-ins-Math.max(2.2,b.bot.dia*scl/2);
+  o+=bars(b.top.n,b.top.dia,yTop)+bars(b.bot.n,b.bot.dia,yBot);
+  o+=svgText(x0+w/2,y0-8,`${b.top.n}Ø${F0(b.top.dia)}`,{c:CDK,w:600,s:9});
+  o+=svgText(x0+w/2,y0+h+16,`${b.bot.n}Ø${F0(b.bot.dia)}`,{c:CDK,w:600,s:9});
+  o+=svgText(x0-8,yTop+3,`M<tspan baseline-shift="sub" font-size="6">Rb</tspan>⁻ = ${F1(b.top.M)}`,{a:'end',c:CBL,s:8.5,w:600});
+  o+=svgText(x0-8,yBot+3,`M<tspan baseline-shift="sub" font-size="6">Rb</tspan>⁺ = ${F1(b.bot.M)}`,{a:'end',c:CBL,s:8.5,w:600});
+  o+=dimH(x0,x0+w,VH-22,`b_w = ${F0(b.bw)} mm`);
+  o+=dimV(y0,y0+h,x0+w+16,`h_b = ${F0(b.hb)} mm`);
+  if(title)o+=svgText(VW/2,12,title,{c:CLB,s:9,w:600});
+  el.innerHTML=o;
+}
+/* column cross-section; h_c drawn horizontally (parallel to the beams) */
+function drawColSection(svgId,c,opt){
+  const el=document.getElementById(svgId); if(!el)return;
+  opt=opt||{};
+  const m=c.m;
+  const VW=opt.VW||340,VH=opt.VH||250,PL=40,PR=44,PT=opt.PT||26,PB=42;
+  const scl=Math.min((VW-PL-PR)/m.hc,(VH-PT-PB)/m.bc);
+  const w=m.hc*scl,h=m.bc*scl, x0=(VW-w)/2, y0=PT+((VH-PT-PB)-h)/2;
+  const X=z=>x0+w/2+z*scl;      // z (along h_c) -> horizontal
+  const Y=y=>y0+h/2-y*scl;      // y (along b_c) -> vertical
+  let o=`<rect x="${x0}" y="${y0}" width="${w}" height="${h}" fill="${CGY}" stroke="${CDK}" stroke-width="1.2"/>`;
+  const insZ=(S.ccn+S.cdsw)*scl, insY=(S.ccn+S.cdsw)*scl;
+  const sx=x0+S.ccn*scl, sy=y0+S.ccn*scl, sw=w-2*S.ccn*scl, sh=h-2*S.ccn*scl;
+  if(opt.legs){
+    /* perimeter stirrup: legs parallel to h_c (horizontal here) are effective */
+    o+=`<line x1="${sx}" y1="${sy}" x2="${sx+sw}" y2="${sy}" stroke="${CBL}" stroke-width="2"/>`;
+    o+=`<line x1="${sx}" y1="${sy+sh}" x2="${sx+sw}" y2="${sy+sh}" stroke="${CBL}" stroke-width="2"/>`;
+    o+=`<line x1="${sx}" y1="${sy}" x2="${sx}" y2="${sy+sh}" stroke="${CDM}" stroke-width="1.2"/>`;
+    o+=`<line x1="${sx+sw}" y1="${sy}" x2="${sx+sw}" y2="${sy+sh}" stroke="${CDM}" stroke-width="1.2"/>`;
+    for(let i=0;i<S.n2;i++){
+      const yy=sy+sh*(i+1)/(S.n2+1);
+      o+=`<line x1="${sx}" y1="${yy}" x2="${sx+sw}" y2="${yy}" stroke="${CBL}" stroke-width="1.6" stroke-dasharray="4,2.5"/>`;
+    }
+  } else {
+    o+=`<rect x="${sx}" y="${sy}" width="${sw}" height="${sh}" fill="none" stroke="${CLB}" stroke-width="1" rx="3"/>`;
+  }
+  m.sf.forEach(f=>{ if(f.A>0) o+=`<circle cx="${X(f.z)}" cy="${Y(f.y)}" r="${Math.max(2.2,Math.sqrt(4*f.A/PI)*scl/2)}" fill="${CDK}"/>`; });
+  o+=dimH(x0,x0+w,opt.legs?VH-28:VH-20,`h_c = ${F0(m.hc)} mm`);
+  o+=dimV(y0,y0+h,x0+w+14,`b_c = ${F0(m.bc)} mm`);
+  if(opt.legs){
+    const ax=x0+w/2, ay=y0-14;
+    o+=`<line x1="${ax-22}" y1="${ay}" x2="${ax+22}" y2="${ay}" stroke="${CRD}" stroke-width="1.4"/>
+        <polyline points="${ax+16},${ay-3.5} ${ax+22},${ay} ${ax+16},${ay+3.5}" fill="none" stroke="${CRD}" stroke-width="1.4"/>
+        <polyline points="${ax-16},${ay-3.5} ${ax-22},${ay} ${ax-16},${ay+3.5}" fill="none" stroke="${CRD}" stroke-width="1.4"/>`;
+    o+=svgText(ax,ay-6,'V_jhd',{c:CRD,s:8.5,w:600});
+    o+=svgText(VW/2,VH-5,LANG==='ro'?'albastru = ramuri efective · gri = ramuri perpendiculare':'blue = effective legs · grey = perpendicular legs',{s:7.5});
+  } else if(opt.mrd!==undefined){
+    o+=svgText(VW/2,y0-8,`M_Rd = ${F1(opt.mrd)} kNm · N_Ed = ${F0(opt.N)} kN`,{c:CBL,s:8.5,w:600});
+  }
+  el.innerHTML=o;
+}
+/* direction helper sketch in the column-section panel */
+function drawColDir(){
+  const el=document.getElementById('skColDir'); if(!el)return;
+  const VW=420,VH=240;
+  const s=S, scl=Math.min(200/Math.max(s.hc,1),150/Math.max(s.bc,1),0.35);
+  const w=s.hc*scl,h=s.bc*scl,x0=VW/2-w/2,y0=VH/2-h/2-6;
+  let o=`<rect x="${x0}" y="${y0}" width="${w}" height="${h}" fill="${CGY}" stroke="${CDK}" stroke-width="1.2"/>`;
+  const bw=(s.end?s.bL.bw:Math.min(s.bL.bw,s.bR.bw))*scl;
+  o+=`<rect x="${x0-70}" y="${y0+h/2-bw/2}" width="70" height="${bw}" fill="#F0F0F3" stroke="${CDM}" stroke-width="1" stroke-dasharray="4,3"/>`;
+  if(!s.end)o+=`<rect x="${x0+w}" y="${y0+h/2-bw/2}" width="70" height="${bw}" fill="#F0F0F3" stroke="${CDM}" stroke-width="1" stroke-dasharray="4,3"/>`;
+  o+=svgText(x0-35,y0+h/2-bw/2-6,LANG==='ro'?'grinda':'beam',{s:8});
+  o+=dimH(x0,x0+w,y0+h+24,`h_c = ${F0(s.hc)} mm`);
+  o+=dimV(y0,y0+h,x0+w+(s.end?16:86),`b_c = ${F0(s.bc)} mm`);
+  o+=`<line x1="${x0-90}" y1="${y0-14}" x2="${x0+w+90}" y2="${y0-14}" stroke="${CBL}" stroke-width="1" stroke-dasharray="6,4"/>`;
+  o+=svgText(VW/2,y0-19,LANG==='ro'?'directia seismica considerata':'seismic direction considered',{c:CBL,s:8,w:600});
+  o+=svgText(VW/2,VH-6,`b_j = min(${F0(s.bc)}; ${F0(s.bwMin)}+0,5·${F0(s.hc)}) = ${F0(s.bj)} mm`,{s:8});
+  el.innerHTML=o;
+}
+/* node elevation — clickable */
+function drawNodeElevation(){
+  const el=document.getElementById('nodeSvg'); if(!el)return;
+  const s=S;
+  const VW=560,VH=400,PAD=34;
+  const hc=s.hc, hbL=s.bL.hb, hbR=s.end?s.bL.hb:s.bR.hb, hb=Math.max(hbL,hbR);
+  const beamStub=1.45*Math.max(hc,hb), colStub=1.15*Math.max(hb,hc*0.9);
+  const totW=hc+(s.end?beamStub:2*beamStub), totH=hb+2*colStub;
+  const scl=Math.min((VW-2*PAD)/totW,(VH-2*PAD)/totH);
+  const cx=VW/2 + (s.end? beamStub*scl/2*0 : 0);
+  const cy=VH/2;
+  const X=mm=>cx+mm*scl, Y=mm=>cy+mm*scl;
+  const jx1=X(-hc/2), jx2=X(hc/2), jy1=Y(-hb/2), jy2=Y(hb/2);
+  const colTop=Y(-hb/2-colStub), colBot=Y(hb/2+colStub);
+  const bxL=X(-hc/2-beamStub), bxR=X(hc/2+beamStub);
+  const sel=selected;
+  const hl=e=>sel===e?`stroke="${CBL}" stroke-width="2"`:`stroke="${CDK}" stroke-width="1.2"`;
+  let o='';
+  /* beams */
+  const byL1=Y(-hbL/2), byL2=Y(hbL/2);
+  o+=`<g class="hit" onclick="selElem('bL')"><rect class="hl" x="${bxL}" y="${byL1}" width="${jx1-bxL}" height="${byL2-byL1}" fill="${sel==='bL'?'#EBF3FF':'#EFEFEF'}" ${hl('bL')}/></g>`;
+  if(!s.end){
+    const byR1=Y(-hbR/2), byR2=Y(hbR/2);
+    o+=`<g class="hit" onclick="selElem('bR')"><rect class="hl" x="${jx2}" y="${byR1}" width="${bxR-jx2}" height="${byR2-byR1}" fill="${sel==='bR'?'#EBF3FF':'#EFEFEF'}" ${hl('bR')}/></g>`;
+  }
+  /* columns */
+  o+=`<g class="hit" onclick="selElem('cS')"><rect class="hl" x="${jx1}" y="${colTop}" width="${jx2-jx1}" height="${jy1-colTop}" fill="${sel==='cS'?'#EBF3FF':'#E9E9EE'}" ${hl('cS')}/></g>`;
+  o+=`<g class="hit" onclick="selElem('cI')"><rect class="hl" x="${jx1}" y="${jy2}" width="${jx2-jx1}" height="${colBot-jy2}" fill="${sel==='cI'?'#EBF3FF':'#E9E9EE'}" ${hl('cI')}/></g>`;
+  /* joint core */
+  o+=`<g class="hit" onclick="selElem('jt')"><rect class="hl" x="${jx1}" y="${jy1}" width="${jx2-jx1}" height="${jy2-jy1}" fill="${sel==='jt'?'#DCE9FA':'#DEDEE4'}" ${hl('jt')}/></g>`;
+  /* beam bars running through */
+  const insB=(s.bL.cn+s.bL.dsw)*scl;
+  function beamBars(y1,y2,x1,x2){
+    return `<line x1="${x1}" y1="${y1+insB}" x2="${x2}" y2="${y1+insB}" stroke="${CDK}" stroke-width="1.6"/>
+            <line x1="${x1}" y1="${y2-insB}" x2="${x2}" y2="${y2-insB}" stroke="${CDK}" stroke-width="1.6"/>`;
+  }
+  o+=beamBars(byL1,byL2,bxL+6,s.end?jx2-insB*0.6:jx2);
+  if(!s.end)o+=beamBars(Y(-hbR/2),Y(hbR/2),jx1,bxR-6);
+  if(s.end){ /* hooks bent into the joint at an end joint */
+    o+=`<line x1="${jx2-insB*0.6}" y1="${byL1+insB}" x2="${jx2-insB*0.6}" y2="${byL1+insB+(jy2-jy1)*0.45}" stroke="${CDK}" stroke-width="1.6"/>`;
+    o+=`<line x1="${jx2-insB*0.6}" y1="${byL2-insB}" x2="${jx2-insB*0.6}" y2="${byL2-insB-(jy2-jy1)*0.45}" stroke="${CDK}" stroke-width="1.6"/>`;
+  }
+  /* column bars */
+  const insC=(s.ccn+s.cdsw)*scl;
+  o+=`<line x1="${jx1+insC}" y1="${colTop+4}" x2="${jx1+insC}" y2="${colBot-4}" stroke="${CDK}" stroke-width="1.6"/>`;
+  o+=`<line x1="${jx2-insC}" y1="${colTop+4}" x2="${jx2-insC}" y2="${colBot-4}" stroke="${CDK}" stroke-width="1.6"/>`;
+  if(s.cI.m.bars.fhn>0){
+    for(let i=0;i<s.cI.m.bars.fhn;i++){
+      const zz=-(s.hc/2-s.ccn-s.cdsw)+(2*(s.hc/2-s.ccn-s.cdsw))*(i+1)/(s.cI.m.bars.fhn+1);
+      o+=`<line x1="${X(zz)}" y1="${colTop+4}" x2="${X(zz)}" y2="${colBot-4}" stroke="${CDM}" stroke-width="1.2" stroke-dasharray="5,3"/>`;
+    }
+  }
+  /* joint hoops */
+  for(let i=0;i<s.nSet;i++){
+    const yy=jy1+insB+((jy2-jy1)-2*insB)*(s.nSet>1?i/(s.nSet-1):0.5);
+    o+=`<line x1="${jx1+insC}" y1="${yy}" x2="${jx2-insC}" y2="${yy}" stroke="${CBL}" stroke-width="1.5"/>`;
+  }
+  /* dims + labels — kept out of the drawing band so nothing overlaps */
+  o+=dimH(jx1,jx2,colBot+16,`h_c = ${F0(hc)} mm`);
+  o+=dimV(jy1,jy2,VW-32,`h_b = ${F0(hb)} mm`);
+  o+=svgText((bxL+jx1)/2,byL1-7,`M_Rb⁻ ${F1(s.bL.top.M)} / M_Rb⁺ ${F1(s.bL.bot.M)}`,{c:CBL,s:8,w:600});
+  if(!s.end)o+=svgText((jx2+bxR)/2,Y(-hbR/2)-7,`M_Rb⁻ ${F1(s.bR.top.M)} / M_Rb⁺ ${F1(s.bR.bot.M)}`,{c:CBL,s:8,w:600});
+  o+=svgText(jx2+7,colTop+13,`M_Rd,sup = ${F1(s.cS.MRd)} kNm`,{a:'start',c:CBL,s:8,w:600});
+  o+=svgText(jx2+7,colBot-7,`M_Rd,inf = ${F1(s.cI.MRd)} kNm`,{a:'start',c:CBL,s:8,w:600});
+  o+=svgText(VW/2,13,`V_jhd = ${F1(s.govVj.Vjhd)} kN`,{c:CRD,s:9,w:600});
+  el.innerHTML=o;
+}
+function selElem(e){selected=e;renderElem();drawNodeElevation();}
+function renderElem(){
+  const s=S;
+  if(s.end&&selected==='bR')selected='bL';
+  document.querySelectorAll('#elemTabs button').forEach(b=>b.classList.toggle('on',b.dataset.e===selected));
+  const ttl=document.getElementById('elemTitle'), vals=document.getElementById('elemVals');
+  const esvg=document.getElementById('elemSvg');
+  let rows=[];
+  if(selected==='bL'||selected==='bR'){
+    const b=(selected==='bL')?s.bL:s.bR;
+    ttl.textContent=t(selected==='bL'?'t_bL':'t_bR');
+    esvg.setAttribute('viewBox','0 0 340 250');
+    drawBeamSection('elemSvg',b,null);
+    rows=[
+      [`b<sub>w</sub> × h<sub>b</sub>`,`${F0(b.bw)} × ${F0(b.hb)} mm`],
+      [t('topReinf'),`${b.top.n}Ø${F0(b.top.dia)} — ${F0(b.top.As)} mm²`],
+      [t('botReinf'),`${b.bot.n}Ø${F0(b.bot.dia)} — ${F0(b.bot.As)} mm²`],
+      ['d<sub>sup</sub> / d<sub>inf</sub>',`${F0(b.top.d)} / ${F0(b.bot.d)} mm`],
+      ['x<sub>sup</sub> / x<sub>inf</sub>',`${F1(b.top.x)} / ${F1(b.bot.x)} mm`],
+      ['z<sub>sup</sub> / z<sub>inf</sub>',`${F1(b.top.z)} / ${F1(b.bot.z)} mm`],
+      ['M<sub>Rb</sub><sup>−</sup>',`${F1(b.top.M)} kNm`],
+      ['M<sub>Rb</sub><sup>+</sup>',`${F1(b.bot.M)} kNm`]
+    ];
+  } else if(selected==='cI'||selected==='cS'){
+    const c=(selected==='cI')?s.cI:s.cS;
+    ttl.textContent=t(selected==='cI'?'t_cI':'t_cS');
+    esvg.setAttribute('viewBox','0 0 340 250');
+    drawColSection('elemSvg',c,{mrd:c.MRd,N:c.N});
+    rows=[
+      [`h<sub>c</sub> × b<sub>c</sub>`,`${F0(s.hc)} × ${F0(s.bc)} mm`],
+      [t('atCorners'),`${c.m.cnt.cor}Ø${F0(c.m.bars.cd)}`],
+      [t('barsFb'),`${c.m.cnt.fb}Ø${F0(c.m.bars.fbd)}`],
+      [t('barsFh'),`${c.m.cnt.fh}Ø${F0(c.m.bars.fhd)}`],
+      ['A<sub>s</sub> / ρ',`${F0(c.m.As_tot)} mm² / ${(100*c.m.As_tot/c.m.Ac).toFixed(2)} %`],
+      ['N<sub>Ed</sub>',`${F0(c.N)} kN`],
+      ['ν<sub>d</sub>',F3(Math.max(0,c.N)*1e3/(s.bc*s.hc*s.M.fcd))],
+      [t('mrdCalc'),`${F1(c.MRdCalc)} kNm`],
+      [t('mrdUsed'),`${F1(c.MRd)} kNm`]
+    ];
+  } else {
+    ttl.textContent=t('e_jt');
+    esvg.setAttribute('viewBox','0 0 340 250');
+    drawColSection('elemSvg',s.cI,{legs:true});
+    rows=[
+      ['b<sub>j</sub> (5.28)',`${F0(s.bj)} mm`],
+      ['h<sub>c</sub>',`${F0(s.hc)} mm`],
+      ['h<sub>jc</sub> / h<sub>jw</sub>',`${F0(s.hjc)} / ${F0(s.hjw)} mm`],
+      [`${t('perimStir')}`,`${s.n1}×Ø${F0(s.d1)}`],
+      [`${t('innerTies')}`,`${s.n2}×Ø${F0(s.d2)}`],
+      [`${t('nSets')} / s`,`${s.nSet} × ${F0(s.sJ)} mm`],
+      ['A<sub>sh,ef</sub>',`${F0(s.AshProv)} mm²`],
+      ['A<sub>sh,nec</sub>',`${F0(s.govAsh.AshReq)} mm²`],
+      ['V<sub>jhd</sub>',`${F1(s.govVj.Vjhd)} kN`],
+      ['V<sub>Rd,j</sub>',`${F1(s.VRdj)} kN`]
+    ];
+  }
+  vals.innerHTML=rows.map(r=>`<div class="dt-row"><span class="dt-k">${r[0]}</span><span class="dt-v">${r[1]}</span></div>`).join('');
+}
+function drawAllSketches(){
+  drawColDir();
+  drawBeamSection('sk_bL',S.bL,null);
+  if(!S.end)drawBeamSection('sk_bR',S.bR,null);
+  drawColSection('sk_cI',S.cI,{mrd:S.cI.MRd,N:S.cI.N});
+  drawColSection('sk_cS',S.cS,{mrd:S.cS.MRd,N:S.cS.N});
+  drawColSection('skJoint',S.cI,{legs:true,VW:420,VH:260});
+  document.getElementById('skJoint').setAttribute('viewBox','0 0 420 260');
+  drawNodeElevation();
+}
+function swapCol(){
+  const a=document.getElementById('hc'), b=document.getElementById('bc');
+  const t0=a.value; a.value=b.value; b.value=t0;
+  /* the bar distributions follow the faces, so they swap too */
+  ['cI','cS'].forEach(p=>{
+    const n1=document.getElementById(p+'_fbn'),d1=document.getElementById(p+'_fbd');
+    const n2=document.getElementById(p+'_fhn'),d2=document.getElementById(p+'_fhd');
+    let x=n1.value;n1.value=n2.value;n2.value=x;
+    x=d1.value;d1.value=d2.value;d2.value=x;
+  });
+  onChange();
+}
+
+/* ══════════════ PDF ══════════════ */
+function generatePdf(){
+  const btn=document.getElementById('rptBtn'),st=document.getElementById('rptStatus');
+  if(typeof window.jspdf==='undefined'){st.textContent=t('pdfLoading');return;}
+  btn.disabled=true;btn.textContent=t('generating');
+  setTimeout(()=>{
+    try{buildPdf();st.textContent=t('statusDownloaded');setTimeout(()=>st.textContent='',4000);}
+    catch(e){console.error(e);st.textContent=t('pdfError')+' '+(e&&e.message||e);}
+    finally{btn.disabled=false;btn.textContent=t('downloadPdf');}
+  },30);
+}
+function buildPdf(){
+  const{jsPDF}=window.jspdf;
+  const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+  const pW=210,pH=297,ml=13,mr=13,cw=pW-ml-mr;
+  const ds=new Date().toLocaleDateString(LANG==='en'?'en-GB':'ro-RO');
+  const s=S,M=s.M;
+  function hdr(){
+    doc.setFillColor(40,80,140);doc.rect(0,0,pW,13,'F');
+    doc.setTextColor(255,255,255);doc.setFontSize(9.5);doc.setFont('helvetica','bold');
+    doc.text(tp('pdfTitle'),ml,7.5);
+    doc.setFontSize(6.8);doc.setFont('helvetica','normal');
+    doc.text(tp('pdfSub'),ml,11.4);
+    doc.text(tp('pdfDate')+ds,pW-mr,7.5,{align:'right'});
+    doc.setTextColor(0,0,0);
+  }
+  hdr();
+  const ST={lineColor:[180,200,220],lineWidth:0.22,fontSize:7.6,textColor:[0,0,0],cellPadding:1.3};
+  const HS={fillColor:[200,215,235],textColor:[0,0,0],fontStyle:'bold',lineColor:[200,215,235],fontSize:7.4};
+  function sec(title,y){
+    doc.setFontSize(8.6);doc.setFont('helvetica','bold');doc.setTextColor(0,102,204);
+    doc.text(title,ml,y);doc.setTextColor(0,0,0);doc.setFont('helvetica','normal');
+    return y+2;
+  }
+  let y=sec(tp('pdfS1'),19);
+  const ductLbl=SEG.duct, jtLbl=s.end?tp('jt_end'):tp('jt_int');
+  const inRows=[
+    ['Beton / Otel / Otel transv.',`${sv('cp')} / ${sv('sp')} / ${sv('swp')}`],
+    ['f_cd / f_yd / f_ywd [MPa]',`${F2(M.fcd)} / ${F1(M.fyd)} / ${F1(M.fywd)}`],
+    [tp('ductClass')+' / '+tp('jointType'),`${ductLbl} / ${jtLbl}`],
+    [tp('levelLbl'),SEG.level==='base'?tp('lv_base'):tp('lv_cur')],
+    ['h_c x b_c [mm]',`${F0(s.hc)} x ${F0(s.bc)}`],
+    ['c_nom / D_sw stalp [mm]',`${F0(s.ccn)} / ${F0(s.cdsw)}`],
+    ['l_cl [mm]',F0(s.lcl)],
+    [tp('t_bL')+' [mm]',`${F0(s.bL.bw)}x${F0(s.bL.hb)} · sus ${s.bL.top.n}D${F0(s.bL.top.dia)} · jos ${s.bL.bot.n}D${F0(s.bL.bot.dia)}`],
+  ];
+  if(!s.end)inRows.push([tp('t_bR')+' [mm]',`${F0(s.bR.bw)}x${F0(s.bR.hb)} · sus ${s.bR.top.n}D${F0(s.bR.top.dia)} · jos ${s.bR.bot.n}D${F0(s.bR.bot.dia)}`]);
+  inRows.push([tp('t_cI'),`N=${F0(s.cI.N)} kN · ${s.cI.m.cnt.cor}D${F0(s.cI.m.bars.cd)} colt + ${s.cI.m.cnt.fb}D${F0(s.cI.m.bars.fbd)} + ${s.cI.m.cnt.fh}D${F0(s.cI.m.bars.fhd)}`]);
+  inRows.push([tp('t_cS'),`N=${F0(s.cS.N)} kN · ${s.cS.m.cnt.cor}D${F0(s.cS.m.bars.cd)} colt + ${s.cS.m.cnt.fb}D${F0(s.cS.m.bars.fbd)} + ${s.cS.m.cnt.fh}D${F0(s.cS.m.bars.fhd)}`]);
+  inRows.push(['Etrieri nod',`${s.n1}xD${F0(s.d1)} + ${s.n2}xD${F0(s.d2)} · ${s.nSet} seturi @ ${F0(s.sJ)} mm`]);
+  inRows.push(['Etrieri zona critica stalp',`${s.nCol}xD${F0(s.dCol)} @ ${F0(s.sCol)} mm`]);
+  doc.autoTable({startY:y+2,body:inRows,margin:{left:ml,right:mr},tableWidth:cw,theme:'grid',
+    styles:ST,columnStyles:{0:{cellWidth:62},1:{fontStyle:'bold'}},didDrawPage:hdr});
+
+  y=sec(tp('pdfS2'),doc.lastAutoTable.finalY+7);
+  const capRows=[
+    ['M_Rb,L (sus / jos)','A_s·f_yd·z, z = d - lambda·x/2',`${F1(s.bL.top.M)} / ${F1(s.bL.bot.M)} kNm`],
+  ];
+  if(!s.end)capRows.push(['M_Rb,R (sus / jos)','A_s·f_yd·z',`${F1(s.bR.top.M)} / ${F1(s.bR.bot.M)} kNm`]);
+  capRows.push(['M_Rd,inf','metoda fibrelor, N = '+F0(s.cI.N)+' kN'+(s.cI.ovr>0?' (manual)':''),`${F1(s.cI.MRd)} kNm`]);
+  capRows.push(['M_Rd,sup','metoda fibrelor, N = '+F0(s.cS.N)+' kN'+(s.cS.ovr>0?' (manual)':''),`${F1(s.cS.MRd)} kNm`]);
+  capRows.push(['Sum M_Rc','M_Rd,inf + M_Rd,sup',`${F1(s.SMRc)} kNm`]);
+  s.senses.forEach(x=>capRows.push([`Sum M_Rb — ${tp(x.lblKey)}`,'(5.4)',`${F1(x.SMRb)} kNm`]));
+  capRows.push(['b_j','min(b_c; b_w + 0,5 h_c)   (5.28)',`${F0(s.bj)} mm`]);
+  capRows.push(['h_jc / h_jw','(5.31)',`${F0(s.hjc)} / ${F0(s.hjw)} mm`]);
+  capRows.push(['v_d','N_Ed,inf/(b_c h_c f_cd)',F3(s.govAsh.nud)]);
+  doc.autoTable({startY:y+2,head:[[tp('colParam'),tp('colForm'),tp('colVal')]],body:capRows,
+    margin:{left:ml,right:mr},tableWidth:cw,theme:'grid',styles:ST,headStyles:HS,
+    columnStyles:{0:{cellWidth:40},2:{halign:'right',fontStyle:'bold',cellWidth:32}},didDrawPage:hdr});
+
+  y=sec(tp('pdfS3'),doc.lastAutoTable.finalY+7);
+  const u54=s.gov54.rat54, uD=s.govVj.Vjhd/s.VRdj, uA=s.govAsh.AshReq/s.AshProv, uV=s.AsvReq/s.AsvProv;
+  const okQty=s.ratJoint>=s.ratCol-1e-9, okSp=s.sJ<=s.sLimit+1e-9;
+  const V=(b)=>b?tp('vOk'):tp('vNo');
+  const ckRows=[
+    ['(5.4)',`Sum M_Rc >= g_Rd Sum M_Rb : ${F1(s.SMRc)} >= ${F2(s.g54)}·${F1(s.gov54.SMRb)} = ${F1(s.g54*s.gov54.SMRb)} kNm`,PCT(u54),s.skip54?tp('vNa'):V(u54<=1)],
+    [s.end?'(5.12)':'(5.11)',`V_jhd = ${F1(s.govVj.Vjhd)} kN  (V_c = ${F1(s.govVj.Vc)} kN)`,'—','—'],
+    [s.end?'(5.27)':'(5.26)',`V_jhd <= ${F2(s.kDiag)}·b_j·h_c·f_cd : ${F1(s.govVj.Vjhd)} <= ${F1(s.VRdj)} kN`,PCT(uD),V(uD<=1)],
+    [s.end?'(5.30)':'(5.29)',`A_sh,nec = ${F0(s.govAsh.AshReq)} mm2  <=  A_sh,ef = ${F0(s.AshProv)} mm2`,PCT(uA),V(uA<=1)],
+    ['(5.31)',`A_sv,nec = ${F0(s.AsvReq)} mm2  <=  A_sv,ef = ${F0(s.AsvProv)} mm2`,PCT(uV),V(uV<=1)],
+    ['5.3.4.2.3(6)',`A_sw/s nod = ${F3(s.ratJoint)} >= zona critica ${F3(s.ratCol)} mm2/mm`,'—',V(okQty)],
+    ['5.4.4.3(2)',`s = ${F0(s.sJ)} mm <= ${F0(s.sLimit)} mm`,'—',V(okSp)]
+  ];
+  doc.autoTable({startY:y+2,head:[['Rel.','Verificare','Utilizare','Verdict']],body:ckRows,
+    margin:{left:ml,right:mr},tableWidth:cw,theme:'grid',styles:ST,headStyles:HS,
+    columnStyles:{0:{cellWidth:20},2:{halign:'right',cellWidth:16},3:{halign:'center',fontStyle:'bold',cellWidth:22}},
+    didParseCell:function(d){
+      if(d.section==='body'&&d.column.index===3){
+        const v=ckRows[d.row.index][3];
+        if(v===tp('vOk'))d.cell.styles.textColor=[46,125,50];
+        else if(v===tp('vNo'))d.cell.styles.textColor=[192,57,43];
+      }},
+    didDrawPage:hdr});
+
+  /* ── 4. SECTIONS (vector drawings, same geometry as the on-screen sketches) ── */
+  doc.addPage(); hdr();
+  y=sec(tp('pdfS4'),19);
+  const colW=(cw-8)/2;
+  pdfBeamSec(doc,s.bL,ml,y+4,colW,52,tp('t_bL'));
+  if(!s.end)pdfBeamSec(doc,s.bR,ml+colW+8,y+4,colW,52,tp('t_bR'));
+  let yy=y+4+52+8;
+  pdfColSec(doc,s.cI,ml,yy,colW,64,{title:tp('t_cI'),mrd:s.cI.MRd,N:s.cI.N});
+  pdfColSec(doc,s.cI,ml+colW+8,yy,colW,64,{title:tp('pdfJointSec'),legs:true});
+  yy+=64+8;
+  pdfNodeElev(doc,ml,yy,cw,96,tp('pdfNodeElev'));
+
+  const tot=doc.internal.getNumberOfPages();
+  for(let i=1;i<=tot;i++){
+    doc.setPage(i);
+    doc.setFontSize(6.5);doc.setTextColor(0,0,0);doc.setFont('helvetica','italic');
+    doc.text(tp('pdfDisc'),ml,pH-6);
+    doc.setFont('helvetica','normal');
+    doc.text('P 100-1/2013 · SR EN 1992-1-1',ml,pH-2.5);
+    doc.text(`${tp('pdfPage')} ${i} ${tp('pdfOf')} ${tot}`,pW-mr,pH-2.5,{align:'right'});
+    doc.text(tp('pdfGenerated')+ds,pW/2,pH-2.5,{align:'center'});
+  }
+  doc.save(tp('pdfFname'));
+}
+
+/* ══════════════ PDF vector drawings ══════════════ */
+const PB_BLUE=[0,102,204], PB_DARK=[28,28,30], PB_GREY=[174,174,178], PB_RED=[192,57,43], PB_FILL=[232,232,237];
+function pdfBox(doc,x,y,w,h,title){
+  doc.setDrawColor(224,224,229);doc.setLineWidth(0.2);doc.setFillColor(255,255,255);
+  doc.roundedRect(x,y,w,h,1.5,1.5,'S');
+  if(title){doc.setFontSize(6.6);doc.setFont('helvetica','bold');doc.setTextColor(...PB_BLUE);
+    doc.text(title,x+3,y+4.6);doc.setTextColor(0,0,0);doc.setFont('helvetica','normal');}
+}
+function pdfLbl(doc,x,y,txt,o){
+  o=o||{};doc.setFontSize(o.s||5.2);doc.setFont('helvetica',o.b?'bold':'normal');
+  doc.setTextColor(...(o.c||[108,108,112]));
+  doc.text(txt,x,y,{align:o.a||'center'});
+  doc.setTextColor(0,0,0);doc.setFont('helvetica','normal');
+}
+function pdfDimH(doc,x1,x2,y,lbl){
+  doc.setDrawColor(...PB_GREY);doc.setLineWidth(0.15);
+  doc.line(x1,y,x2,y);doc.line(x1,y-0.8,x1,y+0.8);doc.line(x2,y-0.8,x2,y+0.8);
+  pdfLbl(doc,(x1+x2)/2,y+2.6,lbl);
+}
+/* beam cross-section */
+function pdfBeamSec(doc,b,x,y,w,h,title){
+  pdfBox(doc,x,y,w,h,title);
+  const top=y+8, av=h-15, aw=w-6;
+  const scl=Math.min((aw*0.42)/b.bw,av/b.hb);
+  const bw=b.bw*scl, bh=b.hb*scl;
+  const cx=x+w*0.34, x0=cx-bw/2, y0=top+(av-bh)/2;
+  doc.setFillColor(...PB_FILL);doc.setDrawColor(...PB_DARK);doc.setLineWidth(0.3);
+  doc.rect(x0,y0,bw,bh,'FD');
+  doc.setDrawColor(140,140,145);doc.setLineWidth(0.18);
+  doc.rect(x0+b.cn*scl,y0+b.cn*scl,bw-2*b.cn*scl,bh-2*b.cn*scl,'S');
+  const ins=(b.cn+b.dsw)*scl;
+  doc.setFillColor(...PB_DARK);
+  function bars(n,dia,yy){
+    if(n<=0)return;
+    const r=Math.max(0.45,dia*scl/2);
+    for(let i=0;i<n;i++){
+      const xx=(n===1)?x0+bw/2:x0+ins+r+(bw-2*ins-2*r)*i/(n-1);
+      doc.circle(xx,yy,r,'F');
+    }
+  }
+  bars(b.top.n,b.top.dia,y0+ins+Math.max(0.45,b.top.dia*scl/2));
+  bars(b.bot.n,b.bot.dia,y0+bh-ins-Math.max(0.45,b.bot.dia*scl/2));
+  pdfLbl(doc,x0+bw/2,y0-1.4,`${b.top.n}D${F0(b.top.dia)}`,{c:PB_DARK,b:1,s:5.6});
+  pdfLbl(doc,x0+bw/2,y0+bh+3.2,`${b.bot.n}D${F0(b.bot.dia)}`,{c:PB_DARK,b:1,s:5.6});
+  pdfDimH(doc,x0,x0+bw,y0+bh+6.2,`b_w = ${F0(b.bw)}`);
+  /* value column on the right */
+  const tx=x+w*0.60;
+  const lines=[
+    [`h_b`,`${F0(b.hb)} mm`],
+    [`d sup / inf`,`${F0(b.top.d)} / ${F0(b.bot.d)} mm`],
+    [`x sup / inf`,`${F1(b.top.x)} / ${F1(b.bot.x)} mm`],
+    [`z sup / inf`,`${F1(b.top.z)} / ${F1(b.bot.z)} mm`],
+    [`M_Rb-`,`${F1(b.top.M)} kNm`],
+    [`M_Rb+`,`${F1(b.bot.M)} kNm`]
+  ];
+  lines.forEach((l,i)=>{
+    const ly=top+4+i*4.4;
+    pdfLbl(doc,tx,ly,l[0],{a:'left',s:5.4});
+    pdfLbl(doc,x+w-3,ly,l[1],{a:'right',s:5.4,c:PB_DARK,b:(i>3?1:0)});
+  });
+}
+/* column cross-section, h_c drawn horizontally (parallel to the beams) */
+function pdfColSec(doc,c,x,y,w,h,opt){
+  opt=opt||{};
+  pdfBox(doc,x,y,w,h,opt.title);
+  /* the legs variant needs head-room for the V_jhd arrow and a footer line for the legend */
+  const m=c.m, top=y+(opt.legs?13:9), av=h-(opt.legs?26:16), aw=w-6;
+  const scl=Math.min((aw*0.40)/m.hc,av/m.bc);
+  const cw2=m.hc*scl, ch=m.bc*scl;
+  const cx=x+w*0.30, x0=cx-cw2/2, y0=top+(av-ch)/2;
+  doc.setFillColor(...PB_FILL);doc.setDrawColor(...PB_DARK);doc.setLineWidth(0.3);
+  doc.rect(x0,y0,cw2,ch,'FD');
+  const sx=x0+S.ccn*scl, sy=y0+S.ccn*scl, sw2=cw2-2*S.ccn*scl, sh2=ch-2*S.ccn*scl;
+  if(opt.legs){
+    doc.setDrawColor(...PB_BLUE);doc.setLineWidth(0.45);
+    doc.line(sx,sy,sx+sw2,sy);doc.line(sx,sy+sh2,sx+sw2,sy+sh2);
+    doc.setDrawColor(...PB_GREY);doc.setLineWidth(0.28);
+    doc.line(sx,sy,sx,sy+sh2);doc.line(sx+sw2,sy,sx+sw2,sy+sh2);
+    doc.setDrawColor(...PB_BLUE);doc.setLineWidth(0.38);
+    for(let i=0;i<S.n2;i++){const yy=sy+sh2*(i+1)/(S.n2+1);doc.line(sx,yy,sx+sw2,yy);}
+    /* V_jhd arrow */
+    doc.setDrawColor(...PB_RED);doc.setLineWidth(0.3);
+    const ay=y0-2.4;doc.line(x0-1,ay,x0+cw2+1,ay);
+    pdfLbl(doc,x0+cw2/2,ay-1.3,'V_jhd',{c:PB_RED,b:1,s:5.4});
+  } else {
+    doc.setDrawColor(140,140,145);doc.setLineWidth(0.18);doc.rect(sx,sy,sw2,sh2,'S');
+  }
+  doc.setFillColor(...PB_DARK);
+  const X=z=>x0+cw2/2+z*scl, Y=yv=>y0+ch/2-yv*scl;
+  m.sf.forEach(f=>{if(f.A>0)doc.circle(X(f.z),Y(f.y),Math.max(0.45,Math.sqrt(4*f.A/PI)*scl/2),'F');});
+  pdfDimH(doc,x0,x0+cw2,y0+ch+3.4,`h_c = ${F0(m.hc)}`);
+  const tx=x+w*0.56;
+  let lines;
+  if(opt.legs){
+    lines=[['b_j (5.28)',`${F0(S.bj)} mm`],['h_jc / h_jw',`${F0(S.hjc)} / ${F0(S.hjw)} mm`],
+      ['Etrier perim.',`${S.n1}xD${F0(S.d1)}`],['Agrafe',`${S.n2}xD${F0(S.d2)}`],
+      ['Seturi x s',`${S.nSet} x ${F0(S.sJ)} mm`],['A_sh,ef',`${F0(S.AshProv)} mm2`],
+      ['A_sh,nec',`${F0(S.govAsh.AshReq)} mm2`]];
+  } else {
+    lines=[['b_c',`${F0(m.bc)} mm`],['Colturi',`${m.cnt.cor}D${F0(m.bars.cd)}`],
+      ['Fete b_c',`${m.cnt.fb}D${F0(m.bars.fbd)}`],['Fete h_c',`${m.cnt.fh}D${F0(m.bars.fhd)}`],
+      ['A_s / rho',`${F0(m.As_tot)} mm2 / ${(100*m.As_tot/m.Ac).toFixed(2)}%`],
+      ['N_Ed',`${F0(opt.N)} kN`],['M_Rd',`${F1(opt.mrd)} kNm`]];
+  }
+  lines.forEach((l,i)=>{
+    const ly=top+3.5+i*4.3;
+    pdfLbl(doc,tx,ly,l[0],{a:'left',s:5.4});
+    pdfLbl(doc,x+w-3,ly,l[1],{a:'right',s:5.4,c:PB_DARK,b:(i>=lines.length-2?1:0)});
+  });
+  if(opt.legs)pdfLbl(doc,x+w/2,y+h-2,tp('pdfLegLegend'),{s:4.6});
+}
+/* node elevation */
+function pdfNodeElev(doc,x,y,w,h,title){
+  pdfBox(doc,x,y,w,h,title);
+  const s=S;
+  const hc=s.hc, hbL=s.bL.hb, hbR=s.end?s.bL.hb:s.bR.hb, hb=Math.max(hbL,hbR);
+  const beamStub=1.45*Math.max(hc,hb), colStub=1.1*Math.max(hb,hc*0.9);
+  const totW=hc+(s.end?beamStub:2*beamStub), totH=hb+2*colStub;
+  /* drawing keeps the left ~62% of the box, the values list takes the rest */
+  const top=y+8, av=h-13, aw=w*0.60;
+  const scl=Math.min(aw/totW,av/totH);
+  const cx=x+w*0.32, cy=top+av/2;
+  const X=mm=>cx+mm*scl, Y=mm=>cy+mm*scl;
+  const jx1=X(-hc/2), jx2=X(hc/2), jy1=Y(-hb/2), jy2=Y(hb/2);
+  const colTop=Y(-hb/2-colStub), colBot=Y(hb/2+colStub);
+  const bxL=X(-hc/2-beamStub), bxR=X(hc/2+beamStub);
+  /* beams */
+  doc.setFillColor(239,239,239);doc.setDrawColor(...PB_DARK);doc.setLineWidth(0.28);
+  doc.rect(bxL,Y(-hbL/2),jx1-bxL,hbL*scl,'FD');
+  if(!s.end)doc.rect(jx2,Y(-hbR/2),bxR-jx2,hbR*scl,'FD');
+  /* columns */
+  doc.setFillColor(233,233,238);
+  doc.rect(jx1,colTop,jx2-jx1,jy1-colTop,'FD');
+  doc.rect(jx1,jy2,jx2-jx1,colBot-jy2,'FD');
+  /* joint core */
+  doc.setFillColor(222,222,228);
+  doc.rect(jx1,jy1,jx2-jx1,jy2-jy1,'FD');
+  /* beam bars through the joint */
+  const insB=(s.bL.cn+s.bL.dsw)*scl;
+  doc.setDrawColor(...PB_DARK);doc.setLineWidth(0.38);
+  doc.line(bxL+1,Y(-hbL/2)+insB,s.end?jx2-insB*0.6:jx2,Y(-hbL/2)+insB);
+  doc.line(bxL+1,Y(hbL/2)-insB,s.end?jx2-insB*0.6:jx2,Y(hbL/2)-insB);
+  if(!s.end){
+    doc.line(jx1,Y(-hbR/2)+insB,bxR-1,Y(-hbR/2)+insB);
+    doc.line(jx1,Y(hbR/2)-insB,bxR-1,Y(hbR/2)-insB);
+  } else {
+    doc.line(jx2-insB*0.6,Y(-hbL/2)+insB,jx2-insB*0.6,Y(-hbL/2)+insB+(jy2-jy1)*0.45);
+    doc.line(jx2-insB*0.6,Y(hbL/2)-insB,jx2-insB*0.6,Y(hbL/2)-insB-(jy2-jy1)*0.45);
+  }
+  /* column bars */
+  const insC=(s.ccn+s.cdsw)*scl;
+  doc.line(jx1+insC,colTop+0.6,jx1+insC,colBot-0.6);
+  doc.line(jx2-insC,colTop+0.6,jx2-insC,colBot-0.6);
+  if(s.cI.m.bars.fhn>0){
+    doc.setDrawColor(...PB_GREY);doc.setLineWidth(0.25);doc.setLineDashPattern([1,0.8],0);
+    for(let i=0;i<s.cI.m.bars.fhn;i++){
+      const zz=-(hc/2-s.ccn-s.cdsw)+(2*(hc/2-s.ccn-s.cdsw))*(i+1)/(s.cI.m.bars.fhn+1);
+      doc.line(X(zz),colTop+0.6,X(zz),colBot-0.6);
+    }
+    doc.setLineDashPattern([],0);
+  }
+  /* joint hoops */
+  doc.setDrawColor(...PB_BLUE);doc.setLineWidth(0.35);
+  for(let i=0;i<s.nSet;i++){
+    const yy=jy1+insB+((jy2-jy1)-2*insB)*(s.nSet>1?i/(s.nSet-1):0.5);
+    doc.line(jx1+insC,yy,jx2-insC,yy);
+  }
+  /* labels */
+  pdfDimH(doc,jx1,jx2,colBot+3,`h_c = ${F0(hc)} mm`);
+  pdfLbl(doc,(bxL+jx1)/2,Y(-hbL/2)-1.3,`M_Rb- ${F1(s.bL.top.M)} / M_Rb+ ${F1(s.bL.bot.M)}`,{c:PB_BLUE,b:1,s:5.2});
+  if(!s.end)pdfLbl(doc,(jx2+bxR)/2,Y(-hbR/2)-1.3,`M_Rb- ${F1(s.bR.top.M)} / M_Rb+ ${F1(s.bR.bot.M)}`,{c:PB_BLUE,b:1,s:5.2});
+  pdfLbl(doc,jx2+2,colTop+3,`M_Rd,sup = ${F1(s.cS.MRd)} kNm`,{a:'left',c:PB_BLUE,b:1,s:5.2});
+  pdfLbl(doc,jx2+2,colBot-1.4,`M_Rd,inf = ${F1(s.cI.MRd)} kNm`,{a:'left',c:PB_BLUE,b:1,s:5.2});
+  pdfLbl(doc,x+4,top+1.5,`V_jhd = ${F1(s.govVj.Vjhd)} kN`,{a:'left',c:PB_RED,b:1,s:6});
+  /* values list filling the right-hand side of the box */
+  const u54=s.gov54.rat54, uD=s.govVj.Vjhd/s.VRdj, uA=s.govAsh.AshReq/s.AshProv;
+  const tx=x+w*0.66;
+  const lines=[
+    ['Tip nod',s.end?tp('jt_end'):tp('jt_int')],
+    ['Clasa ductilitate',SEG.duct],
+    ['b_j / h_c',`${F0(s.bj)} / ${F0(s.hc)} mm`],
+    ['h_jw / h_jc',`${F0(s.hjw)} / ${F0(s.hjc)} mm`],
+    ['Sum M_Rc',`${F1(s.SMRc)} kNm`],
+    ['g_Rd Sum M_Rb',`${F1(s.g54*s.gov54.SMRb)} kNm`],
+    [`(5.4)`,PCT(u54)],
+    ['V_jhd / V_Rd,j',`${F1(s.govVj.Vjhd)} / ${F1(s.VRdj)} kN`],
+    [s.end?'(5.27)':'(5.26)',PCT(uD)],
+    ['A_sh nec / ef',`${F0(s.govAsh.AshReq)} / ${F0(s.AshProv)} mm2`],
+    [s.end?'(5.30)':'(5.29)',PCT(uA)]
+  ];
+  lines.forEach((l,i)=>{
+    const ly=top+4+i*4.6;
+    pdfLbl(doc,tx,ly,l[0],{a:'left',s:5.4});
+    pdfLbl(doc,x+w-3,ly,l[1],{a:'right',s:5.4,c:PB_DARK,b:/^\(5\./.test(l[0])?1:0});
+  });
+}
+
+/* ══════════════ PRESETS P1..P5 ══════════════ */
+let currentPreset='P1';
+const KEY=p=>'sw_mod8_'+p;
+function captureState(){
+  const st={inputs:{},segs:Object.assign({},SEG)};
+  document.querySelectorAll('#inputsWrap input[id], #inputsWrap select[id]').forEach(el=>{st.inputs[el.id]=el.value;});
+  return st;
+}
+function applyState(st){
+  st=st||{};
+  /* an empty preset starts from the page defaults rather than inheriting the previous one */
+  const src=st.inputs||(typeof DEFAULTS!=='undefined'?DEFAULTS.inputs:null);
+  if(src)Object.keys(src).forEach(id=>{const el=document.getElementById(id);if(el)el.value=src[id];});
+  SEG=Object.assign({duct:'DCM',joint:'int',level:'cur',sign:'neg',top:'no',four:'no'},st.segs||{});
+}
+function saveCurrentPreset(){try{localStorage.setItem(KEY(currentPreset),JSON.stringify(captureState()));}catch(e){}}
+function loadPreset(p){try{const s=localStorage.getItem(KEY(p));return s?JSON.parse(s):null;}catch(e){return null;}}
+function switchPreset(p){
+  saveCurrentPreset();
+  currentPreset=p;
+  try{localStorage.setItem('sw_mod8_active',p);}catch(e){}
+  document.getElementById('presetSel').value=p;
+  const st=loadPreset(p);
+  buildDynamicPanels();
+  applyState(st);            /* null → falls back to DEFAULTS inside applyState */
+  applyStaticLang();paintSegs();onChange();
+}
+
+/* ══════════════ BOOT ══════════════ */
+document.querySelectorAll('#langSeg button').forEach(b=>b.addEventListener('click',()=>setLang(b.dataset.lang)));
+buildDynamicPanels();
+const DEFAULTS=captureState();   /* pristine page values, used when a preset slot is empty */
+(function(){
+  try{const ap=localStorage.getItem('sw_mod8_active');if(ap)currentPreset=ap;}catch(e){}
+  document.getElementById('presetSel').value=currentPreset;
+  const st=loadPreset(currentPreset);
+  if(st)applyState(st);
+})();
+applyStaticLang();
+paintSegs();
+onChange();
+</script>
+</body>
+</html>
