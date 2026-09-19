@@ -29,6 +29,16 @@ body{font-family:'Inter',sans-serif;background:#F5F5F7;color:#1C1C1E;min-height:
 .mod-disabled:hover{box-shadow:none;transform:none}
 .mod-badge{position:absolute;top:-7px;right:12px;font-size:9px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#0066CC;background:#EBF3FF;border:1px solid #B8D4F8;border-radius:5px;padding:2px 6px;line-height:1.3}
 .mod-badge.soon{color:#8E6C1A;background:#FBF3DE;border-color:#EAD9A8}
+.mod-pair{display:flex;gap:8px;align-items:stretch}
+.mod-pair>.mod-main{flex:1;min-width:0}
+.mod-batch{width:78px;flex-shrink:0;flex-direction:column;justify-content:center;gap:3px;padding:10px 6px;text-align:center}
+.mod-batch .batch-ico{height:20px;display:flex;align-items:center;justify-content:center}
+.mod-batch .batch-lbl{font-size:11px;font-weight:600;color:#1C1C1E;letter-spacing:.02em;line-height:1}
+.mod-batch .batch-num{font-size:10px;font-weight:600;color:#8E8E93;line-height:1;margin-bottom:1px}
+.mod-batch.mod-disabled{border-style:dashed;border-color:#D8D8DD}
+.mod-batch.mod-disabled .batch-lbl{color:#8E8E93}
+.mod-batch.mod-disabled .batch-num{color:#C7C7CC}
+@media(max-width:400px){.mod-batch{width:62px}}
 .mod-icon{width:52px;height:40px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
 .mod-num{font-size:11px;font-weight:600;color:#8E8E93;flex-shrink:0;text-align:right;width:18px}
 .mod-text{flex:1;min-width:0}
@@ -178,85 +188,72 @@ body{font-family:'Inter',sans-serif;background:#F5F5F7;color:#1C1C1E;min-height:
 
     <div class="group-divider"><span data-i18n="groupColumns">Stalpi</span></div>
 
-    <!-- 06 Stalp biaxial -->
-    <a class="mod" href="6_STALP_BIAXIAL.html">
-      <span class="mod-badge" data-i18n="badgeNew">Nou</span>
-      <span class="mod-num">06</span>
-      <div class="mod-icon">
-        <svg width="52" height="40" viewBox="0 0 52 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect x="14" y="4" width="24" height="32" rx="1.5" fill="#EAF3EA" stroke="#2E7D32" stroke-width="1.3"/>
-          <circle cx="18.5" cy="8.5" r="1.7" fill="#2E7D32"/>
-          <circle cx="26" cy="8.5" r="1.7" fill="#2E7D32"/>
-          <circle cx="33.5" cy="8.5" r="1.7" fill="#2E7D32"/>
-          <circle cx="18.5" cy="31.5" r="1.7" fill="#2E7D32"/>
-          <circle cx="26" cy="31.5" r="1.7" fill="#2E7D32"/>
-          <circle cx="33.5" cy="31.5" r="1.7" fill="#2E7D32"/>
-          <circle cx="18.5" cy="20" r="1.7" fill="#2E7D32"/>
-          <circle cx="33.5" cy="20" r="1.7" fill="#2E7D32"/>
-          <line x1="26" y1="20" x2="26" y2="4" stroke="#2E7D32" stroke-width="1" stroke-dasharray="2,1.6" opacity="0.55"/>
-          <line x1="26" y1="20" x2="41" y2="20" stroke="#2E7D32" stroke-width="1" stroke-dasharray="2,1.6" opacity="0.55"/>
-          <polyline points="23,7 26,4 29,7" stroke="#2E7D32" stroke-width="1" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/>
-          <polyline points="38,17 41,20 38,23" stroke="#2E7D32" stroke-width="1" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/>
-        </svg>
-      </div>
-      <div class="mod-text">
-        <span class="mod-title" data-i18n-sym="m6title">Stalp &mdash; verificare biaxiala</span>
-        <div class="mod-desc" data-i18n-sym="m6desc">Diagrama de interactiune M<sub>y</sub>&ndash;M<sub>z</sub> &mdash; metoda fibrelor 2D</div>
-      </div>
-      <span class="mod-arrow"><svg viewBox="0 0 16 16"><polyline points="5,3 11,8 5,13"/></svg></span>
-    </a>
+        <!-- 06 Stalp biaxial (+ 07 batch) -->
+    <div class="mod-pair">
+      <a class="mod mod-main" href="6_STALP_BIAXIAL.html">
+        <span class="mod-badge" data-i18n="badgeNew">Nou</span>
+        <span class="mod-num">06</span>
+        <div class="mod-icon">
+          <svg width="52" height="40" viewBox="0 0 52 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="14" y="4" width="24" height="32" rx="1.5" fill="#EAF3EA" stroke="#2E7D32" stroke-width="1.3"/>
+            <circle cx="18.5" cy="8.5" r="1.7" fill="#2E7D32"/>
+            <circle cx="26" cy="8.5" r="1.7" fill="#2E7D32"/>
+            <circle cx="33.5" cy="8.5" r="1.7" fill="#2E7D32"/>
+            <circle cx="18.5" cy="31.5" r="1.7" fill="#2E7D32"/>
+            <circle cx="26" cy="31.5" r="1.7" fill="#2E7D32"/>
+            <circle cx="33.5" cy="31.5" r="1.7" fill="#2E7D32"/>
+            <circle cx="18.5" cy="20" r="1.7" fill="#2E7D32"/>
+            <circle cx="33.5" cy="20" r="1.7" fill="#2E7D32"/>
+            <line x1="26" y1="20" x2="26" y2="4" stroke="#2E7D32" stroke-width="1" stroke-dasharray="2,1.6" opacity="0.55"/>
+            <line x1="26" y1="20" x2="41" y2="20" stroke="#2E7D32" stroke-width="1" stroke-dasharray="2,1.6" opacity="0.55"/>
+            <polyline points="23,7 26,4 29,7" stroke="#2E7D32" stroke-width="1" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/>
+            <polyline points="38,17 41,20 38,23" stroke="#2E7D32" stroke-width="1" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/>
+          </svg>
+        </div>
+        <div class="mod-text">
+          <span class="mod-title" data-i18n-sym="m6title">Stalp &mdash; verificare biaxiala</span>
+          <div class="mod-desc" data-i18n-sym="m6desc">Diagrama de interactiune M<sub>y</sub>&ndash;M<sub>z</sub> &mdash; metoda fibrelor 2D</div>
+        </div>
+        <span class="mod-arrow"><svg viewBox="0 0 16 16"><polyline points="5,3 11,8 5,13"/></svg></span>
+      </a>
+      <a class="mod mod-batch" href="7_STALP_TABEL.html" data-i18n-title="m7tip" title="Import combinatii din Excel/ETABS, verificare in lot">
+        <span class="batch-num">07</span>
+        <span class="batch-ico"><svg width="26" height="20" viewBox="0 0 26 20" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="1" y="1" width="24" height="18" rx="2" fill="#fff" stroke="#2E7D32" stroke-width="1.2"/><line x1="1" y1="6.6" x2="25" y2="6.6" stroke="#2E7D32" stroke-width="1"/><line x1="1" y1="12.4" x2="25" y2="12.4" stroke="#2E7D32" stroke-width="1"/><line x1="9.5" y1="1" x2="9.5" y2="19" stroke="#2E7D32" stroke-width="1" opacity="0.55"/></svg></span>
+        <span class="batch-lbl" data-i18n="batchLbl">Batch</span>
+      </a>
+    </div>
 
-    <!-- 07 Stalp verificare tabel -->
-    <a class="mod" href="7_STALP_TABEL.html">
-      <span class="mod-badge" data-i18n="badgeNew">Nou</span>
-      <span class="mod-num">07</span>
-      <div class="mod-icon">
-        <svg width="52" height="40" viewBox="0 0 52 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect x="14" y="4" width="24" height="32" rx="1.5" fill="#ECE8F5" stroke="#5E4FA2" stroke-width="1.3"/>
-          <circle cx="18.5" cy="8.5" r="1.7" fill="#5E4FA2"/>
-          <circle cx="26" cy="8.5" r="1.7" fill="#5E4FA2"/>
-          <circle cx="33.5" cy="8.5" r="1.7" fill="#5E4FA2"/>
-          <circle cx="18.5" cy="31.5" r="1.7" fill="#5E4FA2"/>
-          <circle cx="26" cy="31.5" r="1.7" fill="#5E4FA2"/>
-          <circle cx="33.5" cy="31.5" r="1.7" fill="#5E4FA2"/>
-          <circle cx="18.5" cy="20" r="1.7" fill="#5E4FA2"/>
-          <circle cx="33.5" cy="20" r="1.7" fill="#5E4FA2"/>
-          <line x1="26" y1="20" x2="26" y2="4" stroke="#5E4FA2" stroke-width="1" stroke-dasharray="2,1.6" opacity="0.55"/>
-          <line x1="26" y1="20" x2="41" y2="20" stroke="#5E4FA2" stroke-width="1" stroke-dasharray="2,1.6" opacity="0.55"/>
-          <polyline points="23,7 26,4 29,7" stroke="#5E4FA2" stroke-width="1" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/>
-          <polyline points="38,17 41,20 38,23" stroke="#5E4FA2" stroke-width="1" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/>
-        </svg>
+    <!-- 08 Nod de cadru (+ 09 batch, in dezvoltare) -->
+    <div class="mod-pair">
+      <a class="mod mod-main" href="8_NOD.html">
+        <span class="mod-badge" data-i18n="badgeNew">Nou</span>
+        <span class="mod-num">08</span>
+        <div class="mod-icon">
+          <svg width="52" height="40" viewBox="0 0 52 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- column (vertical) -->
+            <rect x="21" y="2" width="10" height="36" rx="1" fill="#E0F2F1" stroke="#00796B" stroke-width="1.3"/>
+            <!-- beams (horizontal) -->
+            <rect x="2" y="14" width="48" height="12" rx="1" fill="#E0F2F1" stroke="#00796B" stroke-width="1.3"/>
+            <!-- joint core + hoops -->
+            <rect x="21" y="14" width="10" height="12" fill="#B2DFDB" stroke="#00796B" stroke-width="1.3"/>
+            <line x1="22.4" y1="17" x2="29.6" y2="17" stroke="#00796B" stroke-width="1" opacity="0.85"/>
+            <line x1="22.4" y1="20" x2="29.6" y2="20" stroke="#00796B" stroke-width="1" opacity="0.85"/>
+            <line x1="22.4" y1="23" x2="29.6" y2="23" stroke="#00796B" stroke-width="1" opacity="0.85"/>
+          </svg>
+        </div>
+        <div class="mod-text">
+          <span class="mod-title" data-i18n="m8title">Nod de cadru &mdash; verificare</span>
+          <div class="mod-desc" data-i18n="m8desc">Suprarezistenta, forta taietoare in nod, armatura transversala &mdash; P 100-1/2013</div>
+        </div>
+        <span class="mod-arrow"><svg viewBox="0 0 16 16"><polyline points="5,3 11,8 5,13"/></svg></span>
+      </a>
+      <div class="mod mod-batch mod-disabled" data-i18n-title="m9tip" title="Verificare noduri in lot (in dezvoltare)">
+        <span class="batch-num">09</span>
+        <span class="batch-ico"><svg width="26" height="20" viewBox="0 0 26 20" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="1" y="1" width="24" height="18" rx="2" fill="#fff" stroke="#00796B" stroke-width="1.2"/><line x1="1" y1="6.6" x2="25" y2="6.6" stroke="#00796B" stroke-width="1"/><line x1="1" y1="12.4" x2="25" y2="12.4" stroke="#00796B" stroke-width="1"/><line x1="9.5" y1="1" x2="9.5" y2="19" stroke="#00796B" stroke-width="1" opacity="0.55"/></svg></span>
+        <span class="batch-lbl" data-i18n="batchLbl">Batch</span>
       </div>
-      <div class="mod-text">
-        <span class="mod-title" data-i18n="m7title">Stalp &mdash; verificare biaxiala (batch)</span>
-        <div class="mod-desc" data-i18n="m7desc">Import combinatii de incarcare din Excel/ETABS, verificare in lot</div>
-      </div>
-      <span class="mod-arrow"><svg viewBox="0 0 16 16"><polyline points="5,3 11,8 5,13"/></svg></span>
-    </a>
+    </div>
 
-    <!-- 08 Nod de cadru -->
-    <a class="mod" href="8_NOD.html">
-      <span class="mod-badge" data-i18n="badgeNew">Nou</span>
-      <span class="mod-num">08</span>
-      <div class="mod-icon">
-        <svg width="52" height="40" viewBox="0 0 52 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <!-- column (vertical) -->
-          <rect x="21" y="2" width="10" height="36" rx="1" fill="#E0F2F1" stroke="#00796B" stroke-width="1.3"/>
-          <!-- beams (horizontal) -->
-          <rect x="2" y="14" width="48" height="12" rx="1" fill="#E0F2F1" stroke="#00796B" stroke-width="1.3"/>
-          <!-- joint core + hoops -->
-          <rect x="21" y="14" width="10" height="12" fill="#B2DFDB" stroke="#00796B" stroke-width="1.3"/>
-          <line x1="22.4" y1="17" x2="29.6" y2="17" stroke="#00796B" stroke-width="1" opacity="0.85"/>
-          <line x1="22.4" y1="20" x2="29.6" y2="20" stroke="#00796B" stroke-width="1" opacity="0.85"/>
-          <line x1="22.4" y1="23" x2="29.6" y2="23" stroke="#00796B" stroke-width="1" opacity="0.85"/>
-        </svg>
-      </div>
-      <div class="mod-text">
-        <span class="mod-title" data-i18n="m8title">Nod de cadru &mdash; verificare</span>
-        <div class="mod-desc" data-i18n="m8desc">Suprarezistenta, forta taietoare in nod, armatura transversala &mdash; P 100-1/2013</div>
-      </div>
-      <span class="mod-arrow"><svg viewBox="0 0 16 16"><polyline points="5,3 11,8 5,13"/></svg></span>
-    </a>
 
   </div>
   <div class="author" data-i18n="author">Lucrare de disertație — Janos Patrik · UTCN · Facultatea de Construcții · 2026</div>
@@ -284,6 +281,9 @@ const I18N={
   m8desc:{ro:'Suprarezistență, forță tăietoare în nod, armătură transversală &mdash; P 100-1/2013', en:'Overstrength, joint shear, transverse reinforcement &mdash; P 100-1/2013'},
   groupWalls:{ro:'Pereți', en:'Walls'},
   groupColumns:{ro:'Stâlpi', en:'Columns'},
+  batchLbl:{ro:'Batch', en:'Batch'},
+  m7tip:{ro:'Import combinații de încărcare din Excel/ETABS, verificare în lot', en:'Import load combinations from Excel/ETABS, batch check'},
+  m9tip:{ro:'Verificare noduri în lot — în dezvoltare', en:'Batch joint check — in development'},
   badgeNew:{ro:'Nou', en:'New'},
   badgeSoon:{ro:'În curând', en:'Coming soon'},
   author:{ro:'Lucrare de disertație — Janos Patrik · UTCN · Facultatea de Construcții · 2026', en:'Dissertation — Janos Patrik · UTCN · Faculty of Civil Engineering · 2026'}
@@ -295,6 +295,10 @@ function applyLang(l){
   document.querySelectorAll('[data-i18n],[data-i18n-sym]').forEach(el=>{
     const k=el.getAttribute('data-i18n')||el.getAttribute('data-i18n-sym');
     if(I18N[k]&&I18N[k][l]!==undefined)el.innerHTML=I18N[k][l];
+  });
+  document.querySelectorAll('[data-i18n-title]').forEach(el=>{
+    const k=el.getAttribute('data-i18n-title');
+    if(I18N[k]&&I18N[k][l]!==undefined)el.setAttribute('title',I18N[k][l]);
   });
   document.querySelectorAll('#langSeg button').forEach(b=>b.classList.toggle('on',b.dataset.lang===l));
 }
