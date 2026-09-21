@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#F5F5F7">
+<meta name="description" content="Validare nucleu de calcul JP Design — cazuri de referinta si verificari numerice">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='2' y='4' width='8' height='24' rx='1.5' fill='%238E8E93'/><rect x='10' y='11' width='12' height='10' rx='1' fill='%23C7C7CC'/><rect x='22' y='4' width='8' height='24' rx='1.5' fill='%238E8E93'/></svg>">
+<title>Validare nucleu — JP Design</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1C1E}
+.wrap{max-width:1080px;margin:0 auto;padding:20px 16px}
+.topbar{display:flex;align-items:center;gap:8px;padding-right:12px}
+.back-btn{display:inline-flex;align-items:center;gap:5px;font-family:'Inter',sans-serif;font-size:14px;font-weight:500;color:#8E8E93;background:transparent;border:none;cursor:pointer;padding:12px 16px;text-decoration:none;line-height:1}
+.back-btn svg{width:16px;height:16px;stroke:#8E8E93;stroke-width:2.5;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.back-btn:hover{color:#1C1C1E}.back-btn:hover svg{stroke:#1C1C1E}
+.slabel{font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:#1C1C1E;padding:0 0 7px;margin-top:14px}
+.slabel:first-child{margin-top:0}
+.op{background:#fff;border:1px solid #DCDCE0;border-radius:12px;overflow:hidden;margin-bottom:13px}
+.ph{padding:12px 15px 0;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:#1C1C1E}
+.pb{padding:8px 15px 14px}
+.note{font-size:12px;color:#8E8E93;line-height:1.5}
+/* verdict banner */
+.verdict{display:flex;align-items:center;gap:14px;border-radius:12px;padding:16px 18px;margin-bottom:13px;border:1px solid}
+.verdict.pass{background:#EAF6EC;border-color:#BFE3C6}
+.verdict.fail{background:#FDECEC;border-color:#F2C2C2}
+.verdict .vbig{font-size:26px;font-weight:600;letter-spacing:-.01em}
+.verdict.pass .vbig{color:#2E7D32}
+.verdict.fail .vbig{color:#C0392B}
+.verdict .vsub{font-size:12.5px;color:#1C1C1E;line-height:1.45}
+.stat-row{display:flex;gap:8px;margin-bottom:13px;flex-wrap:wrap}
+.stat{flex:1;min-width:110px;background:#fff;border:1px solid #DCDCE0;border-radius:10px;padding:11px 13px}
+.sl{font-size:11px;color:#8E8E93;margin-bottom:3px}
+.sv{font-size:20px;font-weight:500;color:#1C1C1E;line-height:1.15;font-feature-settings:"tnum" 1}
+.sv.ok{color:#2E7D32}.sv.no{color:#C0392B}
+/* results table */
+table.t{width:100%;border-collapse:collapse}
+table.t th{font-size:10px;font-weight:500;letter-spacing:.04em;text-transform:uppercase;color:#8E8E93;padding:7px 6px;border-bottom:1px solid #E5E5EA;text-align:left;white-space:nowrap}
+table.t th.r{text-align:right}
+table.t td{padding:7px 6px;border-bottom:1px solid #F0F0F5;font-size:12.5px;color:#1C1C1E;vertical-align:top}
+table.t td.r{text-align:right;font-feature-settings:"tnum" 1;white-space:nowrap}
+table.t tr:last-child td{border-bottom:none}
+table.t tr.bad td{background:#FDECEC}
+.grphd{font-size:11px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;color:#0066CC;padding:11px 6px 5px;background:#F7FAFF;border-bottom:1px solid #E5E5EA}
+.badge{display:inline-flex;align-items:center;justify-content:center;width:21px;height:21px;border-radius:50%;font-weight:600;font-size:13px}
+.badge.ok{background:#EAF6EC;color:#2E7D32}
+.badge.no{background:#FDECEC;color:#C62828}
+.cid{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11.5px;color:#0066CC;white-space:nowrap}
+.cdesc{font-size:12px;color:#1C1C1E;line-height:1.4}
+.cnote{font-size:11px;color:#8E8E93;line-height:1.4;padding-top:2px}
+.author-footer{text-align:center;font-size:11px;font-weight:500;color:#8E8E93;padding:16px 16px 4px;letter-spacing:.02em}
+.version-footer{text-align:center;font-size:10px;color:#AEAEB2;padding:0 16px 24px;letter-spacing:.02em;font-feature-settings:"tnum" 1}
+.prov{background:#EFEFEF;border:1px solid #DCDCE0;border-radius:10px;padding:11px 13px;font-size:11.5px;color:#1C1C1E;line-height:1.55;margin-bottom:13px}
+.prov b{font-weight:500}
+@media(max-width:680px){.wrap{padding:14px 10px}table.t td,table.t th{padding:6px 4px;font-size:11.5px}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="index.html" class="back-btn"><svg viewBox="0 0 16 16"><polyline points="10,3 4,8 10,13"/></svg><span>Toate modulele</span></a>
+</div>
+
+<div class="wrap">
+
+<div class="slabel">Validare nucleu de calcul</div>
+
+<div id="verdict" class="verdict pass">
+  <div class="vbig" id="vbig">&mdash;</div>
+  <div class="vsub" id="vsub">Se ruleaza&hellip;</div>
+</div>
+
+<div class="stat-row">
+  <div class="stat"><div class="sl">Total cazuri</div><div class="sv" id="s_tot">&mdash;</div></div>
+  <div class="stat"><div class="sl">Trec</div><div class="sv ok" id="s_ok">&mdash;</div></div>
+  <div class="stat"><div class="sl">Cad</div><div class="sv" id="s_no">&mdash;</div></div>
+  <div class="stat"><div class="sl">Abatere max.</div><div class="sv" id="s_dev">&mdash;</div></div>
+  <div class="stat"><div class="sl">Durata</div><div class="sv" id="s_ms">&mdash;</div></div>
+</div>
+
+<div class="prov">
+  <b>Referinta externa:</b> <span id="p_src">&mdash;</span><br>
+  <b>Sectiune de referinta:</b> <span id="p_sec">&mdash;</span><br>
+  <b>Nucleu testat:</b> engine v<span id="p_eng">?</span> &middot; conventie beton
+  <span id="p_conv">?</span> &middot; pivot A <span id="p_pivot">?</span>
+</div>
+
+<div class="op">
+  <div class="ph">Rezultate</div>
+  <div class="pb" style="padding-left:8px;padding-right:8px">
+    <table class="t" id="tbl"><tbody></tbody></table>
+  </div>
+</div>
+
+<div class="op">
+  <div class="ph">Ce inseamna aceasta pagina</div>
+  <div class="pb">
+    <div class="note">
+      Fiecare caz compara nucleul <i>engine.js</i> cu o valoare de referinta
+      independenta sau cu o proprietate care trebuie sa fie adevarata prin
+      construcție. Valorile marcate <b>fib</b> provin din biblioteca
+      <i>structuralcodes</i> a fib International, cu integrare exacta
+      (<i>marin</i>) &mdash; nu o discretizare in fibre, deci fara eroare de
+      integrare. Ele sunt inscrise in aceasta pagina, nu recalculate: pagina
+      ruleaza offline si nu depinde de nimic extern.<br><br>
+      Se ruleaza dupa fiecare modificare a nucleului. Daca un caz cade,
+      nucleul s-a schimbat numeric &mdash; iar cazurile <span class="cid">NUM</span>,
+      <span class="cid">POS</span> si <span class="cid">BAR</span>
+      corespund unor erori deja intalnite si corectate, care nu trebuie sa
+      reapara.
+    </div>
+  </div>
+</div>
+
+<div class="author-footer">Lucrare de disertație — Janos Patrik · UTCN · Facultatea de Construcții · 2026</div>
+<div class="version-footer" id="versionFooter">&mdash;</div>
+</div>
+
+<script src="engine.js"></script>
+<script>
+/* ═══════════════════════════════════════════════════════════════════════════
+   JP DESIGN — VALIDARE NUCLEU
+   Pagina nu calculeaza nimic pentru proiectare: ruleaza cazuri de referinta si
+   raporteaza abaterile. Se deschide local, fara retea.
+   ═══════════════════════════════════════════════════════════════════════════ */
+const PAGE_VERSION='1.4.0';
+
+/* ─── Mic cadru de testare ──────────────────────────────────────────────── */
+const CASES=[];
+function group(name){CASES.push({group:name});}
+function test(id,desc,fn,note){CASES.push({id:id,desc:desc,fn:fn,note:note||''});}
+
+// Comparatie numerica relativa. tol este fractiune (0.0005 = 0,05 %).
+function near(got,exp,tol,unit){
+  const dev = exp!==0 ? Math.abs(got-exp)/Math.abs(exp) : Math.abs(got-exp);
+  return {pass:dev<=tol, got:fmt(got,unit), exp:fmt(exp,unit), dev:dev, tol:tol};
+}
+// Comparatie absoluta, pentru marimi care trebuie sa fie exacte.
+function exact(got,exp,abstol,unit){
+  const d=Math.abs(got-exp);
+  return {pass:d<=abstol, got:fmt(got,unit), exp:fmt(exp,unit), dev:null, tol:null,
+          extra:'|Δ| = '+d.toExponential(2)+(abstol?' ≤ '+abstol.toExponential(1):'')};
+}
+function truthy(cond,gotTxt,expTxt,extra){
+  return {pass:!!cond, got:gotTxt, exp:expTxt, dev:null, tol:null, extra:extra||''};
+}
+function fmt(v,unit){
+  if(typeof v!=='number')return String(v);
+  const a=Math.abs(v);
+  let s=(a>=1000)?v.toFixed(1):(a>=1?v.toFixed(3):v.toExponential(3));
+  return s+(unit?' '+unit:'');
+}
+/* The CASES block that will go into test.html, kept here as a separate file so
+   it can be executed head-less in Node before being pasted into the page.
+   Loaded after engine.js; expects the helpers near/exact/truthy/fmt. */
+
+/* ─── Referinta externa, generata offline si inscrisa aici ──────────────────
+   Generata cu fib structuralcodes v0.7.2, integrator "marin" (integrare
+   inchisa a legii parabola-dreptunghi pe poligon, fara discretizare).
+   Sectiunea a fost construita cu ACELEASI materiale si ACELEASI poziții de
+   bare lumped ca modelul modulului 03, ca sa se compare integrarea si nimic
+   altceva. Versiunea este fixata: structuralcodes este pre-1.0 si API-ul se
+   poate schimba.
+   REGENERATA la engine 2.2.0: barele bulbilor s-au mutat la acoperirea
+   mecanica, deci si sectiunea de referinta a fost reconstruita cu aceleasi
+   poziții noi. Valorile vechi (bare pe fetele bulbului) erau:
+   13139,03 / 18105,55 / 16966,66 / 13523,76 / 8901,26 kNm.
+   ──────────────────────────────────────────────────────────────────────── */
+const REF={
+  generated:'2026-09-21',
+  source:'fib structuralcodes v0.7.2, integrator=marin (integrare exacta)',
+  section:{desc:'Perete 400 x 2750 mm, C50/60, S500, 23 fibre lumped, eps_ud = 45 permil',
+           As_tot:16762.0, Ac:1100000, fcd:33.3333, fyd:434.7826, eps_ud:0.045},
+  mrd:[{N:30000,M:13102.85},{N:20000,M:18054.62},{N:10000,M:16973.05},
+       {N:5000,M:13472.98},{N:0,M:8778.12}],
+  limits:{NRdc:43954.48,NRdcDomain:43371.45,NRdt:-7287.81}
+};
+
+/* ─── Sectiunea de referinta (implicitele modulului 03) ─────────────────── */
+function refInput(opts){
+  return {
+    lw:2750,bw0:400,bf1:650,lf1:400,bf2:650,lf2:400,li1:0,li2:0,
+    cnom:35,detr:10,concrete:'C50/60',steel:'S 500',confMode:'none',
+    fckc:59.31,ec2c:2.81,ecu2c:10.95,fckcw:55,ec2cw:2.48,ecu2cw:8.08,
+    bars:{b1c_n:4,b1c_d:25,b1s_n:2,b1s_d:25,b1l_n:9,b1l_d:25,b1l_r:3,
+          b2c_n:4,b2c_d:25,b2s_n:2,b2s_d:25,b2l_n:9,b2l_d:25,b2l_r:3,
+          in_d:12,in_s:150,in_r:2},
+    opts:opts||{}
+  };
+}
+
+/* ═══════════════════ CAZURI ═══════════════════ */
+
+group('Referinta externa — M_Rd fata de integrare exacta (fib)');
+REF.mrd.forEach(function(p,i){
+  test('REF-'+(i+1),
+    'M_Rd la N_Ed = '+p.N.toLocaleString('ro-RO')+' kN (compresiune)',
+    function(){
+      const m=JP.wall.buildModel(refInput());
+      const r=JP.wall.solve(m,p.N,1,'ro');
+      if(!r.ok)return truthy(false,r.code,'OK');
+      return near(r.value.Mrd,p.M,0.0005,'kNm');
+    },
+    'fib marin: '+p.M.toFixed(2)+' kNm · toleranta 0,05 %');
+});
+
+group('Referinta externa — capacitati axiale limita');
+test('LIM-1','N_Rd,c — compresiune centrica (pivot C)',function(){
+  const m=JP.wall.buildModel(refInput());
+  return near(JP.wall.axialLimits(m).NRdc,REF.limits.NRdcDomain,0.0001,'kN');
+},'Apexul domeniului de interactiune fib: '+43371.45.toFixed(2)+' kN. Otelul este limitat la Es·eps_c2 = 400 MPa, nu la f_yd.');
+test('LIM-1b','N_Rd,c material (fara pivot C) = limita fib',function(){
+  const m=JP.wall.buildModel(refInput());
+  return near(JP.wall.axialLimits(m).NRdc_mat,REF.limits.NRdc,0.0001,'kN');
+},'fib calculate_limit_axial_load(): '+REF.limits.NRdc.toFixed(2)+' kN — limita MATERIALA, nu rezistenta de calcul');
+test('LIM-2','N_Rd,t — intindere centrica',function(){
+  const m=JP.wall.buildModel(refInput());
+  return near(JP.wall.axialLimits(m).NRdt,REF.limits.NRdt,0.0005,'kN');
+},'fib: '+REF.limits.NRdt.toFixed(2)+' kN · mica diferenta din diametre echivalente');
+
+group('Conventii — trebuie sa fie adevarate prin construcție');
+test('CONV-1','Aria de beton este BRUTA: N_Rd,c = A_c·f_cd + A_s·f_yd',function(){
+  const m=JP.wall.buildModel(refInput());
+  const gross=(m.Ac*m.fcd + m.As_tot*m.fyd)/1e3;
+  return exact(JP.wall.axialLimits(m).NRdc_mat,gross,1e-6,'kN');
+},'Daca acest caz cade, s-a activat conventia "net" (A_c − A_s) — vezi DEDUCT_STEEL');
+test('CONV-2','Aria totala de armatura din gruparea in fibre',function(){
+  const m=JP.wall.buildModel(refInput());
+  return exact(m.As_tot,REF.section.As_tot,0.05,'mm²');
+},'15 bare per bulb + 18 bare in inima');
+test('CONV-3','eps_ud = 0,9 · eps_uk',function(){
+  const m=JP.wall.buildModel(refInput());
+  return exact(m.eud,REF.section.eps_ud,1e-12,'');
+},'SR EN 1992-1-1');
+
+group('Pozitia barelor peretelui — acoperirea mecanica (engine 2.2.0)');
+test('POS-1','Bara extrema la c_nom + Ø_etrier + Ø/2, nu pe fata bulbului',function(){
+  const m=JP.wall.buildModel(refInput());
+  const lmin=Math.min.apply(null,m.steelFibers.map(function(f){return f.l;}));
+  return exact(lmin,35+10+25/2,1e-9,'mm');
+},'Pana la engine 2.2.0 lumpul de capat statea la l = 0, adica exact pe marginea betonului');
+test('POS-2','Acoperire si etrier nule: bara ramane la Ø/2 de fata',function(){
+  const i=refInput(); i.cnom=0; i.detr=0;
+  const m=JP.wall.buildModel(i);
+  return exact(Math.min.apply(null,m.steelFibers.map(function(f){return f.l;})),12.5,1e-9,'mm');
+},'Aceeasi conditie ca la stalp (COLI-0b): centrul barei nu poate cadea pe fata sectiunii');
+test('POS-3','c_nom si Ø_etrier chiar misca M_Rd',function(){
+  const a=JP.wall.solve(JP.wall.buildModel(refInput()),20000,1,'ro');
+  const i2=refInput(); i2.cnom=0; i2.detr=0;
+  const b=JP.wall.solve(JP.wall.buildModel(i2),20000,1,'ro');
+  if(!a.ok||!b.ok)return truthy(false,'solver: '+a.code+' / '+b.code,'OK');
+  return truthy(b.value.Mrd>a.value.Mrd+1,
+    'c 35/10 → '+a.value.Mrd.toFixed(1)+' kNm; c 0/0 → '+b.value.Mrd.toFixed(1)+' kNm',
+    'acoperire mai mica → brat mai mare → M_Rd mai mare',
+    'Inainte de engine 2.2.0 aceste doua campuri nu aveau NICIUN efect asupra lui M_Rd.');
+},'Control negativ: prinde revenirea la barele asezate pe fata sectiunii');
+test('POS-4','Barele de pe latura lunga stau intre barele de colt',function(){
+  const m=JP.wall.buildModel(refInput());
+  const c=35+10+12.5, span=650-2*c;
+  const want=[c+span*0.25,c+span*0.5,c+span*0.75];
+  const got=m.steelFibers.filter(function(f){return f.l>c+1e-9&&f.l<650-c-1e-9;})
+                         .map(function(f){return f.l;}).sort(function(a,b){return a-b;});
+  const good=got.length===3&&got.every(function(v,i){return Math.abs(v-want[i])<1e-9;});
+  return truthy(good,got.map(function(v){return v.toFixed(2);}).join(', ')+' mm',
+    want.map(function(v){return v.toFixed(2);}).join(', ')+' mm');
+},'Ca la stalp: barele intermediare se distribuie intre CENTRELE barelor de colt');
+test('POS-5','Mutarea barelor nu schimba aria de armatura',function(){
+  const m=JP.wall.buildModel(refInput());
+  return exact(m.As_tot,REF.section.As_tot,0.05,'mm²');
+},'Se schimba numai bratul de parghie, deci M_Rd; N_Rd,c si N_Rd,t raman identice');
+
+group('Numere de bare care nu se pot dispune (engine 2.2.0)');
+test('BAR-1','Perete: 6 bare la colturi → BAR_COUNT, nu rotunjire tacuta',function(){
+  const i=refInput(); i.bars.b1c_n=6;
+  const r=JP.wall.solve(JP.wall.buildModel(i),20000,1,'ro');
+  return truthy(!r.ok&&r.code===JP.CODES.BAR_COUNT,r.ok?'ok:true':r.code,'BAR_COUNT',
+    r.message||'');
+},'Barele de la colturi se numara pe toate cele 4 colturi: un pachet la fiecare colt da 4, 8, 12 …');
+test('BAR-2','Perete: 12 bare la colturi (pachet de 3) trece',function(){
+  const i=refInput(); i.bars.b1c_n=12;
+  const r=JP.wall.solve(JP.wall.buildModel(i),20000,1,'ro');
+  return truthy(r.ok,r.ok?('M_Rd = '+r.value.Mrd.toFixed(1)+' kNm'):r.code,'rezultat valid');
+},'Asa se introduce un pachet de armatura la fiecare colt');
+test('BAR-3','Perete: 10 bare pe latura lunga in 3 randuri → BAR_COUNT',function(){
+  const i=refInput(); i.bars.b2l_n=10;
+  const r=JP.wall.solve(JP.wall.buildModel(i),20000,1,'ro');
+  return truthy(!r.ok&&r.code===JP.CODES.BAR_COUNT,r.ok?'ok:true':r.code,'BAR_COUNT');
+},'10 bare nu se impart exact in 3 randuri; inainte se modelau tacut 9');
+test('BAR-4','Stalp: 6 bare la colturi → BAR_COUNT',function(){
+  const r=JP.column.solve(JP.column.buildModel(refCol({cor_n:6})),1500,1,0,'ro');
+  return truthy(!r.ok&&r.code===JP.CODES.BAR_COUNT,r.ok?'ok:true':r.code,'BAR_COUNT',
+    'Inainte se modela tacut o sectiune cu 8 bare la colturi, adica +33 % pe grupul de colt.');
+},'Acelasi caz care in modulele 06 / 07 colora doar chenarul campului');
+test('BAR-5','Stalp: 12 bare la colturi trece si chiar modeleaza 12',function(){
+  const m=JP.column.buildModel(refCol({cor_n:12}));
+  const r=JP.column.solve(m,1500,1,0,'ro');
+  return truthy(r.ok&&m.cntCorner===12,
+    'cntCorner = '+m.cntCorner+(r.ok?', rezultat valid':', '+r.code),'12, rezultat valid');
+});
+test('BAR-6','Nodul refuza aceeasi sectiune imposibila',function(){
+  const beam={bw:250,hb:500,cnom:25,dsw:8,nt:2,dt:18,nb:3,db:16};
+  const col=function(n){return {N:1600,cor_n:n,cor_d:20,fb_n:2,fb_d:20,fh_n:1,fh_d:20};};
+  const mk=function(n){return JP.joint.buildModel({
+    concrete:'C30/37',steel:'S500B',steelW:'S500B',duct:'DCM',jointType:'int',level:'cur',
+    bc:1000,hc:300,cnom:35,dsw:8,lcl:3300,beamL:beam,beamR:beam,
+    colI:col(n),colS:col(4),
+    joint:{n1:2,d1:10,n2:2,d2:8,nSets:5,s:100,nCol:2,dCol:8,sCol:100}});};
+  const bad=JP.joint.solve(mk(6),'ro'), good=JP.joint.solve(mk(4),'ro');
+  return truthy(!bad.ok&&bad.code===JP.CODES.BAR_COUNT&&good.ok,
+    '6 bare → '+bad.code+' · 4 bare → '+(good.ok?'OK':good.code),
+    'BAR_COUNT · OK');
+},'M_Rd al stalpului intra in Sum M_Rc, deci o sectiune gresita ar muta tacit verificarea (5.4)');
+test('BAR-7','Mesajul spune ce numar si de ce, in limba ceruta',function(){
+  const ro=JP.column.solve(JP.column.buildModel(refCol({cor_n:6})),1500,1,0,'ro');
+  const en=JP.column.solve(JP.column.buildModel(refCol({cor_n:6})),1500,1,0,'en');
+  const good=/6/.test(ro.message)&&/multiplu de 4/.test(ro.message)
+           &&/6/.test(en.message)&&/multiple of 4/.test(en.message);
+  return truthy(good,'ro: "…'+ro.message.slice(48,96)+'…"','contine numarul si regula, RO si EN');
+});
+
+/* ─── Nodul de referinta (implicitele modulului 08) ─────────────────────── */
+function refJoint(over){
+  const beam={bw:250,hb:500,cnom:25,dsw:8,nt:2,dt:18,nb:3,db:16};
+  const col=function(N){return {N:N,cor_n:4,cor_d:20,fb_n:2,fb_d:20,fh_n:1,fh_d:20};};
+  return Object.assign({
+    concrete:'C30/37',steel:'S500B',steelW:'S500B',
+    duct:'DCM',jointType:'int',level:'cur',topLevel:false,fourBeams:false,
+    bc:1000,hc:300,cnom:35,dsw:8,lcl:3300,
+    beamL:beam,beamR:beam,colI:col(1600),colS:col(1600),
+    joint:{n1:2,d1:10,n2:2,d2:8,nSets:5,s:100,nCol:2,dCol:8,sCol:100}
+  },over||{});
+}
+function jsolve(over){const m=JP.joint.buildModel(refJoint(over));return {m:m,v:JP.joint.solve(m,'ro').value};}
+
+group('Nod de cadru — valori verificate independent (P 100-1/2013)');
+test('JNT-1','M_Rb cu blocul dreptunghiular echivalent',function(){
+  const j=jsolve();
+  // recalcul independent: x = As*fyd/(lam*eta*fcd*bw), z = d - lam*x/2
+  const A=function(d){return Math.PI*d*d/4;}, fyd=500/1.15, fcd=20;
+  const As=2*A(18), d=500-(25+8+9), x=As*fyd/(0.8*1.0*fcd*250), M=As*fyd*(d-0.8*x/2)/1e6;
+  return near(j.m.beamL.top.M,M,1e-9,'kNm');
+},'2Ø18 sus, sectiune 250×500, C30/37 — recalculat in test, nu preluat');
+test('JNT-2','Sum M_Rc din metoda fibrelor',function(){
+  const j=jsolve();
+  return near(j.v.SMRc,572.7165,1e-6,'kNm');
+},'Stalp lamelar 1000×300, N = 1600 kN pe fiecare: 2 × 286,36 kNm');
+test('JNT-3','(5.4) Sum M_Rc >= g_Rd Sum M_Rb',function(){
+  const j=jsolve();
+  return near(j.v.u54*100,43.9895,1e-4,'%');
+},'DCM: g_Rd = 1,2; Sum M_Rb = 96,45 + 113,50 = 209,95 kNm');
+test('JNT-4','b_j = min(b_c; b_w + 0,5 h_c) — (5.28)',function(){
+  const j=jsolve();
+  return exact(j.m.bj,Math.min(1000,250+0.5*300),1e-9,'mm');
+},'P 100 da o singura ramura pentru b_j, nu doua ca EC8');
+test('JNT-5','V_Rd,j = 0,30 b_j h_c f_cd — (5.26)',function(){
+  const j=jsolve();
+  return exact(j.v.VRdj,0.30*j.m.bj*300*20/1e3,1e-9,'kN');
+},'Forma simpla din P 100: fara nu_d, fara (1 - f_ck/250)');
+test('JNT-6','0,25 la noduri de capat — (5.27)',function(){
+  const j=jsolve({jointType:'end',beamR:null});
+  return exact(j.v.kDiag,0.25,1e-12,'');
+});
+test('JNT-7','nu_d este al STALPULUI INFERIOR',function(){
+  const a=jsolve({colI:{N:2400,cor_n:4,cor_d:20,fb_n:2,fb_d:20,fh_n:1,fh_d:20}});
+  const nud=2400e3/(1000*300*20);
+  return near(a.v.govAsh.nud,nud,1e-9,'');
+},'5.3.4.2.3(3): "nu_d corespunde fortei axiale a stalpului inferior" — difera de EC8');
+test('JNT-8','A_sh,nec — (5.29)',function(){
+  const j=jsolve();
+  const A=function(d){return Math.PI*d*d/4;}, fyd=500/1.15;
+  const As=2*A(18)+3*A(16), nud=1600e3/(1000*300*20);
+  return near(j.v.govAsh.AshReq,0.8*As*fyd*(1-0.8*nud)/fyd,1e-9,'mm²');
+},'Recalculat in test din As1+As2 si nu_d');
+test('JNT-9','Sporirea cu 20% la noduri de capat — (5.30)',function(){
+  const e=jsolve({jointType:'end',beamR:null});
+  const A=function(d){return Math.PI*d*d/4;}, fyd=500/1.15;
+  const nud=1600e3/(1000*300*20);
+  // A_s2 = armatura COMPRIMATA a grinzii, infasuratoarea celor doua sensuri
+  const Acomp=Math.max(2*A(18),3*A(16));
+  return near(e.v.govAsh.AshReq,1.2*0.8*Acomp*fyd*(1-0.8*nud)/fyd,1e-9,'mm²');
+},'"In cazul nodurilor exterioare armatura A_sh se sporeste cu 20%"');
+test('JNT-10','A_sv >= (2/3) A_sh (h_jc/h_jw) — (5.31)',function(){
+  const j=jsolve();
+  return near(j.v.AsvReq,(2/3)*j.m.AshProv*(j.m.hjc/j.m.hjw),1e-9,'mm²');
+},'h_jc = interax bare marginale stalp, h_jw = interax armaturi grinda');
+test('JNT-11','A_sv disponibil = colturi + bare pe adancimea nodului',function(){
+  const j=jsolve();
+  const A=function(d){return Math.PI*d*d/4;};
+  return near(j.v.AsvProv,(4+2)*A(20),1e-9,'mm²');
+},'(5.31) cere "armatura longitudinala intermediara a stalpului (situata intre barele de la colturi)"');
+
+group('V_c — stalpul de deasupra nodului (engine 2.3.0)');
+test('VC-1','V_c = 2 M_dc,sup / l_cl',function(){
+  const j=jsolve();
+  const s=j.v.govVj;
+  return near(s.Vc,2*s.MdcS*1e6/3300/1e3,1e-9,'kN');
+},'5.3.3.4(2): "forta taietoare din stalpul de deasupra nodului", cu 5.3.3.3(2)');
+test('VC-2','Pe linie de stalpi uniforma rezultatul nu s-a schimbat',function(){
+  const j=jsolve();
+  return near(j.v.govVj.Vc,63.6199,1e-3,'kN');
+},'Vechea formula (M_dc,inf+M_dc,sup)/l_cl dadea acelasi lucru cand cei doi stalpi sunt identici');
+test('VC-3','Stalp superior mai slab: V_c scade, V_jhd creste',function(){
+  const a=jsolve();
+  const b=jsolve({colS:{N:800,cor_n:4,cor_d:20,fb_n:2,fb_d:20,fh_n:1,fh_d:20}});
+  return truthy(b.v.govVj.Vc<a.v.govVj.Vc && b.v.govVj.Vjhd>a.v.govVj.Vjhd,
+    'V_c '+a.v.govVj.Vc.toFixed(1)+' → '+b.v.govVj.Vc.toFixed(1)+' kN, V_jhd '+
+    a.v.govVj.Vjhd.toFixed(1)+' → '+b.v.govVj.Vjhd.toFixed(1)+' kN',
+    'V_c mai mic, V_jhd mai mare',
+    'V_c se scade din V_jhd, deci o supraestimare este neacoperitoare. Vechea formula '+
+    'lua M_dc,inf al stalpului inferior, mai puternic, si supraestima V_c.');
+},'Control: prinde revenirea la formula care amesteca cei doi stalpi');
+test('VC-4','V_c nu mai depinde de stalpul inferior',function(){
+  const a=jsolve();
+  const b=jsolve({colI:{N:1600,cor_n:8,cor_d:20,fb_n:2,fb_d:20,fh_n:1,fh_d:20}});
+  // stalpul inferior mai puternic: M_dc,sup se schimba doar prin k = min(1, SMRb/SMRc)
+  const rap=b.v.govVj.Vc/(2*b.v.govVj.MdcS*1e6/3300/1e3);
+  return near(rap,1,1e-9,'');
+},'V_c ramane 2 M_dc,sup/l_cl oricare ar fi stalpul inferior');
+
+group('Alcatuirea nodului — verdict, nu procent (engine 2.3.0)');
+test('DET-1','Verificarea de alcatuire poarta pct:false',function(){
+  const j=jsolve();
+  const c=j.v.checks.find(function(x){return x.id==='det';});
+  return truthy(c&&c.pct===false,'pct = '+(c?String(c.pct):'lipseste'),'false');
+},'Modulele afiseaza doar VERIFICA / NU VERIFICA, fara procent');
+test('DET-2','Alcatuirea nu mai intra in "cea mai solicitata"',function(){
+  const j=jsolve();
+  const others=j.v.checks.filter(function(c){return !c.na&&c.pct!==false;})
+                         .map(function(c){return c.util;});
+  return truthy(Math.abs(j.v.worst-Math.max.apply(null,others))<1e-12 && j.v.uDet>=1,
+    'worst = '+(j.v.worst*100).toFixed(1)+' %, desi uDet = '+(j.v.uDet*100).toFixed(1)+' %',
+    'worst ia numai verificarile cu procent');
+},'Cu s = s_cr — cazul uzual — uDet este exact 100 % si parea o sectiune la limita');
+test('DET-3','Verdictul de alcatuire este neschimbat',function(){
+  const ok=jsolve();
+  const bad=jsolve({joint:{n1:2,d1:10,n2:2,d2:8,nSets:5,s:200,nCol:2,dCol:8,sCol:100}});
+  const cOk=ok.v.checks.find(function(c){return c.id==='det';});
+  const cNo=bad.v.checks.find(function(c){return c.id==='det';});
+  return truthy(cOk.ok&&!cNo.ok,'s = 100 → '+(cOk.ok?'ok':'nu')+', s = 200 → '+(cNo.ok?'ok':'nu'),
+    'ok / nu');
+},'Renuntarea la procent nu schimba ce trece si ce cade');
+
+group('Numeric — erori deja intalnite, nu trebuie sa reapara');
+test('NUM-1','Continuitatea sigC la eps_cu (limita de virgula mobila)',function(){
+  const m=JP.wall.buildModel(refInput());
+  const pr=m.props('web'), e=pr.ecu;
+  const below=JP.laws.sigC(e-1e-12,pr), at=JP.laws.sigC(e,pr), above=JP.laws.sigC(e+1e-12,pr);
+  const jump=Math.max(Math.abs(at-below),Math.abs(above-at));
+  return truthy(jump<1e-9 && above>0,
+    'salt = '+jump.toExponential(2)+' MPa, sigC(ecu+δ) = '+above.toFixed(4),
+    'salt ~ 0, fara cadere la 0',
+    'Anularea tensiunii peste ecu producea dinti de fierastrau in N(X) si '+
+    'impiedica bisectia sa atinga echilibrul exact.');
+},'Palierul f_cd continua peste eps_cu; eps_cu este limita domeniului, nu un prag');
+test('NUM-2','Parabola: sigC(eps_c2/2) = 0,75 · f_cd',function(){
+  const m=JP.wall.buildModel(refInput());
+  const pr=m.props('web');
+  return exact(JP.laws.sigC(pr.ec2/2,pr), 0.75*pr.fcd, 1e-10,'MPa');
+},'Verifica forma legii parabola-dreptunghi, nu doar capetele');
+test('NUM-3','Convergenta cu numarul de fibre NF',function(){
+  const NFs=[100,1000,5000,20000];
+  const exactM=REF.mrd.find(function(p){return p.N===20000;}).M;
+  const v=NFs.map(function(nf){
+    const m=JP.wall.buildModel(refInput({NF:nf}));
+    const r=JP.wall.solve(m,20000,1,'ro');
+    return r.ok?r.value.Mrd:NaN;
+  });
+  // Criteriul corect este ca EROAREA fata de integrarea exacta sa scada cu NF.
+  // Sensul apropierii (de sus sau de jos) depinde de caz si nu trebuie impus:
+  // pe acest perete convergenta este de sus, catre 18054,62 kNm.
+  const err=v.map(function(x){return Math.abs(x-exactM)/exactM;});
+  const scade=err[0]>err[1]&&err[1]>err[2]&&err[2]>err[3];
+  return truthy(scade&&err[2]<0.0005,
+    'NF '+NFs.map(function(n,i){return n+'→'+v[i].toFixed(1);}).join(', ')+
+    ' kNm; eroare '+(err[0]*100).toFixed(3)+' % → '+(err[3]*100).toFixed(4)+' %',
+    'eroare strict descrescatoare, < 0,05 % la NF = 5000',
+    'Integrarea este in trepte: precizia se obtine marind NF, nu prin mai multe '+
+    'iteratii de bisectie — functia sare peste tinta.');
+},'Convergenta se masoara fata de integrarea exacta (fib), nu fata de un sens presupus');
+
+group('Echilibru — rezidualul trebuie sa fie nul, nu doar mic');
+[30000,20000,5000,0].forEach(function(N,i){
+  test('EQ-'+(i+1),'N_int = N_Ed la N = '+N.toLocaleString('ro-RO')+' kN',function(){
+    const m=JP.wall.buildModel(refInput());
+    const r=JP.wall.solve(m,N,1,'ro');
+    if(!r.ok)return truthy(false,r.code,'OK');
+    return exact(r.value.Nint,N,1e-6,'kN');
+  },'Un rezidual semnificativ inseamna M_Rd nevalabil');
+});
+
+group('Pivot A — limitarea deformatiei otelului');
+test('PIV-1','Compresiune mare: guverneaza betonul',function(){
+  const m=JP.wall.buildModel(refInput());
+  const r=JP.wall.solve(m,20000,1,'ro');
+  return truthy(r.ok&&r.value.pivot==='concrete',r.ok?r.value.pivot:r.code,'concrete');
+},'La X = 1724 mm otelul intins este departe de eps_ud');
+test('PIV-2','Intindere: guverneaza otelul',function(){
+  const m=JP.wall.buildModel(refInput());
+  const r=JP.wall.solve(m,-4000,1,'ro');
+  return truthy(r.ok&&r.value.pivot==='steel',r.ok?r.value.pivot:r.code,'steel');
+},'Pivotul A devine activ pe ramura de intindere');
+test('PIV-3','Nicio bara nu depaseste eps_ud',function(){
+  const m=JP.wall.buildModel(refInput());
+  const r=JP.wall.solve(m,-4000,1,'ro');
+  if(!r.ok)return truthy(false,r.code,'OK');
+  // Reconstruieste planul de deformatii si ia cea mai intinsa bara.
+  const X=r.value.X, cfr=r.value.compFromRef, L=m.lw;
+  let worst=0;
+  m.steelFibers.forEach(function(sf){
+    const lc=cfr?sf.l:(L-sf.l);
+    const eps=r.value.epsEdge*(X-lc)/X;
+    if(eps<worst)worst=eps;   // intindere = negativ
+  });
+  return truthy(Math.abs(worst)<=m.eud*(1+1e-9),
+    'eps_s,max = '+(Math.abs(worst)*1000).toFixed(3)+' permil',
+    '≤ '+(m.eud*1000).toFixed(1)+' permil');
+},'Verifica direct planul de deformatii, nu doar eticheta pivotului');
+test('PIV-4','Fara pivot A, aceeasi sectiune depaseste eps_ud',function(){
+  const m=JP.wall.buildModel(refInput({LIMIT_EPS_UD:false}));
+  const r=JP.wall.solve(m,-6000,1,'ro');
+  if(!r.ok)return truthy(true,r.code+' (nerezolvabil fara pivot A)','depasire sau nerezolvare');
+  const X=r.value.X,cfr=r.value.compFromRef,L=m.lw;
+  let worst=0;
+  m.steelFibers.forEach(function(sf){
+    const lc=cfr?sf.l:(L-sf.l);
+    const eps=r.value.epsEdge*(X-lc)/X;
+    if(eps<worst)worst=eps;
+  });
+  return truthy(Math.abs(worst)>m.eud,
+    'eps_s,max = '+(Math.abs(worst)*1000).toFixed(2)+' permil',
+    '> '+(m.eud*1000).toFixed(1)+' permil (arata de ce e nevoie de pivot A)');
+},'Control negativ: demonstreaza ca limitarea chiar face ceva');
+
+group('Geometrie');
+test('GEO-1','CG geometric la mijloc pentru sectiune simetrica',function(){
+  const m=JP.wall.buildModel(refInput());
+  return exact(JP.core.geomCG(m),m.lw/2,1e-9,'mm');
+},'La bulbi identici, CG = l_w/2');
+test('GEO-2','CG se deplaseaza spre bulbul mai mare',function(){
+  const inp=refInput(); inp.lf1=700;            // bulb 1 mai lat
+  const m=JP.wall.buildModel(inp);
+  const cg=JP.core.geomCG(m);
+  return truthy(cg>m.lw/2,cg.toFixed(1)+' mm','> '+(m.lw/2).toFixed(1)+' mm');
+},'Bulbul 1 este la capatul indepartat de referinta (l = l_w)');
+
+group('Contractul de stare — eroarea trebuie sa fie explicita');
+test('ST-1','N peste capacitate: NO_BRACKET cu limita depasita',function(){
+  const m=JP.wall.buildModel(refInput());
+  const r=JP.wall.solve(m,60000,1,'ro');
+  const good=!r.ok && r.code===JP.CODES.NO_BRACKET && r.partial && r.partial.exceeded;
+  return truthy(good,
+    (r.ok?'ok:true':r.code+(r.partial&&r.partial.exceeded?' · '+r.partial.exceeded.limit+' = '+r.partial.exceeded.value.toFixed(0)+' kN':'')),
+    'NO_BRACKET + partial.exceeded');
+},'Nu se intoarce niciodata un numar plauzibil fara stare');
+test('ST-2','Sectiune degenerata: nu trece ca rezultat valid',function(){
+  const inp=refInput();
+  inp.lw=0;inp.bw0=0;inp.bf1=0;inp.bf2=0;inp.lf1=0;inp.lf2=0;
+  Object.keys(inp.bars).forEach(function(k){inp.bars[k]=0;});
+  let r;
+  try{ r=JP.wall.solve(JP.wall.buildModel(inp),1000,1,'ro'); }
+  catch(e){ return truthy(true,'excepție prinsa: '+e.message,'ok:false'); }
+  return truthy(!r.ok,r.ok?'ok:true':r.code,'ok:false');
+},'Geometrie nula nu trebuie sa produca un M_Rd');
+test('ST-3','Mesajul de eroare este in limba cerută',function(){
+  const m=JP.wall.buildModel(refInput());
+  const ro=JP.wall.solve(m,60000,1,'ro'), en=JP.wall.solve(m,60000,1,'en');
+  return truthy(ro.message!==en.message&&/capacitat/i.test(ro.message)&&/capacity/i.test(en.message),
+    'ro: "'+ro.message.slice(0,34)+'…" / en: "'+en.message.slice(0,30)+'…"',
+    'mesaje distincte RO / EN');
+});
+
+/* ─── Stalp de referinta (implicitele modulului 06) ─────────────────────── */
+function refCol(over,opts){
+  return Object.assign({
+    b:500,h:500,cnom:35,detr:8,concrete:'C30/37',steel:'S 500',confMode:'none',
+    fckc:35,ec2c:2.20,ecu2c:5.50,
+    cor_n:4,cor_d:20, topb_n:2,topb_d:20, sidh_n:2,sidh_d:20,
+    opts:opts||{}
+  },over||{});
+}
+// fib structuralcodes v0.7.2, integrator marin, aceeasi sectiune si aceleasi bare.
+// |M_Rd| pe directii din primul cadran, la N = 1500 kN compresiune.
+const COLREF={N:1500, As_tot:3769.911, NRdc:6639.09, NRdcDomain:6507.96, NRdt:-1639.09,
+  M:[{psi:0,M:508.52},{psi:45,M:438.29},{psi:90,M:508.52}]};
+
+group('Stalp biaxial — referinta externa (fib, integrare exacta)');
+COLREF.M.forEach(function(p,i){
+  test('COL-'+(i+1),'|M_Rd| pe directia '+p.psi+'°, N = '+COLREF.N+' kN',function(){
+    const m=JP.column.buildModel(refCol());
+    const a=p.psi*Math.PI/180;
+    const r=JP.column.solve(m,COLREF.N,Math.cos(a),Math.sin(a),'ro');
+    if(!r.ok)return truthy(false,r.code,'OK');
+    return near(Math.hypot(r.value.MyRd,r.value.MzRd),p.M,0.0005,'kNm');
+  },'fib marin: '+p.M.toFixed(2)+' kNm · toleranta 0,05 % (malaj '+JP.DEFAULTS.NGY+'×'+JP.DEFAULTS.NGZ+')');
+});
+test('COL-4','N_Rd,c fata de apexul domeniului fib (pivot C)',function(){
+  const m=JP.column.buildModel(refCol());
+  return near(JP.column.axialLimits(m).NRdc,COLREF.NRdcDomain,0.0001,'kN');
+},'fib domain apex si XD-CoSec: '+COLREF.NRdcDomain.toFixed(2)+' kN');
+test('COL-4b','N_Rd,c material = limita fib',function(){
+  const m=JP.column.buildModel(refCol());
+  return near(JP.column.axialLimits(m).NRdc_mat,COLREF.NRdc,0.0001,'kN');
+},'fib calculate_limit_axial_load(): '+COLREF.NRdc.toFixed(2)+' kN');
+test('COL-5','N_Rd,t fata de fib',function(){
+  const m=JP.column.buildModel(refCol());
+  return near(JP.column.axialLimits(m).NRdt,COLREF.NRdt,0.0001,'kN');
+},'fib: '+COLREF.NRdt.toFixed(2)+' kN');
+
+group('Pivot C — sectiune integral comprimata (SR EN 1992-1-1 fig. 6.1)');
+test('PC-1','sigma_s la compresiune centrica = Es·eps_c2, nu f_yd',function(){
+  const m=JP.column.buildModel(refCol());
+  const lim=JP.column.axialLimits(m);
+  return exact(lim.sigS_c,Math.min(m.fyd,m.Es*0.002),1e-9,'MPa');
+},'S500: f_yd/Es = 2,174 permil > eps_c2 = 2 permil, deci otelul ramane la 400 MPa');
+test('PC-2','Pivotul C este continuu cu pivotul B la X = H',function(){
+  const m=JP.column.buildModel(refCol());
+  const p=JP.column.project(0,m);
+  const a=JP.column.forces(p.H*0.9999,0,m,p);
+  const b=JP.column.forces(p.H*1.0001,0,m,p);
+  const d=Math.abs(a.epsEdge-b.epsEdge)/a.epsEdge;
+  return truthy(d<1e-3,'eps_edge '+a.epsEdge.toExponential(4)+' -> '+b.epsEdge.toExponential(4),
+    'fara salt la trecerea X = H');
+},'Formula eps_c2·X/(X−d_C) da exact eps_cu la X = H');
+test('PC-3','La X foarte mare deformatia tinde la eps_c2',function(){
+  const m=JP.column.buildModel(refCol());
+  const p=JP.column.project(0,m);
+  const r=JP.column.forces(p.H*1e6,0,m,p);
+  return near(r.epsEdge,0.002,1e-4,'');
+},'Compresiune centrica: deformatie uniforma = eps_c2');
+test('PC-4','Pivotul C intra in actiune numai la N mare',function(){
+  const m=JP.column.buildModel(refCol());
+  const lo=JP.column.solve(m,1500,1,0,'ro').value;
+  const hi=JP.column.solve(m,6288,1,0,'ro').value;
+  return truthy(lo.pivot==='concrete'&&hi.pivot==='squash',
+    'N=1500 -> '+lo.pivot+', N=6288 -> '+hi.pivot,'concrete / squash');
+},'Sub ~5800 kN rezultatele sunt identice cu cele fara pivot C');
+test('PC-5','Fara pivot C rezultatul era in sens defavorabil',function(){
+  const withC=JP.column.solve(JP.column.buildModel(refCol()),6288,1,0,'ro').value;
+  const noC=JP.column.solve(JP.column.buildModel(refCol(null,{LIMIT_PIVOT_C:false})),6288,1,0,'ro').value;
+  const Mw=Math.hypot(withC.MyRd,withC.MzRd), Mn=Math.hypot(noC.MyRd,noC.MzRd);
+  return truthy(Mn>Mw*1.1,'cu pivot C '+Mw.toFixed(2)+' kNm, fara '+Mn.toFixed(2)+' kNm (+'+
+    ((Mn/Mw-1)*100).toFixed(1)+' %)','fara pivot C supraestimeaza cu peste 10 %');
+},'Control negativ: arata de ce schimbarea era necesara. fib domain: 56,92 kNm');
+test('PC-6','La perete pivotul C da exact apexul domeniului fib',function(){
+  const m=JP.wall.buildModel(refInput());
+  return near(JP.wall.axialLimits(m).NRdc,43371.45,0.0001,'kN');
+},'fib domain apex pentru M03-W1');
+
+group('Stalp biaxial — conventii si invarianti');
+test('COLI-0','Centrul barei la c_nom + etrier + Ø/2 (acoperire mecanica)',function(){
+  const m=JP.column.buildModel(refCol());
+  const cmec=35+8+20/2;
+  return exact(250-m.halfY,cmec,1e-9,'mm');
+},'XD-CoSec: c_mec = 5,3 cm. Cu acoperire si etrier nule centrul barei trebuie sa ramana la Ø/2 de fata.');
+test('COLI-0b','Acoperire 0 + etrier 0 nu aseaza bara pe fata',function(){
+  const m=JP.column.buildModel(refCol({cnom:0,detr:0}));
+  return exact(m.halfY,250-20/2,1e-9,'mm');
+},'Bug reparat in engine v1.6.0: inainte centrul cadea exact pe fata sectiunii');
+test('COLI-0c','Diametre diferite pe laturi dau decalaje diferite',function(){
+  const m=JP.column.buildModel(refCol({cor_d:25,topb_d:12}));
+  // Bara mai subtire sta mai APROAPE de fata, pentru ca decalajul este Ø/2:
+  // colt Ø25 -> 250-(35+8+12,5) = 194,5 ; sus/jos Ø12 -> 250-(35+8+6) = 201.
+  const zCorner=Math.abs(m.steelFibers[0].z);
+  const zTop=Math.max.apply(null,m.steelFibers.map(function(f){return Math.abs(f.z);}));
+  const okC=Math.abs(zCorner-(250-(35+8+25/2)))<1e-9;
+  const okT=Math.abs(zTop-(250-(35+8+12/2)))<1e-9;
+  return truthy(okC&&okT&&zTop>zCorner,
+    'colt Ø25 la '+zCorner.toFixed(1)+' mm, sus/jos Ø12 la '+zTop.toFixed(1)+' mm',
+    '194,5 si 201,0 mm (bara subtire mai aproape de fata)');
+},'Decalajul este Ø/2 pentru fiecare grup, deci barele nu stau pe aceeasi linie');
+test('COLI-1','Aria de beton este BRUTA si la stalp',function(){
+  const m=JP.column.buildModel(refCol());
+  const gross=(m.Ac*m.fcd+m.As_tot*m.fyd)/1e3;
+  return exact(JP.column.axialLimits(m).NRdc_mat,gross,1e-6,'kN');
+},'Daca acest caz cade, modulul 06 a revenit la conventia "net" din versiunea 1.x');
+test('COLI-2','Conventia bruta da rezultate MAI MARI decat cea neta',function(){
+  const g=JP.column.solve(JP.column.buildModel(refCol()),1500,1,0.75,'ro').value;
+  const n=JP.column.solve(JP.column.buildModel(refCol(null,{DEDUCT_STEEL:true})),1500,1,0.75,'ro').value;
+  const Mg=Math.hypot(g.MyRd,g.MzRd), Mn=Math.hypot(n.MyRd,n.MzRd);
+  return truthy(Mg>Mn,'brut '+Mg.toFixed(1)+' > net '+Mn.toFixed(1)+' kNm ('+
+    ((Mg/Mn-1)*100).toFixed(2)+' %)','brut > net');
+},'Documenteaza sensul si marimea schimbarii fata de versiunea 1.x');
+test('COLI-3','Aria de armatura din dispunerea pe contur',function(){
+  const m=JP.column.buildModel(refCol());
+  return exact(m.As_tot,COLREF.As_tot,0.01,'mm²');
+},'4 colturi + 2×2 lateral + 2×2 lateral = 12 bare Ø20');
+test('COLI-4','Simetrie dubla: |M| la ψ = |M| la 90−ψ',function(){
+  const m=JP.column.buildModel(refCol());
+  function Mat(psi){
+    const a=psi*Math.PI/180;
+    const r=JP.column.solve(m,1500,Math.cos(a),Math.sin(a),'ro');
+    return Math.hypot(r.value.MyRd,r.value.MzRd);
+  }
+  const d=Math.abs(Mat(20)-Mat(70))/Mat(20);
+  return truthy(d<1e-4,'|M|(20°) = '+Mat(20).toFixed(3)+', |M|(70°) = '+Mat(70).toFixed(3),
+    'egale pentru sectiune patrata simetric armata');
+},'Sectiunea 500×500 cu armare simetrica trebuie sa fie simetrica fata de diagonala');
+test('COLI-5','Punctul capabil cade pe directia ceruta',function(){
+  const m=JP.column.buildModel(refCol());
+  const psi=33*Math.PI/180;
+  const r=JP.column.solve(m,1500,Math.cos(psi),Math.sin(psi),'ro');
+  const got=Math.atan2(r.value.MzRd,r.value.MyRd);
+  return truthy(Math.abs(got-psi)<1e-4,
+    (got*180/Math.PI).toFixed(4)+'°','33.0000°');
+},'Inversarea theta_na -> unghiul momentului trebuie sa fie exacta');
+test('COLI-6','Echilibru: N_int = N_Ed',function(){
+  const m=JP.column.buildModel(refCol());
+  const r=JP.column.solve(m,1500,120,90,'ro');
+  return exact(r.value.Nint,1500,1e-4,'kN');
+});
+test('COLI-7','Conturul My-Mz are NANG puncte si este inchis',function(){
+  const m=JP.column.buildModel(refCol());
+  const c=JP.column.traceCurve(1500,m);
+  const r0=Math.hypot(c[0].My,c[0].Mz);
+  const rHalf=Math.hypot(c[Math.floor(c.length/2)].My,c[Math.floor(c.length/2)].Mz);
+  return truthy(c.length===m.NANG && Math.abs(r0-rHalf)/r0<1e-4,
+    c.length+' puncte, raza la 0° = '+r0.toFixed(2)+', la 180° = '+rHalf.toFixed(2),
+    m.NANG+' puncte, raze egale la 0° si 180°');
+});
+test('COLI-8','N peste capacitate: NO_BRACKET',function(){
+  const m=JP.column.buildModel(refCol());
+  const r=JP.column.solve(m,9000,120,90,'ro');
+  return truthy(!r.ok&&r.code===JP.CODES.NO_BRACKET&&r.partial&&r.partial.exceeded,
+    r.ok?'ok:true':r.code,'NO_BRACKET + partial.exceeded');
+});
+
+/* ─── Sectiunea de referinta pentru forta taietoare (implicitele modulului 04) ── */
+function refShear(over){
+  return Object.assign({
+    wallType:'Bulb+inima',lw:2400,bw0:300,bf:500,cnom:35,
+    concrete:'C30/37',steel:'S 500',muf:0.7,
+    oh:10,sh:100,nr:2, ss:100,oswp:8,nswp:2,oswi:8,loswi:190,nei:1,nswi:2,
+    ol:10,sl:150,nrl:2, obb1:14,nbb1:8, obb2:14,nbb2:8
+  },over||{});
+}
+// Valori verificate manual si comparate cu ieșirea modulului 04 v1.0 (care
+// folosea f_yd rotunjit la 434,8 — de aici diferenta de 0,004 % pe V_Rd,s).
+const SHREF={Acw:720000,scp:0.6944444,VRdmaxA:2157.36,VRdmaxB:2575.95,
+  Ash:3769.911,VRdsA:1639.09,vsB1:250.0,VRdsB:1889.09,
+  lweb:1260,AsvWeb:1319.469,asvb1:1231.504,VRdiWeb:751.58,VRdiBulb:1126.38,
+  govA:1126.38,govB:1126.38};
+
+group('Forta taietoare — regresie fata de valori verificate manual');
+[['Acw','A_cw = l_w·b_w0','mm²'],['VRdmaxA','V_Rd,max zona critica','kN'],
+ ['VRdmaxB','V_Rd,max zona non-critica','kN'],['Ash','A_sh taiata de fisura','mm²'],
+ ['VRdsA','V_Rd,s zona critica','kN'],['VRdsB','V_Rd,s zona non-critica','kN'],
+ ['lweb','l_web = l_w − 2b_f − 4c_nom','mm'],['AsvWeb','A_sv,inima','mm²'],
+ ['VRdiBulb','V_Rd,i (inima + bulb intins)','kN'],
+ ['govA','V_Rd guvernant zona critica','kN']
+].forEach(function(row,i){
+  const key=row[0];
+  test('SH-'+(i+1),row[1],function(){
+    const m=JP.shear.buildModel(refShear());
+    const r=JP.shear.solve(m,500,500,'ro');
+    if(!r.ok)return truthy(false,r.code,'OK');
+    return near(r.value[key],SHREF[key],0.0002,row[2]);
+  },'Perete 2400×300, bulbi 500, C30/37, S 500, V_Ed = 500 kN, N_Ed = 500 kN');
+});
+
+group('Forta taietoare — invarianti de formula');
+test('SHI-1','Raportul V_Rd,max B/A = 0,80 / 0,67',function(){
+  const m=JP.shear.buildModel(refShear());
+  const r=JP.shear.solve(m,500,500,'ro');
+  return exact(r.value.VRdmaxB/r.value.VRdmaxA, 0.80/0.67, 1e-12,'');
+},'Prinde o modificare a coeficienților, chiar daca ambele valori se schimba');
+test('SHI-2','A_sh recalculata independent (mod inima)',function(){
+  const inp=refShear(); const m=JP.shear.buildModel(inp);
+  const r=JP.shear.solve(m,500,500,'ro');
+  const indep=inp.nr*inp.lw/inp.sh*JP.barArea(inp.oh);
+  return exact(r.value.Ash,indep,1e-9,'mm²');
+},'n_r·l_w/s_h · πØ²/4');
+test('SHI-3','f_yd este exact f_yk/1,15, nu rotunjit',function(){
+  const m=JP.shear.buildModel(refShear());
+  return exact(m.fyd, 500/1.15, 1e-12,'MPa');
+},'Modulul 04 folosea 434,8 → rezultatele lui se schimba cu ~0,004 %');
+test('SHI-4','V_Rd guvernant = min(V_Rd,max, V_Rd,s, V_Rd,i)',function(){
+  const m=JP.shear.buildModel(refShear());
+  const v=JP.shear.solve(m,500,500,'ro').value;
+  return exact(v.govA, Math.min(v.VRdmaxA,v.VRdsA,v.VRdiBulb), 1e-12,'kN');
+});
+test('SHI-5','Tipul "Bulb": fara inima, cu etrieri taiati',function(){
+  const m=JP.shear.buildModel(refShear({wallType:'Bulb'}));
+  const r=JP.shear.solve(m,500,500,'ro');
+  const good=m.lweb===0 && r.value.vsDetail.mode==='stir' && r.value.AsvWeb===0;
+  return truthy(good,'l_web = '+m.lweb+' mm, mod = '+r.value.vsDetail.mode+
+    ', A_sv,inima = '+r.value.AsvWeb,'l_web = 0, mod = stir, A_sv,inima = 0');
+},'La perete lamelar fara inima, V_Rd,s vine din etrieri, nu din armatura orizontala');
+test('SHI-6','Lungimea ramurii perimetrale l_w − 2c − 2Ø',function(){
+  const inp=refShear({wallType:'Bulb'});
+  const m=JP.shear.buildModel(inp);
+  return exact(m.loswp, inp.lw-2*inp.cnom-2*inp.oswp, 1e-9,'mm');
+});
+test('SHI-7','Termenul cu armaturi inclinate — CR 2 rel. (5.7)',function(){
+  const inp=refShear({nsi:4,osi:16,alphaSi:45});
+  const m=JP.shear.buildModel(inp);
+  const r=JP.shear.solve(m,500,500,'ro');
+  const a=45*Math.PI/180;
+  const indep=4*JP.barArea(16)*m.fyd*(Math.cos(a)+m.muf*Math.sin(a))/1e3;
+  return exact(r.value.VRdIncl,indep,1e-9,'kN');
+},'SUM A_si·f_yd,i·(cos α + μ_f·sin α), recalculat independent');
+test('SHI-8','Fara bare inclinate termenul este nul si nu muta nimic',function(){
+  const a=JP.shear.solve(JP.shear.buildModel(refShear()),500,500,'ro').value;
+  const b=JP.shear.solve(JP.shear.buildModel(refShear({nsi:0,osi:0})),500,500,'ro').value;
+  return truthy(a.VRdIncl===0 && a.VRdiBulb===b.VRdiBulb &&
+                Math.abs(a.VRdiBulb-SHREF.VRdiBulb)/SHREF.VRdiBulb<0.0002,
+    'termen = '+a.VRdIncl.toFixed(1)+' kN, V_Rd,i = '+a.VRdiBulb.toFixed(2)+' kN',
+    '0 kN si V_Rd,i = '+SHREF.VRdiBulb+' kN');
+},'Garanteaza ca adaugarea termenului nu a schimbat rezultatele anterioare');
+
+group('Forta taietoare — intinderea trebuie semnalata, nu ascunsa');
+test('SHT-1','Intinderea face sigma_cp negativ',function(){
+  const m=JP.shear.buildModel(refShear());
+  const r=JP.shear.solve(m,500,-1500,'ro');
+  return truthy(r.value.scp<0,r.value.scp.toFixed(4)+' MPa','< 0');
+},'N < 0 = intindere in conventia interna a nucleului');
+test('SHT-2','Capacitatile negative sunt aduse la zero si semnalate',function(){
+  const m=JP.shear.buildModel(refShear());
+  const r=JP.shear.solve(m,500,-6000,'ro');
+  const codes=(r.warnings||[]).map(function(w){return w.code;});
+  const good=r.value.VRdiBulb===0 && r.value.govA===0 &&
+             codes.indexOf('NEG_CAPACITY')>=0 && codes.indexOf('TENSION')>=0;
+  return truthy(good,'V_Rd,i = '+r.value.VRdiBulb.toFixed(1)+' kN, avertismente: '+codes.join(', '),
+    'V_Rd,i = 0 + NEG_CAPACITY + TENSION');
+},'O rezistenta negativa nu este un rezultat; ar aparea ca numar valid in raport');
+test('SHT-3','Clasa cu euk presupus produce avertisment',function(){
+  const m=JP.shear.buildModel(refShear({steel:'S 355'}));
+  const r=JP.shear.solve(m,500,500,'ro');
+  const codes=(r.warnings||[]).map(function(w){return w.code;});
+  return truthy(codes.indexOf('EUK_ASSUMED')>=0,codes.join(', ')||'niciun avertisment','EUK_ASSUMED');
+},'S 235…S 420 provin din modulul 04, unde euk nu a fost niciodata declarat');
+test('SHT-4','Aceeasi clasa avertizeaza si in metoda fibrelor (pivot A)',function(){
+  const inp=refInput(); inp.steel='S 355';
+  const m=JP.wall.buildModel(inp);
+  const r=JP.wall.solve(m,20000,1,'ro');
+  const codes=(r.warnings||[]).map(function(w){return w.code;});
+  return truthy(codes.indexOf('EUK_ASSUMED')>=0,codes.join(', ')||'niciun avertisment','EUK_ASSUMED');
+},'Pivotul A depinde de euk, deci avertismentul conteaza mai mult aici');
+
+/* ═══════════════════ RULARE ═══════════════════ */
+function run(){
+  const tb=document.querySelector('#tbl tbody');
+  let html='', tot=0, ok=0, maxDev=0;
+  const t0=performance.now();
+
+  html+='<tr><th style="width:74px">Caz</th><th>Descriere</th>'+
+        '<th class="r">Obtinut</th><th class="r">Asteptat</th>'+
+        '<th class="r">Abatere</th><th class="r" style="width:34px"></th></tr>';
+
+  CASES.forEach(function(c){
+    if(c.group){html+='<tr><td class="grphd" colspan="6">'+c.group+'</td></tr>';return;}
+    let res;
+    try{ res=c.fn(); }
+    catch(e){ res={pass:false,got:'excepție: '+e.message,exp:'—',dev:null,tol:null}; }
+    tot++; if(res.pass)ok++;
+    if(res.dev!==null&&res.dev!==undefined&&isFinite(res.dev)&&res.dev>maxDev)maxDev=res.dev;
+    const devTxt=(res.dev!==null&&res.dev!==undefined&&isFinite(res.dev))
+      ? (res.dev*100).toFixed(4)+' %' : (res.extra?'':'—');
+    html+='<tr'+(res.pass?'':' class="bad"')+'>'+
+      '<td><span class="cid">'+c.id+'</span></td>'+
+      '<td><div class="cdesc">'+c.desc+'</div>'+
+        (c.note?'<div class="cnote">'+c.note+'</div>':'')+
+        (res.extra?'<div class="cnote">'+res.extra+'</div>':'')+'</td>'+
+      '<td class="r">'+res.got+'</td>'+
+      '<td class="r">'+res.exp+'</td>'+
+      '<td class="r">'+devTxt+
+        (res.tol?'<div class="cnote">tol. '+(res.tol*100).toFixed(3)+' %</div>':'')+'</td>'+
+      '<td class="r"><span class="badge '+(res.pass?'ok':'no')+'">'+(res.pass?'✓':'✕')+'</span></td>'+
+    '</tr>';
+  });
+
+  const ms=performance.now()-t0;
+  tb.innerHTML=html;
+
+  const no=tot-ok, allPass=(no===0);
+  document.getElementById('s_tot').textContent=tot;
+  document.getElementById('s_ok').textContent=ok;
+  const noEl=document.getElementById('s_no');
+  noEl.textContent=no; noEl.className='sv '+(no?'no':'ok');
+  document.getElementById('s_dev').textContent=(maxDev*100).toFixed(4)+' %';
+  document.getElementById('s_ms').textContent=ms.toFixed(0)+' ms';
+
+  const v=document.getElementById('verdict');
+  v.className='verdict '+(allPass?'pass':'fail');
+  document.getElementById('vbig').textContent=allPass?'VALIDAT':'CADE';
+  document.getElementById('vsub').innerHTML=allPass
+    ? 'Toate cele '+tot+' cazuri trec. Abatere maxima fata de referinta: <b>'+
+      (maxDev*100).toFixed(4)+' %</b>.'
+    : '<b>'+no+'</b> din '+tot+' cazuri cad. Nucleul s-a schimbat numeric &mdash; '+
+      'nu folosiți rezultate pentru proiectare pana la clarificare.';
+
+  document.getElementById('p_src').textContent=REF.source+' · generata '+REF.generated;
+  document.getElementById('p_sec').textContent=REF.section.desc;
+  document.getElementById('p_eng').textContent=JP.VERSION;
+  document.getElementById('p_conv').textContent=JP.DEFAULTS.DEDUCT_STEEL?'net (A_c − A_s)':'brut (A_c)';
+  document.getElementById('p_pivot').textContent=JP.DEFAULTS.LIMIT_EPS_UD?'activ':'inactiv';
+  document.getElementById('versionFooter').textContent=
+    'JP Design · Validare v'+PAGE_VERSION+' · engine v'+JP.VERSION+' · CR 2-1-1.1/2022';
+}
+
+if(typeof JP==='undefined'){
+  document.getElementById('verdict').className='verdict fail';
+  document.getElementById('vbig').textContent='EROARE';
+  document.getElementById('vsub').textContent=
+    'engine.js nu s-a incarcat. Verificati ca fisierul este in acelasi folder cu aceasta pagina.';
+}else{
+  run();
+}
+</script>
+</body>
+</html>

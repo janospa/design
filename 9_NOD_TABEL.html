@@ -1,0 +1,1375 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#F5F5F7">
+<meta name="description" content="Verificare nod de cadru in tabel — un rand pe nivel, pe o linie de stalp, cu seturi de armare reutilizabile — P 100-1/2013">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='13' y='2' width='6' height='28' rx='1' fill='%238E8E93'/><rect x='2' y='6' width='28' height='4' rx='1' fill='%23C7C7CC'/><rect x='2' y='14' width='28' height='4' rx='1' fill='%23C7C7CC'/><rect x='2' y='22' width='28' height='4' rx='1' fill='%23C7C7CC'/></svg>">
+<title>Nod de cadru — verificare pe niveluri — JP Design</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1C1E}
+.wrap{max-width:1400px;margin:0 auto;padding:20px 16px}
+.slabel{font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:#1C1C1E;padding:0 0 7px;margin-top:14px}
+.slabel:first-child{margin-top:0}
+.ip{background:#EFEFEF;border:1px solid #DCDCE0;border-radius:12px;overflow:hidden;margin-bottom:13px}
+.op{background:#fff;border:1px solid #DCDCE0;border-radius:12px;overflow:hidden;margin-bottom:13px}
+.ph{padding:12px 15px;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:#1C1C1E;display:flex;align-items:center;gap:6px;cursor:pointer;user-select:none}
+.ph .chev{margin-left:auto;width:9px;height:9px;border-right:1.6px solid #8E8E93;border-bottom:1.6px solid #8E8E93;transform:rotate(45deg);transition:transform .15s;flex-shrink:0}
+.ip.collapsed .ph .chev{transform:rotate(-45deg)}
+.ip.collapsed .pb-outer{display:none}
+.ph .badge{margin-left:auto;font-size:10px;font-weight:600;letter-spacing:.02em;text-transform:none;color:#6C6C70;background:#E4E4E9;border-radius:20px;padding:2px 9px;white-space:nowrap}
+.ph .badge+.chev{margin-left:8px}
+.info-wrap{position:relative;display:inline-flex;flex-shrink:0}
+.info-btn{width:16px;height:16px;border-radius:50%;border:1.3px solid #AEAEB2;background:transparent;color:transparent;font-size:0;line-height:1;cursor:pointer;padding:0;position:relative;transition:all .12s}
+.info-btn::before{content:'';position:absolute;left:50%;top:3.5px;width:1.6px;height:1.6px;background:#8E8E93;border-radius:50%;transform:translateX(-50%)}
+.info-btn::after{content:'';position:absolute;left:50%;top:6.3px;width:1.6px;height:5.2px;background:#8E8E93;border-radius:.8px;transform:translateX(-50%)}
+.info-btn:hover,.info-btn.on{border-color:#007AFF;background:#EBF3FF}
+.info-btn:hover::before,.info-btn:hover::after,.info-btn.on::before,.info-btn.on::after{background:#007AFF}
+.info-pop{display:none;position:fixed;z-index:1200;width:300px;max-width:82vw;background:#fff;border:1px solid #DCDCE0;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.18);padding:11px 13px;font-size:12px;font-weight:400;color:#6C6C70;line-height:1.55;text-transform:none;letter-spacing:0;cursor:default}
+.info-pop.wide{width:400px;max-width:92vw}
+.info-pop.show{display:block}
+.info-pop b{color:#1C1C1E;font-weight:600}
+.info-pop code{font-family:'Inter',sans-serif;background:#F2F2F7;border-radius:4px;padding:1px 4px;color:#1C1C1E}
+.info-pop::before{content:'';position:fixed;width:9px;height:9px;background:#fff;border-left:1px solid #DCDCE0;border-top:1px solid #DCDCE0;left:var(--arrow-left);top:var(--arrow-top);transform:var(--arrow-rot)}
+.pb{padding:8px 15px 14px}
+.row{display:flex;align-items:center;padding:7px 0;border-bottom:1px solid #E0E0E5;gap:8px}
+.row:last-child{border-bottom:none}
+.rl{flex:1;font-size:13px;color:#1C1C1E;min-width:0}
+.rn{font-size:12px;color:#8E8E93;margin-left:4px}
+.rc{display:flex;align-items:center;gap:5px;flex-shrink:0}
+.rc input[type=number]{width:78px;padding:5px 8px;font-size:13px;border:1px solid #C7C7CC;border-radius:7px;background:#fff;color:#1C1C1E;font-family:'Inter',sans-serif;-moz-appearance:textfield;appearance:textfield;text-align:right}
+.rc input[type=number]::-webkit-inner-spin-button,.rc input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.rc input:focus{outline:none;box-shadow:0 0 0 2px rgba(0,122,255,.2);border-color:#007AFF}
+.ru{font-size:12px;color:#8E8E93;min-width:30px}
+.sel-field{margin-bottom:10px}
+.sel-field label{display:block;font-size:12px;color:#8E8E93;margin-bottom:5px;font-weight:500}
+.sel-wrap{position:relative}
+.sel-wrap::after{content:'';position:absolute;right:13px;top:50%;width:7px;height:7px;border-right:2px solid #8E8E93;border-bottom:2px solid #8E8E93;transform:translateY(-65%) rotate(45deg);pointer-events:none}
+.sel-field select{width:100%;padding:8px 34px 8px 11px;font-size:13px;border:1px solid #C7C7CC;border-radius:8px;background:#fff;color:#1C1C1E;font-family:'Inter',sans-serif;cursor:pointer;-webkit-appearance:none;appearance:none}
+.sel-field select:focus{outline:none;box-shadow:0 0 0 2px rgba(0,122,255,.2);border-color:#007AFF}
+.mat-vals{display:flex;gap:6px;padding:6px 0 2px;flex-wrap:wrap}
+.mv{flex:1;min-width:58px;text-align:center;background:#E8E8ED;border-radius:7px;padding:8px 4px}
+.mvl{font-size:11px;color:#8E8E93;margin-bottom:2px}
+.mvv{font-size:14px;font-weight:500;color:#1C1C1E}
+.mvu{font-size:10px;color:#8E8E93}
+.sub{font-size:11px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;color:#8E8E93;padding:9px 0 5px;display:flex;align-items:center;gap:6px}
+.toggle-row{display:flex;align-items:center;gap:10px;padding:4px 0 10px}
+.toggle-row span.tlbl{font-size:13px;color:#1C1C1E;flex:1}
+.seg{display:inline-flex;background:#E0E0E5;border-radius:8px;padding:2px;gap:2px}
+.seg button{padding:6px 13px;font-size:12px;font-weight:500;border:none;border-radius:6px;background:transparent;color:#8E8E93;cursor:pointer;font-family:'Inter',sans-serif;transition:all .12s}
+.seg button.on{background:#fff;color:#1C1C1E;box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.note{font-size:12px;color:#8E8E93;line-height:1.5}
+.geom-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}
+@media(max-width:680px){.geom-grid{grid-template-columns:1fr}}
+.status-strip{display:none;align-items:flex-start;gap:8px;padding:9px 11px;border-radius:8px;font-size:12px;line-height:1.45;margin-top:10px;background:#FDECEC;color:#C0392B;border:1px solid #F2C2C2}
+.status-strip.on{display:flex}
+.status-strip.warn{background:#FFF6E5;color:#8A5A00;border-color:#F5DCA8}
+.status-strip .sico{font-weight:600;flex-shrink:0}
+.status-strip ul{margin:0;padding-left:15px}
+
+/* ── set library ── */
+.setgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+.setcard{background:#fff;border:1px solid #DCDCE0;border-radius:10px;padding:10px 11px;position:relative}
+.setcard.used{border-color:#B8D4F8;box-shadow:0 0 0 2px rgba(0,122,255,.07)}
+.setcard-h{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.setname{flex:1;min-width:0;border:1px solid transparent;border-radius:6px;background:transparent;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;color:#1C1C1E;padding:3px 5px}
+.setname:hover{border-color:#E0E0E5;background:#FAFAFB}
+.setname:focus{outline:none;border-color:#007AFF;background:#fff;box-shadow:0 0 0 2px rgba(0,122,255,.15)}
+.set-del{width:22px;height:22px;border-radius:6px;border:none;background:transparent;color:#C7C7CC;cursor:pointer;font-size:15px;line-height:1;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+.set-del:hover{background:#FCECEC;color:#C0392B}
+.set-del:disabled{opacity:.25;cursor:default}
+.setrow{display:flex;align-items:center;gap:6px;padding:3px 0;font-size:12px}
+.setrow .sl{flex:1;color:#6C6C70;min-width:0}
+.setrow input[type=number]{width:52px;padding:3px 6px;font-size:12px;border:1px solid #DCDCE0;border-radius:6px;background:#fff;color:#1C1C1E;font-family:'Inter',sans-serif;-moz-appearance:textfield;appearance:textfield;text-align:right}
+.setrow input[type=number]::-webkit-inner-spin-button,.setrow input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.setrow input:focus{outline:none;border-color:#007AFF;box-shadow:0 0 0 2px rgba(0,122,255,.15)}
+.setrow .su{color:#AEAEB2;font-size:11px;min-width:22px}
+.setcap{margin-top:7px;padding-top:7px;border-top:1px solid #EFEFEF;font-size:11.5px;color:#0066CC;font-weight:500;display:flex;justify-content:space-between;gap:8px}
+.setcap span:last-child{font-feature-settings:"tnum" 1;white-space:nowrap}
+.setadd{border:1.5px dashed #C7C7CC;border-radius:10px;background:transparent;color:#8E8E93;font-family:'Inter',sans-serif;font-size:13px;font-weight:500;cursor:pointer;min-height:74px;transition:all .12s}
+.setadd:hover{border-color:#007AFF;color:#0066CC;background:#F5F9FF}
+.setsk{margin-top:7px}
+.setsk svg{display:block;width:100%;max-width:190px;margin:0 auto}
+
+/* ── table ── */
+.table-toolbar{display:flex;align-items:center;gap:10px;padding:12px 15px;flex-wrap:wrap;border-bottom:1px solid #E0E0E5}
+.table-toolbar .ttl{font-size:13px;font-weight:500;color:#1C1C1E;margin-right:auto}
+.btn-sm{padding:8px 14px;font-size:13px;font-weight:500;font-family:'Inter',sans-serif;border:1px solid #C7C7CC;border-radius:8px;background:#fff;color:#1C1C1E;cursor:pointer;transition:all .12s}
+.btn-sm:hover{background:#F5F5F7}
+.btn-sm.primary{background:#1C1C1E;color:#fff;border-color:#1C1C1E}
+.btn-sm.primary:hover{opacity:.85}
+.btn-sm.danger{color:#C0392B;border-color:#F2C2C2}
+.btn-sm.danger:hover{background:#FCECEC}
+.btn-sm:disabled{opacity:.4;cursor:default}
+.summary-bar{display:flex;gap:10px;padding:12px 15px;flex-wrap:wrap;border-bottom:1px solid #E0E0E5}
+.sum-chip{flex:1;min-width:104px;background:#F2F2F7;border-radius:8px;padding:8px 12px}
+.sum-chip.ok{background:#EAF6EC}
+.sum-chip.no{background:#FCECEC}
+.sum-chip .sc-l{font-size:11px;color:#8E8E93;margin-bottom:2px}
+.sum-chip .sc-v{font-size:17px;font-weight:500;color:#1C1C1E}
+.sum-chip.ok .sc-v{color:#2E7D32}
+.sum-chip.no .sc-v{color:#C0392B}
+.tbl-wrap{overflow-x:auto}
+table.results{width:100%;border-collapse:collapse;font-size:12.5px;white-space:nowrap}
+table.results th{background:#F2F2F7;color:#6C6C70;font-weight:500;font-size:10.5px;letter-spacing:.03em;text-transform:uppercase;padding:8px 9px;text-align:right;position:sticky;top:0;border-bottom:1px solid #DCDCE0;z-index:1}
+table.results th:nth-child(-n+3){text-align:left}
+table.results th:first-child,table.results td:first-child{position:sticky;left:0;background:#F2F2F7;z-index:2}
+table.results td:first-child{background:#fff}
+table.results th.grp-start{border-left:1px solid #DCDCE0}
+table.results td.grp-start{border-left:1px solid #E0E0E5}
+table.results td{padding:6px 9px;text-align:right;border-bottom:1px solid #EFEFEF;color:#1C1C1E;font-feature-settings:"tnum" 1}
+table.results td.lbl-col{text-align:left}
+table.results tr:hover td{background:#FAFAFB}
+table.results tr:hover td:first-child{background:#F5F5F7}
+table.results tr.row-ok td{background:#F3FAF4}
+table.results tr.row-ok td:first-child{background:#EDF7EE}
+table.results tr.row-fail td{background:#FDF1F1}
+table.results tr.row-fail td:first-child{background:#FBE8E8}
+table.results tr.row-invalid td{background:#F7F7F9;color:#6C6C70}
+table.results tr.row-invalid td:first-child{background:#F2F2F5}
+table.results tr.row-pending td{color:#AEAEB2}
+.verdict-pill{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap}
+.verdict-pill.ok{background:#D9F0DB;color:#1E6B26}
+.verdict-pill.no{background:#F7D6D6;color:#A32626}
+.verdict-pill.na{background:#E4E4E9;color:#6C6C70;cursor:help}
+.verdict-pill.pending{background:#EEEEEE;color:#AEAEB2}
+.namecell{display:flex;align-items:center;gap:4px;min-width:130px}
+.namecell .lbl-in{flex:1;min-width:52px}
+.lvl-tag{display:inline-block;flex-shrink:0;font-size:9.5px;font-weight:600;letter-spacing:.03em;text-transform:uppercase;color:#8E6C1A;background:#FBF3DE;border:1px solid #EAD9A8;border-radius:5px;padding:1px 5px;vertical-align:middle}
+.lvl-tag.top{color:#0066CC;background:#EBF3FF;border-color:#B8D4F8}
+.cell-in{width:100%;border:1px solid transparent;border-radius:5px;background:transparent;font-family:'Inter',sans-serif;font-size:12.5px;color:#1C1C1E;padding:3px 5px;-moz-appearance:textfield;appearance:textfield}
+.cell-in::-webkit-inner-spin-button,.cell-in::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.cell-in:hover{border-color:#E0E0E5;background:#fff}
+.cell-in:focus{outline:none;border-color:#007AFF;background:#fff;box-shadow:0 0 0 2px rgba(0,122,255,.15)}
+.num-in{text-align:right;font-feature-settings:"tnum" 1;min-width:62px}
+.lbl-in{text-align:left;min-width:64px}
+.lbl-in::placeholder{color:#C7C7CC}
+select.cell-sel{border:1px solid transparent;border-radius:5px;background:transparent;font-family:'Inter',sans-serif;font-size:12.5px;color:#1C1C1E;padding:3px 18px 3px 5px;cursor:pointer;-webkit-appearance:none;appearance:none;min-width:58px;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5'%3E%3Cpath d='M0 0l4 5 4-5z' fill='%23AEAEB2'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 5px center}
+select.cell-sel:hover{border-color:#E0E0E5;background-color:#fff}
+select.cell-sel:focus{outline:none;border-color:#007AFF;background-color:#fff;box-shadow:0 0 0 2px rgba(0,122,255,.15)}
+.row-del{width:20px;height:20px;border-radius:6px;border:none;background:transparent;color:#C7C7CC;cursor:pointer;font-size:14px;line-height:1;display:inline-flex;align-items:center;justify-content:center}
+.row-del:hover{background:#FCECEC;color:#C0392B}
+.exp-cell{text-align:center!important;width:24px;padding:0!important}
+.row-exp{width:22px;height:22px;border:none;background:transparent;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:0}
+.chev-r{width:6px;height:6px;border-right:1.6px solid #8E8E93;border-bottom:1.6px solid #8E8E93;transform:rotate(-45deg);transition:transform .15s;margin-left:-2px}
+.row-exp.expanded .chev-r{transform:rotate(45deg)}
+.row-exp:hover .chev-r{border-color:#007AFF}
+.detail-row td{padding:0!important;background:#F7F9FC!important;border-bottom:1px solid #E0E0E5}
+.detail-panel{padding:14px 16px;white-space:normal}
+.detail-panel table.der{table-layout:fixed}
+.detail-panel table.der td,.detail-panel table.der th{white-space:normal;overflow-wrap:anywhere}
+.detail-panel table.der td:last-child,.detail-panel table.der th:last-child{width:34%}
+.detail-note{margin-bottom:10px;padding:8px 11px;border-radius:8px;background:#FDECEC;color:#C0392B;border:1px solid #F2C2C2;font-size:12px;line-height:1.45}
+.detail-note.warn{background:#FFF6E5;color:#8A5A00;border-color:#F5DCA8}
+.dcols{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+.detail-h{font-size:10.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#8E8E93;margin-bottom:7px}
+table.der{width:100%;border-collapse:collapse;font-size:12px}
+table.der th{background:#F7F7FA;color:#6C6C70;font-weight:500;font-size:10px;letter-spacing:.03em;text-transform:uppercase;padding:5px 8px;text-align:left;border-bottom:1px solid #E8E8ED}
+table.der th:last-child,table.der td:last-child{text-align:right}
+table.der td{padding:4px 8px;border-bottom:1px solid #F2F2F5;color:#1C1C1E;vertical-align:top}
+table.der td.f{color:#6C6C70;font-size:11.5px}
+table.der tr:last-child td{border-bottom:none}
+table.der tr.gov td{background:#F5F9FF}
+.empty-state{padding:40px 20px;text-align:center;color:#8E8E93;font-size:13px}
+.progress-bar{height:3px;background:#E0E0E5;overflow:hidden}
+.progress-fill{height:100%;background:#007AFF;width:0%;transition:width .15s}
+.back-btn{display:inline-flex;align-items:center;gap:5px;font-family:'Inter',sans-serif;font-size:14px;font-weight:500;color:#8E8E93;background:transparent;border:none;cursor:pointer;padding:12px 16px;text-decoration:none;line-height:1}
+.back-btn svg{width:16px;height:16px;stroke:#8E8E93;stroke-width:2.5;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.back-btn:hover{color:#1C1C1E}
+.back-btn:hover svg{stroke:#1C1C1E}
+.lang-seg{display:inline-flex;background:#E0E0E5;border-radius:8px;padding:2px;gap:2px;margin-left:auto}
+.lang-seg button{padding:5px 11px;font-size:12px;font-weight:600;border:none;border-radius:6px;background:transparent;color:#8E8E93;cursor:pointer;font-family:'Inter',sans-serif;transition:all .12s;letter-spacing:.02em}
+.lang-seg button.on{background:#fff;color:#1C1C1E;box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.topbar{display:flex;align-items:center;gap:8px;padding-right:12px}
+.author-footer{text-align:center;font-size:11px;font-weight:500;color:#8E8E93;padding:16px 16px 4px;letter-spacing:.02em}
+.version-footer{text-align:center;font-size:10px;color:#AEAEB2;padding:0 16px 24px;letter-spacing:.02em;font-feature-settings:"tnum" 1}
+.preset-bar{display:flex;align-items:center;gap:10px;padding:0 16px 10px;max-width:1400px;margin:0 auto}
+.preset-bar label{font-size:14px;font-weight:500;color:#8E8E93}
+.preset-bar select{padding:6px 28px 6px 10px;font-size:14px;border:1px solid #C7C7CC;border-radius:8px;background:#fff;color:#1C1C1E;font-family:'Inter',sans-serif;-webkit-appearance:none;appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238E8E93'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
+.preset-bar select:focus{outline:none;box-shadow:0 0 0 2px rgba(0,122,255,.2);border-color:#007AFF}
+.report-bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:12px 15px}
+.report-lbl{font-size:13px;color:#1C1C1E;flex:1;min-width:120px}
+.report-btn{padding:11px 18px;font-size:14px;font-weight:500;font-family:'Inter',sans-serif;border:none;border-radius:10px;background:#1C1C1E;color:#fff;cursor:pointer;transition:opacity .15s}
+.report-btn:active{opacity:.7}
+.report-btn:disabled{opacity:.4}
+.report-status{font-size:12px;color:#8E8E93;text-align:center;padding:0 15px 10px;min-height:16px}
+@media(max-width:680px){.wrap{padding:14px 10px}.rc input[type=number],.sel-field select{font-size:16px}.rl{font-size:14px}.ph{font-size:12px}.preset-bar select{font-size:16px}table.results{font-size:11.5px}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+<a href="index.html" class="back-btn"><svg viewBox="0 0 16 16"><polyline points="10,3 4,8 10,13"/></svg><span data-i18n="backAll">Toate modulele</span></a>
+<div class="lang-seg" id="langSeg"><button data-lang="ro">RO</button><button data-lang="en">EN</button></div>
+</div>
+<div class="preset-bar">
+  <label data-i18n="presetLabel">Linie de stalp:</label>
+  <select id="presetSel" onchange="switchPreset(this.value)">
+    <option value="S1">S1</option><option value="S2">S2</option><option value="S3">S3</option>
+    <option value="S4">S4</option><option value="S5">S5</option>
+  </select>
+</div>
+
+<div class="wrap">
+  <div class="slabel" data-i18n="pageLabel">Verificare nod de cadru pe niveluri &mdash; P 100-1/2013</div>
+
+  <!-- ══════ 1. GENERAL ══════ -->
+  <div class="ip" id="pnl_gen">
+    <div class="ph" onclick="togglePanel('pnl_gen')"><span data-i18n="t_gen">Date generale &amp; materiale (comune pentru tot tabelul)</span><span class="badge" id="bdg_gen">&mdash;</span><span class="chev"></span></div>
+    <div class="pb-outer"><div class="pb">
+      <div class="geom-grid">
+        <div class="sel-field"><label data-i18n="concClass">Clasa beton</label><div class="sel-wrap">
+          <select id="cp" onchange="curC=this.value;onGlobalChange()"></select></div></div>
+        <div class="sel-field"><label data-i18n="steelClass">Clasa otel longitudinal</label><div class="sel-wrap">
+          <select id="sp" onchange="curS=this.value;onGlobalChange()"></select></div></div>
+      </div>
+      <div class="sel-field"><label data-i18n="steelClassW">Clasa otel armatura transversala</label><div class="sel-wrap">
+        <select id="swp" onchange="curSW=this.value;onGlobalChange()"></select></div></div>
+      <div class="mat-vals">
+        <div class="mv"><div class="mvl">f<sub>cd</sub></div><div class="mvv" id="fcd_d">&mdash;</div><div class="mvu">MPa</div></div>
+        <div class="mv"><div class="mvl">f<sub>yd</sub></div><div class="mvv" id="fyd_d">&mdash;</div><div class="mvu">MPa</div></div>
+        <div class="mv"><div class="mvl">f<sub>ywd</sub></div><div class="mvv" id="fywd_d">&mdash;</div><div class="mvu">MPa</div></div>
+        <div class="mv"><div class="mvl">&lambda;</div><div class="mvv" id="lam_d">&mdash;</div><div class="mvu">&mdash;</div></div>
+        <div class="mv"><div class="mvl">&eta;</div><div class="mvv" id="eta_d">&mdash;</div><div class="mvu">&mdash;</div></div>
+      </div>
+
+      <div class="sub" style="padding-top:12px"><span data-i18n="s_config">Configuratie</span></div>
+      <div class="toggle-row"><span class="tlbl" data-i18n="ductClass">Clasa de ductilitate</span>
+        <span class="info-wrap"><button class="info-btn" type="button" onclick="toggleInfo(this,event)">i</button><div class="info-pop" onclick="event.stopPropagation()" data-i18n="i_duct"></div></span>
+        <div class="seg" id="seg_duct">
+          <button data-v="DCH" onclick="setSeg('duct','DCH')">DCH</button>
+          <button data-v="DCM" class="on" onclick="setSeg('duct','DCM')">DCM</button>
+        </div></div>
+      <div class="toggle-row"><span class="tlbl" data-i18n="jointType">Tip nod</span>
+        <span class="info-wrap"><button class="info-btn" type="button" onclick="toggleInfo(this,event)">i</button><div class="info-pop" onclick="event.stopPropagation()" data-i18n="i_jtype"></div></span>
+        <div class="seg" id="seg_joint">
+          <button data-v="int" class="on" onclick="setSeg('joint','int')" data-i18n="jt_int">Interior</button>
+          <button data-v="end" onclick="setSeg('joint','end')" data-i18n="jt_end">De capat</button>
+        </div></div>
+      <div class="toggle-row"><span class="tlbl" data-i18n="fourBeams">Grinzi pe toate cele 4 laturi, b<sub>b</sub> &ge; 3/4 b<sub>c</sub></span>
+        <span class="info-wrap"><button class="info-btn" type="button" onclick="toggleInfo(this,event)">i</button><div class="info-pop" onclick="event.stopPropagation()" data-i18n="i_four"></div></span>
+        <div class="seg" id="seg_four">
+          <button data-v="no" class="on" onclick="setSeg('four','no')" data-i18n="no_">Nu</button>
+          <button data-v="yes" onclick="setSeg('four','yes')" data-i18n="yes_">Da</button>
+        </div></div>
+      <div class="toggle-row" data-nopreset="1" style="padding-bottom:2px"><span class="tlbl" data-i18n="signConv">Conventie semn N<sub>Ed</sub></span>
+        <span class="info-wrap"><button class="info-btn" type="button" onclick="toggleInfo(this,event)">i</button><div class="info-pop" onclick="event.stopPropagation()" data-i18n="i_sign"></div></span>
+        <div class="seg" id="seg_sign" data-nopreset="1">
+          <button data-v="neg" class="on" onclick="setSignConv('neg')" data-i18n="sg_neg">N&lt;0 compresiune</button>
+          <button data-v="pos" onclick="setSignConv('pos')" data-i18n="sg_pos">N&gt;0 compresiune</button>
+        </div></div>
+      <div class="status-strip" id="statusStrip"><span class="sico" id="statusIco">!</span><span id="statusMsg"></span></div>
+    </div></div>
+  </div>
+
+  <!-- ══════ 2. SET LIBRARIES ══════ -->
+  <div class="ip" id="pnl_setC">
+    <div class="ph" onclick="togglePanel('pnl_setC')"><span data-i18n="t_setC">Seturi de st&acirc;lp &mdash; sectiune &amp; armare</span><span class="badge" id="bdg_setC">&mdash;</span><span class="chev"></span></div>
+    <div class="pb-outer"><div class="pb">
+      <div class="note" style="padding-bottom:9px" data-i18n="n_setC"></div>
+      <div class="setgrid" id="gridC"></div>
+    </div></div>
+  </div>
+
+  <div class="ip collapsed" id="pnl_setB">
+    <div class="ph" onclick="togglePanel('pnl_setB')"><span data-i18n="t_setB">Seturi de grinda &mdash; sectiune &amp; armare</span><span class="badge" id="bdg_setB">&mdash;</span><span class="chev"></span></div>
+    <div class="pb-outer"><div class="pb">
+      <div class="note" style="padding-bottom:9px" data-i18n="n_setB"></div>
+      <div class="setgrid" id="gridB"></div>
+    </div></div>
+  </div>
+
+  <div class="ip collapsed" id="pnl_setJ">
+    <div class="ph" onclick="togglePanel('pnl_setJ')"><span data-i18n="t_setJ">Seturi de armatura transversala &icirc;n nod</span><span class="badge" id="bdg_setJ">&mdash;</span><span class="chev"></span></div>
+    <div class="pb-outer"><div class="pb">
+      <div class="note" style="padding-bottom:9px" data-i18n="n_setJ"></div>
+      <div class="setgrid" id="gridJ"></div>
+    </div></div>
+  </div>
+
+  <!-- ══════ 3. STOREY TABLE ══════ -->
+  <div class="op" id="resultsPanel" style="display:none">
+    <div class="summary-bar" id="summaryBar"></div>
+    <div class="table-toolbar">
+      <span class="ttl" id="tableTitle"></span>
+      <button class="btn-sm primary" onclick="addRow()" data-i18n="addRowBtn">+ Adauga nivel</button>
+      <button class="btn-sm" onclick="chainUp()" title="" id="chainBtn" data-i18n="chainBtn">Inlantuie N &amp; seturi</button>
+      <button class="btn-sm" id="recalcBtn" onclick="recalcAll()" data-i18n="recalcAllBtn">Recalculeaza tot</button>
+      <button class="btn-sm" id="copyBtn" onclick="copyTable()" data-i18n="copyBtn">Copiaza tabelul</button>
+      <button class="btn-sm danger" onclick="clearTable()" data-i18n="clearBtn">Sterge tabelul</button>
+    </div>
+    <div class="progress-bar" id="progressBar" style="display:none"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="tbl-wrap">
+      <table class="results" id="resultsTable">
+        <thead><tr id="theadRow"></tr></thead>
+        <tbody id="tbodyRows"></tbody>
+      </table>
+    </div>
+    <div class="report-bar">
+      <span class="report-lbl" data-i18n="exportCalcReport">Export raport de calcul (PDF)</span>
+      <button class="report-btn" id="rptBtn" onclick="generatePdf()" data-i18n="downloadPdf">Descarca PDF</button>
+    </div>
+    <div class="report-status" id="rptStatus"></div>
+  </div>
+
+  <div class="op" id="emptyPanel">
+    <div class="empty-state" data-i18n="emptyStateMsg">Niciun nivel introdus. Defineste seturile mai sus, apoi adauga niveluri.</div>
+    <div style="text-align:center;padding:0 20px 24px"><button class="btn-sm primary" onclick="addRow()" data-i18n="addRowBtn">+ Adauga nivel</button></div>
+  </div>
+
+</div>
+<div class="author-footer" data-i18n="footer">Lucrare de disertație — Janos Patrik · UTCN · Facultatea de Construcții · 2026</div>
+<div class="version-footer" id="versionFooter">&mdash;</div>
+
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
+
+<!-- ═══ nucleu de calcul comun — trebuie incarcat INAINTE de scriptul modulului ═══ -->
+<script src="engine.js"></script>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════════════════
+   MODULUL 09 — NOD DE CADRU, VERIFICARE PE NIVELURI (TABEL)
+   P 100-1/2013. Un rand = un nod, pe o linie de stalp, urcand prin cladire.
+
+   Tot calculul este in engine.js (JP.joint.*), exact acelasi apel ca in modulul
+   08 — un nivel din tabelul acesta si acelasi nod introdus in modulul 08 dau
+   aceleasi numere.
+
+   SETURI DE ARMARE. In loc sa aiba cate o coloana pentru fiecare diametru,
+   tabelul lucreaza cu seturi numite: un set de stalp poarta sectiunea si
+   armatura longitudinala, un set de grinda sectiunea si armatura sus/jos, un
+   set de nod etrierii. Fiecare nivel alege seturile dintr-un select. Asa arata
+   si realitatea: cateva alcatuiri, repartizate pe inaltimea cladirii.
+
+   NIVELUL DE LA BAZA si NODUL DE LA ULTIMUL NIVEL se deduc din pozitia
+   randului (primul rand = baza, ultimul = ultimul nivel), fiindca randurile
+   sunt ordonate de jos in sus. Ambele pot fi fortate manual din panoul de
+   detaliu al randului, pentru cazurile in care tabelul nu incepe la baza.
+   ═══════════════════════════════════════════════════════════════════════════ */
+const MODULE_ID='09', MODULE_VERSION='1.1.0';
+
+let curC='C30/37', curS='S500B', curSW='S500B';
+let SEG={duct:'DCM',joint:'int',four:'no'};
+let setsC=[], setsB=[], setsJ=[], rows=[];
+let MAT=null;
+
+/* Conventia de semn pentru N — preferinta de utilizator, comuna cu 03/06/07/08. */
+let signConv=(function(){try{return localStorage.getItem('sw_signconv')||'neg';}catch(e){return 'neg';}})();
+function sgnN(){return signConv==='neg'?-1:1;}
+function convN(v){return sgnN()*v;}
+
+if(typeof JP==='undefined'){
+  document.getElementById('statusStrip').className='status-strip on';
+  document.getElementById('statusMsg').textContent=
+    'engine.js nu s-a incarcat. Verificati ca fisierul este in acelasi folder cu aceasta pagina.';
+}
+
+let _uid=1; function uid(){return 'x'+(_uid++);}
+function gv(id){const e=document.getElementById(id);const v=parseFloat(e&&e.value);return isFinite(v)?v:0;}
+function esc(s){return (s===undefined||s===null?'':String(s)).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+const F0=v=>(isFinite(v)?v.toFixed(0):'—');
+const F1=v=>(isFinite(v)?v.toFixed(1):'—');
+const F2=v=>(isFinite(v)?v.toFixed(2):'—');
+const F3=v=>(isFinite(v)?v.toFixed(3):'—');
+const PCT=v=>(isFinite(v)?(v*100).toFixed(1)+' %':'—');
+
+/* ══════════════ i18n ══════════════ */
+let LANG=(function(){try{return localStorage.getItem('sw_lang')||'en';}catch(e){return 'en';}})();
+const T={
+ backAll:{ro:'Toate modulele',en:'All modules'},
+ pageLabel:{ro:'Verificare nod de cadru pe niveluri &mdash; P 100-1/2013',en:'Beam&ndash;column joint check by storey &mdash; P 100-1/2013'},
+ presetLabel:{ro:'Linie de st&acirc;lp:',en:'Column line:'},
+ t_gen:{ro:'Date generale &amp; materiale (comune pentru tot tabelul)',en:'General data &amp; materials (shared by the whole table)'},
+ t_setC:{ro:'Seturi de st&acirc;lp &mdash; sectiune &amp; armare',en:'Column sets &mdash; section &amp; reinforcement'},
+ t_setB:{ro:'Seturi de grinda &mdash; sectiune &amp; armare',en:'Beam sets &mdash; section &amp; reinforcement'},
+ t_setJ:{ro:'Seturi de armatura transversala &icirc;n nod',en:'Joint transverse reinforcement sets'},
+ n_setC:{ro:'Fiecare set poarta sectiunea st&acirc;lpului si armatura longitudinala. h<sub>c</sub> este latura paralela cu grinzile &mdash; adancimea nodului pe directia lui V<sub>jhd</sub>. Nodul unui nivel foloseste sectiunea setului de st&acirc;lp <b>inferior</b>.',
+        en:'Each set carries the column section and its longitudinal reinforcement. h<sub>c</sub> is the side parallel to the beams &mdash; the joint depth along V<sub>jhd</sub>. A storey’s joint uses the section of its <b>lower</b> column set.'},
+ n_setB:{ro:'M<sub>Rb</sub> se calculeaza cu blocul dreptunghiular echivalent, sectiune simplu armata; armatura comprimata si cea din placa nu se iau in considerare.',
+        en:'M<sub>Rb</sub> uses the equivalent rectangular stress block on a singly reinforced section; compression steel and slab reinforcement are ignored.'},
+ n_setJ:{ro:'Ramuri <b>paralele cu axa grinzilor</b> (deci cu V<sub>jhd</sub>): etrierul perimetral contribuie cu 2 ramuri, fiecare agrafa care traverseaza h<sub>c</sub> adauga 1. Setul poarta si etrierii din zona critica a st&acirc;lpului, pentru verificarea 5.3.4.2.3(6).',
+        en:'Legs <b>parallel to the beam axis</b> (i.e. to V<sub>jhd</sub>): the perimeter stirrup contributes 2 legs, every tie crossing h<sub>c</sub> adds 1. The set also carries the column critical-zone stirrups, for check 5.3.4.2.3(6).'},
+ concClass:{ro:'Clasa beton',en:'Concrete class'},
+ steelClass:{ro:'Clasa otel longitudinal',en:'Longitudinal steel class'},
+ steelClassW:{ro:'Clasa otel armatura transversala',en:'Transverse steel class'},
+ s_config:{ro:'Configuratie',en:'Configuration'},
+ ductClass:{ro:'Clasa de ductilitate',en:'Ductility class'},
+ jointType:{ro:'Tip nod',en:'Joint type'},
+ jt_int:{ro:'Interior',en:'Interior'}, jt_end:{ro:'De capat',en:'End'},
+ fourBeams:{ro:'Grinzi pe toate cele 4 laturi, b<sub>b</sub> &ge; 3/4 b<sub>c</sub>',en:'Beams on all 4 sides, b<sub>b</sub> &ge; 3/4 b<sub>c</sub>'},
+ signConv:{ro:'Conventie semn N<sub>Ed</sub>',en:'N<sub>Ed</sub> sign convention'},
+ sg_pos:{ro:'N&gt;0 compresiune',en:'N&gt;0 compression'}, sg_neg:{ro:'N&lt;0 compresiune',en:'N&lt;0 compression'},
+ no_:{ro:'Nu',en:'No'}, yes_:{ro:'Da',en:'Yes'},
+ addRowBtn:{ro:'+ Adauga nivel',en:'+ Add storey'},
+ chainBtn:{ro:'&#8593; &Icirc;nlantuie N &amp; seturi',en:'&#8593; Chain N &amp; sets'},
+ chainTitle:{ro:'Completeaza, pentru fiecare nivel, N si setul de st&acirc;lp de deasupra nodului din randul imediat superior. Randurile trebuie ordonate de jos in sus.',
+             en:'For every storey, fills N and the column set above the joint from the row immediately above. Rows must be ordered bottom to top.'},
+ recalcAllBtn:{ro:'Recalculeaza tot',en:'Recalculate all'},
+ copyBtn:{ro:'Copiaza tabelul',en:'Copy table'},
+ copiedBtn:{ro:'Copiat ✓',en:'Copied ✓'},
+ clearBtn:{ro:'Sterge tabelul',en:'Clear table'},
+ emptyStateMsg:{ro:'Niciun nivel introdus. Defineste seturile mai sus, apoi adauga niveluri.',en:'No storeys yet. Define the sets above, then add storeys.'},
+ exportCalcReport:{ro:'Export raport de calcul (PDF)',en:'Export calculation report (PDF)'},
+ downloadPdf:{ro:'Descarca PDF',en:'Download PDF'},
+ generating:{ro:'Se genereaza...',en:'Generating...'},
+ pdfLoading:{ro:'Libraria PDF se incarca...',en:'PDF library is loading...'},
+ statusDownloaded:{ro:'Raport descarcat.',en:'Report downloaded.'},
+ pdfError:{ro:'Eroare la generare:',en:'Generation error:'},
+ footer:{ro:'Lucrare de disertație — Janos Patrik · UTCN · Facultatea de Construcții · 2026',en:'Dissertation — Janos Patrik · UTCN · Faculty of Civil Engineering · 2026'},
+ /* set cards */
+ setAddC:{ro:'+ Set de st&acirc;lp',en:'+ Column set'},
+ setAddB:{ro:'+ Set de grinda',en:'+ Beam set'},
+ setAddJ:{ro:'+ Set de nod',en:'+ Joint set'},
+ setDelUsed:{ro:'Setul este folosit de un nivel din tabel.',en:'This set is used by a storey in the table.'},
+ setDelLast:{ro:'Trebuie sa ramana cel putin un set.',en:'At least one set must remain.'},
+ lblHc:{ro:'h<sub>c</sub> (&#8741; grinzi)',en:'h<sub>c</sub> (&#8741; beams)'},
+ lblBc:{ro:'b<sub>c</sub>',en:'b<sub>c</sub>'},
+ lblCnom:{ro:'c<sub>nom</sub>',en:'c<sub>nom</sub>'},
+ lblDsw:{ro:'&Oslash; etrier',en:'&Oslash; stirrup'},
+ lblCor:{ro:'Colturi buc/&Oslash;',en:'Corners pcs/&Oslash;'},
+ lblFb:{ro:'Fete b<sub>c</sub> buc/&Oslash;',en:'b<sub>c</sub>-faces pcs/&Oslash;'},
+ lblFh:{ro:'Fete h<sub>c</sub> buc/&Oslash;',en:'h<sub>c</sub>-faces pcs/&Oslash;'},
+ lblBw:{ro:'b<sub>w</sub>',en:'b<sub>w</sub>'},
+ lblHb:{ro:'h<sub>b</sub>',en:'h<sub>b</sub>'},
+ lblTop:{ro:'Sus buc/&Oslash;',en:'Top pcs/&Oslash;'},
+ lblBot:{ro:'Jos buc/&Oslash;',en:'Bottom pcs/&Oslash;'},
+ lblPer:{ro:'Perimetral ram/&Oslash;',en:'Perimeter legs/&Oslash;'},
+ lblTies:{ro:'Agrafe ram/&Oslash;',en:'Ties legs/&Oslash;'},
+ lblSets:{ro:'Seturi &times; pas',en:'Sets &times; spacing'},
+ lblColSt:{ro:'Etrieri st&acirc;lp ram/&Oslash;',en:'Column stirrups legs/&Oslash;'},
+ lblScr:{ro:'Pas zona critica',en:'Critical-zone spacing'},
+ capAs:{ro:'A<sub>s</sub> / &rho;',en:'A<sub>s</sub> / &rho;'},
+ capMrb:{ro:'M<sub>Rb</sub><sup>&minus;</sup> / M<sub>Rb</sub><sup>+</sup>',en:'M<sub>Rb</sub><sup>&minus;</sup> / M<sub>Rb</sub><sup>+</sup>'},
+ capAsh:{ro:'A<sub>sh,ef</sub>',en:'A<sub>sh,ef</sub>'},
+ /* table */
+ colStorey:{ro:'Nivel',en:'Storey'},
+ colCI:{ro:'St&acirc;lp inf.',en:'Col. below'},
+ colCS:{ro:'St&acirc;lp sup.',en:'Col. above'},
+ colBL:{ro:'Grinda stg.',en:'Beam left'},
+ colBR:{ro:'Grinda dr.',en:'Beam right'},
+ colJ:{ro:'Nod',en:'Joint'},
+ colNi:{ro:'N inf. (kN)',en:'N below (kN)'},
+ colNs:{ro:'N sup. (kN)',en:'N above (kN)'},
+ colLcl:{ro:'l<sub>cl</sub> (mm)',en:'l<sub>cl</sub> (mm)'},
+ colSMRc:{ro:'&Sigma;M<sub>Rc</sub>',en:'&Sigma;M<sub>Rc</sub>'},
+ colVjhd:{ro:'V<sub>jhd</sub>',en:'V<sub>jhd</sub>'},
+ col54:{ro:'(5.4)',en:'(5.4)'},
+ colDiag:{ro:'Diag.',en:'Diag.'},
+ colAsh:{ro:'A<sub>sh</sub>',en:'A<sub>sh</sub>'},
+ colAsv:{ro:'A<sub>sv</sub>',en:'A<sub>sv</sub>'},
+ colDet:{ro:'Alcat.',en:'Detail.'},
+ colVerdict:{ro:'Verdict',en:'Verdict'},
+ vOk:{ro:'VERIFICA',en:'PASS'}, vNo:{ro:'NU VERIFICA',en:'FAIL'},
+ vNa:{ro:'INVALID',en:'INVALID'}, vPend:{ro:'&mdash;',en:'&mdash;'},
+ // Alcatuirea se respecta sau nu — un procent nu inseamna nimic acolo (era
+ // 100 % ori de cate ori pasul din nod era egal cu cel din zona critica).
+ vDetOk:{ro:'DA',en:'YES'}, vDetNo:{ro:'NU',en:'NO'},
+ detTipOk:{ro:'Alcatuirea nodului respecta 5.3.4.2.3(4) si (6) si 5.4.4.3.',
+           en:'Joint detailing complies with 5.3.4.2.3(4) and (6) and 5.4.4.3.'},
+ detTipNo:{ro:'Alcatuirea nodului nu respecta 5.3.4.2.3(4)/(6) sau 5.4.4.3 — vezi detaliile randului.',
+           en:'Joint detailing does not comply with 5.3.4.2.3(4)/(6) or 5.4.4.3 — see the row details.'},
+ tagBase:{ro:'baza',en:'base'}, tagTop:{ro:'ultimul',en:'top'},
+ tableTitleN:{ro:n=>`${n} niveluri`,en:n=>`${n} storeys`},
+ sumTotal:{ro:'Niveluri',en:'Storeys'}, sumOk:{ro:'Verifica',en:'Pass'},
+ sumNo:{ro:'Nu verifica',en:'Fail'}, sumWorst:{ro:'Cea mai solicitata',en:'Governing'},
+ sumInvalid:{ro:'Invalid',en:'Invalid'},
+ confirmClear:{ro:'Sigur vrei sa stergi toate nivelurile?',en:'Are you sure you want to clear all storeys?'},
+ errSet:{ro:'Setul selectat nu mai exista. Alege altul.',en:'The selected set no longer exists. Pick another.'},
+ warnGeom:{ro:'Sectiunea st&acirc;lpului superior difera de cea a celui inferior. Nodul foloseste sectiunea st&acirc;lpului inferior; M<sub>Rd,sup</sub> s-a calculat pe sectiunea lui proprie. Verifica alcatuirea nodului la schimbarea de sectiune.',
+           en:'The upper column section differs from the lower one. The joint uses the lower column section; M<sub>Rd,sup</sub> was computed on its own section. Check the joint detailing where the section changes.'},
+ warnSets:{ro:(n,s,h)=>`Cele ${n} seturi la pas ${s} mm acopera ${(n-1)*s} mm, peste inaltimea utila a nodului h<sub>jw</sub> = ${h} mm.`,
+           en:(n,s,h)=>`${n} sets at ${s} mm span ${(n-1)*s} mm, more than the usable joint height h<sub>jw</sub> = ${h} mm.`},
+ wEuk:{ro:c=>'Clasa '+c+' nu are eps_uk declarat; s-a presupus 50 permil.',en:c=>'Class '+c+' has no declared eps_uk; 50 per mille assumed.'},
+ wCol:{ro:r=>'N<sub>Ed</sub> este in afara capacitatii axiale a st&acirc;lpului '+(r==='inf'?'inferior':'superior')+'.',
+       en:r=>'N<sub>Ed</sub> lies outside the axial capacity of the '+(r==='inf'?'lower':'upper')+' column.'},
+ /* detail */
+ dtCaps:{ro:'Capacitati',en:'Capacities'},
+ dtJoint:{ro:'Nod',en:'Joint'},
+ dtChecks:{ro:'Verificari',en:'Checks'},
+ dtOpts:{ro:'Optiuni de nivel',en:'Storey options'},
+ dtBase:{ro:'Nivel de la baza (5.10)',en:'Base level (5.10)'},
+ dtTop:{ro:'Nod la ultimul nivel &mdash; se sare (5.4)',en:'Top-level joint &mdash; skip (5.4)'},
+ dtAuto:{ro:'automat',en:'auto'},
+ colParam:{ro:'Marime',en:'Quantity'}, colForm:{ro:'Relatie',en:'Expression'}, colVal:{ro:'Valoare',en:'Value'},
+ /* info */
+ i_duct:{ro:'Determina factorii de suprarezistenta &gamma;<sub>Rd</sub>: <b>(5.4)</b> 1,3 DCH / 1,2 DCM; <b>(5.9)</b> grinzi 1,2 DCH / 1,0 DCM; <b>(5.10)</b> stalpi 1,3 la baza si 1,2 la restul nivelurilor la DCH, 1,0 la DCM; <b>(5.11)/(5.12)</b> 1,1 DCH / 1,0 DCM. Nivelul de la baza se deduce din pozitia randului.',
+        en:'Sets the overstrength factors &gamma;<sub>Rd</sub>: <b>(5.4)</b> 1.3 DCH / 1.2 DCM; <b>(5.9)</b> beams 1.2 DCH / 1.0 DCM; <b>(5.10)</b> columns 1.3 at the base and 1.2 at other levels for DCH, 1.0 for DCM; <b>(5.11)/(5.12)</b> 1.1 DCH / 1.0 DCM. The base level follows from the row position.'},
+ i_jtype:{ro:'Se aplica tuturor nivelurilor din tabel. <b>Interior</b>: grinzi pe ambele fete &rarr; (5.11), (5.26) cu 0,30, (5.29). <b>De capat</b>: o singura grinda &rarr; (5.12), (5.27) cu 0,25, (5.30) si sporirea cu 20% a lui A<sub>sh</sub>; coloana grinzii drepte dispare.',
+         en:'Applies to every storey in the table. <b>Interior</b>: beams on both faces &rarr; (5.11), (5.26) with 0.30, (5.29). <b>End</b>: a single beam &rarr; (5.12), (5.27) with 0.25, (5.30) and the 20% increase of A<sub>sh</sub>; the right-beam column disappears.'},
+ i_four:{ro:'5.4.4.3(2): daca in nod intra grinzi pe toate cele 4 laturi si latimea lor este cel putin 3/4 din latimea stalpului, pasul etrierilor orizontali din nod se poate dubla fata de cel din zona critica, fara a depasi 150 mm.',
+         en:'5.4.4.3(2): if beams frame in on all 4 sides with a width of at least 3/4 of the column width, the joint hoop spacing may be doubled relative to the critical zone, but never beyond 150 mm.'},
+ i_sign:{ro:'Preferinta de utilizator, comuna cu modulele 03, 06, 07 si 08 (cheia <code>sw_signconv</code>), deci nu se salveaza in presetare. Nucleul lucreaza intern cu compresiunea pozitiva. Schimbarea comutatorului negheaza valorile N din tabel.',
+         en:'A user preference shared with modules 03, 06, 07 and 08 (the <code>sw_signconv</code> key), so it is not stored in the preset. The engine works internally with compression positive. Flipping the switch negates the N values in the table.'}
+};
+function t(k,...a){const e=T[k];if(!e)return k;const v=(e[LANG]!==undefined)?e[LANG]:e.ro;return typeof v==='function'?v(...a):v;}
+function tp(k,...a){return String(t(k,...a)).replace(/<[^>]*>/g,'').replace(/&minus;/g,'-').replace(/&middot;/g,'.')
+  .replace(/&times;/g,'x').replace(/&ge;/g,'>=').replace(/&le;/g,'<=').replace(/&Sigma;/g,'Sum').replace(/&gamma;/g,'g')
+  .replace(/&nu;/g,'v').replace(/&mdash;/g,'-').replace(/&ndash;/g,'-').replace(/&amp;/g,'&').replace(/&Oslash;/g,'D')
+  .replace(/&rho;/g,'rho').replace(/&#8741;/g,'||').replace(/&#8593;/g,'').replace(/&acirc;/g,'a').replace(/&icirc;/g,'i')
+  .replace(/&Icirc;/g,'I').replace(/&nbsp;/g,' ').trim();}
+function applyStaticLang(){
+  document.documentElement.lang=LANG;
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const k=el.getAttribute('data-i18n');
+    if(T[k]){const v=T[k][LANG];if(v!==undefined&&typeof v!=='function')el.innerHTML=v;}
+  });
+  document.querySelectorAll('#langSeg button').forEach(b=>b.classList.toggle('on',b.dataset.lang===LANG));
+  const cb=document.getElementById('chainBtn'); if(cb)cb.title=tp('chainTitle');
+  stampVersion();
+}
+function setLang(l){LANG=l;try{localStorage.setItem('sw_lang',l);}catch(e){}applyStaticLang();renderSets();renderTable();}
+function stampVersion(){
+  const eng=(typeof JP!=='undefined')?JP.VERSION:'?';
+  const el=document.getElementById('versionFooter');
+  if(el)el.textContent='JP Design · M'+MODULE_ID+' v'+MODULE_VERSION+' · engine v'+eng+' · P 100-1/2013';
+}
+
+/* ══════════════ info popovers / panels ══════════════ */
+function toggleInfo(btn,ev){
+  ev.stopPropagation();
+  const pop=btn.nextElementSibling, was=pop.classList.contains('show');
+  closeAllInfo();
+  if(!was){positionInfoPop(btn,pop);pop.classList.add('show');btn.classList.add('on');}
+}
+function positionInfoPop(btn,pop){
+  const r=btn.getBoundingClientRect(), vw=innerWidth, vh=innerHeight;
+  const wide=pop.classList.contains('wide');
+  const w=Math.min(wide?400:300, vw*(wide?0.92:0.82));
+  let left=Math.max(10,Math.min(r.left+r.width/2-w/2, vw-w-10));
+  pop.style.width=w+'px';pop.style.left=left+'px';
+  pop.style.visibility='hidden';pop.style.display='block';
+  const h=pop.offsetHeight;
+  pop.style.display='';pop.style.visibility='';
+  let top=r.bottom+8,aTop,aRot,fin;
+  if(top+h>vh-10 && r.top-h-8>10){fin=r.top-h-8;aTop=r.top-8-1;aRot='rotate(225deg)';}
+  else{fin=top;aTop=r.bottom+3;aRot='rotate(45deg)';}
+  pop.style.top=fin+'px';
+  pop.style.setProperty('--arrow-left',Math.max(left+10,Math.min(r.left+r.width/2-4.5,left+w-18))+'px');
+  pop.style.setProperty('--arrow-top',aTop+'px');
+  pop.style.setProperty('--arrow-rot',aRot);
+}
+function closeAllInfo(){
+  document.querySelectorAll('.info-pop.show').forEach(p=>p.classList.remove('show'));
+  document.querySelectorAll('.info-btn.on').forEach(b=>b.classList.remove('on'));
+}
+document.addEventListener('click',closeAllInfo);
+addEventListener('scroll',closeAllInfo,true);
+addEventListener('resize',closeAllInfo);
+function togglePanel(id){document.getElementById(id).classList.toggle('collapsed');}
+
+/* ══════════════ global config ══════════════ */
+function fillMaterialSelects(){
+  const cp=document.getElementById('cp'),sp=document.getElementById('sp'),swp=document.getElementById('swp');
+  cp.innerHTML=Object.keys(JP.CONC).map(k=>`<option${k===curC?' selected':''}>${k}</option>`).join('');
+  sp.innerHTML=Object.keys(JP.STEEL).map(k=>`<option${k===curS?' selected':''}>${k}</option>`).join('');
+  swp.innerHTML=Object.keys(JP.STEEL).map(k=>`<option${k===curSW?' selected':''}>${k}</option>`).join('');
+}
+function readMat(){ return JP.joint.materials(curC,curS,curSW,JP.DEFAULTS); }
+function setSeg(k,v){SEG[k]=v;paintSegs();onGlobalChange();}
+function paintSegs(){
+  const map={duct:'seg_duct',joint:'seg_joint',four:'seg_four'};
+  Object.keys(map).forEach(k=>{
+    const el=document.getElementById(map[k]); if(!el)return;
+    el.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.v===SEG[k]));
+  });
+  document.getElementById('seg_sign').querySelectorAll('button')
+    .forEach(b=>b.classList.toggle('on',b.dataset.v===signConv));
+}
+/* Schimbarea conventiei negheaza valorile N din tabel, ca un stalp comprimat sa
+   nu devina in tacere unul intins — acelasi comportament ca in 03/06/07/08. */
+function setSignConv(mode){
+  if(mode===signConv)return;
+  signConv=mode;
+  try{localStorage.setItem('sw_signconv',mode);}catch(e){}
+  rows.forEach(r=>{
+    if(isFinite(r.Ni)&&r.Ni!==0)r.Ni=-r.Ni;
+    if(isFinite(r.Ns)&&r.Ns!==0)r.Ns=-r.Ns;
+    r.status='pending';r.res=null;
+  });
+  paintSegs();renderTable();recalcAll();saveCurrentPreset();
+}
+function onGlobalChange(){
+  MAT=readMat();
+  const el=id=>document.getElementById(id);
+  el('fcd_d').textContent=F2(MAT.fcd); el('fyd_d').textContent=F1(MAT.fyd);
+  el('fywd_d').textContent=F1(MAT.fywd); el('lam_d').textContent=F2(MAT.lam); el('eta_d').textContent=F2(MAT.eta);
+  el('bdg_gen').textContent=curC+' · '+curS+' · '+SEG.duct+' · '+(SEG.joint==='end'?tp('jt_end'):tp('jt_int'));
+  showGlobalStatus();
+  renderSets();
+  rows.forEach(r=>{r.status='pending';r.res=null;});
+  renderTable(); recalcAll(); saveCurrentPreset();
+}
+function showGlobalStatus(){
+  const strip=document.getElementById('statusStrip'),msg=document.getElementById('statusMsg'),ico=document.getElementById('statusIco');
+  const items=[]; let fatal=false;
+  if(MAT){
+    if(!(MAT.fcd>0)||!(MAT.fyd>0)||!(MAT.fywd>0)){items.push(tp('errSet'));fatal=true;}
+    if(MAT.eukAssumed)items.push(t('wEuk',curS));
+  }
+  if(!items.length){strip.className='status-strip';msg.innerHTML='';return;}
+  msg.innerHTML=items.length===1?items[0]:'<ul><li>'+items.join('</li><li>')+'</li></ul>';
+  ico.textContent=fatal?'!':'~';
+  strip.className='status-strip on'+(fatal?'':' warn');
+}
+
+/* ══════════════ reinforcement sets ══════════════ */
+function defC(n){return{id:uid(),name:n,hc:300,bc:1000,cnom:35,dsw:8,cor_n:4,cor_d:20,fb_n:2,fb_d:20,fh_n:1,fh_d:20};}
+function defB(n){return{id:uid(),name:n,bw:250,hb:500,cnom:25,dsw:8,nt:2,dt:18,nb:3,db:16};}
+function defJ(n){return{id:uid(),name:n,n1:2,d1:10,n2:2,d2:8,nSets:5,s:100,nCol:2,dCol:8,sCol:100};}
+function getSet(list,id){return list.find(s=>s.id===id)||null;}
+function nextName(list,pref){let i=1;while(list.some(s=>s.name===pref+i))i++;return pref+i;}
+
+/* Intrarea pentru modelul de stalp al nucleului. Maparea fetelor:
+   fb = bare pe fetele de lungime b_c -> 'topb';  fh = pe fetele de lungime h_c -> 'sidh'. */
+function colInp(c){
+  return {b:c.bc,h:c.hc,cnom:c.cnom,detr:c.dsw,concrete:curC,steel:curS,confMode:'none',
+          cor_n:c.cor_n,cor_d:c.cor_d,topb_n:c.fb_n,topb_d:c.fb_d,sidh_n:c.fh_n,sidh_d:c.fh_d};
+}
+function colStats(c){
+  const m=JP.column.buildModel(colInp(c));
+  return {As:m.As_tot,Ac:m.Ac,rho:m.Ac>0?100*m.As_tot/m.Ac:0,n:m.cntTot,model:m};
+}
+function beamStats(b){
+  const mat=MAT||readMat();
+  const bb={bw:b.bw,hb:b.hb,cnom:b.cnom,dsw:b.dsw,nt:b.nt,dt:b.dt,nb:b.nb,db:b.db};
+  return JP.joint.beam(bb,mat);
+}
+function jointStats(j){
+  return {AshSet:j.n1*JP.barArea(j.d1)+j.n2*JP.barArea(j.d2),
+          AshProv:(j.n1*JP.barArea(j.d1)+j.n2*JP.barArea(j.d2))*j.nSets};
+}
+function setUsed(kind,id){
+  return rows.some(r=> kind==='C' ? (r.cI===id||r.cS===id)
+                     : kind==='B' ? (r.bL===id||r.bR===id) : (r.j===id));
+}
+function addSet(kind){
+  if(kind==='C')setsC.push(defC(nextName(setsC,'C')));
+  else if(kind==='B')setsB.push(defB(nextName(setsB,'G')));
+  else setsJ.push(defJ(nextName(setsJ,'N')));
+  renderSets();renderTable();saveCurrentPreset();
+}
+function delSet(kind,id){
+  const list=kind==='C'?setsC:kind==='B'?setsB:setsJ;
+  if(list.length<=1){alert(tp('setDelLast'));return;}
+  if(setUsed(kind,id)){alert(tp('setDelUsed'));return;}
+  const i=list.findIndex(s=>s.id===id); if(i>=0)list.splice(i,1);
+  renderSets();renderTable();saveCurrentPreset();
+}
+let setDebounce=null;
+function editSet(kind,id,field,val){
+  const list=kind==='C'?setsC:kind==='B'?setsB:setsJ;
+  const s=getSet(list,id); if(!s)return;
+  if(field==='name'){s.name=val;}
+  else{const n=parseFloat(String(val).replace(',','.'));s[field]=isFinite(n)?n:0;}
+  clearTimeout(setDebounce);
+  setDebounce=setTimeout(()=>{
+    if(field==='name'){renderTable();saveCurrentPreset();return;}
+    renderSetCaption(kind,id);
+    rows.forEach(r=>{
+      const hit = kind==='C' ? (r.cI===id||r.cS===id) : kind==='B' ? (r.bL===id||r.bR===id) : (r.j===id);
+      if(hit){r.status='pending';r.res=null;}
+    });
+    renderTable();recalcAll();saveCurrentPreset();
+  },260);
+}
+function numCell(kind,id,field,val,w){
+  return `<input type="number" inputmode="numeric" value="${val}" style="width:${w||52}px"
+    oninput="editSet('${kind}','${id}','${field}',this.value)">`;
+}
+function setCardHtml(kind,s){
+  const used=setUsed(kind,s.id);
+  let body='';
+  if(kind==='C'){
+    body=`<div class="setrow"><span class="sl">${t('lblHc')}</span>${numCell('C',s.id,'hc',s.hc)}<span class="su">mm</span></div>
+      <div class="setrow"><span class="sl">${t('lblBc')}</span>${numCell('C',s.id,'bc',s.bc)}<span class="su">mm</span></div>
+      <div class="setrow"><span class="sl">${t('lblCnom')} / ${t('lblDsw')}</span>${numCell('C',s.id,'cnom',s.cnom,40)}${numCell('C',s.id,'dsw',s.dsw,40)}<span class="su">mm</span></div>
+      <div class="setrow"><span class="sl">${t('lblCor')}</span>${numCell('C',s.id,'cor_n',s.cor_n,40)}${numCell('C',s.id,'cor_d',s.cor_d,40)}<span class="su">mm</span></div>
+      <div class="setrow"><span class="sl">${t('lblFb')}</span>${numCell('C',s.id,'fb_n',s.fb_n,40)}${numCell('C',s.id,'fb_d',s.fb_d,40)}<span class="su">mm</span></div>
+      <div class="setrow"><span class="sl">${t('lblFh')}</span>${numCell('C',s.id,'fh_n',s.fh_n,40)}${numCell('C',s.id,'fh_d',s.fh_d,40)}<span class="su">mm</span></div>`;
+  } else if(kind==='B'){
+    body=`<div class="setrow"><span class="sl">${t('lblBw')} / ${t('lblHb')}</span>${numCell('B',s.id,'bw',s.bw,40)}${numCell('B',s.id,'hb',s.hb,40)}<span class="su">mm</span></div>
+      <div class="setrow"><span class="sl">${t('lblCnom')} / ${t('lblDsw')}</span>${numCell('B',s.id,'cnom',s.cnom,40)}${numCell('B',s.id,'dsw',s.dsw,40)}<span class="su">mm</span></div>
+      <div class="setrow"><span class="sl">${t('lblTop')}</span>${numCell('B',s.id,'nt',s.nt,40)}${numCell('B',s.id,'dt',s.dt,40)}<span class="su">mm</span></div>
+      <div class="setrow"><span class="sl">${t('lblBot')}</span>${numCell('B',s.id,'nb',s.nb,40)}${numCell('B',s.id,'db',s.db,40)}<span class="su">mm</span></div>`;
+  } else {
+    body=`<div class="setrow"><span class="sl">${t('lblPer')}</span>${numCell('J',s.id,'n1',s.n1,40)}${numCell('J',s.id,'d1',s.d1,40)}<span class="su">mm</span></div>
+      <div class="setrow"><span class="sl">${t('lblTies')}</span>${numCell('J',s.id,'n2',s.n2,40)}${numCell('J',s.id,'d2',s.d2,40)}<span class="su">mm</span></div>
+      <div class="setrow"><span class="sl">${t('lblSets')}</span>${numCell('J',s.id,'nSets',s.nSets,40)}${numCell('J',s.id,'s',s.s,40)}<span class="su">mm</span></div>
+      <div class="setrow"><span class="sl">${t('lblColSt')}</span>${numCell('J',s.id,'nCol',s.nCol,40)}${numCell('J',s.id,'dCol',s.dCol,40)}<span class="su">mm</span></div>
+      <div class="setrow"><span class="sl">${t('lblScr')}</span>${numCell('J',s.id,'sCol',s.sCol)}<span class="su">mm</span></div>`;
+  }
+  return `<div class="setcard${used?' used':''}" id="card-${s.id}">
+    <div class="setcard-h">
+      <input class="setname" type="text" value="${esc(s.name)}" oninput="editSet('${kind}','${s.id}','name',this.value)">
+      <button class="set-del" onclick="delSet('${kind}','${s.id}')" title="${esc(tp('clearBtn'))}">&times;</button>
+    </div>
+    ${body}
+    <div class="setcap" id="cap-${s.id}"></div>
+    ${kind!=='J'?`<div class="setsk"><svg id="sk-${s.id}" viewBox="0 0 200 120"></svg></div>`:''}
+  </div>`;
+}
+function renderSets(){
+  if(typeof JP==='undefined')return;
+  document.getElementById('gridC').innerHTML=
+    setsC.map(s=>setCardHtml('C',s)).join('')+`<button class="setadd" onclick="addSet('C')">${t('setAddC')}</button>`;
+  document.getElementById('gridB').innerHTML=
+    setsB.map(s=>setCardHtml('B',s)).join('')+`<button class="setadd" onclick="addSet('B')">${t('setAddB')}</button>`;
+  document.getElementById('gridJ').innerHTML=
+    setsJ.map(s=>setCardHtml('J',s)).join('')+`<button class="setadd" onclick="addSet('J')">${t('setAddJ')}</button>`;
+  setsC.forEach(s=>renderSetCaption('C',s.id));
+  setsB.forEach(s=>renderSetCaption('B',s.id));
+  setsJ.forEach(s=>renderSetCaption('J',s.id));
+  document.getElementById('bdg_setC').textContent=setsC.length+' ×';
+  document.getElementById('bdg_setB').textContent=setsB.length+' ×';
+  document.getElementById('bdg_setJ').textContent=setsJ.length+' ×';
+}
+function renderSetCaption(kind,id){
+  const cap=document.getElementById('cap-'+id); if(!cap)return;
+  const list=kind==='C'?setsC:kind==='B'?setsB:setsJ;
+  const s=getSet(list,id); if(!s)return;
+  if(kind==='C'){
+    const st=colStats(s);
+    cap.innerHTML=`<span>${t('capAs')}</span><span>${F0(st.As)} mm² / ${F2(st.rho)} %</span>`;
+    drawColSet(s,st.model);
+  } else if(kind==='B'){
+    const b=beamStats(s);
+    cap.innerHTML=`<span>${t('capMrb')}</span><span>${F1(b.top.M)} / ${F1(b.bot.M)} kNm</span>`;
+    drawBeamSet(s,b);
+  } else {
+    const st=jointStats(s);
+    cap.innerHTML=`<span>${t('capAsh')}</span><span>${F0(st.AshProv)} mm² = ${(st.AshProv/100).toFixed(2)} cm²</span>`;
+  }
+}
+/* mini-sectiuni pe cartonasele de set; h_c se deseneaza orizontal, ca peste tot */
+function drawColSet(s,m){
+  const el=document.getElementById('sk-'+s.id); if(!el||!(s.hc>0)||!(s.bc>0))return;
+  const VW=200,VH=120,PAD=16;
+  const scl=Math.min((VW-2*PAD)/s.hc,(VH-2*PAD)/s.bc);
+  const w=s.hc*scl,h=s.bc*scl,x0=(VW-w)/2,y0=(VH-h)/2;
+  const X=z=>x0+w/2+z*scl, Y=y=>y0+h/2-y*scl;
+  let o=`<rect x="${x0}" y="${y0}" width="${w}" height="${h}" fill="#E8E8ED" stroke="#1C1C1E" stroke-width="1"/>`;
+  o+=`<rect x="${x0+s.cnom*scl}" y="${y0+s.cnom*scl}" width="${w-2*s.cnom*scl}" height="${h-2*s.cnom*scl}" fill="none" stroke="#AEAEB2" stroke-width=".7" rx="2"/>`;
+  m.steelFibers.forEach(f=>{if(f.A>0)o+=`<circle cx="${X(f.z)}" cy="${Y(f.y)}" r="${Math.max(1.6,Math.sqrt(4*f.A/Math.PI)*scl/2)}" fill="#1C1C1E"/>`;});
+  o+=`<text x="${VW/2}" y="${VH-3}" text-anchor="middle" font-size="7" fill="#8E8E93" font-family="Inter,sans-serif">h_c=${F0(s.hc)} · b_c=${F0(s.bc)}</text>`;
+  el.innerHTML=o;
+}
+function drawBeamSet(s,b){
+  const el=document.getElementById('sk-'+s.id); if(!el||!(s.bw>0)||!(s.hb>0))return;
+  const VW=200,VH=120,PAD=16;
+  const scl=Math.min((VW-2*PAD)/s.bw,(VH-2*PAD)/s.hb);
+  const w=s.bw*scl,h=s.hb*scl,x0=(VW-w)/2,y0=(VH-h)/2;
+  let o=`<rect x="${x0}" y="${y0}" width="${w}" height="${h}" fill="#E8E8ED" stroke="#1C1C1E" stroke-width="1"/>`;
+  o+=`<rect x="${x0+s.cnom*scl}" y="${y0+s.cnom*scl}" width="${w-2*s.cnom*scl}" height="${h-2*s.cnom*scl}" fill="none" stroke="#AEAEB2" stroke-width=".7" rx="2"/>`;
+  const ins=(s.cnom+s.dsw)*scl;
+  function bars(n,d,yy){let g='';const r=Math.max(1.6,d*scl/2);
+    for(let i=0;i<n;i++){const xx=(n===1)?x0+w/2:x0+ins+r+(w-2*ins-2*r)*i/(n-1);g+=`<circle cx="${xx}" cy="${yy}" r="${r}" fill="#1C1C1E"/>`;}
+    return g;}
+  o+=bars(s.nt,s.dt,y0+ins+Math.max(1.6,s.dt*scl/2));
+  o+=bars(s.nb,s.db,y0+h-ins-Math.max(1.6,s.db*scl/2));
+  o+=`<text x="${VW/2}" y="${VH-3}" text-anchor="middle" font-size="7" fill="#8E8E93" font-family="Inter,sans-serif">${s.nt}Ø${F0(s.dt)} / ${s.nb}Ø${F0(s.db)}</text>`;
+  el.innerHTML=o;
+}
+
+/* ══════════════ storey rows ══════════════ */
+function newRow(o){
+  o=o||{};
+  return {id:uid(), name:o.name||'', Ni:(o.Ni!==undefined?o.Ni:convN(1600)), Ns:(o.Ns!==undefined?o.Ns:convN(1200)),
+    lcl:o.lcl!==undefined?o.lcl:3300,
+    cI:o.cI||(setsC[0]&&setsC[0].id), cS:o.cS||(setsC[0]&&setsC[0].id),
+    bL:o.bL||(setsB[0]&&setsB[0].id), bR:o.bR||(setsB[0]&&setsB[0].id),
+    j:o.j||(setsJ[0]&&setsJ[0].id),
+    ovrBase:o.ovrBase!==undefined?o.ovrBase:null, ovrTop:o.ovrTop!==undefined?o.ovrTop:null,
+    res:null,m:null,geomDiff:false,status:'pending',_expanded:false};
+}
+/* Randurile sunt ordonate de jos in sus: primul este la baza, ultimul este
+   nodul de la ultimul nivel. Ambele pot fi fortate din panoul de detaliu. */
+function isBase(r,idx){return r.ovrBase!==null?!!r.ovrBase:(idx===0);}
+function isTop(r,idx){return r.ovrTop!==null?!!r.ovrTop:(idx===rows.length-1);}
+
+function computeRow(idx){
+  const r=rows[idx];
+  const end=(SEG.joint==='end');
+  const cI=getSet(setsC,r.cI), cS=getSet(setsC,r.cS);
+  const bL=getSet(setsB,r.bL), bR=end?null:getSet(setsB,r.bR), j=getSet(setsJ,r.j);
+  if(!cI||!cS||!bL||!j||(!end&&!bR)){
+    r.res={ok:false,code:'SET_MISSING',message:tp('errSet'),value:null,partial:null};
+    r.m=null;r.status='done';return;
+  }
+  /* Sectiunea nodului este cea a stalpului INFERIOR. Daca stalpul superior are
+     alta sectiune, M_Rd,sup se calculeaza pe sectiunea lui proprie si se paseaza
+     ca override, iar randul primeste un avertisment. */
+  const geomDiff=(cS.hc!==cI.hc)||(cS.bc!==cI.bc)||(cS.cnom!==cI.cnom)||(cS.dsw!==cI.dsw);
+  r.geomDiff=geomDiff;
+  let ovrS=0;
+  if(geomDiff){
+    try{
+      const mS=JP.column.buildModel(colInp(cS));
+      ovrS=JP.column.mrdUniaxial(mS,convN(r.Ns),'h').MRd;
+    }catch(e){ovrS=0;}
+  }
+  const inp={
+    concrete:curC, steel:curS, steelW:curSW,
+    duct:SEG.duct, jointType:end?'end':'int',
+    level:isBase(r,idx)?'base':'cur', topLevel:isTop(r,idx), fourBeams:(SEG.four==='yes'),
+    bc:cI.bc, hc:cI.hc, cnom:cI.cnom, dsw:cI.dsw, lcl:r.lcl,
+    beamL:{bw:bL.bw,hb:bL.hb,cnom:bL.cnom,dsw:bL.dsw,nt:bL.nt,dt:bL.dt,nb:bL.nb,db:bL.db},
+    beamR:end?null:{bw:bR.bw,hb:bR.hb,cnom:bR.cnom,dsw:bR.dsw,nt:bR.nt,dt:bR.dt,nb:bR.nb,db:bR.db},
+    colI:{N:convN(r.Ni),cor_n:cI.cor_n,cor_d:cI.cor_d,fb_n:cI.fb_n,fb_d:cI.fb_d,fh_n:cI.fh_n,fh_d:cI.fh_d},
+    colS:{N:convN(r.Ns),cor_n:cS.cor_n,cor_d:cS.cor_d,fb_n:cS.fb_n,fb_d:cS.fb_d,fh_n:cS.fh_n,fh_d:cS.fh_d,
+          MRdOverride:ovrS},
+    joint:{n1:j.n1,d1:j.d1,n2:j.n2,d2:j.d2,nSets:j.nSets,s:j.s,nCol:j.nCol,dCol:j.dCol,sCol:j.sCol},
+  };
+  try{
+    r.m=JP.joint.buildModel(inp);
+    r.res=JP.joint.solve(r.m,LANG);
+  }catch(e){
+    r.m=null;
+    r.res={ok:false,code:'EXCEPTION',message:String((e&&e.message)||e),value:null,partial:null};
+  }
+  r.status='done';
+}
+
+/* ══════════════ batch ══════════════ */
+function recalcAll(){runBatch(false);}
+function recalcPending(){runBatch(true);}
+function runBatch(pendingOnly){
+  if(typeof JP==='undefined')return;
+  if(!pendingOnly)rows.forEach(r=>{r.status='pending';r.res=null;});
+  const todo=[];
+  rows.forEach((r,i)=>{if(r.status!=='done')todo.push(i);});
+  const btn=document.getElementById('recalcBtn');
+  const pb=document.getElementById('progressBar'),pf=document.getElementById('progressFill');
+  if(!todo.length){renderSummary();if(btn)btn.disabled=false;if(pb)pb.style.display='none';return;}
+  if(btn)btn.disabled=true;
+  if(pb){pb.style.display='';pf.style.width='0%';}
+  let k=0;
+  const now=(typeof performance!=='undefined'&&performance.now)?()=>performance.now():()=>Date.now();
+  function step(){
+    const t0=now();
+    while(k<todo.length&&(now()-t0)<30){ computeRow(todo[k]); updateRowCells(todo[k]); k++; }
+    if(pf)pf.style.width=(100*k/todo.length).toFixed(0)+'%';
+    if(k<todo.length)requestAnimationFrame(step);
+    else{renderSummary();if(btn)btn.disabled=false;setTimeout(()=>{if(pb)pb.style.display='none';},400);}
+  }
+  requestAnimationFrame(step);
+}
+
+/* ══════════════ table ══════════════ */
+function setOptions(list,sel){
+  return list.map(s=>`<option value="${s.id}"${s.id===sel?' selected':''}>${esc(s.name)}</option>`).join('');
+}
+function rowCells(r,idx){
+  const out={sm:'—',vj:'—',u54:'—',ud:'—',ua:'—',uv:'—',ut:'—',
+             verdict:`<span class="verdict-pill pending">${t('vPend')}</span>`,cls:'row-pending'};
+  if(r.status!=='done')return out;
+  if(!r.res||!r.res.ok){
+    out.verdict=`<span class="verdict-pill na" title="${esc(statusText(r))}">${t('vNa')}</span>`;
+    out.cls='row-invalid';
+    return out;
+  }
+  const v=r.res.value, m=r.m;
+  const na=v.checks.find(c=>c.id==='c54').na;
+  out.sm=F1(v.SMRc); out.vj=F1(v.govVj.Vjhd);
+  out.u54=na?'—':PCT(v.u54); out.ud=PCT(v.uDiag); out.ua=PCT(v.uAsh);
+  out.uv=PCT(v.uAsv);
+  const cDet=v.checks.find(c=>c.id==='det');
+  const detOk=cDet?cDet.ok:false;
+  out.ut=`<span class="verdict-pill ${detOk?'ok':'no'}" title="${esc(t(detOk?'detTipOk':'detTipNo'))}">`
+        +`${t(detOk?'vDetOk':'vDetNo')}</span>`;
+  out.verdict=v.allOk?`<span class="verdict-pill ok">${t('vOk')}</span>`
+                     :`<span class="verdict-pill no">${t('vNo')}</span>`;
+  out.cls=v.allOk?'row-ok':'row-fail';
+  return out;
+}
+/* Alcatuirea, ca text simplu (tabel copiat si PDF): verdict, nu procent. */
+function dv(v){
+  if(!v)return '-';
+  const c=v.checks.find(x=>x.id==='det');
+  return tp(c&&c.ok?'vDetOk':'vDetNo');
+}
+function statusText(r){
+  if(!r.res)return '';
+  if(r.res.ok)return '';
+  return r.res.message||tp('vNa');
+}
+function renderTable(){
+  const end=(SEG.joint==='end');
+  const thead=document.getElementById('theadRow');
+  thead.innerHTML=`<th></th><th>${t('colStorey')}</th>
+    <th class="grp-start">${t('colCI')}</th><th>${t('colCS')}</th><th>${t('colBL')}</th>
+    ${end?'':`<th>${t('colBR')}</th>`}<th>${t('colJ')}</th>
+    <th class="grp-start">${t('colNi')}</th><th>${t('colNs')}</th><th>${t('colLcl')}</th>
+    <th class="grp-start">${t('colSMRc')}</th><th>${t('colVjhd')}</th>
+    <th class="grp-start">${t('col54')}</th><th>${t('colDiag')}</th><th>${t('colAsh')}</th>
+    <th>${t('colAsv')}</th><th>${t('colDet')}</th><th>${t('colVerdict')}</th><th></th>`;
+  const nCols=end?18:19;
+  const tb=document.getElementById('tbodyRows');
+  let html='';
+  rows.forEach((r,idx)=>{
+    const c=rowCells(r,idx);
+    const tags=(isBase(r,idx)?`<span class="lvl-tag">${t('tagBase')}</span>`:'')
+              +(isTop(r,idx)?`<span class="lvl-tag top">${t('tagTop')}</span>`:'');
+    html+=`<tr class="${c.cls}">
+      <td class="exp-cell"><button class="row-exp${r._expanded?' expanded':''}" onclick="toggleDetail(${idx})"><span class="chev-r"></span></button></td>
+      <td class="lbl-col"><div class="namecell"><input class="cell-in lbl-in" type="text" value="${esc(r.name)}" placeholder="${idx+1}" oninput="editRow(${idx},'name',this.value)">${tags}</div></td>
+      <td class="lbl-col grp-start"><select class="cell-sel" onchange="editRow(${idx},'cI',this.value)">${setOptions(setsC,r.cI)}</select></td>
+      <td class="lbl-col"><select class="cell-sel" onchange="editRow(${idx},'cS',this.value)">${setOptions(setsC,r.cS)}</select></td>
+      <td class="lbl-col"><select class="cell-sel" onchange="editRow(${idx},'bL',this.value)">${setOptions(setsB,r.bL)}</select></td>
+      ${end?'':`<td class="lbl-col"><select class="cell-sel" onchange="editRow(${idx},'bR',this.value)">${setOptions(setsB,r.bR)}</select></td>`}
+      <td class="lbl-col"><select class="cell-sel" onchange="editRow(${idx},'j',this.value)">${setOptions(setsJ,r.j)}</select></td>
+      <td class="grp-start"><input class="cell-in num-in" type="number" step="10" value="${r.Ni}" oninput="editRow(${idx},'Ni',this.value)"></td>
+      <td><input class="cell-in num-in" type="number" step="10" value="${r.Ns}" oninput="editRow(${idx},'Ns',this.value)"></td>
+      <td><input class="cell-in num-in" type="number" step="50" value="${r.lcl}" oninput="editRow(${idx},'lcl',this.value)"></td>
+      <td class="grp-start">${c.sm}</td><td>${c.vj}</td>
+      <td class="grp-start">${c.u54}</td><td>${c.ud}</td><td>${c.ua}</td><td>${c.uv}</td><td>${c.ut}</td>
+      <td onclick="toggleDetail(${idx})" style="cursor:pointer">${c.verdict}</td>
+      <td style="text-align:center"><button class="row-del" onclick="delRow(${idx})">&times;</button></td>
+    </tr>`;
+    if(r._expanded)html+=`<tr class="detail-row"><td colspan="${nCols}"><div class="detail-panel">${detailHtml(r,idx)}</div></td></tr>`;
+  });
+  tb.innerHTML=html;
+  document.getElementById('tableTitle').textContent=t('tableTitleN',rows.length);
+  renderSummary();
+}
+function updateRowCells(idx){
+  const tb=document.getElementById('tbodyRows'); if(!tb)return;
+  const trs=[...tb.querySelectorAll('tr')].filter(tr=>!tr.classList.contains('detail-row'));
+  const tr=trs[idx]; if(!tr)return;
+  const end=(SEG.joint==='end');
+  const base=end?9:10;    // prima coloana de rezultat (0 exp, 1 nume, seturi, N, l_cl)
+  const c=rowCells(rows[idx],idx);
+  const tds=tr.querySelectorAll('td');
+  const vals=[c.sm,c.vj,c.u54,c.ud,c.ua,c.uv,c.ut,c.verdict];
+  vals.forEach((v,i)=>{if(tds[base+i])tds[base+i].innerHTML=v;});
+  tr.className=c.cls;
+}
+/* Un temporizator PE RAND, nu unul singur pe tabel.
+   Cu un temporizator comun, tastarea in randul urmator in mai putin de 260 ms
+   anula recalcularea randului precedent: acesta ramanea cu rezultatele datelor
+   VECHI, alaturi de valoarea abia tastata, si cu pastila verde nemodificata.
+   Coborarea fortelor axiale pe verticala, rand dupa rand, este exact modul
+   normal de folosire a tabelului, deci se intampla des. */
+const rowDebounce={};
+function editRow(idx,field,val){
+  const r=rows[idx]; if(!r)return;
+  if(field==='name'){r.name=val;saveCurrentPreset();return;}
+  if(field==='Ni'||field==='Ns'||field==='lcl'){
+    const n=parseFloat(String(val).replace(',','.'));
+    r[field]=isFinite(n)?n:0;
+  } else { r[field]=val; }
+  r.status='pending';r.res=null;
+  // Rezultatele vechi dispar IMEDIAT, nu dupa ce se termina recalcularea:
+  // un rand nu trebuie sa arate niciodata cifre care nu corespund datelor lui.
+  updateRowCells(idx); renderSummary();
+  clearTimeout(rowDebounce[idx]);
+  rowDebounce[idx]=setTimeout(()=>{
+    delete rowDebounce[idx];
+    if(!rows[idx])return;             // randul a fost sters intre timp
+    computeRow(idx);
+    if(rows[idx]._expanded)renderTable(); else {updateRowCells(idx);renderSummary();}
+    renderSets();   // marcajul "folosit" pe cartonase
+    saveCurrentPreset();
+  },260);
+}
+/* Indicii se renumeroteaza la stergerea unui rand, deci orice temporizator in
+   curs ar recalcula ALT rand decat cel editat. Se anuleaza toate. */
+function cancelRowTimers(){
+  Object.keys(rowDebounce).forEach(function(k){clearTimeout(rowDebounce[k]);delete rowDebounce[k];});
+}
+function addRow(){
+  const last=rows[rows.length-1];
+  rows.push(newRow(last?{Ni:last.Ns,Ns:last.Ns,lcl:last.lcl,cI:last.cS,cS:last.cS,bL:last.bL,bR:last.bR,j:last.j}:{}));
+  showPanels();renderTable();renderSets();recalcPending();saveCurrentPreset();
+}
+function delRow(idx){
+  cancelRowTimers();
+  rows.splice(idx,1);
+  if(!rows.length){showPanels();saveCurrentPreset();return;}
+  rows.forEach(r=>{r.status='pending';r.res=null;});   // baza / ultimul nivel se muta
+  renderTable();renderSets();recalcAll();saveCurrentPreset();
+}
+function clearTable(){
+  if(rows.length&&!confirm(tp('confirmClear')))return;
+  cancelRowTimers();
+  rows=[];showPanels();renderTable();renderSets();saveCurrentPreset();
+}
+/* Completeaza N si setul de stalp de deasupra nodului din randul imediat superior. */
+function chainUp(){
+  for(let i=0;i<rows.length-1;i++){rows[i].Ns=rows[i+1].Ni;rows[i].cS=rows[i+1].cI;}
+  rows.forEach(r=>{r.status='pending';r.res=null;});
+  renderTable();recalcAll();saveCurrentPreset();
+}
+function toggleDetail(idx){
+  const r=rows[idx]; if(!r)return;
+  r._expanded=!r._expanded;
+  if(r._expanded&&r.status!=='done')computeRow(idx);
+  renderTable();
+}
+function renderSummary(){
+  const done=rows.filter(r=>r.status==='done');
+  const invalid=done.filter(r=>!(r.res&&r.res.ok));
+  const valid=done.filter(r=>r.res&&r.res.ok);
+  const nOk=valid.filter(r=>r.res.value.allOk).length;
+  const nNo=valid.length-nOk;
+  let worst=0,worstRow=null;
+  valid.forEach(r=>{if(r.res.value.worst>worst){worst=r.res.value.worst;worstRow=r;}});
+  let html=`<div class="sum-chip"><div class="sc-l">${t('sumTotal')}</div><div class="sc-v">${rows.length}</div></div>
+    <div class="sum-chip ok"><div class="sc-l">${t('sumOk')}</div><div class="sc-v">${nOk}</div></div>
+    <div class="sum-chip ${nNo?'no':''}"><div class="sc-l">${t('sumNo')}</div><div class="sc-v">${nNo}</div></div>
+    <div class="sum-chip ${worst>1?'no':'ok'}"><div class="sc-l">${t('sumWorst')}</div><div class="sc-v">${worst?PCT(worst):'—'}</div></div>`;
+  if(invalid.length)html+=`<div class="sum-chip"><div class="sc-l">${t('sumInvalid')}</div><div class="sc-v">${invalid.length}</div></div>`;
+  document.getElementById('summaryBar').innerHTML=html;
+}
+function showPanels(){
+  const has=rows.length>0;
+  document.getElementById('resultsPanel').style.display=has?'':'none';
+  document.getElementById('emptyPanel').style.display=has?'none':'';
+}
+
+/* ══════════════ row detail ══════════════ */
+function der(rowsArr,caption){
+  return `<table class="der">${caption?`<caption style="caption-side:top;text-align:left;font-size:10px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#8E8E93;padding:8px 0 2px">${caption}</caption>`:''}
+  <thead><tr><th>${t('colParam')}</th><th>${t('colForm')}</th><th>${t('colVal')}</th></tr></thead>
+  <tbody>${rowsArr.map(x=>`<tr class="${x[3]?'gov':''}"><td>${x[0]}</td><td class="f">${x[1]}</td><td>${x[2]}</td></tr>`).join('')}</tbody></table>`;
+}
+function detailHtml(r,idx){
+  let head='';
+  const warns=[];
+  if(r.geomDiff)warns.push(t('warnGeom'));
+  if(r.res&&r.res.warnings){
+    r.res.warnings.forEach(w=>{
+      if(w.code==='EUK_ASSUMED')warns.push(t('wEuk',w.ref));
+      else if(w.code==='COL_NO_BRACKET')warns.push(t('wCol',w.ref));
+      else if(w.code==='SETS_DONT_FIT'&&r.m)warns.push(t('warnSets',r.m.nSets,F0(r.m.s),F0(r.m.hjw)));
+    });
+  }
+  warns.forEach(w=>{head+=`<div class="detail-note warn">${w}</div>`;});
+  const opts=`<div class="detail-h" style="margin-top:4px">${t('dtOpts')}</div>
+    <div style="display:flex;gap:18px;flex-wrap:wrap;font-size:12.5px;color:#1C1C1E">
+      <label style="display:flex;align-items:center;gap:6px;cursor:pointer">
+        <input type="checkbox" ${isBase(r,idx)?'checked':''} onchange="setOvr(${idx},'ovrBase',this.checked)"> ${t('dtBase')}
+        ${r.ovrBase===null?`<span style="color:#AEAEB2">(${t('dtAuto')})</span>`:''}</label>
+      <label style="display:flex;align-items:center;gap:6px;cursor:pointer">
+        <input type="checkbox" ${isTop(r,idx)?'checked':''} onchange="setOvr(${idx},'ovrTop',this.checked)"> ${t('dtTop')}
+        ${r.ovrTop===null?`<span style="color:#AEAEB2">(${t('dtAuto')})</span>`:''}</label>
+    </div>`;
+  if(!r.res||!r.res.ok){
+    return head+`<div class="detail-note">${esc(statusText(r))}</div>`+opts;
+  }
+  const v=r.res.value, m=r.m, mat=m.mat, end=m.end;
+  const capRows=[
+    ['M<sub>Rb,L</sub> (sus/jos)','A<sub>s</sub>f<sub>yd</sub>z',`${F1(m.beamL.top.M)} / ${F1(m.beamL.bot.M)} kNm`],
+  ];
+  if(!end)capRows.push(['M<sub>Rb,R</sub> (sus/jos)','A<sub>s</sub>f<sub>yd</sub>z',`${F1(m.beamR.top.M)} / ${F1(m.beamR.bot.M)} kNm`]);
+  const fibLbl=LANG==='en'?'fibre method (JP.column)':'metoda fibrelor (nucleu)';
+  capRows.push(['M<sub>Rd,inf</sub>',`${fibLbl}, N = ${F0(r.Ni)} kN`,`${F1(m.colI.MRd)} kNm`]);
+  capRows.push(['M<sub>Rd,sup</sub>',`${fibLbl}, N = ${F0(r.Ns)} kN${r.geomDiff?' *':''}`,`${F1(m.colS.MRd)} kNm`]);
+  capRows.push(['&Sigma;M<sub>Rc</sub>','M<sub>Rd,inf</sub> + M<sub>Rd,sup</sub>',`${F1(v.SMRc)} kNm`,true]);
+  v.senses.forEach(s=>capRows.push([`&Sigma;M<sub>Rb</sub> — ${s.name==='A'?'sens 1':'sens 2'}`,
+    s.parts.map(p=>`${p[0]} = ${F1(p[1])}`).join(' + '),`${F1(s.SMRb)} kNm`,s===v.gov54]));
+  capRows.push(['&gamma;<sub>Rd</sub> (5.4) / (5.9) / (5.10) / (5.11)','—',`${F2(v.g54)} / ${F2(v.gb)} / ${F2(v.gc)} / ${F2(v.gj)}`]);
+
+  const jRows=[
+    ['b<sub>j</sub>','min(b<sub>c</sub>; b<sub>w</sub>+0,5h<sub>c</sub>) &nbsp;(5.28)',`${F0(m.bj)} mm`],
+    ['h<sub>c</sub> / h<sub>jc</sub> / h<sub>jw</sub>','—',`${F0(m.hc)} / ${F0(m.hjc)} / ${F0(m.hjw)} mm`],
+    ['&nu;<sub>d</sub>','N<sub>Ed,inf</sub>/(b<sub>c</sub>h<sub>c</sub>f<sub>cd</sub>)',F3(v.govAsh.nud)],
+    ['V<sub>c</sub>','2·M<sub>dc,sup</sub>/l<sub>cl</sub>',`${F1(v.govVj.Vc)} kN`],
+    ['V<sub>jhd</sub>',end?'(5.12)':'(5.11)',`${F1(v.govVj.Vjhd)} kN`,true],
+    ['A<sub>sh,ef</sub> / A<sub>sh,nec</sub>','—',`${F0(m.AshProv)} / ${F0(v.govAsh.AshReq)} mm²`],
+    ['A<sub>sv,ef</sub> / A<sub>sv,nec</sub>','(5.31)',`${F0(v.AsvProv)} / ${F0(v.AsvReq)} mm²`],
+    ['A<sub>sw</sub>/s nod / st&acirc;lp','5.3.4.2.3(6)',`${F3(v.ratJoint)} / ${F3(v.ratCol)} mm²/mm`],
+  ];
+  const V=b=>b?`<span style="color:#2E7D32;font-weight:600">${t('vOk')}</span>`:`<span style="color:#C0392B;font-weight:600">${t('vNo')}</span>`;
+  const ckRows=v.checks.map(c=>{
+    const lbl={c54:'&Sigma;M<sub>Rc</sub> &ge; &gamma;<sub>Rd</sub>&Sigma;M<sub>Rb</sub>',
+               diag:'V<sub>jhd</sub> &le; k·b<sub>j</sub>h<sub>c</sub>f<sub>cd</sub>',
+               ash:'A<sub>sh,nec</sub> &le; A<sub>sh,ef</sub>',
+               asv:'A<sub>sv,nec</sub> &le; A<sub>sv,ef</sub>',
+               det:'alcatuire nod'}[c.id];
+    return [lbl,c.clause,c.na?`<span style="color:#8E8E93">${t('vNa')}</span>`:(PCT(c.util)+' &nbsp; '+V(c.ok)),!c.na&&c.util>=v.worst-1e-9];
+  });
+  return head+`<div class="dcols">
+    <div><div class="detail-h">${t('dtCaps')}</div>${der(capRows)}</div>
+    <div><div class="detail-h">${t('dtJoint')}</div>${der(jRows)}</div>
+    <div><div class="detail-h">${t('dtChecks')}</div>${der(ckRows)}${opts}</div>
+  </div>`;
+}
+function setOvr(idx,field,val){
+  const r=rows[idx]; if(!r)return;
+  const auto=(field==='ovrBase')?(idx===0):(idx===rows.length-1);
+  r[field]=(val===auto)?null:val;   // daca alegerea coincide cu automatul, revine la automat
+  r.status='pending';r.res=null;
+  computeRow(idx);renderTable();saveCurrentPreset();
+}
+
+/* ══════════════ copy ══════════════ */
+function copyTable(){
+  const btn=document.getElementById('copyBtn');
+  const end=(SEG.joint==='end');
+  const head=[tp('colStorey'),tp('colCI'),tp('colCS'),tp('colBL')].concat(end?[]:[tp('colBR')])
+    .concat([tp('colJ'),'N inf (kN)','N sup (kN)','l_cl (mm)','Sum M_Rc (kNm)','V_jhd (kN)',
+             '(5.4)','Diag','A_sh','A_sv','Alcat.',tp('colVerdict')]);
+  const nm=(list,id)=>{const s=getSet(list,id);return s?s.name:'?';};
+  const lines=[head.join('\t')];
+  rows.forEach((r,idx)=>{
+    const ok=r.status==='done'&&r.res&&r.res.ok, v=ok?r.res.value:null;
+    const pc=x=>ok&&isFinite(x)?(100*x).toFixed(1)+'%':'-';
+    const na=ok&&v.checks.find(c=>c.id==='c54').na;
+    const cells=[r.name||String(idx+1),nm(setsC,r.cI),nm(setsC,r.cS),nm(setsB,r.bL)]
+      .concat(end?[]:[nm(setsB,r.bR)])
+      .concat([nm(setsJ,r.j),r.Ni,r.Ns,r.lcl,
+        ok?F1(v.SMRc):'-', ok?F1(v.govVj.Vjhd):'-',
+        na?'-':pc(ok?v.u54:NaN), pc(ok?v.uDiag:NaN), pc(ok?v.uAsh:NaN), pc(ok?v.uAsv:NaN), dv(ok?v:null),
+        ok?(v.allOk?tp('vOk'):tp('vNo')):(r.status==='done'?tp('vNa'):'-')]);
+    lines.push(cells.join('\t'));
+  });
+  const tsv=lines.join('\n');
+  const done=()=>{btn.textContent=t('copiedBtn');btn.disabled=true;
+    setTimeout(()=>{btn.textContent=t('copyBtn');btn.disabled=false;},1600);};
+  if(navigator.clipboard&&navigator.clipboard.writeText)
+    navigator.clipboard.writeText(tsv).then(done).catch(()=>fallbackCopy(tsv,done));
+  else fallbackCopy(tsv,done);
+}
+function fallbackCopy(text,cb){
+  const ta=document.createElement('textarea');
+  ta.value=text;ta.style.position='fixed';ta.style.left='-9999px';
+  document.body.appendChild(ta);ta.focus();ta.select();
+  try{document.execCommand('copy');cb&&cb();}catch(e){}
+  document.body.removeChild(ta);
+}
+
+/* ══════════════ PDF ══════════════ */
+function generatePdf(){
+  const btn=document.getElementById('rptBtn'),st=document.getElementById('rptStatus');
+  if(typeof window.jspdf==='undefined'){st.textContent=t('pdfLoading');return;}
+  if(!rows.length)return;
+  btn.disabled=true;btn.textContent=t('generating');
+  setTimeout(()=>{
+    try{buildPdf();st.textContent=t('statusDownloaded');setTimeout(()=>st.textContent='',4000);}
+    catch(e){console.error(e);st.textContent=t('pdfError')+' '+((e&&e.message)||e);}
+    finally{btn.disabled=false;btn.textContent=t('downloadPdf');}
+  },30);
+}
+function buildPdf(){
+  const{jsPDF}=window.jspdf;
+  const doc=new jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
+  const pW=297,pH=210,ml=12,mr=12,cw=pW-ml-mr;
+  const ds=new Date().toLocaleDateString(LANG==='en'?'en-GB':'ro-RO');
+  const end=(SEG.joint==='end');
+  const mat=MAT||readMat();
+  function hdr(){
+    doc.setFillColor(40,80,140);doc.rect(0,0,pW,13,'F');
+    doc.setTextColor(255,255,255);doc.setFontSize(10);doc.setFont('helvetica','bold');
+    doc.text(LANG==='en'?'CALCULATION REPORT — BEAM-COLUMN JOINTS BY STOREY'
+                        :'NOTA DE CALCUL — NODURI DE CADRU PE NIVELURI',ml,8);
+    doc.setFontSize(7.5);doc.setFont('helvetica','normal');
+    doc.text('P 100-1/2013 — 5.2.3.3.3, 5.3.3.4, 5.3.4.2.3, 5.4.4.3',ml,12);
+    doc.text((LANG==='en'?'Date: ':'Data: ')+ds,pW-mr,8,{align:'right'});
+    doc.setTextColor(0,0,0);
+  }
+  const ST={lineColor:[180,200,220],lineWidth:0.25,fontSize:7.4,textColor:[0,0,0],cellPadding:1.4};
+  const HS={fillColor:[200,215,235],textColor:[0,0,0],fontStyle:'bold',lineColor:[200,215,235],fontSize:7.2};
+  function sec(title,y){
+    doc.setFontSize(9);doc.setFont('helvetica','bold');doc.setTextColor(0,102,204);
+    doc.text(title,ml,y);doc.setTextColor(0,0,0);doc.setFont('helvetica','normal');return y+2;
+  }
+  hdr();
+  let y=sec(LANG==='en'?'1. GENERAL DATA':'1. DATE GENERALE',19);
+  doc.autoTable({startY:y+2,body:[
+    [LANG==='en'?'Concrete / steel / transverse steel':'Beton / otel / otel transversal',`${curC} / ${curS} / ${curSW}`],
+    ['f_cd / f_yd / f_ywd [MPa]',`${F2(mat.fcd)} / ${F1(mat.fyd)} / ${F1(mat.fywd)}`],
+    [tp('ductClass')+' / '+tp('jointType'),`${SEG.duct} / ${end?tp('jt_end'):tp('jt_int')}`],
+    [tp('fourBeams'),SEG.four==='yes'?tp('yes_'):tp('no_')],
+    [tp('signConv'),signConv==='neg'?'N < 0 '+(LANG==='en'?'compression (ETABS)':'compresiune (ETABS)')
+                                    :'N > 0 '+(LANG==='en'?'compression':'compresiune')],
+  ],margin:{left:ml},tableWidth:120,theme:'grid',styles:ST,
+    columnStyles:{0:{cellWidth:66},1:{fontStyle:'bold'}},didDrawPage:hdr});
+  let yA=doc.lastAutoTable.finalY;
+
+  // ── seturi ──
+  y=sec(LANG==='en'?'2. REINFORCEMENT SETS':'2. SETURI DE ARMARE',yA+7);
+  const cBody=setsC.map(s=>{const st2=colStats(s);
+    return [s.name,`${F0(s.hc)} x ${F0(s.bc)}`,`${F0(s.cnom)}/${F0(s.dsw)}`,
+      `${s.cor_n}D${F0(s.cor_d)} + ${2*s.fb_n}D${F0(s.fb_d)} + ${2*s.fh_n}D${F0(s.fh_d)}`,
+      `${F0(st2.As)} mm2`,`${F2(st2.rho)} %`];});
+  doc.autoTable({startY:y+2,head:[[LANG==='en'?'Column set':'Set stalp','h_c x b_c [mm]','c/Dsw',
+      LANG==='en'?'Bars':'Bare','A_s','rho']],body:cBody,
+    margin:{left:ml,right:mr},tableWidth:cw,theme:'grid',styles:ST,headStyles:HS,didDrawPage:hdr});
+  const bBody=setsB.map(s=>{const b=beamStats(s);
+    return [s.name,`${F0(s.bw)} x ${F0(s.hb)}`,`${F0(s.cnom)}/${F0(s.dsw)}`,
+      `${s.nt}D${F0(s.dt)}`,`${s.nb}D${F0(s.db)}`,`${F1(b.top.M)} / ${F1(b.bot.M)} kNm`];});
+  doc.autoTable({startY:doc.lastAutoTable.finalY+3,
+    head:[[LANG==='en'?'Beam set':'Set grinda','b_w x h_b [mm]','c/Dsw',
+      LANG==='en'?'Top':'Sus',LANG==='en'?'Bottom':'Jos','M_Rb- / M_Rb+']],body:bBody,
+    margin:{left:ml,right:mr},tableWidth:cw,theme:'grid',styles:ST,headStyles:HS,didDrawPage:hdr});
+  const jBody=setsJ.map(s=>{const st2=jointStats(s);
+    return [s.name,`${s.n1}D${F0(s.d1)}`,`${s.n2}D${F0(s.d2)}`,`${s.nSets} x ${F0(s.s)} mm`,
+      `${F0(st2.AshProv)} mm2`,`${s.nCol}D${F0(s.dCol)} @ ${F0(s.sCol)}`];});
+  doc.autoTable({startY:doc.lastAutoTable.finalY+3,
+    head:[[LANG==='en'?'Joint set':'Set nod',LANG==='en'?'Perimeter':'Perimetral',
+      LANG==='en'?'Ties':'Agrafe',LANG==='en'?'Sets x s':'Seturi x s','A_sh,ef',
+      LANG==='en'?'Column crit. zone':'Zona critica stalp']],body:jBody,
+    margin:{left:ml,right:mr},tableWidth:cw,theme:'grid',styles:ST,headStyles:HS,didDrawPage:hdr});
+
+  // ── rezultate pe niveluri ──
+  y=sec(LANG==='en'?'3. RESULTS BY STOREY':'3. REZULTATE PE NIVELURI',doc.lastAutoTable.finalY+7);
+  const nm=(list,id)=>{const s=getSet(list,id);return s?s.name:'?';};
+  const obs=[];
+  const body=rows.map((r,idx)=>{
+    const ok=r.status==='done'&&r.res&&r.res.ok, v=ok?r.res.value:null;
+    const pc=x=>ok&&isFinite(x)?(100*x).toFixed(1)+'%':'-';
+    const na=ok&&v.checks.find(c=>c.id==='c54').na;
+    if(r.status==='done'&&!ok)obs.push(`${idx+1}. ${r.name||idx+1} — ${statusText(r)}`);
+    else if(r.geomDiff)obs.push(`${idx+1}. ${r.name||idx+1} — ${tp('warnGeom')}`);
+    const tags=(isBase(r,idx)?' ['+tp('tagBase')+']':'')+(isTop(r,idx)?' ['+tp('tagTop')+']':'');
+    return [(r.name||String(idx+1))+tags,
+      nm(setsC,r.cI)+' / '+nm(setsC,r.cS), nm(setsB,r.bL)+(end?'':' / '+nm(setsB,r.bR)), nm(setsJ,r.j),
+      String(r.Ni), String(r.Ns), String(r.lcl),
+      ok?F1(v.SMRc):'-', ok?F1(v.govVj.Vjhd):'-',
+      na?'-':pc(ok?v.u54:NaN), pc(ok?v.uDiag:NaN), pc(ok?v.uAsh:NaN), pc(ok?v.uAsv:NaN), dv(ok?v:null),
+      ok?(v.allOk?tp('vOk'):tp('vNo')):(r.status==='done'?tp('vNa'):'-')];
+  });
+  doc.autoTable({startY:y+2,
+    head:[[tp('colStorey'),tp('colCI')+' / '+tp('colCS'),tp('colBL')+(end?'':' / '+tp('colBR')),tp('colJ'),
+      'N inf','N sup','l_cl','Sum M_Rc','V_jhd','(5.4)','Diag','A_sh','A_sv','Alcat.',tp('colVerdict')]],
+    body,margin:{left:ml,right:mr},tableWidth:cw,theme:'grid',styles:ST,headStyles:HS,
+    columnStyles:{4:{halign:'right'},5:{halign:'right'},6:{halign:'right'},7:{halign:'right'},8:{halign:'right'},
+      9:{halign:'right'},10:{halign:'right'},11:{halign:'right'},12:{halign:'right'},13:{halign:'right'},
+      14:{halign:'center',fontStyle:'bold'}},
+    didParseCell:function(d){
+      if(d.section==='body'&&d.column.index===14){
+        const t2=body[d.row.index][14];
+        if(t2===tp('vOk'))d.cell.styles.textColor=[46,125,50];
+        else if(t2===tp('vNo'))d.cell.styles.textColor=[192,57,43];
+        else if(t2===tp('vNa'))d.cell.styles.textColor=[108,108,112];
+      }},
+    didDrawPage:hdr});
+  let y3=doc.lastAutoTable.finalY+7;
+  function need(n){if(y3+n>pH-14){doc.addPage();hdr();y3=19;}}
+  if(obs.length){
+    need(12);y3=sec(LANG==='en'?'NOTES':'OBSERVATII',y3)+3;
+    doc.setFontSize(7.4);
+    obs.forEach(l=>{need(5);doc.text(l,ml,y3,{maxWidth:cw});y3+=4.2;});
+    y3+=3;
+  }
+  need(26);
+  y3=sec(LANG==='en'?'CONVENTIONS AND LIMITATIONS':'CONVENTII SI LIMITARI',y3)+3;
+  doc.setFontSize(7.4);
+  const lims=LANG==='en'?[
+    '- Column M_Rd: fibre method (40x40 mesh), uniaxial over the depth h_c, both senses, smaller retained.',
+    '- Beam M_Rb: equivalent rectangular stress block, singly reinforced; compression and slab steel ignored.',
+    '- Concrete integrated over the gross area; bars at c_nom + D_stirrup + D/2 from the face.',
+    '- The base level and the top-level joint follow from the row order, unless overridden per storey.',
+    '- A storey’s joint uses the section of its lower column set.',
+    '- Axial values are reported in the sign convention stated above.']:[
+    '- M_Rd stalp: metoda fibrelor (malaj 40x40), uniaxial pe adancimea h_c, ambele sensuri, se retine cel mai mic.',
+    '- M_Rb grinda: bloc dreptunghiular echivalent, sectiune simplu armata; armatura comprimata si cea din placa nu se iau in considerare.',
+    '- Betonul se integreaza pe aria bruta; barele la c_nom + D_etrier + D/2 de fata.',
+    '- Nivelul de la baza si nodul de la ultimul nivel rezulta din ordinea randurilor, daca nu sunt fortate pe nivel.',
+    '- Nodul unui nivel foloseste sectiunea setului de stalp inferior.',
+    '- Valorile axiale sunt raportate in conventia de semn declarata mai sus.'];
+  lims.forEach(l=>{need(5);doc.text(l,ml,y3,{maxWidth:cw});y3+=4.2;});
+
+  const tot=doc.internal.getNumberOfPages();
+  const stamp='P 100-1/2013 · SR EN 1992-1-1  |  M'+MODULE_ID+' v'+MODULE_VERSION+' / engine v'+JP.VERSION;
+  for(let i=1;i<=tot;i++){
+    doc.setPage(i);
+    doc.setFontSize(7);doc.setTextColor(0,0,0);doc.setFont('helvetica','italic');
+    doc.text(LANG==='en'?'Responsibility for the obtained results rests solely with the user. All values must be verified before use.'
+                        :'Responsabilitatea pentru rezultatele obtinute revine in exclusivitate utilizatorului. Toate valorile trebuie verificate inainte de utilizare.',ml,pH-5);
+    doc.setFont('helvetica','normal');
+    doc.text(stamp,ml,pH-1.5);
+    doc.text((LANG==='en'?'Page ':'Pagina ')+i+(LANG==='en'?' of ':' din ')+tot,pW-mr,pH-1.5,{align:'right'});
+    doc.text((LANG==='en'?'Generated: ':'Generat: ')+ds,pW/2,pH-1.5,{align:'center'});
+  }
+  doc.save(LANG==='en'?'Report_joints_by_storey.pdf':'Raport_noduri_pe_niveluri.pdf');
+}
+
+/* ══════════════ presets S1..S5 ══════════════ */
+let currentPreset='S1';
+const KEY=p=>'sw_mod9_'+p;
+function captureState(){
+  return {curC,curS,curSW,SEG:Object.assign({},SEG),signConv,
+    setsC:JSON.parse(JSON.stringify(setsC)),setsB:JSON.parse(JSON.stringify(setsB)),
+    setsJ:JSON.parse(JSON.stringify(setsJ)),
+    rows:rows.map(r=>({name:r.name,Ni:r.Ni,Ns:r.Ns,lcl:r.lcl,cI:r.cI,cS:r.cS,bL:r.bL,bR:r.bR,j:r.j,
+                       ovrBase:r.ovrBase,ovrTop:r.ovrTop}))};
+}
+function applyState(st){
+  if(!st){
+    curC='C30/37';curS='S500B';curSW='S500B';
+    SEG={duct:'DCM',joint:'int',four:'no'};
+    setsC=[defC('C1')];setsB=[defB('G1')];setsJ=[defJ('N1')];
+    rows=[];
+    return;
+  }
+  curC=st.curC||'C30/37';curS=st.curS||'S500B';curSW=st.curSW||'S500B';
+  SEG=Object.assign({duct:'DCM',joint:'int',four:'no'},st.SEG||{});
+  setsC=(st.setsC&&st.setsC.length)?st.setsC:[defC('C1')];
+  setsB=(st.setsB&&st.setsB.length)?st.setsB:[defB('G1')];
+  setsJ=(st.setsJ&&st.setsJ.length)?st.setsJ:[defJ('N1')];
+  /* Presetarile salvate sub alta conventie de semn isi pastreaza sensul fizic:
+     valorile N se negheaza o singura data, ca in 03/06/07/08. */
+  const savedSign=st.signConv||'neg';   // aceeasi implicita ca la modulul 08
+  const flip=(savedSign!==signConv);
+  rows=(st.rows||[]).map(r=>newRow({
+    name:r.name,
+    Ni:(flip&&isFinite(r.Ni)&&r.Ni!==0)?-r.Ni:r.Ni,
+    Ns:(flip&&isFinite(r.Ns)&&r.Ns!==0)?-r.Ns:r.Ns,
+    lcl:r.lcl,cI:r.cI,cS:r.cS,bL:r.bL,bR:r.bR,j:r.j,ovrBase:r.ovrBase,ovrTop:r.ovrTop}));
+  /* id-urile de set trebuie sa existe; altfel randul cade pe primul set */
+  rows.forEach(r=>{
+    if(!getSet(setsC,r.cI))r.cI=setsC[0].id;
+    if(!getSet(setsC,r.cS))r.cS=setsC[0].id;
+    if(!getSet(setsB,r.bL))r.bL=setsB[0].id;
+    if(!getSet(setsB,r.bR))r.bR=setsB[0].id;
+    if(!getSet(setsJ,r.j))r.j=setsJ[0].id;
+  });
+  /* uid trebuie sa continue dupa id-urile incarcate, ca sa nu se ciocneasca */
+  const all=[].concat(setsC,setsB,setsJ).map(s=>parseInt(String(s.id).slice(1),10)).filter(n=>isFinite(n));
+  if(all.length)_uid=Math.max(_uid,Math.max.apply(null,all)+1);
+}
+function saveCurrentPreset(){try{localStorage.setItem(KEY(currentPreset),JSON.stringify(captureState()));}catch(e){}}
+function loadPreset(p){try{const s=localStorage.getItem(KEY(p));return s?JSON.parse(s):null;}catch(e){return null;}}
+function switchPreset(p){
+  saveCurrentPreset();
+  currentPreset=p;
+  try{localStorage.setItem('sw_mod9_active',p);}catch(e){}
+  document.getElementById('presetSel').value=p;
+  applyState(loadPreset(p));
+  fillMaterialSelects();
+  document.getElementById('cp').value=curC;
+  document.getElementById('sp').value=curS;
+  document.getElementById('swp').value=curSW;
+  paintSegs();
+  MAT=readMat();
+  onGlobalChange();
+  showPanels();
+  saveCurrentPreset();
+}
+
+/* ══════════════ boot ══════════════ */
+document.querySelectorAll('#langSeg button').forEach(b=>b.addEventListener('click',()=>setLang(b.dataset.lang)));
+if(typeof JP!=='undefined'){
+  (function(){
+    try{const ap=localStorage.getItem('sw_mod9_active');if(ap)currentPreset=ap;}catch(e){}
+    document.getElementById('presetSel').value=currentPreset;
+    applyState(loadPreset(currentPreset));
+  })();
+  fillMaterialSelects();
+  MAT=readMat();
+}
+paintSegs();
+applyStaticLang();
+if(typeof JP!=='undefined'){
+  onGlobalChange();
+  showPanels();
+}
+</script>
+</body>
+</html>

@@ -48,6 +48,9 @@ body{font-family:'Inter',sans-serif;background:#F5F5F7;color:#1C1C1E;min-height:
 .mod-arrow svg{width:12px;height:12px;stroke:#C7C7CC;stroke-width:2.5;fill:none;stroke-linecap:round;stroke-linejoin:round}
 .mod:hover .mod-arrow svg{stroke:#8E8E93}
 .author{text-align:center;font-size:12px;font-weight:500;color:#8E8E93;margin-top:20px;letter-spacing:.02em}
+.validate{text-align:center;margin-top:7px}
+.validate a{font-size:11px;color:#AEAEB2;text-decoration:none;letter-spacing:.02em;border-bottom:1px solid transparent;padding-bottom:1px;transition:color .12s,border-color .12s}
+.validate a:hover{color:#6C6C70;border-bottom-color:#C7C7CC}
 @media(max-width:400px){.mod-title{font-size:13px}.mod-desc{font-size:10px}.mod-icon{width:44px}}
 </style>
 </head>
@@ -223,7 +226,7 @@ body{font-family:'Inter',sans-serif;background:#F5F5F7;color:#1C1C1E;min-height:
       </a>
     </div>
 
-    <!-- 08 Nod de cadru (+ 09 batch, in dezvoltare) -->
+    <!-- 08 Nod de cadru (+ 09 batch) -->
     <div class="mod-pair">
       <a class="mod mod-main" href="8_NOD.html">
         <span class="mod-badge" data-i18n="badgeNew">Nou</span>
@@ -247,16 +250,17 @@ body{font-family:'Inter',sans-serif;background:#F5F5F7;color:#1C1C1E;min-height:
         </div>
         <span class="mod-arrow"><svg viewBox="0 0 16 16"><polyline points="5,3 11,8 5,13"/></svg></span>
       </a>
-      <div class="mod mod-batch mod-disabled" data-i18n-title="m9tip" title="Verificare noduri in lot (in dezvoltare)">
+      <a class="mod mod-batch" href="9_NOD_TABEL.html" data-i18n-title="m9tip" title="Un rand pe nivel, pe o linie de stalp, cu seturi de armare">
         <span class="batch-num">09</span>
         <span class="batch-ico"><svg width="26" height="20" viewBox="0 0 26 20" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="1" y="1" width="24" height="18" rx="2" fill="#fff" stroke="#00796B" stroke-width="1.2"/><line x1="1" y1="6.6" x2="25" y2="6.6" stroke="#00796B" stroke-width="1"/><line x1="1" y1="12.4" x2="25" y2="12.4" stroke="#00796B" stroke-width="1"/><line x1="9.5" y1="1" x2="9.5" y2="19" stroke="#00796B" stroke-width="1" opacity="0.55"/></svg></span>
         <span class="batch-lbl" data-i18n="batchLbl">Batch</span>
-      </div>
+      </a>
     </div>
 
 
   </div>
   <div class="author" data-i18n="author">Lucrare de disertație — Janos Patrik · UTCN · Facultatea de Construcții · 2026</div>
+  <div class="validate"><a href="test.html" data-i18n="validateLink">Validarea nucleului de calcul</a></div>
 </div>
 
 <script>
@@ -283,10 +287,11 @@ const I18N={
   groupColumns:{ro:'Stâlpi', en:'Columns'},
   batchLbl:{ro:'Batch', en:'Batch'},
   m7tip:{ro:'Import combinații de încărcare din Excel/ETABS, verificare în lot', en:'Import load combinations from Excel/ETABS, batch check'},
-  m9tip:{ro:'Verificare noduri în lot — în dezvoltare', en:'Batch joint check — in development'},
+  m9tip:{ro:'Un rând pe nivel, pe o linie de stâlp, cu seturi de armare', en:'One row per storey up a column line, with reinforcement sets'},
   badgeNew:{ro:'Nou', en:'New'},
   badgeSoon:{ro:'În curând', en:'Coming soon'},
-  author:{ro:'Lucrare de disertație — Janos Patrik · UTCN · Facultatea de Construcții · 2026', en:'Dissertation — Janos Patrik · UTCN · Faculty of Civil Engineering · 2026'}
+  author:{ro:'Lucrare de disertație — Janos Patrik · UTCN · Facultatea de Construcții · 2026', en:'Dissertation — Janos Patrik · UTCN · Faculty of Civil Engineering · 2026'},
+  validateLink:{ro:'Validarea nucleului de calcul', en:'Calculation engine validation'}
 };
 function getLang(){try{return localStorage.getItem('sw_lang')||'en';}catch(e){return 'en';}}
 function setLang(l){try{localStorage.setItem('sw_lang',l);}catch(e){}applyLang(l);}

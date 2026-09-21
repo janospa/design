@@ -65,6 +65,11 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
 .geom-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}
 .geom-grid .row{border-bottom:1px solid #E0E0E5}
 @media(max-width:680px){.geom-grid{grid-template-columns:1fr}}
+.status-strip{display:none;align-items:flex-start;gap:8px;padding:9px 11px;border-radius:8px;font-size:12px;line-height:1.45;margin-top:10px;background:#FDECEC;color:#C0392B;border:1px solid #F2C2C2}
+.status-strip.on{display:flex}
+.status-strip.warn{background:#FFF6E5;color:#8A5A00;border-color:#F5DCA8}
+.status-strip .sico{font-weight:600;flex-shrink:0}
+.status-strip ul{margin:0;padding-left:15px}
 
 /* ── paste / table section ── */
 .paste-zone{border:2px dashed #B8D4F8;border-radius:12px;background:#F5F9FF;padding:22px 16px;text-align:center;cursor:text;transition:all .15s}
@@ -106,10 +111,13 @@ table.results tr.row-ok td{background:#F3FAF4}
 table.results tr.row-ok td:first-child{background:#EDF7EE}
 table.results tr.row-fail td{background:#FDF1F1}
 table.results tr.row-fail td:first-child{background:#FBE8E8}
+table.results tr.row-invalid td{background:#F7F7F9;color:#6C6C70}
+table.results tr.row-invalid td:first-child{background:#F2F2F5}
 table.results tr.row-pending td{color:#AEAEB2}
 .verdict-pill{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600}
 .verdict-pill.ok{background:#D9F0DB;color:#1E6B26}
 .verdict-pill.no{background:#F7D6D6;color:#A32626}
+.verdict-pill.na{background:#E4E4E9;color:#6C6C70;cursor:help}
 .verdict-pill.pending{background:#EEEEEE;color:#AEAEB2}
 .editable-row-actions{text-align:center!important}
 .row-del{width:20px;height:20px;border-radius:6px;border:none;background:transparent;color:#C7C7CC;cursor:pointer;font-size:14px;line-height:1;display:inline-flex;align-items:center;justify-content:center}
@@ -136,11 +144,12 @@ table.results tr.row-pending td{color:#AEAEB2}
 .detail-h{font-size:10.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#8E8E93;margin-bottom:8px}
 .detail-chart-wrap{position:relative;width:100%;height:250px}
 .detail-vals{font-size:12.5px}
-.dt-row{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #ECECF0}
+.dt-row{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #ECECF0;gap:10px}
 .dt-row:last-child{border-bottom:none}
 .dt-k{color:#6C6C70}
-.dt-v{font-weight:500;color:#1C1C1E;font-feature-settings:"tnum" 1}
+.dt-v{font-weight:500;color:#1C1C1E;font-feature-settings:"tnum" 1;text-align:right}
 .detail-empty{padding:16px;text-align:center;color:#8E8E93;font-size:12.5px}
+.detail-note{margin-bottom:10px;padding:8px 11px;border-radius:8px;background:#FDECEC;color:#C0392B;border:1px solid #F2C2C2;font-size:12px;line-height:1.45}
 @media(max-width:820px){.detail-grid{grid-template-columns:1fr}}
 .empty-state{padding:40px 20px;text-align:center;color:#8E8E93;font-size:13px}
 .progress-bar{height:3px;background:#E0E0E5;overflow:hidden}
@@ -154,7 +163,8 @@ table.results tr.row-pending td{color:#AEAEB2}
 .lang-seg button{padding:5px 11px;font-size:12px;font-weight:600;border:none;border-radius:6px;background:transparent;color:#8E8E93;cursor:pointer;font-family:'Inter',sans-serif;transition:all .12s;letter-spacing:.02em}
 .lang-seg button.on{background:#fff;color:#1C1C1E;box-shadow:0 1px 2px rgba(0,0,0,.08)}
 .topbar{display:flex;align-items:center;gap:8px;padding-right:12px}
-.author-footer{text-align:center;font-size:11px;font-weight:500;color:#8E8E93;padding:16px 16px 24px;letter-spacing:.02em}
+.author-footer{text-align:center;font-size:11px;font-weight:500;color:#8E8E93;padding:16px 16px 4px;letter-spacing:.02em}
+.version-footer{text-align:center;font-size:10px;color:#AEAEB2;padding:0 16px 24px;letter-spacing:.02em;font-feature-settings:"tnum" 1}
 .preset-bar{display:flex;align-items:center;gap:10px;padding:0 16px 10px;max-width:1240px;margin:0 auto}
 .preset-bar label{font-size:14px;font-weight:500;color:#8E8E93}
 .preset-bar select{padding:6px 28px 6px 10px;font-size:14px;border:1px solid #C7C7CC;border-radius:8px;background:#fff;color:#1C1C1E;font-family:'Inter',sans-serif;-webkit-appearance:none;appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238E8E93'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
@@ -201,15 +211,9 @@ table.results tr.row-pending td{color:#AEAEB2}
       <div class="sub" style="padding-top:12px" data-i18n="s2materials">Materiale</div>
       <div class="geom-grid">
         <div class="sel-field"><label data-i18n="concClass">Clasa beton</label><div class="sel-wrap">
-          <select id="cp" onchange="curC=this.value;updMat();onSectionChange()">
-            <option>C12/15</option><option>C16/20</option><option>C20/25</option><option>C25/30</option>
-            <option selected>C30/37</option><option>C35/45</option><option>C40/50</option><option>C45/55</option>
-            <option>C50/60</option><option>C55/67</option><option>C60/75</option>
-          </select></div></div>
+          <select id="cp" onchange="curC=this.value;updMat();onSectionChange()"></select></div></div>
         <div class="sel-field"><label data-i18n="steelClass">Clasa otel</label><div class="sel-wrap">
-          <select id="sp" onchange="curS=this.value;updMat();onSectionChange()">
-            <option>S240B</option><option>S400B</option><option>S500B</option><option selected>S 500</option>
-          </select></div></div>
+          <select id="sp" onchange="curS=this.value;updMat();onSectionChange()"></select></div></div>
       </div>
       <div class="mat-vals">
         <div class="mv"><div class="mvl">f<sub>cd</sub></div><div class="mvv" id="fcd_d">20.00</div><div class="mvu">MPa</div></div>
@@ -243,6 +247,7 @@ table.results tr.row-pending td{color:#AEAEB2}
         <div class="row"><div class="rl"><span data-i18n="stirrupDia">Diametru etrier</span> <span class="rn">(&Oslash;<sub>etr</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="detr" value="8" step="2" oninput="onSectionChange()"><span class="ru">mm</span></div></div>
       </div>
       <div class="note" id="sectionSummaryNote" style="padding-top:10px"></div>
+      <div class="status-strip" id="statusStrip"><span class="sico" id="statusIco">!</span><span id="statusMsg"></span></div>
       <div style="margin-top:6px;background:#fff;border:1px solid #E0E0E5;border-radius:10px;padding:8px">
         <svg id="sketch" viewBox="0 0 460 260" width="100%" style="display:block;max-width:420px;margin:0 auto"></svg>
       </div>
@@ -252,7 +257,7 @@ table.results tr.row-pending td{color:#AEAEB2}
 
   <!-- ═══ PASTE ZONE ═══ -->
   <div class="op">
-    <div class="ph"><span data-i18n="pasteTitle">Import combinatii de incarcare</span><span class="info-wrap"><button class="info-btn" type="button" onclick="toggleInfo(this,event)">i</button><div class="info-pop wide" onclick="event.stopPropagation()" data-i18n="pasteInfo">Copiaza din Excel/ETABS un bloc de date FARA antet, cu coloanele in aceasta ordine: Story, Column, Output Case, Station, N, M2, M3. Valorile trebuie separate prin Tab (formatul implicit la copiere din Excel). Semnul lui N se stabileste din comutatorul de mai sus.</div></span></div>
+    <div class="ph"><span data-i18n="pasteTitle">Import combinatii de incarcare</span><span class="info-wrap"><button class="info-btn" type="button" onclick="toggleInfo(this,event)">i</button><div class="info-pop wide" onclick="event.stopPropagation()" data-i18n="pasteInfo">&mdash;</div></span></div>
     <div class="pb" style="padding-top:4px">
       <div class="toggle-row" style="padding-bottom:10px">
         <span data-i18n="mapLabel">Convenție axe ETABS</span>
@@ -261,11 +266,11 @@ table.results tr.row-pending td{color:#AEAEB2}
           <button id="seg-map-swap" data-v="swap" onclick="setAxisMap('swap')" data-i18n="mapSwap">M2&rarr;My, M3&rarr;Mz</button>
         </div>
       </div>
-      <div class="toggle-row" style="padding-bottom:12px;border-bottom:1px solid #E0E0E5;margin-bottom:14px">
+      <div class="toggle-row" data-nopreset="1" style="padding-bottom:12px;border-bottom:1px solid #E0E0E5;margin-bottom:14px">
         <span data-i18n="signLabel">Convenție semn N</span>
-        <div class="seg">
-          <button id="seg-sign-pos" class="on" data-v="pos" onclick="setSignConv('pos')" data-i18n="signPos">N&gt;0 compresiune</button>
-          <button id="seg-sign-neg" data-v="neg" onclick="setSignConv('neg')" data-i18n="signNeg">N&lt;0 compresiune</button>
+        <div class="seg" data-nopreset="1">
+          <button id="seg-sign-neg" class="on" data-v="neg" onclick="setSignConv('neg')" data-i18n="signNeg">N&lt;0 compresiune</button>
+          <button id="seg-sign-pos" data-v="pos" onclick="setSignConv('pos')" data-i18n="signPos">N&gt;0 compresiune</button>
         </div>
       </div>
       <div class="paste-zone" id="pasteZone" onclick="focusPasteInput()" tabindex="0">
@@ -308,26 +313,71 @@ table.results tr.row-pending td{color:#AEAEB2}
 
 </div>
 <div class="author-footer" data-i18n="footer">Lucrare de disertație — Janos Patrik · UTCN · Facultatea de Construcții · 2026</div>
+<div class="version-footer" id="versionFooter">&mdash;</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
+
+<!-- ═══ nucleu de calcul comun — trebuie incarcat INAINTE de scriptul modulului ═══ -->
+<script src="engine.js"></script>
+
 <script>
-const CONC={'C12/15':{fck:12},'C16/20':{fck:16},'C20/25':{fck:20},'C25/30':{fck:25},'C30/37':{fck:30},'C35/45':{fck:35},'C40/50':{fck:40},'C45/55':{fck:45},'C50/60':{fck:50},'C55/67':{fck:55},'C60/75':{fck:60}};
-const STEEL={'S240B':{fyk:240,euk:0.05},'S400B':{fyk:400,euk:0.05},
-             'S500B':{fyk:500,euk:0.05},'S 500':{fyk:500,euk:0.05}};
+/* ═══════════════════════════════════════════════════════════════════════════
+   MODULUL 07 — STALP, VERIFICARE BIAXIALA IN LOT (TABEL)
+   Tot calculul este in engine.js (JP.column.*). Aici raman doar: interfata,
+   importul din ETABS/Excel, tabelul, desenele, exportul PDF si presetarile.
+
+   ATENTIE — rezultatele se schimba fata de versiunea 1.x, din trei motive,
+   toate preluate din nucleul comun (aceleasi ca la modulul 06 v2.x):
+     1. aria de beton este BRUTA (armatura se adauga peste), nu neta;
+     2. pozitia barelor foloseste acoperirea mecanica c_nom + Ø_etr + Ø/2,
+        deci centrul barei nu mai cade pe fata etrierului;
+     3. curbura este limitata de pivotul A (eps_ud) si de pivotul C
+        (sectiune integral comprimata -> eps_c2), nu numai de eps_cu.
+   Validarea fata de XD-CoSec trebuie refacuta.
+   ═══════════════════════════════════════════════════════════════════════════ */
+const MODULE_ID='07', MODULE_VERSION='2.0.1';
+
+/* Captura de ecran cu formatul ETABS, afisata in popover-ul de import.
+   Se completeaza cu sirul "data:image/png;base64,..." din versiunea
+   anterioara a modulului (o singura inlocuire). Daca ramane gol, popover-ul
+   afiseaza doar textul, fara imagine. */
+const ETABS_IMG='';
+
 let curC='C30/37',curS='S 500',confMode='none';
-let axisMap=(function(){try{return localStorage.getItem('sw_col_axismap')||'std';}catch(e){return 'std';}})();
-let signConv=(function(){try{return localStorage.getItem('sw_col_signconv')||'pos';}catch(e){return 'pos';}})();
-// Same discretization as Module 06 (validated against XD-CoSec within ~0.7%,
-// conservative direction). Kept identical so batch results match the
-// single-column module exactly for the same section/loads.
-const NGY=40, NGZ=40, NANG=24;
-let rows=[]; // {story,column,outputCase,station,N,My,Mz, result:{...}|null, status:'pending'|'done'|'error'}
+let rows=[];            // {story,column,outputCase,station,Nraw,M2,M3,N,My,Mz,res,status,_expanded}
 let currentModel=null;
+
+/* ─── Conventia axelor ETABS ─────────────────────────────────────────────────
+   Conventia de axe locale nu este universala: depinde de cum au fost setate
+   (sau suprascrise) axele locale in model. Implicit M2->Mz, M3->My. Valorile
+   brute M2/M3 se pastreaza pe rand, deci schimbarea comutatorului re-mapeaza
+   datele existente fara a relipi din Excel. Este o proprietate a modelului,
+   deci ramane salvata pe presetare. */
+let axisMap=(function(){try{return localStorage.getItem('sw_col_axismap')||'std';}catch(e){return 'std';}})();
+function mapMy(M2,M3){return axisMap==='swap'?M2:M3;}
+function mapMz(M2,M3){return axisMap==='swap'?M3:M2;}
+
+/* ─── Conventia de semn pentru N (comuna cu modulele 03 / 06) ────────────────
+   Nucleul lucreaza intern cu COMPRESIUNEA POZITIVA. Conversia se face numai la
+   granita cu interfata, atat pentru valoarea citita cat si pentru orice
+   valoare axiala afisata. Este o preferinta de utilizator, nu o proprietate a
+   sectiunii, deci se pastreaza global (sw_signconv) si NU intra in presetare —
+   presetarea poarta doar o eticheta, folosita la migrare. */
+let signConv=(function(){try{return localStorage.getItem('sw_signconv')||'neg';}catch(e){return 'neg';}})();
+function sgnN(){return signConv==='neg'?-1:1;}
+function convN(v){return sgnN()*v;}
+
+if(typeof JP==='undefined'){
+  document.getElementById('statusStrip').className='status-strip on';
+  document.getElementById('statusMsg').textContent=
+    'engine.js nu s-a incarcat. Verificati ca fisierul este in acelasi folder cu aceasta pagina.';
+}
 
 // ═══════════════════ i18n ═══════════════════
 let LANG=(function(){try{return localStorage.getItem('sw_lang')||'en';}catch(e){return 'en';}})();
+const IMG_TAG=ETABS_IMG?('<img src="'+ETABS_IMG+'" alt="ETABS" style="width:100%;margin-top:8px;border:1px solid #DCDCE0;border-radius:6px;display:block">'):'';
 const T={
   backAll:{ro:'Toate modulele',en:'All modules'},
   pageLabel:{ro:'Verificare biaxiala in tabel',en:'Biaxial check — table'},
@@ -355,7 +405,8 @@ const T={
   s4coverStirrups:{ro:'Acoperire &amp; etrieri',en:'Cover &amp; stirrups'},
   cover:{ro:'Acoperire',en:'Cover'},
   stirrupDia:{ro:'Diametru etrier',en:'Stirrup diameter'},
-  cornerRoundNote:{ro:n=>`Rotunjit la ${n} bare (multiplu de 4, cate 1 identica in fiecare colt).`,en:n=>`Rounded to ${n} bars (multiple of 4, one identical bar per corner).`},
+  cornerBadNote:{ro:'Numarul de bare de la colturi trebuie sa fie multiplu de 4: barele se numara pe toate cele 4 colturi, iar un pachet de bare la fiecare colt da 4, 8, 12 … Calculul este oprit pana la corectare.',
+                  en:'The corner bar count must be a multiple of 4: the bars are counted over all 4 corners, and one bundle at each corner gives 4, 8, 12 … The calculation is stopped until this is corrected.'},
   mapLabel:{ro:'Conventie axe ETABS',en:'ETABS axis convention'},
   signLabel:{ro:'Conventie semn N',en:'N sign convention'},
   signPos:{ro:'N&gt;0 compresiune',en:'N&gt;0 compression'},
@@ -363,7 +414,9 @@ const T={
   mapStd:{ro:'M2&rarr;Mz, M3&rarr;My',en:'M2&rarr;Mz, M3&rarr;My'},
   mapSwap:{ro:'M2&rarr;My, M3&rarr;Mz',en:'M2&rarr;My, M3&rarr;Mz'},
   pasteTitle:{ro:'Import combinatii de incarcare',en:'Import load combinations'},
-  pasteInfo:{ro:'Copiaza din Excel/ETABS un bloc de date FARA antet, cu coloanele in aceasta ordine: Story, Column, Output Case, Station, N, M2, M3. Valorile trebuie separate prin Tab (formatul implicit la copiere din Excel). Semnul lui N se stabileste din comutatorul de mai sus.<br><br><b>Recomandare:</b> sorteaza intai valorile in Excel si pastreaza doar combinatiile critice pentru fiecare stalp (ex. N max cu M aferente, M2 max cu rest aferente, M3 max cu rest aferente).<br><img src="data:image/png;base64,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" alt="Exemplu format ETABS" style="width:100%;margin-top:8px;border:1px solid #DCDCE0;border-radius:6px;display:block">',en:'Copy a block of data from Excel/ETABS WITHOUT a header row, with columns in this order: Story, Column, Output Case, Station, N, M2, M3. Values must be Tab-separated (the default when copying from Excel). The sign of N is set by the toggle above.<br><br><b>Tip:</b> first sort the values in Excel and keep only the critical combinations per column (e.g. max N with concurrent M, max M2 with the rest concurrent, max M3 with the rest concurrent).<br><img src="data:image/png;base64,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" alt="ETABS format example" style="width:100%;margin-top:8px;border:1px solid #DCDCE0;border-radius:6px;display:block">'},
+  pasteInfo:{
+    ro:'Copiaza din Excel/ETABS un bloc de date FARA antet, cu coloanele in aceasta ordine: Story, Column, Output Case, Station, N, M2, M3. Valorile trebuie separate prin Tab (formatul implicit la copiere din Excel). Semnul lui N se stabileste din comutatorul de mai sus.<br><br><b>Recomandare:</b> sorteaza intai valorile in Excel si pastreaza doar combinatiile critice pentru fiecare stalp (ex. N max cu M aferente, M2 max cu rest aferente, M3 max cu rest aferente).'+IMG_TAG,
+    en:'Copy a block of data from Excel/ETABS WITHOUT a header row, with columns in this order: Story, Column, Output Case, Station, N, M2, M3. Values must be Tab-separated (the default when copying from Excel). The sign of N is set by the toggle above.<br><br><b>Tip:</b> first sort the values in Excel and keep only the critical combinations per column (e.g. max N with concurrent M, max M2 with the rest concurrent, max M3 with the rest concurrent).'+IMG_TAG},
   pasteZoneTitle:{ro:'Click aici, apoi Ctrl+V',en:'Click here, then Ctrl+V'},
   pasteZoneSub:{ro:'Story &middot; Column &middot; Output Case &middot; Station &middot; N &middot; M2 &middot; M3 (fara antet, separate prin Tab)',en:'Story &middot; Column &middot; Output Case &middot; Station &middot; N &middot; M2 &middot; M3 (no header, Tab-separated)'},
   recalcAllBtn:{ro:'Recalculeaza tot',en:'Recalculate all'},
@@ -383,9 +436,13 @@ const T={
   dtX:{ro:'X (adânc. axă neutră)',en:'X (neutral axis depth)'},
   dtTheta:{ro:'θ (înclinare axă neutră)',en:'θ (neutral axis angle)'},
   dtUtil:{ro:'Utilizare',en:'Utilization'},
+  dtPivot:{ro:'Limita care guvernează',en:'Governing limit'},
   dtNRdc:{ro:'N_Rd,c (compresiune)',en:'N_Rd,c (compression)'},
   dtNRdt:{ro:'N_Rd,t (întindere)',en:'N_Rd,t (tension)'},
   dtHatch:{ro:'zonă comprimată (albastru) · axă neutră (roșu)',en:'compressed zone (blue) · neutral axis (red)'},
+  pivotConc:{ro:'beton (eps_cu)',en:'concrete (eps_cu)'},
+  pivotSteel:{ro:'otel (eps_ud)',en:'steel (eps_ud)'},
+  pivotSquash:{ro:'sectiune integral comprimata (pivot C, eps_c2)',en:'fully compressed section (pivot C, eps_c2)'},
   clearBtn:{ro:'Sterge tabelul',en:'Clear table'},
   emptyStateMsg:{ro:'Nicio combinatie importata inca. Defineste sectiunea mai sus, apoi lipeste datele din Excel/ETABS.',en:'No combinations imported yet. Define the section above, then paste data from Excel/ETABS.'},
   exportCalcReport:{ro:'Export raport de calcul (PDF)',en:'Export calculation report (PDF)'},
@@ -408,25 +465,28 @@ const T={
   colVerdict:{ro:'Verdict',en:'Verdict'},
   verdictOk:{ro:'VERIFICA',en:'PASS'},
   verdictFail:{ro:'NU VERIFICA',en:'FAIL'},
-  verdictOutOfRange:{ro:'N in afara capacitatii sectiunii (sub N_Rd,t sau peste N_Rd,c) — combinatia nu poate fi verificata pentru aceasta sectiune.',en:'N outside the section capacity (below N_Rd,t or above N_Rd,c) — this combination cannot be checked for this section.'},
+  verdictInvalid:{ro:'INVALID',en:'INVALID'},
   verdictPending:{ro:'&mdash;',en:'&mdash;'},
+  // status (contractul {ok, code, message} al nucleului)
+  stNoBracket:{ro:'N_Ed este in afara capacitatii axiale a sectiunii. Rezultatul nu este valabil.',en:'N_Ed lies outside the section axial capacity. The result is not valid.'},
+  stResidual:{ro:'Echilibrul nu a fost satisfacut exact. Rezultatul este aproximativ.',en:'Equilibrium was not satisfied exactly. The result is approximate.'},
+  stDegenerate:{ro:'Sectiune degenerata: aria de beton este nula.',en:'Degenerate section: zero concrete area.'},
+  stInvalid:{ro:'Date de intrare invalide: verificati geometria si materialele.',en:'Invalid input: check geometry and materials.'},
+  stExceeds:{ro:(l,v)=>` ${l} = ${v} kN.`,en:(l,v)=>` ${l} = ${v} kN.`},
+  wEuk:{ro:c=>'Clasa '+c+' nu are eps_uk declarat; s-a presupus 50 permil. De confirmat inainte de folosire intr-o nota de calcul.',en:c=>'Class '+c+' has no declared eps_uk; 50 per mille assumed. Confirm before using in a calculation note.'},
   sumTotal:{ro:'Total combinatii',en:'Total combinations'},
   sumOk:{ro:'Verifica',en:'Pass'},
   sumFail:{ro:'Nu verifica',en:'Fail'},
   sumWorst:{ro:'Cea mai defavorabila',en:'Governing (worst)'},
-  sumOutOfRange:{ro:'In afara intervalului',en:'Out of range'},
+  sumInvalid:{ro:'Rezultat invalid',en:'Invalid result'},
   tableTitleN:{ro:n=>`${n} combinatii importate`,en:n=>`${n} combinations imported`},
-  sectionSummary:{ro:(b,h,tot,rho)=>`Sectiune curenta: ${b}\u00d7${h} mm, ${tot} bare, \u03C1 = ${rho}%. Se aplica identic tuturor r\u00e2ndurilor din tabel.`,en:(b,h,tot,rho)=>`Current section: ${b}\u00d7${h} mm, ${tot} bars, \u03C1 = ${rho}%. Applied identically to every row in the table.`},
+  sectionSummary:{ro:(b,h,tot,rho)=>`Sectiune curenta: ${b}×${h} mm, ${tot} bare, ρ = ${rho}%. Se aplica identic tuturor rândurilor din tabel.`,en:(b,h,tot,rho)=>`Current section: ${b}×${h} mm, ${tot} bars, ρ = ${rho}%. Applied identically to every row in the table.`},
   confirmClear:{ro:'Sigur vrei sa stergi toate combinatiile importate?',en:'Are you sure you want to clear all imported combinations?'},
   pasteParseError:{ro:n=>`${n} rand(uri) nu au putut fi interpretate si au fost ignorate (verifica formatul: Story, Column, Output Case, Station, N, M2, M3).`,en:n=>`${n} row(s) could not be parsed and were skipped (check the format: Story, Column, Output Case, Station, N, M2, M3).`},
-  calculating:{ro:n=>`Se calculeaza... ${n}`,en:n=>`Calculating... ${n}`},
   pdfTitle:{ro:'VERIFICARE BIAXIALA IN TABEL — COMBINATII DE INCARCARE',en:'BIAXIAL CHECK — TABLE OF LOAD COMBINATIONS'},
   pdfSub:{ro:'Metoda fibrelor 2D - CR 2-2022 / SR EN 1992-1-1',en:'2D fibre method - CR 2-2022 / SR EN 1992-1-1'},
-  pdfAppLine:{ro:'Aplicatie dezvoltata in cadrul lucrarii de disertatie \u2014 Janos Patrik',en:'Application developed within the dissertation \u2014 Janos Patrik'},
   pdfDate:{ro:'Data: ',en:'Date: '},
   pdfSecTitle:{ro:'SECTIUNE (comuna pentru toate combinatiile)',en:'SECTION (shared by all combinations)'},
-  pdfColParam:{ro:'Parametru',en:'Parameter'},
-  pdfColVal:{ro:'Valoare',en:'Value'},
   pdfInWidth:{ro:'Latime b',en:'Width b'},
   pdfInHeight:{ro:'Inaltime h',en:'Height h'},
   pdfInTotBars:{ro:'Total bare',en:'Total bars'},
@@ -434,9 +494,30 @@ const T={
   pdfInConcClass:{ro:'Clasa beton',en:'Concrete class'},
   pdfInSteelClass:{ro:'Clasa otel',en:'Steel class'},
   pdfConfAll:{ro:' (confinat)',en:' (confined)'},
+  pdfInSignConv:{ro:'Conventie semn N',en:'N sign convention'},
+  pdfSignNeg:{ro:'N < 0 compresiune (ETABS)',en:'N < 0 compression (ETABS)'},
+  pdfSignPos:{ro:'N > 0 compresiune',en:'N > 0 compression'},
+  pdfInAxisMap:{ro:'Conventie axe ETABS',en:'ETABS axis convention'},
+  pdfMapStd:{ro:'M2 -> Mz, M3 -> My',en:'M2 -> Mz, M3 -> My'},
+  pdfMapSwap:{ro:'M2 -> My, M3 -> Mz',en:'M2 -> My, M3 -> Mz'},
+  pdfInConvention:{ro:'Conventie aria de beton',en:'Concrete area convention'},
+  pdfConvGross:{ro:'brut (A_c integral)',en:'gross (full A_c)'},
+  pdfConvNet:{ro:'net (A_c - A_s)',en:'net (A_c - A_s)'},
+  pdfInNfibres:{ro:'Numar fibre beton (malaj)',en:'No. concrete fibres (grid)'},
+  pdfNRdc:{ro:'Compresiune centrica N_Rd,c',en:'Centric compression N_Rd,c'},
+  pdfNRdt:{ro:'Intindere centrica N_Rd,t',en:'Centric tension N_Rd,t'},
   pdfResultsTitle:{ro:'REZULTATE PE COMBINATII',en:'RESULTS PER COMBINATION'},
+  pdfObsTitle:{ro:'OBSERVATII',en:'NOTES'},
+  pdfWarnHead:{ro:'AVERTISMENTE',en:'WARNINGS'},
+  pdfLimTitle:{ro:'CONVENTII SI LIMITARI',en:'CONVENTIONS AND LIMITATIONS'},
+  pdfLim1:{ro:e=>'- Curbura este limitata de prima limita atinsa: eps_cu (beton) sau eps_ud = '+e+' permil (otel).',en:e=>'- Curvature limited by whichever is reached first: eps_cu (concrete) or eps_ud = '+e+' per mille (steel).'},
+  pdfLim2:{ro:'- Betonul se integreaza pe aria bruta; armatura se adauga peste (conventie fib).',en:'- Concrete integrated over the gross area; reinforcement added on top (fib convention).'},
+  pdfLim3:{ro:'- Armatura este dispusa numai pe conturul sectiunii, la c_nom + Ø_etr + Ø/2 de fata.',en:'- Reinforcement is placed on the section perimeter only, at c_nom + Ø_st + Ø/2 from the face.'},
+  pdfLim4:{ro:'- Valorile axiale sunt raportate in conventia de semn declarata mai sus.',en:'- Axial values are reported in the sign convention stated above.'},
+  pdfLim5:{ro:'- La sectiune integral comprimata deformatia este limitata la eps_c2 (pivot C), deci',en:'- For a fully compressed section the strain is limited to eps_c2 (pivot C), so'},
+  pdfLim5b:{ro:'  N_Rd,c foloseste sigma_s = Es*eps_c2 = 400 MPa pentru S500, nu f_yd.',en:'  N_Rd,c uses sigma_s = Es*eps_c2 = 400 MPa for S500, not f_yd.'},
   pdfError:{ro:'Eroare la generare:',en:'Generation error:'},
-  pdfOOR:{ro:'N in afara',en:'N out of range'},
+  pdfInvalidCell:{ro:'INVALID — VEZI OBS.',en:'INVALID — SEE NOTES'},
   pdfGenerated:{ro:'Generat: ',en:'Generated: '},
   pdfPage:{ro:(i,n)=>'Pagina '+i+' din '+n,en:(i,n)=>'Page '+i+' of '+n},
   pdfDisc1:{ro:'Responsabilitatea pentru rezultatele obtinute revine in exclusivitate utilizatorului.',en:'Responsibility for the obtained results rests solely with the user.'},
@@ -457,8 +538,15 @@ function applyStaticLang(){
     if(T[k]){const v=T[k][LANG];if(v!==undefined&&typeof v!=='function')el.innerHTML=v;}
   });
   document.querySelectorAll('#langSeg button').forEach(b=>b.classList.toggle('on',b.dataset.lang===LANG));
+  stampVersion();
 }
-function setLang(l){LANG=l;try{localStorage.setItem('sw_lang',l);}catch(e){}applyStaticLang();renderTable();updSectionSummary();}
+function setLang(l){LANG=l;try{localStorage.setItem('sw_lang',l);}catch(e){}applyStaticLang();renderTable();updSectionSummary();showSectionStatus();}
+
+function stampVersion(){
+  const eng=(typeof JP!=='undefined')?JP.VERSION:'?';
+  document.getElementById('versionFooter').textContent=
+    'JP Design · M'+MODULE_ID+' v'+MODULE_VERSION+' · engine v'+eng+' · CR 2-1-1.1/2022';
+}
 
 // ═══════════════════ info popovers ═══════════════════
 function toggleInfo(btn,ev){
@@ -499,305 +587,164 @@ window.addEventListener('resize',closeAllInfo);
 
 function toggleSectionPanel(){document.getElementById('sectionPanel').classList.toggle('collapsed');}
 
-// ═══════════════════ ETABS axis mapping ═══════════════════
-// ETABS local-axis convention for columns is not universal — it depends on
-// how the local axes were set (or overridden) in the model. Default ("std")
-// follows the common case M2->Mz, M3->My; "swap" covers the flipped case.
-// Kept as raw M2/M3 per row so switching the toggle re-maps existing data
-// without requiring the person to re-paste from Excel.
-function mapMy(M2,M3){return axisMap==='swap'?M2:M3;}
-function mapMz(M2,M3){return axisMap==='swap'?M3:M2;}
+function gv(id){const e=document.getElementById(id);return e?(parseFloat(e.value)||0):0;}
+function esc(s){return (s===undefined||s===null?'':String(s)).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+
+// Listele de materiale vin din nucleu — versiunea 1.x avea doar 4 clase de otel
+// si ii lipseau cele preluate din modulul 04.
+function fillMaterialSelects(){
+  const cp=document.getElementById('cp'), sp=document.getElementById('sp');
+  cp.innerHTML=Object.keys(JP.CONC).map(k=>`<option${k===curC?' selected':''}>${k}</option>`).join('');
+  sp.innerHTML=Object.keys(JP.STEEL).map(k=>`<option${k===curS?' selected':''}>${k}</option>`).join('');
+}
+function updMat(){
+  const c=JP.CONC[curC], s=JP.STEEL[curS];
+  document.getElementById('fcd_d').textContent=((c?c.fck:0)/JP.DEFAULTS.GAMMA_C).toFixed(2);
+  document.getElementById('fyd_d').textContent=((s?s.fyk:0)/JP.DEFAULTS.GAMMA_S).toFixed(1);
+  const conf=(confMode==='all');
+  document.getElementById('ecu_d').textContent=(conf?gv('ecu2c'):JP.DEFAULTS.ECU_NC*1000).toFixed(2);
+  document.getElementById('ec2_d').textContent=(conf?gv('ec2c'):JP.DEFAULTS.EC2_NC*1000).toFixed(2);
+}
+// setConf se imparte: partea de UI poate fi refolosita la restaurarea unei
+// presetari fara a declansa un recalcul in mijlocul restaurarii.
+function setConfUI(mode){
+  confMode=mode;
+  document.getElementById('seg-nc').classList.toggle('on',mode==='none');
+  document.getElementById('seg-cc').classList.toggle('on',mode==='all');
+  document.getElementById('conf-fields').classList.toggle('on',mode!=='none');
+}
+function setConf(mode){ setConfUI(mode); updMat(); onSectionChange(); saveCurrentPreset(); }
+
 function setAxisMap(mode){
   axisMap=mode;
   try{localStorage.setItem('sw_col_axismap',mode);}catch(e){}
   document.getElementById('seg-map-std').classList.toggle('on',mode==='std');
   document.getElementById('seg-map-swap').classList.toggle('on',mode==='swap');
   if(rows.length){
-    rows.forEach(r=>{
-      r.My=mapMy(r.M2,r.M3);
-      r.Mz=mapMz(r.M2,r.M3);
-      r.status='pending';r.result=null;
-    });
+    rows.forEach(r=>{r.My=mapMy(r.M2,r.M3);r.Mz=mapMz(r.M2,r.M3);r.status='pending';r.res=null;});
     recalcAll();
   }
   saveCurrentPreset();
 }
-// N sign convention: ETABS typically reports compression as NEGATIVE axial
-// force, while this tool's engine treats N>0 as compression. When "neg" is
-// selected, the raw pasted N is negated so the engine receives compression as
-// positive. Stored as raw Nraw per row so the toggle can be flipped later
-// without re-pasting.
-function convN(Nraw){return signConv==='neg'?-Nraw:Nraw;}
+/* Schimbarea conventiei de semn NEGEAZA valorile din coloana N, exact ca in
+   modulul 03: altfel un stalp comprimat ar deveni, in tacere, intins. */
 function setSignConv(mode){
+  if(mode===signConv)return;
   signConv=mode;
-  try{localStorage.setItem('sw_col_signconv',mode);}catch(e){}
-  document.getElementById('seg-sign-pos').classList.toggle('on',mode==='pos');
+  try{localStorage.setItem('sw_signconv',mode);}catch(e){}
   document.getElementById('seg-sign-neg').classList.toggle('on',mode==='neg');
+  document.getElementById('seg-sign-pos').classList.toggle('on',mode==='pos');
   if(rows.length){
     rows.forEach(r=>{
-      r.N=convN(r.Nraw);
-      r.status='pending';r.result=null;
+      if(isFinite(r.Nraw)&&r.Nraw!==0)r.Nraw=-r.Nraw;
+      r.N=convN(r.Nraw); r.status='pending'; r.res=null;
     });
+    renderTable();
     recalcAll();
   }
   saveCurrentPreset();
 }
 
-function gv(id){return parseFloat(document.getElementById(id)?.value)||0;}
-function updMat(){
-  const fck=CONC[curC].fck, fyk=STEEL[curS].fyk;
-  document.getElementById('fcd_d').textContent=(fck/1.5).toFixed(2);
-  document.getElementById('fyd_d').textContent=(fyk/1.15).toFixed(1);
+// ═══════════════════ Model (nucleu comun) ═══════════════════
+function readInputs(){
+  return {
+    b:gv('bcol'), h:gv('hcol'), cnom:gv('cnom'), detr:gv('detr'),
+    concrete:curC, steel:curS, confMode:confMode,
+    fckc:gv('fckc'), ec2c:gv('ec2c'), ecu2c:gv('ecu2c'),
+    cor_n:gv('cor_n'), cor_d:gv('cor_d'),
+    topb_n:gv('topb_n'), topb_d:gv('topb_d'),
+    sidh_n:gv('sidh_n'), sidh_d:gv('sidh_d'),
+    // NANG nu influenteaza echilibrul, doar finetea conturului My-Mz desenat
+    // in panoul de detaliu; se pastreaza 48, ca in versiunea anterioara.
+    opts:{NANG:48}
+  };
 }
-function setConf(mode){
-  setConfUI(mode);
-  onSectionChange();
-  saveCurrentPreset();
+function buildModel(){ return JP.column.buildModel(readInputs()); }
+
+// O combinatie se evalueaza prin contractul nucleului: {ok, code, message,
+// value, partial}. Nu se intorc niciodata numere fara stare.
+function evalCombo(m,Ned,MyEd,MzEd){
+  try{ return JP.column.solve(m,Ned,MyEd,MzEd,LANG); }
+  catch(e){ return {ok:false,code:'EXCEPTION',message:String((e&&e.message)||e),value:null,partial:null}; }
 }
-
-// ═══════════════════ Section model (identical engine to Module 06) ═══════════════════
-function buildModel(){
-  const b=gv('bcol'),h=gv('hcol');
-  const cnom=gv('cnom'),detr=gv('detr');
-  const fck=CONC[curC].fck, fcd=fck/1.5;
-  const fckc=gv('fckc'), fcdc=fckc/1.5;
-  const fyd=STEEL[curS].fyk/1.15;
-  const eud=0.9*STEEL[curS].euk;
-  const Es=200000;
-  const ec2_nc=0.002, ecu_nc=0.0035;
-  const ec2_c=gv('ec2c')/1000, ecu_c=gv('ecu2c')/1000;
-  const PI=Math.PI;
-  function barA(d){return d*d*PI/4;}
-
-  const cor_n=gv('cor_n'),cor_d=gv('cor_d');
-  const topb_n=Math.max(0,gv('topb_n')),topb_d=gv('topb_d');
-  const sidh_n=Math.max(0,gv('sidh_n')),sidh_d=gv('sidh_d');
-
-  const inset=cnom+detr;
-  const halfY=b/2-inset;
-  const halfZ=h/2-inset;
-
-  const steelFibers=[];
-  const cornersXY=[[-halfY,-halfZ],[halfY,-halfZ],[halfY,halfZ],[-halfY,halfZ]];
-  const Acorner=barA(cor_d);
-  const perCorner=Math.max(0,Math.round(cor_n/4));
-  cornersXY.forEach(([y,z])=>{steelFibers.push({y,z,A:Acorner*perCorner});});
-
-  const Atop=barA(topb_d);
-  if(topb_n>0){
-    for(let s=0;s<2;s++){
-      const z=(s===0)?-halfZ:halfZ;
-      for(let i=0;i<topb_n;i++){
-        const y=-halfY+(halfY*2)*(i+1)/(topb_n+1);
-        steelFibers.push({y,z,A:Atop});
-      }
-    }
+// Textul de stare al unui rand, in conventia de semn a utilizatorului.
+function statusText(res){
+  if(!res)return '';
+  if(res.ok)return '';
+  if(res.code===JP.CODES.NO_BRACKET){
+    let s=t('stNoBracket');
+    if(res.partial&&res.partial.exceeded)
+      s+=t('stExceeds',res.partial.exceeded.limit,convN(res.partial.exceeded.value).toFixed(0));
+    return s;
   }
-  const Aside=barA(sidh_d);
-  if(sidh_n>0){
-    for(let s=0;s<2;s++){
-      const y=(s===0)?-halfY:halfY;
-      for(let i=0;i<sidh_n;i++){
-        const z=-halfZ+(halfZ*2)*(i+1)/(sidh_n+1);
-        steelFibers.push({y,z,A:Aside});
-      }
-    }
-  }
-  const As_tot=steelFibers.reduce((s,f)=>s+f.A,0);
-  const Ac=b*h;
-  const cntCorner=perCorner*4;
-  const cntTop=topb_n*2, cntSide=sidh_n*2;
-  const cntTot=cntCorner+cntTop+cntSide;
-
-  const dAg=(b/NGY)*(h/NGZ);
-  const cFibers=[];
-  for(let i=0;i<NGY;i++){
-    const y=-b/2+(i+0.5)*(b/NGY);
-    for(let j=0;j<NGZ;j++){
-      const z=-h/2+(j+0.5)*(h/NGZ);
-      cFibers.push({y,z});
-    }
-  }
-
-  return {b,h,cnom,detr,fck,fcd,fckc,fcdc,fyd,eud,Es,ec2_nc,ecu_nc,ec2_c,ecu_c,
-    steelFibers,cFibers,dAg,As_tot,Ac,cntTot,cntCorner,cntTop,cntSide,
-    bars:{cor_n,cor_d,topb_n,topb_d,sidh_n,sidh_d,halfY,halfZ}};
+  if(res.code===JP.CODES.RESIDUAL_HIGH)return t('stResidual');
+  if(res.code===JP.CODES.DEGENERATE)   return t('stDegenerate');
+  if(res.code===JP.CODES.INVALID_INPUT)return t('stInvalid');
+  return res.message||t('stInvalid');
+}
+function pivotLabel(p){
+  return p==='steel'?t('pivotSteel'):(p==='squash'?t('pivotSquash'):t('pivotConc'));
 }
 
-function sigC(eps,m){
-  if(eps<=0) return 0;
-  const conf=(confMode==='all');
-  const fcd=conf?m.fcdc:m.fcd, ec2=conf?m.ec2_c:m.ec2_nc, ecu=conf?m.ecu_c:m.ecu_nc;
-  const r=eps/ec2;
-  if(eps<=ec2) return fcd*(2*r-r*r);
-  return fcd;
-}
-function sigS(eps,m){let s=eps*m.Es;if(s>m.fyd)s=m.fyd;if(s<-m.fyd)s=-m.fyd;return s;}
-
-function dmaxTheta(theta,b,h){
-  const cx=Math.cos(theta), cz=Math.sin(theta);
-  const corners=[[-b/2,-h/2],[b/2,-h/2],[b/2,h/2],[-b/2,h/2]];
-  let dmax=-Infinity;
-  for(const [y,z] of corners){const d=y*cx+z*cz; if(d>dmax)dmax=d;}
-  return dmax;
-}
-
-function sectionForces(X,theta,m){
-  const cx=Math.cos(theta), cz=Math.sin(theta);
-  const conf=(confMode==='all');
-  const ecu=conf?m.ecu_c:m.ecu_nc;
-  const epsEdge=ecu;
-  const dmax=dmaxTheta(theta,m.b,m.h);
-  const na=dmax-X;
-  let Fc=0,Mcy=0,Mcz=0;
-  for(const f of m.cFibers){
-    const d=f.y*cx+f.z*cz;
-    const eps=epsEdge*(d-na)/X;
-    if(eps<=0) continue;
-    const sig=sigC(eps,m);
-    const F=sig*m.dAg;
-    Fc+=F; Mcy+=F*f.z; Mcz+=F*f.y;
-  }
-  let Fs=0,Msy=0,Msz=0;
-  for(const s of m.steelFibers){
-    const d=s.y*cx+s.z*cz;
-    const eps=epsEdge*(d-na)/X;
-    const sigSt=sigS(eps,m);
-    // Subtract the concrete stress displaced by the bar (same location/strain)
-    // so steel and concrete never overlap physically — see Module 06 fix.
-    const sigDisp=sigC(eps,m);
-    const F=(sigSt-sigDisp)*s.A;
-    Fs+=F; Msy+=F*s.z; Msz+=F*s.y;
-  }
-  const N=(Fc+Fs)/1e3;
-  const My=(Mcy+Msy)/1e6, Mz=(Mcz+Msz)/1e6;
-  return {N,My,Mz,Fc:Fc/1e3,Fs:Fs/1e3};
-}
-
-function solveX(theta,Ntarget,m){
-  const maxSpan=Math.max(m.b,m.h)*2;
-  const F=X=>sectionForces(X,theta,m).N-Ntarget;
-  let lo=1,hi=maxSpan*4;
-  let flo=F(lo),fhi=F(hi);
-  let guard=0;
-  while(flo*fhi>0 && guard++<200){
-    if(Math.abs(flo)<Math.abs(fhi)){lo/=2; if(lo<1e-6) break; flo=F(lo);}
-    else{hi*=2; if(hi>maxSpan*1e6) break; fhi=F(hi);}
-  }
-  if(flo*fhi>0){
-    const X=(Math.abs(flo)<Math.abs(fhi))?lo:hi;
-    return{X,...sectionForces(X,theta,m),converged:false};
-  }
-  for(let it=0;it<45;it++){
-    const mid=(lo+hi)/2, fm=F(mid);
-    if(flo*fm<=0){hi=mid;fhi=fm;}else{lo=mid;flo=fm;}
-    if(Math.abs(fm)<1e-6) break;
-  }
-  const X=(lo+hi)/2;
-  return{X,...sectionForces(X,theta,m),converged:true};
-}
-
-function findThetaForDirection(dirAngle,Ntarget,m){
-  function angAt(th){
-    const r=solveX(th,Ntarget,m);
-    return {ang:Math.atan2(r.Mz,r.My),r};
-  }
-  const TWO_PI=2*Math.PI;
-  let target=dirAngle;
-  while(target<=-Math.PI) target+=TWO_PI;
-  while(target>Math.PI) target-=TWO_PI;
-  let lo=0,hi=TWO_PI;
-  for(let it=0;it<38;it++){
-    const mid=(lo+hi)/2;
-    const {ang}=angAt(mid);
-    let diff=ang-target;
-    while(diff>Math.PI) diff-=TWO_PI;
-    while(diff<=-Math.PI) diff+=TWO_PI;
-    if(diff>0){lo=mid;} else {hi=mid;}
-  }
-  const thFinal=(lo+hi)/2;
-  const {r:rFinal}=angAt(thFinal);
-  return {theta:thFinal,...rFinal};
-}
-
-// Evaluate one load combination against the current model. Returns null-safe
-// result object; never throws (defensive, since this runs unattended over
-// many pasted rows that could contain degenerate/out-of-range values).
-function evalCombo(m,N,MyEd,MzEd){
-  try{
-    const dirAngle=Math.atan2(MzEd,MyEd);
-    const res=findThetaForDirection(dirAngle,N,m);
-    const MyRd=res.My, MzRd=res.Mz;
-    const dEd=Math.hypot(MyEd,MzEd);
-    const dRd=Math.hypot(MyRd,MzRd);
-    const util=dRd>1e-9?(dEd/dRd*100):0;
-    const eqOk=(res.converged!==false)&&Math.abs(N-res.N)<=Math.max(0.05,Math.abs(N)*1e-4);
-    return {MyRd,MzRd,util,X:res.X,thetaDeg:res.theta*180/Math.PI,theta:res.theta,Nint:res.N,eqOk,ok:util<=100&&eqOk,error:false};
-  }catch(e){
-    return {error:true,errorMsg:String(e&&e.message||e)};
-  }
-}
-
-// Axial limit capacities of the current section (centric compression / tension).
-function axialLimits(m){
-  const conf=(confMode==='all');
-  const fcdUse=conf?m.fcdc:m.fcd;
-  const NRdc=((m.Ac-m.As_tot)*fcdUse+m.As_tot*m.fyd)/1e3;
-  const NRdt=-(m.As_tot*m.fyd)/1e3;
-  return {NRdc,NRdt};
-}
-
-// Trace the My-Mz interaction contour at constant N (sweep neutral-axis angle
-// over 0..360deg, solving X for N at each). Used only on demand for the expanded
-// detail panel of one row, not for the whole batch.
-function traceCurve(Ntarget,m){
-  const pts=[];
-  const NANG=48;
-  for(let k=0;k<=NANG;k++){
-    const theta=k*2*Math.PI/NANG;
-    const r=solveX(theta,Ntarget,m);
-    if(r.converged) pts.push({My:r.My,Mz:r.Mz});
-  }
-  return pts;
-}
-
-// For a given neutral-axis (theta, X), return per-concrete-fiber compression
-// flags so the detail sketch can hatch the compressed zone. Reuses the exact
-// same strain-plane logic as sectionForces.
+// Fibrele comprimate, pentru hasura din panoul de detaliu. Foloseste exact
+// proiectiile nucleului, deci nu duplica geometria planului de deformatii.
 function compressedFibers(X,theta,m){
-  const cx=Math.cos(theta), cz=Math.sin(theta);
-  const conf=(confMode==='all');
-  const ecu=conf?m.ecu_c:m.ecu_nc;
-  const dmax=dmaxTheta(theta,m.b,m.h);
-  const na=dmax-X;
+  const p=JP.column.project(theta,m);
+  const na=p.dmax-X;
   const out=[];
-  for(const f of m.cFibers){
-    const d=f.y*cx+f.z*cz;
-    const eps=ecu*(d-na)/X;
-    out.push({y:f.y,z:f.z,comp:eps>0});
-  }
-  return out;
+  for(let i=0;i<m.nC;i++) out.push({y:m.cy[i],z:m.cz[i],comp:(p.dC[i]-na)>0});
+  return {fibers:out,dmax:p.dmax};
 }
 
-// ═══════════════════ Section change → invalidate results, update summary ═══════════════════
-function onSectionChange(){
-  currentModel=buildModel();
-  updSectionSummary();
-  drawSketch(currentModel);
-  document.getElementById('cnt_tot').textContent=currentModel.cntTot+' '+t('barsWord');
-  document.getElementById('rho_r').textContent=(100*currentModel.As_tot/currentModel.Ac).toFixed(2)+' %';
-  const corInputEl=document.getElementById('cor_n');
-  const corRaw=gv('cor_n');
-  corInputEl.style.borderColor=(corRaw!==currentModel.cntCorner)?'#C0392B':'';
-  corInputEl.title=(corRaw!==currentModel.cntCorner)?t('cornerRoundNote',currentModel.cntCorner):'';
-  if(rows.length){
-    // section changed → all previous results are stale, recompute the batch
-    recalcAll();
+// ═══════════════════ Section status strip ═══════════════════
+function showSectionStatus(){
+  const strip=document.getElementById('statusStrip');
+  const msg=document.getElementById('statusMsg');
+  const ico=document.getElementById('statusIco');
+  if(typeof JP==='undefined')return;
+  const items=[]; let fatal=false;
+  const m=currentModel;
+  if(m){
+    if(!(m.Ac>0)){items.push(t('stDegenerate'));fatal=true;}
+    else if(!(m.fcd>0)||!(m.fyd>0)){items.push(t('stInvalid'));fatal=true;}
+    // O sectiune imposibila ar face fiecare combinatie sa esueze cu acelasi
+    // motiv; se spune o data, aici, cu textul nucleului.
+    if(m.barIssues&&m.barIssues.length){
+      items.push(JP.barMessage(m.barIssues,LANG));fatal=true;
+    }
+    if(m.eukAssumed&&m.limitEpsUd)items.push(t('wEuk',m.steel));
   }
+  if(!items.length){strip.className='status-strip';msg.innerHTML='';return;}
+  msg.innerHTML=items.length===1?items[0]:'<ul><li>'+items.join('</li><li>')+'</li></ul>';
+  ico.textContent=fatal?'!':'~';
+  strip.className='status-strip on'+(fatal?'':' warn');
+}
+
+// ═══════════════════ Section change ═══════════════════
+function onSectionChange(){
+  if(typeof JP==='undefined')return;
+  currentModel=buildModel();
+  const m=currentModel;
+  updSectionSummary();
+  drawSketch(m);
+  document.getElementById('cnt_tot').textContent=m.cntTot+' '+t('barsWord');
+  document.getElementById('rho_r').textContent=(m.Ac>0?(100*m.As_tot/m.Ac).toFixed(2):'—')+' %';
+  const corInputEl=document.getElementById('cor_n');
+  const corBad=((m.barIssues||[]).length>0);
+  corInputEl.style.borderColor=corBad?'#C0392B':'';
+  corInputEl.title=corBad?t('cornerBadNote'):'';
+  showSectionStatus();
+  if(rows.length) recalcAll();   // sectiunea s-a schimbat -> rezultatele sunt expirate
+}
+function updSectionSummary(){
+  if(!currentModel)return;
+  const m=currentModel;
+  document.getElementById('sectionSummaryNote').textContent=
+    t('sectionSummary',m.b,m.h,m.cntTot,(m.Ac>0?(100*m.As_tot/m.Ac).toFixed(2):'0'));
 }
 function drawSketch(m){
   const svg=document.getElementById('sketch');
-  if(!svg)return;
+  if(!svg||!(m.b>0)||!(m.h>0))return;
   const VW=460,VH=260,PL=30,PR=30,PT=30,PB=44;
   const scl=Math.min((VW-PL-PR)/m.b,(VH-PT-PB)/m.h);
   const dark='#1C1C1E',dim='#AEAEB2',lbl='#6C6C70';
@@ -805,10 +752,9 @@ function drawSketch(m){
   function X2(y){return cx0+y*scl;}
   function Y2(z){return cy0-z*scl;}
   let o='';
-  const fillCol=(confMode==='all')?'#DDEEFF':'#E8E8ED';
+  const fillCol=(m.conf)?'#DDEEFF':'#E8E8ED';
   o+=`<rect x="${X2(-m.b/2)}" y="${Y2(m.h/2)}" width="${m.b*scl}" height="${m.h*scl}" fill="${fillCol}" stroke="${dark}" stroke-width="1.2"/>`;
-  const R=2.6;
-  m.steelFibers.forEach(f=>{o+=`<circle cx="${X2(f.y)}" cy="${Y2(f.z)}" r="${R}" fill="${dark}"/>`;});
+  m.steelFibers.forEach(f=>{o+=`<circle cx="${X2(f.y)}" cy="${Y2(f.z)}" r="2.6" fill="${dark}"/>`;});
   o+=`<text x="${cx0}" y="${Y2(m.h/2)-10}" text-anchor="middle" font-size="8" fill="${lbl}" font-family="Inter,sans-serif">${t('skBars',m.cntTot)}</text>`;
   const dy=Y2(-m.h/2)+20;
   o+=`<line x1="${X2(-m.b/2)}" y1="${dy}" x2="${X2(m.b/2)}" y2="${dy}" stroke="${dim}" stroke-width="0.7"/>`;
@@ -825,21 +771,20 @@ function drawSketch(m){
   o+=`<line x1="${ax0}" y1="${ay0}" x2="${ax0}" y2="${ay0-14}" stroke="#0066CC" stroke-width="1"/><text x="${ax0-3}" y="${ay0-17}" font-size="7" fill="#0066CC" font-family="Inter,sans-serif">z</text>`;
   svg.innerHTML=o;
 }
-function updSectionSummary(){
-  if(!currentModel)return;
-  const m=currentModel;
-  document.getElementById('sectionSummaryNote').textContent=
-    t('sectionSummary',m.b,m.h,m.cntTot,(100*m.As_tot/m.Ac).toFixed(2));
-}
 
 // ═══════════════════ Paste handling ═══════════════════
 function focusPasteInput(){document.getElementById('pasteInput').focus();}
-document.getElementById('pasteZone')?.addEventListener?.('focus',()=>{});
 function handlePaste(ev){
   ev.preventDefault();
   const text=(ev.clipboardData||window.clipboardData).getData('text');
   parseAndAppend(text);
   ev.target.value='';
+}
+function newRow(o){
+  return {story:o.story||'',column:o.column||'',outputCase:o.outputCase||'',station:o.station||'',
+    Nraw:o.Nraw,M2:o.M2,M3:o.M3,
+    N:convN(o.Nraw),My:mapMy(o.M2,o.M3),Mz:mapMz(o.M2,o.M3),
+    res:null,status:'pending',_expanded:false};
 }
 function parseAndAppend(text){
   const lines=text.split(/\r\n|\n|\r/).map(l=>l.trim()).filter(l=>l.length>0);
@@ -849,40 +794,23 @@ function parseAndAppend(text){
     const cols=line.split('\t');
     if(cols.length<7){errCount++;continue;}
     const [story,column,outputCase,station,nStr,m2Str,m3Str]=cols;
-    const N=parseFloat(nStr.replace(',','.'));
-    const M2=parseFloat(m2Str.replace(',','.'));
-    const M3=parseFloat(m3Str.replace(',','.'));
+    const N=parseFloat(String(nStr).replace(',','.'));
+    const M2=parseFloat(String(m2Str).replace(',','.'));
+    const M3=parseFloat(String(m3Str).replace(',','.'));
     if(!isFinite(N)||!isFinite(M2)||!isFinite(M3)){errCount++;continue;}
-    newRows.push({story:story||'',column:column||'',outputCase:outputCase||'',station:station||'',
-      Nraw:N,M2,M3, // raw ETABS values kept so axis/sign conventions can change later without re-pasting
-      N:convN(N),My:mapMy(M2,M3),Mz:mapMz(M2,M3),
-      result:null,status:'pending',_expanded:false});
+    newRows.push(newRow({story,column,outputCase,station,Nraw:N,M2,M3}));
   }
-  if(newRows.length===0 && errCount>0){
-    alert(t('pasteParseError',errCount));
-    return;
-  }
+  if(newRows.length===0 && errCount>0){alert(t('pasteParseError',errCount));return;}
   rows=rows.concat(newRows);
-  if(errCount>0){
-    // non-blocking notice
-    setTimeout(()=>alert(t('pasteParseError',errCount)),50);
-  }
+  if(errCount>0) setTimeout(()=>alert(t('pasteParseError',errCount)),50);
   document.getElementById('resultsPanel').style.display='';
   document.getElementById('emptyPanel').style.display='none';
-  recalcPending(); // only compute the newly added rows; existing results stay valid
+  recalcPending();   // se calculeaza doar randurile noi
   saveCurrentPreset();
 }
 function clearTable(){
   if(rows.length && !confirm(t('confirmClear')))return;
-  rows=[];
-  document.getElementById('resultsPanel').style.display='none';
-  document.getElementById('emptyPanel').style.display='';
-  saveCurrentPreset();
-}
-function deleteRow(idx){
-  rows.splice(idx,1);
-  if(rows.length===0){clearTableSilent();saveCurrentPreset();return;}
-  renderTable();
+  clearTableSilent();
   saveCurrentPreset();
 }
 function clearTableSilent(){
@@ -890,55 +818,69 @@ function clearTableSilent(){
   document.getElementById('resultsPanel').style.display='none';
   document.getElementById('emptyPanel').style.display='';
 }
+function deleteRow(idx){
+  rows.splice(idx,1);
+  if(rows.length===0){clearTableSilent();saveCurrentPreset();return;}
+  renderTable();
+  saveCurrentPreset();
+}
 
-// ═══════════════════ Batch calculation (async, chunked to keep UI responsive) ═══════════════════
+// ═══════════════════ Batch (asincron, pe bucati, ca UI-ul sa ramana viu) ═══════════════════
 function recalcAll(){ runBatch(false); }
-// Recompute only rows that aren't done yet (e.g. after pasting more rows onto an
-// already-computed table) — avoids redoing work that's still valid because the
-// section hasn't changed.
 function recalcPending(){ runBatch(true); }
 function runBatch(pendingOnly){
+  if(typeof JP==='undefined')return;
   if(!currentModel) currentModel=buildModel();
-  if(!pendingOnly) rows.forEach(r=>{r.status='pending';r.result=null;});
+  if(!pendingOnly) rows.forEach(r=>{r.status='pending';r.res=null;});
   const todo=[];
-  rows.forEach((r,idx)=>{ if(r.status!=='done'&&r.status!=='error') todo.push(idx); });
-  renderTable(); // draw once
+  rows.forEach((r,idx)=>{ if(r.status!=='done') todo.push(idx); });
+  renderTable();
   const btn=document.getElementById('recalcBtn');
-  btn.disabled=true;
   const progBar=document.getElementById('progressBar'), progFill=document.getElementById('progressFill');
-  progBar.style.display='';
-  progFill.style.width='0%';
+  if(todo.length===0){ renderSummary(); btn.disabled=false; progBar.style.display='none'; return; }
+  btn.disabled=true;
+  progBar.style.display=''; progFill.style.width='0%';
   let k=0;
   const m=currentModel;
   const now=(typeof performance!=='undefined'&&performance.now)?()=>performance.now():()=>Date.now();
-  // Process rows until ~30ms of the frame is used, updating only each row's
-  // result cells in place (no full re-render), then yield. This removes the
-  // O(n^2) DOM rebuild that caused the lag; the engine is unchanged.
+  // Se lucreaza ~30 ms pe cadru, actualizand DOAR celulele de rezultat ale
+  // randului (fara re-desenarea intregului tabel, care ar fi O(n^2)).
   function step(){
     const t0=now();
     while(k<todo.length && (now()-t0)<30){
       const idx=todo[k];
       const row=rows[idx];
-      const res=evalCombo(m,row.N,row.My,row.Mz);
-      if(res.error){row.status='error';row.result=res;}
-      else{row.status='done';row.result=res;}
+      row.res=evalCombo(m,row.N,row.My,row.Mz);
+      row.status='done';
       updateRowResultCells(idx);
       k++;
     }
     progFill.style.width=(todo.length?(100*k/todo.length):100).toFixed(0)+'%';
-    if(k<todo.length){
-      requestAnimationFrame(step);
-    } else {
-      renderSummary();
-      btn.disabled=false;
-      setTimeout(()=>{progBar.style.display='none';},400);
-    }
+    if(k<todo.length) requestAnimationFrame(step);
+    else { renderSummary(); btn.disabled=false; setTimeout(()=>{progBar.style.display='none';},400); }
   }
-  if(todo.length===0){ renderSummary(); btn.disabled=false; progBar.style.display='none'; return; }
   requestAnimationFrame(step);
 }
 
 // ═══════════════════ Table rendering ═══════════════════
+function rowCells(r){
+  let myRd='&mdash;',mzRd='&mdash;',util='&mdash;',
+      verdict=`<span class="verdict-pill pending">${t('verdictPending')}</span>`,cls='row-pending';
+  if(r.status==='done'){
+    if(r.res&&r.res.ok){
+      const v=r.res.value;
+      myRd=v.MyRd.toFixed(1); mzRd=v.MzRd.toFixed(1); util=v.util.toFixed(1)+' %';
+      const pass=v.util<=100;
+      verdict=`<span class="verdict-pill ${pass?'ok':'no'}">${pass?t('verdictOk'):t('verdictFail')}</span>`;
+      cls=pass?'row-ok':'row-fail';
+    } else {
+      // Contractul nucleului: fara verdict verde/rosu, celula goala + motivul.
+      verdict=`<span class="verdict-pill na" title="${esc(statusText(r.res))}">${t('verdictInvalid')}</span>`;
+      cls='row-invalid';
+    }
+  }
+  return {myRd,mzRd,util,verdict,cls};
+}
 function renderTable(){
   const thead=document.getElementById('theadRow');
   thead.innerHTML=`
@@ -950,28 +892,10 @@ function renderTable(){
   const tbody=document.getElementById('tbodyRows');
   let html='';
   rows.forEach((r,idx)=>{
-    const rowClass=r.status==='done'?(r.result.ok?'row-ok':'row-fail'):(r.status==='error'?'row-fail':'row-pending');
-    let myRd='&mdash;',mzRd='&mdash;',util='&mdash;',verdict=`<span class="verdict-pill pending">${t('verdictPending')}</span>`;
-    if(r.status==='done'){
-      if(r.result.eqOk===false){
-        myRd=mzRd=util='&mdash;';
-        verdict=`<span class="verdict-pill no" title="${esc(t('verdictOutOfRange'))}">${t('verdictFail')}</span>`;
-      } else {
-        myRd=r.result.MyRd.toFixed(1);
-        mzRd=r.result.MzRd.toFixed(1);
-        util=r.result.util.toFixed(1)+' %';
-        verdict=r.result.ok
-          ? `<span class="verdict-pill ok">${t('verdictOk')}</span>`
-          : `<span class="verdict-pill no">${t('verdictFail')}</span>`;
-      }
-    } else if(r.status==='error'){
-      myRd=mzRd=util='err';
-      verdict=`<span class="verdict-pill no" title="${esc(r.result&&r.result.errorMsg||'')}">${t('verdictFail')}</span>`;
-    }
+    const c=rowCells(r);
     const expanded=(r._expanded)?' expanded':'';
     const chevBtn=`<button class="row-exp${expanded}" onclick="toggleRowDetail(${idx})" title="${esc(t('detailToggle'))}"><span class="chev-r"></span></button>`;
-    // editable cells: labels (text) + N/M2/M3 (numeric). Editing recomputes the row.
-    html+=`<tr class="${rowClass}">
+    html+=`<tr class="${c.cls}">
       <td class="exp-cell">${chevBtn}</td>
       <td class="lbl-col"><input class="cell-in lbl-in" type="text" value="${esc(r.story)}" oninput="editCell(${idx},'story',this.value)" placeholder="&mdash;"></td>
       <td class="lbl-col"><input class="cell-in lbl-in" type="text" value="${esc(r.column)}" oninput="editCell(${idx},'column',this.value)" placeholder="&mdash;"></td>
@@ -980,8 +904,8 @@ function renderTable(){
       <td class="grp-start"><input class="cell-in num-in" type="number" step="1" value="${fmtIn(r.Nraw)}" oninput="editCell(${idx},'Nraw',this.value)"></td>
       <td><input class="cell-in num-in" type="number" step="1" value="${fmtIn(r.M2)}" oninput="editCell(${idx},'M2',this.value)"></td>
       <td><input class="cell-in num-in" type="number" step="1" value="${fmtIn(r.M3)}" oninput="editCell(${idx},'M3',this.value)"></td>
-      <td class="grp-start">${myRd}</td><td>${mzRd}</td><td>${util}</td>
-      <td class="verdict-cell" onclick="toggleRowDetail(${idx})" style="cursor:pointer">${verdict}</td>
+      <td class="grp-start">${c.myRd}</td><td>${c.mzRd}</td><td>${c.util}</td>
+      <td class="verdict-cell" onclick="toggleRowDetail(${idx})" style="cursor:pointer">${c.verdict}</td>
       <td class="editable-row-actions"><button class="row-del" onclick="deleteRow(${idx})" title="Delete">&times;</button></td>
     </tr>`;
     if(r._expanded){
@@ -989,16 +913,28 @@ function renderTable(){
     }
   });
   tbody.innerHTML=html;
-  // draw any expanded detail charts/sketches after DOM is in place
   rows.forEach((r,idx)=>{ if(r._expanded) drawDetail(r,idx); });
   document.getElementById('tableTitle').textContent=t('tableTitleN',rows.length);
   renderSummary();
 }
 function fmtIn(v){ if(v===undefined||v===null||!isFinite(v))return ''; return (Math.round(v*100)/100); }
-function esc(s){return (s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-
-// Edit a single cell in place. Numeric edits (Nraw/M2/M3) re-derive N/My/Mz with
-// the current sign & axis conventions and recompute just that row.
+function updateRowResultCells(idx){
+  const r=rows[idx];
+  const tbody=document.getElementById('tbodyRows');
+  if(!tbody)return;
+  const trs=[...tbody.querySelectorAll('tr')].filter(tr=>!tr.classList.contains('detail-row'));
+  const tr=trs[idx];
+  if(!tr)return;
+  const tds=tr.querySelectorAll('td');
+  const c=rowCells(r);
+  if(tds[8])tds[8].innerHTML=c.myRd;
+  if(tds[9])tds[9].innerHTML=c.mzRd;
+  if(tds[10])tds[10].innerHTML=c.util;
+  if(tds[11])tds[11].innerHTML=c.verdict;
+  tr.className=c.cls;
+}
+// Editarea unei celule. Modificarile numerice re-deriva N/My/Mz cu conventiile
+// curente si recalculeaza doar randul respectiv.
 let editDebounce=null;
 function editCell(idx,field,value){
   const r=rows[idx];
@@ -1007,8 +943,7 @@ function editCell(idx,field,value){
     const num=parseFloat(String(value).replace(',','.'));
     r[field]=isFinite(num)?num:0;
     r.N=convN(r.Nraw); r.My=mapMy(r.M2,r.M3); r.Mz=mapMz(r.M2,r.M3);
-    r.status='pending'; r.result=null;
-    // debounce recompute so fast typing stays smooth
+    r.status='pending'; r.res=null;
     clearTimeout(editDebounce);
     editDebounce=setTimeout(()=>{ recomputeRow(idx); saveCurrentPreset(); },250);
   } else {
@@ -1020,56 +955,24 @@ function recomputeRow(idx){
   const r=rows[idx];
   if(!r)return;
   if(!currentModel) currentModel=buildModel();
-  const res=evalCombo(currentModel,r.N,r.My,r.Mz);
-  r.result=res; r.status=res.error?'error':'done';
-  // Update only the result cells of this row in place, so the input cell being
-  // edited keeps focus and caret position (a full renderTable() would rebuild
-  // the inputs and drop focus mid-typing). Full render only when the row is
-  // expanded (the detail panel needs redrawing).
+  r.res=evalCombo(currentModel,r.N,r.My,r.Mz);
+  r.status='done';
+  // Se actualizeaza numai celulele de rezultat, ca inputul aflat in editare sa
+  // isi pastreze focusul si cursorul. Re-desenare completa doar daca randul
+  // este desfasurat (panoul de detaliu trebuie redesenat).
   if(r._expanded){ renderTable(); return; }
   updateRowResultCells(idx);
   renderSummary();
 }
-function updateRowResultCells(idx){
-  const r=rows[idx];
-  const tbody=document.getElementById('tbodyRows');
-  if(!tbody)return;
-  // find the idx-th non-detail row
-  const trs=[...tbody.querySelectorAll('tr')].filter(tr=>!tr.classList.contains('detail-row'));
-  const tr=trs[idx];
-  if(!tr)return;
-  const tds=tr.querySelectorAll('td');
-  // columns: 0 exp,1-4 labels,5-7 N/M2/M3,8 MyRd,9 MzRd,10 util,11 verdict,12 del
-  let myRd='&mdash;',mzRd='&mdash;',util='&mdash;',verdict=`<span class="verdict-pill pending">${t('verdictPending')}</span>`;
-  if(r.status==='done'){
-    if(r.result.eqOk===false){
-      verdict=`<span class="verdict-pill no" title="${esc(t('verdictOutOfRange'))}">${t('verdictFail')}</span>`;
-    } else {
-      myRd=r.result.MyRd.toFixed(1); mzRd=r.result.MzRd.toFixed(1); util=r.result.util.toFixed(1)+' %';
-      verdict=r.result.ok?`<span class="verdict-pill ok">${t('verdictOk')}</span>`:`<span class="verdict-pill no">${t('verdictFail')}</span>`;
-    }
-  } else if(r.status==='error'){
-    myRd=mzRd=util='err';
-    verdict=`<span class="verdict-pill no">${t('verdictFail')}</span>`;
-  }
-  if(tds[8])tds[8].innerHTML=myRd;
-  if(tds[9])tds[9].innerHTML=mzRd;
-  if(tds[10])tds[10].innerHTML=util;
-  if(tds[11])tds[11].innerHTML=verdict;
-  const rowClass=r.status==='done'?(r.result.ok?'row-ok':'row-fail'):(r.status==='error'?'row-fail':'row-pending');
-  tr.className=rowClass;
-}
 function addManualRow(){
-  rows.push({story:'',column:'',outputCase:'',station:'',Nraw:0,M2:0,M3:0,
-    N:convN(0),My:mapMy(0,0),Mz:mapMz(0,0),result:null,status:'pending',_expanded:false});
+  rows.push(newRow({Nraw:0,M2:0,M3:0}));
   document.getElementById('resultsPanel').style.display='';
   document.getElementById('emptyPanel').style.display='none';
   renderTable();
   saveCurrentPreset();
-  // focus the N cell of the new row for quick entry
   setTimeout(()=>{
-    const inputs=document.querySelectorAll('#tbodyRows tr:not(.detail-row)');
-    const last=inputs[inputs.length-1];
+    const trs=document.querySelectorAll('#tbodyRows tr:not(.detail-row)');
+    const last=trs[trs.length-1];
     if(last){const nCell=last.querySelector('.num-in');if(nCell)nCell.focus();}
   },30);
 }
@@ -1077,32 +980,57 @@ function toggleRowDetail(idx){
   const r=rows[idx];
   if(!r)return;
   r._expanded=!r._expanded;
-  if(r._expanded && (r.status!=='done')) recomputeRow(idx);
+  if(r._expanded && r.status!=='done') recomputeRow(idx);
   else renderTable();
 }
+function renderSummary(){
+  const bar=document.getElementById('summaryBar');
+  const done=rows.filter(r=>r.status==='done');
+  const invalid=done.filter(r=>!(r.res&&r.res.ok));
+  const valid=done.filter(r=>r.res&&r.res.ok);
+  const okCount=valid.filter(r=>r.res.value.util<=100).length;
+  const failCount=valid.length-okCount;
+  let worst=null;
+  valid.forEach(r=>{if(!worst||r.res.value.util>worst.res.value.util)worst=r;});
+  let html=`
+    <div class="sum-chip"><div class="sc-l">${t('sumTotal')}</div><div class="sc-v">${rows.length}</div></div>
+    <div class="sum-chip ok"><div class="sc-l">${t('sumOk')}</div><div class="sc-v">${okCount}</div></div>
+    <div class="sum-chip no"><div class="sc-l">${t('sumFail')}</div><div class="sc-v">${failCount}</div></div>
+    <div class="sum-chip"><div class="sc-l">${t('sumWorst')}</div><div class="sc-v">${worst?worst.res.value.util.toFixed(1)+' %':'&mdash;'}</div></div>`;
+  if(invalid.length>0){
+    html+=`<div class="sum-chip"><div class="sc-l">${t('sumInvalid')}</div><div class="sc-v">${invalid.length}</div></div>`;
+  }
+  bar.innerHTML=html;
+}
 
-// ─── Detail panel (expanded under a row): My-Mz diagram + hatched section + values ───
+// ─── Panoul de detaliu: diagrama My-Mz + sectiunea cu zona comprimata + valori ───
 function renderDetailPanel(r,idx){
-  if(r.status!=='done'||!r.result||r.result.error){
+  if(r.status!=='done'||!r.res){
     return `<div class="detail-empty">${esc(t('detailUnavailable'))}</div>`;
   }
-  const res=r.result;
-  const lim=axialLimits(currentModel);
-  const oor=res.eqOk===false;
-  const rows2=[
-    [t('dtN'), r.N.toFixed(1)+' kN'],
+  const v=r.res.value||r.res.partial;
+  const okv=r.res.ok;
+  const note=okv?'':`<div class="detail-note">${esc(statusText(r.res))}</div>`;
+  if(!v) return note||`<div class="detail-empty">${esc(t('detailUnavailable'))}</div>`;
+  const dash='&mdash;';
+  const vals=[
+    [t('dtN'), r.Nraw.toFixed(1)+' kN'],
     [t('dtMyEd'), r.My.toFixed(1)+' kNm'],
     [t('dtMzEd'), r.Mz.toFixed(1)+' kNm'],
-    [t('dtMyRd'), oor?'&mdash;':res.MyRd.toFixed(1)+' kNm'],
-    [t('dtMzRd'), oor?'&mdash;':res.MzRd.toFixed(1)+' kNm'],
-    [t('dtX'), oor?'&mdash;':res.X.toFixed(1)+' mm'],
-    [t('dtTheta'), oor?'&mdash;':res.thetaDeg.toFixed(1)+' °'],
-    [t('dtUtil'), oor?'&mdash;':res.util.toFixed(1)+' %'],
-    [t('dtNRdc'), lim.NRdc.toFixed(0)+' kN'],
-    [t('dtNRdt'), lim.NRdt.toFixed(0)+' kN'],
+    [t('dtMyRd'), okv?v.MyRd.toFixed(1)+' kNm':dash],
+    [t('dtMzRd'), okv?v.MzRd.toFixed(1)+' kNm':dash],
+    [t('dtX'), okv?v.X.toFixed(1)+' mm':dash],
+    [t('dtTheta'), okv?v.thetaDeg.toFixed(1)+' °':dash],
+    [t('dtUtil'), okv?v.util.toFixed(1)+' %':dash],
+    [t('dtPivot'), okv?pivotLabel(v.pivot):dash],
+    [t('dtNRdc'), convN(v.NRdc).toFixed(0)+' kN'],
+    [t('dtNRdt'), convN(v.NRdt).toFixed(0)+' kN'],
   ];
-  let valRows=rows2.map(([k,v])=>`<div class="dt-row"><span class="dt-k">${k}</span><span class="dt-v">${v}</span></div>`).join('');
-  return `
+  const valRows=vals.map(([k,val])=>`<div class="dt-row"><span class="dt-k">${k}</span><span class="dt-v">${val}</span></div>`).join('');
+  // Rezultat invalid: nu se deseneaza diagrama si sectiunea (nu exista o axa
+  // neutra de aratat), se pastreaza doar motivul si datele de intrare.
+  if(!okv) return note+`<div class="detail-vals" style="max-width:420px">${valRows}</div>`;
+  return note+`
     <div class="detail-grid">
       <div class="detail-col">
         <div class="detail-h">${esc(t('detailDiagram'))}</div>
@@ -1118,22 +1046,20 @@ function renderDetailPanel(r,idx){
       </div>
     </div>`;
 }
-
 const detailCharts={};
 function drawDetail(r,idx){
-  if(r.status!=='done'||!r.result||r.result.error||r.result.eqOk===false)return;
-  const m=currentModel;
-  // My-Mz interaction curve at this row's N
+  if(r.status!=='done'||!r.res||!r.res.ok)return;
+  const m=currentModel, v=r.res.value;
   const canvas=document.getElementById('dtchart-'+idx);
   if(canvas && typeof Chart!=='undefined'){
     if(detailCharts[idx]){try{detailCharts[idx].destroy();}catch(e){}}
-    const pts=traceCurve(r.N,m).map(p=>({x:p.My,y:p.Mz}));
+    const pts=JP.column.traceCurve(r.N,m).map(p=>({x:p.My,y:p.Mz}));
     if(pts.length)pts.push(pts[0]);
     detailCharts[idx]=new Chart(canvas,{type:'scatter',
       data:{datasets:[
         {label:'Rd',data:pts,showLine:true,borderColor:'#0066CC',borderWidth:2,pointRadius:0,fill:false,tension:0,order:3},
         {label:'Ed',data:[{x:r.My,y:r.Mz}],backgroundColor:'#C0392B',borderColor:'#C0392B',pointRadius:6,pointStyle:'rectRot',order:1},
-        {label:'RdPt',data:[{x:r.result.MyRd,y:r.result.MzRd}],backgroundColor:'#2E7D32',borderColor:'#2E7D32',pointRadius:5,order:1}
+        {label:'RdPt',data:[{x:v.MyRd,y:v.MzRd}],backgroundColor:'#2E7D32',borderColor:'#2E7D32',pointRadius:5,order:1}
       ]},
       options:{responsive:true,maintainAspectRatio:false,animation:false,
         plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`My=${c.parsed.x.toFixed(0)}, Mz=${c.parsed.y.toFixed(0)} kNm`}}},
@@ -1142,79 +1068,64 @@ function drawDetail(r,idx){
           y:{type:'linear',title:{display:true,text:'Mz (kNm)',font:{size:11}},grid:{color:'rgba(0,0,0,0.05)'},ticks:{font:{size:10}}}
         }}});
   }
-  // section with hatched compressed zone + rotated load axis
   drawDetailSketch(r,idx);
 }
-
 function drawDetailSketch(r,idx){
   const svg=document.getElementById('dtsketch-'+idx);
   if(!svg)return;
-  const m=currentModel;
-  const res=r.result;
+  const m=currentModel, v=r.res.value;
   const VW=300,VH=260,PAD=34;
   const scl=Math.min((VW-2*PAD)/m.b,(VH-2*PAD)/m.h);
   const cx0=VW/2, cy0=VH/2;
   const X2=(y)=>cx0+y*scl, Y2=(z)=>cy0-z*scl;
   let o='';
-  // compressed fibers (hatched fill via small dots is heavy; use translucent rects per fiber)
-  const fib=compressedFibers(res.X,res.theta,m);
-  const fw=(m.b/NGY)*scl, fh=(m.h/NGZ)*scl;
-  // draw compressed fibers as a light fill
+  const cf=compressedFibers(v.X,v.theta,m);
+  const fw=(m.b/m.NGY)*scl, fh=(m.h/m.NGZ)*scl;
   o+='<g>';
-  fib.forEach(f=>{ if(f.comp){ o+=`<rect x="${X2(f.y)-fw/2}" y="${Y2(f.z)-fh/2}" width="${fw+0.5}" height="${fh+0.5}" fill="#BcD8F5" opacity="0.55"/>`; } });
+  cf.fibers.forEach(f=>{ if(f.comp){ o+=`<rect x="${X2(f.y)-fw/2}" y="${Y2(f.z)-fh/2}" width="${fw+0.5}" height="${fh+0.5}" fill="#BCD8F5" opacity="0.55"/>`; } });
   o+='</g>';
-  // section outline
   o+=`<rect x="${X2(-m.b/2)}" y="${Y2(m.h/2)}" width="${m.b*scl}" height="${m.h*scl}" fill="none" stroke="#1C1C1E" stroke-width="1.3"/>`;
-  // neutral axis line: perpendicular to compression normal n=(cos,sin), passing at depth
-  const th=res.theta, cxx=Math.cos(th), czz=Math.sin(th);
-  const dmax=(function(){const c=[[-m.b/2,-m.h/2],[m.b/2,-m.h/2],[m.b/2,m.h/2],[-m.b/2,m.h/2]];let d=-Infinity;for(const[y,z]of c){const v=y*cxx+z*czz;if(v>d)d=v;}return d;})();
-  const na=dmax-res.X;
-  // NA line direction = perpendicular to (cxx,czz) => (-czz,cxx). Point on line: na*(cxx,czz)
+  // axa neutra: perpendiculara pe normala de compresiune n=(cos,sin), la adancimea X
+  const th=v.theta, cxx=Math.cos(th), czz=Math.sin(th);
+  const na=cf.dmax-v.X;
   const px=na*cxx, pz=na*czz, dx=-czz, dz=cxx;
   const L=Math.max(m.b,m.h);
-  const ax1=px-dx*L, az1=pz-dz*L, ax2=px+dx*L, az2=pz+dz*L;
-  o+=`<line x1="${X2(ax1)}" y1="${Y2(az1)}" x2="${X2(ax2)}" y2="${Y2(az2)}" stroke="#C0392B" stroke-width="1.4" stroke-dasharray="5,3"/>`;
-  // bars
+  o+=`<line x1="${X2(px-dx*L)}" y1="${Y2(pz-dz*L)}" x2="${X2(px+dx*L)}" y2="${Y2(pz+dz*L)}" stroke="#C0392B" stroke-width="1.4" stroke-dasharray="5,3"/>`;
   m.steelFibers.forEach(f=>{o+=`<circle cx="${X2(f.y)}" cy="${Y2(f.z)}" r="2.6" fill="#1C1C1E"/>`;});
-  // load direction arrow (resultant moment vector direction in My-Mz plane, drawn on section as rotated axis)
   const mlen=Math.min(VW,VH)*0.30;
   const dirAng=Math.atan2(r.Mz,r.My);
   const ex=Math.cos(dirAng), ez=Math.sin(dirAng);
   o+=`<line x1="${cx0}" y1="${cy0}" x2="${cx0+ex*mlen}" y2="${cy0-ez*mlen}" stroke="#2E7D32" stroke-width="1.8"/>`;
   o+=`<circle cx="${cx0+ex*mlen}" cy="${cy0-ez*mlen}" r="3" fill="#2E7D32"/>`;
   o+=`<text x="${cx0+ex*mlen+4}" y="${cy0-ez*mlen-4}" font-size="9" fill="#2E7D32" font-family="Inter,sans-serif">M_Ed</text>`;
-  // legend
   o+=`<text x="6" y="${VH-6}" font-size="8" fill="#6C6C70" font-family="Inter,sans-serif">${esc(t('dtHatch'))}</text>`;
   svg.innerHTML=o;
 }
 
-// Copy the full results table to the clipboard as Tab-separated values, ready to
-// paste straight back into Excel. Includes a header row and every column
-// (labels + inputs + computed My,Rd / Mz,Rd / utilization / verdict).
+// ═══════════════════ Copy to clipboard (TSV, gata de lipit in Excel) ═══════════════════
 function copyTable(){
   const btn=document.getElementById('copyBtn');
   const header=[t('colStory'),t('colColumn'),t('colCase'),t('colStation'),
     'N (kN)','M2 (kNm)','M3 (kNm)','My,Rd (kNm)','Mz,Rd (kNm)',t('colUtil'),t('colVerdict')];
-  const stripHtml=s=>String(s).replace(/<[^>]*>/g,'').replace(/&mdash;/g,'-').replace(/&amp;/g,'&');
+  const strip=s=>String(s).replace(/<[^>]*>/g,'').replace(/&mdash;/g,'-').replace(/&amp;/g,'&');
   const lines=[header.join('\t')];
   rows.forEach(r=>{
-    const isOOR=r.status==='done'&&r.result.eqOk===false;
-    const done=r.status==='done'&&!isOOR;
-    const myRd=done?r.result.MyRd.toFixed(1):(isOOR?t('pdfOOR'):'-');
-    const mzRd=done?r.result.MzRd.toFixed(1):(isOOR?t('pdfOOR'):'-');
-    const util=done?r.result.util.toFixed(1)+'%':(isOOR?t('pdfOOR'):'-');
-    const verdict=r.status==='done'?(isOOR?stripHtml(t('verdictFail')):(r.result.ok?stripHtml(t('verdictOk')):stripHtml(t('verdictFail')))):(r.status==='error'?stripHtml(t('verdictFail')):'-');
+    const okv=r.status==='done'&&r.res&&r.res.ok;
+    const v=okv?r.res.value:null;
+    const myRd=okv?v.MyRd.toFixed(1):'-';
+    const mzRd=okv?v.MzRd.toFixed(1):'-';
+    const util=okv?v.util.toFixed(1)+'%':'-';
+    const verdict=okv?(v.util<=100?strip(t('verdictOk')):strip(t('verdictFail')))
+                    :(r.status==='done'?strip(t('verdictInvalid')):'-');
     lines.push([r.story,r.column,r.outputCase,r.station,
-      r.N.toFixed(1),r.Mz.toFixed(1),r.My.toFixed(1),myRd,mzRd,util,verdict].join('\t'));
+      fmtIn(r.Nraw),fmtIn(r.M2),fmtIn(r.M3),myRd,mzRd,util,verdict].join('\t'));
   });
   const tsv=lines.join('\n');
-  const done=()=>{const orig=btn.textContent;btn.textContent=t('copiedBtn');btn.disabled=true;
+  const done=()=>{btn.textContent=t('copiedBtn');btn.disabled=true;
     setTimeout(()=>{btn.textContent=t('copyBtn');btn.disabled=false;},1600);};
   if(navigator.clipboard&&navigator.clipboard.writeText){
     navigator.clipboard.writeText(tsv).then(done).catch(()=>fallbackCopy(tsv,done));
-  } else {
-    fallbackCopy(tsv,done);
-  }
+  } else fallbackCopy(tsv,done);
 }
 function fallbackCopy(text,cb){
   const ta=document.createElement('textarea');
@@ -1223,32 +1134,12 @@ function fallbackCopy(text,cb){
   try{document.execCommand('copy');cb&&cb();}catch(e){}
   document.body.removeChild(ta);
 }
-function renderSummary(){
-  const bar=document.getElementById('summaryBar');
-  const done=rows.filter(r=>r.status==='done');
-  const outOfRange=done.filter(r=>r.result.eqOk===false);
-  const validDone=done.filter(r=>r.result.eqOk!==false);
-  const okCount=validDone.filter(r=>r.result.ok).length;
-  const failCount=validDone.length-okCount+rows.filter(r=>r.status==='error').length+outOfRange.length;
-  let worst=null;
-  validDone.forEach(r=>{if(!worst||r.result.util>worst.result.util)worst=r;});
-  let html=`
-    <div class="sum-chip"><div class="sc-l">${t('sumTotal')}</div><div class="sc-v">${rows.length}</div></div>
-    <div class="sum-chip ok"><div class="sc-l">${t('sumOk')}</div><div class="sc-v">${okCount}</div></div>
-    <div class="sum-chip no"><div class="sc-l">${t('sumFail')}</div><div class="sc-v">${failCount}</div></div>
-    <div class="sum-chip"><div class="sc-l">${t('sumWorst')}</div><div class="sc-v">${worst?worst.result.util.toFixed(1)+' %':'&mdash;'}</div></div>`;
-  if(outOfRange.length>0){
-    html+=`<div class="sum-chip no"><div class="sc-l">${t('sumOutOfRange')}</div><div class="sc-v">${outOfRange.length}</div></div>`;
-  }
-  bar.innerHTML=html;
-}
 
 // ═══════════════════ PDF export ═══════════════════
 function generatePdf(){
   const btn=document.getElementById('rptBtn'),status=document.getElementById('rptStatus');
   if(typeof window.jspdf==='undefined'){status.textContent=t('pdfLoading');return;}
-  if(!currentModel){return;}
-  if(!rows.length){return;}
+  if(!currentModel||!rows.length)return;
   btn.disabled=true;btn.textContent=t('generating');
   setTimeout(()=>{
     try{
@@ -1257,19 +1148,19 @@ function generatePdf(){
       setTimeout(()=>status.textContent='',4000);
     }catch(err){
       console.error('PDF generation failed:',err);
-      status.textContent=t('pdfError')+' '+(err&&err.message||err);
+      status.textContent=t('pdfError')+' '+((err&&err.message)||err);
     }finally{
       btn.disabled=false;btn.textContent=t('downloadPdf');
     }
   },30);
 }
-
 function buildPdfDoc(){
   const{jsPDF}=window.jspdf;
   const doc=new jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
   const pW=297,pH=210,ml=12,mr=12,cw=pW-ml-mr;
   const ds=new Date().toLocaleDateString(LANG==='en'?'en-GB':'ro-RO');
   const m=currentModel;
+  const lim=JP.column.axialLimits(m);
   function hdr(){
     doc.setFillColor(40,80,140);doc.rect(0,0,pW,13,'F');
     doc.setTextColor(255,255,255);doc.setFontSize(10);doc.setFont('helvetica','bold');
@@ -1282,12 +1173,12 @@ function buildPdfDoc(){
   hdr();
   let y=19;
 
-  // ── Section summary (params table + sketch, side by side) ──
+  // ── Sectiunea (tabel de parametri + desen, alaturate) ──
   doc.setFontSize(9);doc.setFont('helvetica','bold');doc.setTextColor(0,102,204);
   doc.text(t('pdfSecTitle'),ml,y);doc.setTextColor(0,0,0);doc.setFont('helvetica','normal');
   y+=5;
-  const rho=(100*m.As_tot/m.Ac).toFixed(2);
-  const leftW=120;
+  const rho=(m.Ac>0?(100*m.As_tot/m.Ac).toFixed(2):'0');
+  const leftW=132;
   doc.autoTable({
     startY:y,
     body:[
@@ -1295,38 +1186,48 @@ function buildPdfDoc(){
       [t('pdfInHeight'),m.h+' mm'],
       [t('pdfInConcClass'),curC+(confMode==='all'?t('pdfConfAll'):'')],
       [t('pdfInSteelClass'),curS],
-      ['f_cd',(confMode==='all'?m.fcdc:m.fcd).toFixed(2)+' MPa'],
-      ['f_yd',m.fyd.toFixed(1)+' MPa'],
+      ['f_cd',(confMode==='all'?m.fcdc:m.fcd).toFixed(4)+' MPa'],
+      ['f_yd',m.fyd.toFixed(4)+' MPa'],
       [t('pdfInTotBars'),m.cntTot+' '+t('barsWord')],
       [t('pdfInReinfRatio'),rho+' %'],
+      [t('pdfNRdc'),convN(lim.NRdc).toFixed(0)+' kN'],
+      [t('pdfNRdt'),convN(lim.NRdt).toFixed(0)+' kN'],
+      [t('pdfInSignConv'),(signConv==='pos')?t('pdfSignPos'):t('pdfSignNeg')],
+      [t('pdfInAxisMap'),(axisMap==='swap')?t('pdfMapSwap'):t('pdfMapStd')],
+      [t('pdfInConvention'),m.deductSteel?t('pdfConvNet'):t('pdfConvGross')],
+      [t('pdfInNfibres'),m.NGY+' x '+m.NGZ],
     ],
     margin:{left:ml},tableWidth:leftW,theme:'grid',
     styles:{lineColor:[180,200,220],lineWidth:0.25,fontSize:8,textColor:[0,0,0],cellPadding:1.5},
-    columnStyles:{0:{cellWidth:66,fontStyle:'normal'},1:{halign:'right',fontStyle:'bold'}},
+    columnStyles:{0:{cellWidth:72,fontStyle:'normal'},1:{halign:'right',fontStyle:'bold'}},
   });
-
-  // section sketch to the right of the params table
   const secTableEndY=doc.lastAutoTable.finalY;
   drawSectionInPdf(doc,m,ml+leftW+10,y,pW-mr-(ml+leftW+10));
 
-  // ── Results table (same page, below the section block) ──
+  // ── Rezultate ──
   let y2=secTableEndY+8;
   doc.setFontSize(9);doc.setFont('helvetica','bold');doc.setTextColor(0,102,204);
   doc.text(t('pdfResultsTitle'),ml,y2);doc.setTextColor(0,0,0);doc.setFont('helvetica','normal');
-  y2+=2;
-  const body=rows.map(r=>{
-    const isOOR=r.status==='done'&&r.result.eqOk===false;
+  const obs=[];
+  const body=rows.map((r,i)=>{
+    const okv=r.status==='done'&&r.res&&r.res.ok;
+    const v=okv?r.res.value:null;
+    let verdict;
+    if(!okv){
+      verdict=r.status==='done'?t('pdfInvalidCell'):'-';
+      if(r.status==='done') obs.push((i+1)+'. '+[r.story,r.column,r.outputCase].filter(Boolean).join(' / ')+' — '+statusText(r.res));
+    } else verdict=(v.util<=100?t('verdictOk'):t('verdictFail'));
     return [
       r.story,r.column,r.outputCase,r.station,
-      r.N.toFixed(1),r.Mz.toFixed(1),r.My.toFixed(1),
-      (r.status==='done'&&!isOOR)?r.result.MyRd.toFixed(1):'-',
-      (r.status==='done'&&!isOOR)?r.result.MzRd.toFixed(1):'-',
-      (r.status==='done'&&!isOOR)?r.result.util.toFixed(1)+'%':(isOOR?t('pdfOOR'):'-'),
-      r.status==='done'?(isOOR?t('verdictFail'):(r.result.ok?t('verdictOk'):t('verdictFail'))):(r.status==='error'?t('verdictFail'):'-')
+      fmtIn(r.Nraw),fmtIn(r.M2),fmtIn(r.M3),
+      okv?v.MyRd.toFixed(1):'-',
+      okv?v.MzRd.toFixed(1):'-',
+      okv?v.util.toFixed(1)+'%':'-',
+      verdict
     ];
   });
   doc.autoTable({
-    startY:y2+2,
+    startY:y2+4,
     head:[[t('colStory'),t('colColumn'),t('colCase'),t('colStation'),t('colN'),t('colM2'),t('colM3'),t('colMyRd'),t('colMzRd'),t('colUtil'),t('colVerdict')]],
     body,
     margin:{left:ml,right:mr},tableWidth:cw,theme:'grid',
@@ -1334,34 +1235,60 @@ function buildPdfDoc(){
     headStyles:{fillColor:[200,215,235],textColor:[0,0,0],fontStyle:'bold',lineColor:[200,215,235],fontSize:7.5},
     columnStyles:{4:{halign:'right'},5:{halign:'right'},6:{halign:'right'},7:{halign:'right'},8:{halign:'right'},9:{halign:'right'},10:{halign:'center',fontStyle:'bold'}},
     didParseCell:function(data){
-      if(data.section==='body'){
-        const verdictText=body[data.row.index][10];
-        if(data.column.index===10){
-          if(verdictText===t('verdictOk')){data.cell.styles.textColor=[46,125,50];}
-          else if(verdictText===t('verdictFail')){data.cell.styles.textColor=[192,57,43];}
-        }
+      if(data.section==='body'&&data.column.index===10){
+        const vt=body[data.row.index][10];
+        if(vt===t('verdictOk')) data.cell.styles.textColor=[46,125,50];
+        else if(vt===t('verdictFail')) data.cell.styles.textColor=[192,57,43];
+        else if(vt===t('pdfInvalidCell')) data.cell.styles.textColor=[108,108,112];
       }
     },
     didDrawPage:function(){hdr();}
   });
+  let y3=doc.lastAutoTable.finalY+7;
+  function need(n){ if(y3+n>pH-14){doc.addPage();hdr();y3=19;} }
+  // ── Observatii (randuri fara rezultat valabil) ──
+  if(obs.length){
+    need(12);
+    doc.setFontSize(9);doc.setFont('helvetica','bold');doc.setTextColor(0,102,204);
+    doc.text(t('pdfObsTitle'),ml,y3);doc.setTextColor(0,0,0);doc.setFont('helvetica','normal');y3+=5;
+    doc.setFontSize(7.5);
+    obs.forEach(function(line){ need(5); doc.text(line,ml,y3,{maxWidth:cw}); y3+=4.2; });
+    y3+=3;
+  }
+  // ── Avertismente ──
+  if(m.eukAssumed&&m.limitEpsUd){
+    need(10);
+    doc.setFontSize(9);doc.setFont('helvetica','bold');doc.setTextColor(138,90,0);
+    doc.text(t('pdfWarnHead'),ml,y3);y3+=5;doc.setFont('helvetica','normal');doc.setFontSize(7.5);
+    doc.text('- '+t('wEuk',m.steel),ml,y3,{maxWidth:cw});y3+=6;
+    doc.setTextColor(0,0,0);
+  }
+  // ── Conventii si limitari ──
+  need(30);
+  doc.setFontSize(9);doc.setFont('helvetica','bold');doc.setTextColor(0,102,204);
+  doc.text(t('pdfLimTitle'),ml,y3);doc.setTextColor(0,0,0);doc.setFont('helvetica','normal');y3+=5;
+  doc.setFontSize(7.5);
+  [t('pdfLim1',(m.eud*1000).toFixed(1)),t('pdfLim2'),t('pdfLim3'),t('pdfLim4'),t('pdfLim5'),t('pdfLim5b')]
+    .forEach(function(line){ need(5); doc.text(line,ml,y3,{maxWidth:cw}); y3+=4.2; });
 
-  // ── footer on every page ──
+  // ── subsol pe fiecare pagina ──
   const tp=doc.internal.getNumberOfPages();
+  const stamp='CR 2-1-1.1/2022 / SR EN 1992-1-1  |  M'+MODULE_ID+' v'+MODULE_VERSION+' / engine v'+JP.VERSION;
   for(let i=1;i<=tp;i++){
     doc.setPage(i);
     doc.setFontSize(7);doc.setTextColor(0,0,0);doc.setFont('helvetica','italic');
     doc.text(t('pdfDisc1')+'  '+t('pdfDisc2'),ml,pH-5);
     doc.setFont('helvetica','normal');
-    doc.text('CR 2-1-1.1/2022 / SR EN 1992-1-1',ml,pH-1.5);
+    doc.text(stamp,ml,pH-1.5);
     doc.text(t('pdfPage',i,tp),pW-mr,pH-1.5,{align:'right'});
     doc.text(t('pdfGenerated')+ds,pW/2,pH-1.5,{align:'center'});
   }
   doc.save(t('pdfFname'));
 }
-
-// Draw the section rectangle + reinforcement bars directly as PDF vector graphics.
+// Sectiunea se deseneaza direct ca grafica vectoriala in PDF.
 function drawSectionInPdf(doc,m,x0,y0,availW){
-  const maxW=availW, maxH=42;
+  if(!(m.b>0)||!(m.h>0))return;
+  const maxW=availW, maxH=46;
   const scl=Math.min(maxW/m.b,maxH/m.h)*0.8;
   const w=m.b*scl, h=m.h*scl;
   const cx=x0+maxW/2, cy=y0+maxH/2;
@@ -1370,19 +1297,21 @@ function drawSectionInPdf(doc,m,x0,y0,availW){
   if(confMode==='all'){doc.setFillColor(221,238,255);}else{doc.setFillColor(232,232,237);}
   doc.rect(rx,ry,w,h,'FD');
   doc.setFillColor(28,28,30);
-  function X2(yy){return cx+yy*scl;}
-  function Y2(zz){return cy-zz*scl;}
+  const X2=(yy)=>cx+yy*scl, Y2=(zz)=>cy-zz*scl;
   m.steelFibers.forEach(f=>{doc.circle(X2(f.y),Y2(f.z),0.7,'F');});
   doc.setFontSize(6.5);doc.setTextColor(108,108,112);doc.setFont('helvetica','normal');
-  doc.text(`b=${m.b}`,cx,ry+h+3,{align:'center'});
+  doc.text(`b=${m.b} x h=${m.h} mm`,cx,ry+h+3.5,{align:'center'});
   doc.setTextColor(0,0,0);
 }
 
-// ═══════════════════ Section presets S1..S5 ═══════════════════
-// Each preset stores the full section definition (geometry, materials,
-// reinforcement, confinement) AND its own imported load-combination rows, so
-// the user can keep several different column sections side by side and switch
-// between them — the batch of combinations follows each section.
+// ═══════════════════ Presetari de sectiune S1..S5 ═══════════════════
+// Fiecare presetare tine intreaga definitie a sectiunii SI combinatiile ei de
+// incarcare, ca sa poti pastra mai multe sectiuni de stalp in paralel si sa
+// comuti intre ele — lotul de combinatii urmeaza sectiunea.
+// Conventia de semn NU se salveaza ca setare (este o preferinta de utilizator,
+// comuna cu modulele 03/06), ci doar ca ETICHETA, folosita la restaurare: daca
+// eticheta difera de conventia activa, valorile N din presetare se negheaza,
+// ca un stalp comprimat sa nu se transforme in tacere intr-unul intins.
 let currentPreset='S1';
 function getKey(p){return 'sw_mod7_'+p;}
 function captureState(){
@@ -1390,10 +1319,11 @@ function captureState(){
   document.querySelectorAll('#sectionPanel input[id], #sectionPanel select[id]').forEach(el=>{st.inputs[el.id]=el.value;});
   st.segs.conf=confMode;
   st.segs.axisMap=axisMap;
-  st.segs.signConv=signConv;
-  // store only the raw pasted data per row (labels + raw N/M2/M3); results are
-  // recomputed on load, never persisted (they depend on the section anyway).
-  st.rows=rows.map(r=>({story:r.story,column:r.column,outputCase:r.outputCase,station:r.station,Nraw:r.Nraw,M2:r.M2,M3:r.M3}));
+  st.segs.signConv=signConv;   // eticheta, nu setare
+  // Se salveaza doar datele brute lipite; rezultatele se recalculeaza la
+  // incarcare (depind oricum de sectiune).
+  st.rows=rows.map(r=>({story:r.story,column:r.column,outputCase:r.outputCase,station:r.station,
+                        Nraw:r.Nraw,M2:r.M2,M3:r.M3}));
   return st;
 }
 function applyState(st){
@@ -1401,21 +1331,22 @@ function applyState(st){
   if(st.inputs){
     Object.keys(st.inputs).forEach(id=>{const el=document.getElementById(id);if(el)el.value=st.inputs[id];});
   } else {
-    // empty preset → reset section inputs to defaults so a fresh section starts clean
-    const defs={bcol:'300',hcol:'300',cp:'C30/37',sp:'S 500',fckc:'35',ec2c:'2.20',ecu2c:'5.50',cor_n:'4',cor_d:'16',topb_n:'1',topb_d:'16',sidh_n:'1',sidh_d:'16',cnom:'30',detr:'8'};
+    // presetare goala -> sectiune noua, pe valorile implicite
+    const defs={bcol:'300',hcol:'300',cp:'C30/37',sp:'S 500',fckc:'35',ec2c:'2.20',ecu2c:'5.50',
+                cor_n:'4',cor_d:'16',topb_n:'1',topb_d:'16',sidh_n:'1',sidh_d:'16',cnom:'30',detr:'8'};
     Object.keys(defs).forEach(id=>{const el=document.getElementById(id);if(el)el.value=defs[id];});
   }
   curC=document.getElementById('cp').value;
   curS=document.getElementById('sp').value;
   confMode=(st.segs&&st.segs.conf)||'none';
   axisMap=(st.segs&&st.segs.axisMap)||'std';
-  signConv=(st.segs&&st.segs.signConv)||'pos';
-  // rebuild rows from stored raw data, applying current conventions (empty if none)
-  rows=(st.rows||[]).map(r=>({
+  // Presetarile facute inainte de mutarea conventiei pe cheia comuna nu au
+  // eticheta; ele au fost salvate cand N>0 insemna compresiune.
+  const savedSign=(st.segs&&st.segs.signConv)||'pos';
+  const flip=(savedSign!==signConv);
+  rows=(st.rows||[]).map(r=>newRow({
     story:r.story,column:r.column,outputCase:r.outputCase,station:r.station,
-    Nraw:r.Nraw,M2:r.M2,M3:r.M3,
-    N:convN(r.Nraw),My:mapMy(r.M2,r.M3),Mz:mapMz(r.M2,r.M3),
-    result:null,status:'pending',_expanded:false
+    Nraw:(flip&&isFinite(r.Nraw)&&r.Nraw!==0)?-r.Nraw:r.Nraw, M2:r.M2, M3:r.M3
   }));
 }
 function saveCurrentPreset(){
@@ -1424,67 +1355,53 @@ function saveCurrentPreset(){
 function loadPreset(p){
   try{const s=localStorage.getItem(getKey(p));return s?JSON.parse(s):null;}catch(e){return null;}
 }
+function syncToggleUI(){
+  setConfUI(confMode);
+  document.getElementById('seg-map-std').classList.toggle('on',axisMap==='std');
+  document.getElementById('seg-map-swap').classList.toggle('on',axisMap==='swap');
+  document.getElementById('seg-sign-neg').classList.toggle('on',signConv==='neg');
+  document.getElementById('seg-sign-pos').classList.toggle('on',signConv==='pos');
+}
+function showPanels(){
+  const has=rows.length>0;
+  document.getElementById('resultsPanel').style.display=has?'':'none';
+  document.getElementById('emptyPanel').style.display=has?'none':'';
+}
 function switchPreset(p){
   saveCurrentPreset();
   currentPreset=p;
   try{localStorage.setItem('sw_mod7_active',p);}catch(e){}
   document.getElementById('presetSel').value=p;
-  const st=loadPreset(p);
-  applyState(st);
-  // reflect restored toggle states in the UI
-  setConfUI(confMode);
-  document.getElementById('seg-map-std').classList.toggle('on',axisMap==='std');
-  document.getElementById('seg-map-swap').classList.toggle('on',axisMap==='swap');
-  document.getElementById('seg-sign-pos').classList.toggle('on',signConv==='pos');
-  document.getElementById('seg-sign-neg').classList.toggle('on',signConv==='neg');
+  applyState(loadPreset(p));
+  syncToggleUI();
   updMat();
-  onSectionChange();
-  // show/hide results panel depending on whether this preset has rows
-  if(rows.length){
-    document.getElementById('resultsPanel').style.display='';
-    document.getElementById('emptyPanel').style.display='none';
-    renderTable();
-    recalcAll();
-  } else {
-    document.getElementById('resultsPanel').style.display='none';
-    document.getElementById('emptyPanel').style.display='';
-  }
-}
-// setConf splits into UI-only part so preset restore can reuse it without
-// re-triggering a section recompute mid-restore.
-function setConfUI(mode){
-  confMode=mode;
-  document.getElementById('seg-nc').classList.toggle('on',mode==='none');
-  document.getElementById('seg-cc').classList.toggle('on',mode==='all');
-  document.getElementById('conf-fields').classList.toggle('on',mode!=='none');
+  showPanels();
+  onSectionChange();       // reconstruieste modelul si, daca exista randuri, recalculeaza
+  saveCurrentPreset();     // persista eventuala migrare de semn
 }
 
+// ═══════════════════ Init ═══════════════════
 document.querySelectorAll('#langSeg button').forEach(b=>b.addEventListener('click',()=>setLang(b.dataset.lang)));
-applyStaticLang();
-// restore active preset (if any) before first render
-(function(){
-  try{const ap=localStorage.getItem('sw_mod7_active');if(ap)currentPreset=ap;}catch(e){}
-  document.getElementById('presetSel').value=currentPreset;
-  const st=loadPreset(currentPreset);
-  if(st) applyState(st);
-})();
-setConfUI(confMode);
-updMat();
-onSectionChange();
-if(rows.length){
-  document.getElementById('resultsPanel').style.display='';
-  document.getElementById('emptyPanel').style.display='none';
-  renderTable();
-  recalcAll();
+if(typeof JP!=='undefined'){
+  fillMaterialSelects();
+  (function(){
+    try{const ap=localStorage.getItem('sw_mod7_active');if(ap)currentPreset=ap;}catch(e){}
+    document.getElementById('presetSel').value=currentPreset;
+    const st=loadPreset(currentPreset);
+    if(st) applyState(st);
+  })();
 }
-// persist section-panel edits into the active preset as they happen
+syncToggleUI();
+applyStaticLang();
+if(typeof JP!=='undefined'){
+  updMat();
+  showPanels();
+  onSectionChange();
+}
+// modificarile din panoul de sectiune se salveaza in presetarea activa
 document.querySelectorAll('#sectionPanel input, #sectionPanel select').forEach(el=>{
   el.addEventListener('change',saveCurrentPreset);
 });
-document.getElementById('seg-map-std').classList.toggle('on',axisMap==='std');
-document.getElementById('seg-map-swap').classList.toggle('on',axisMap==='swap');
-document.getElementById('seg-sign-pos').classList.toggle('on',signConv==='pos');
-document.getElementById('seg-sign-neg').classList.toggle('on',signConv==='neg');
 </script>
 </body>
 </html>

@@ -75,6 +75,11 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
 @media(max-width:680px){.geom-grid{grid-template-columns:1fr}}
 .sk-box{margin-top:8px;background:#fff;border:1px solid #E0E0E5;border-radius:10px;padding:8px}
 .sk-box svg{display:block;width:100%;max-width:400px;margin:0 auto}
+.status-strip{display:none;align-items:flex-start;gap:8px;padding:9px 11px;border-radius:8px;font-size:12px;line-height:1.45;margin:10px 0 0;background:#FDECEC;color:#C0392B;border:1px solid #F2C2C2}
+.status-strip.on{display:flex}
+.status-strip.warn{background:#FFF6E5;color:#8A5A00;border-color:#F5DCA8}
+.status-strip .sico{font-weight:600;flex-shrink:0}
+.status-strip ul{margin:0;padding-left:15px}
 
 /* ── interactive node view ── */
 .node-grid{display:grid;grid-template-columns:1.35fr 1fr;gap:0}
@@ -138,7 +143,8 @@ table.der caption{caption-side:top;text-align:left;font-size:10.5px;font-weight:
 .lang-seg button{padding:5px 11px;font-size:12px;font-weight:600;border:none;border-radius:6px;background:transparent;color:#8E8E93;cursor:pointer;font-family:'Inter',sans-serif;transition:all .12s;letter-spacing:.02em}
 .lang-seg button.on{background:#fff;color:#1C1C1E;box-shadow:0 1px 2px rgba(0,0,0,.08)}
 .topbar{display:flex;align-items:center;gap:8px;padding-right:12px}
-.author-footer{text-align:center;font-size:11px;font-weight:500;color:#8E8E93;padding:16px 16px 24px;letter-spacing:.02em}
+.author-footer{text-align:center;font-size:11px;font-weight:500;color:#8E8E93;padding:16px 16px 4px;letter-spacing:.02em}
+.version-footer{text-align:center;font-size:10px;color:#AEAEB2;padding:0 16px 24px;letter-spacing:.02em;font-feature-settings:"tnum" 1}
 .preset-bar{display:flex;align-items:center;gap:10px;padding:0 16px 10px;max-width:1240px;margin:0 auto}
 .preset-bar label{font-size:14px;font-weight:500;color:#8E8E93}
 .preset-bar select{padding:6px 28px 6px 10px;font-size:14px;border:1px solid #C7C7CC;border-radius:8px;background:#fff;color:#1C1C1E;font-family:'Inter',sans-serif;-webkit-appearance:none;appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238E8E93'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
@@ -168,6 +174,7 @@ table.der caption{caption-side:top;text-align:left;font-size:10.5px;font-weight:
 
 <div class="wrap">
   <div class="slabel" data-i18n="pageLabel">Nod de cadru grinda&ndash;stalp &mdash; P 100-1/2013</div>
+  <div class="status-strip" id="statusStrip"><span class="sico" id="statusIco">!</span><span id="statusMsg"></span></div>
 
 <div id="inputsWrap">
   <!-- ══════ 1. GENERAL & MATERIALS ══════ -->
@@ -176,20 +183,12 @@ table.der caption{caption-side:top;text-align:left;font-size:10.5px;font-weight:
     <div class="pb-outer"><div class="pb">
       <div class="geom-grid">
         <div class="sel-field"><label data-i18n="concClass">Clasa beton</label><div class="sel-wrap">
-          <select id="cp" onchange="onChange()">
-            <option>C12/15</option><option>C16/20</option><option>C20/25</option><option>C25/30</option>
-            <option selected>C30/37</option><option>C35/45</option><option>C40/50</option><option>C45/55</option>
-            <option>C50/60</option><option>C55/67</option><option>C60/75</option>
-          </select></div></div>
+          <select id="cp" onchange="onChange()"></select></div></div>
         <div class="sel-field"><label data-i18n="steelClass">Clasa otel longitudinal</label><div class="sel-wrap">
-          <select id="sp" onchange="onChange()">
-            <option>S240B</option><option>S400B</option><option selected>S500B</option>
-          </select></div></div>
+          <select id="sp" onchange="onChange()"></select></div></div>
       </div>
       <div class="sel-field"><label data-i18n="steelClassW">Clasa otel armatura transversala</label><div class="sel-wrap">
-        <select id="swp" onchange="onChange()">
-          <option>S240B</option><option>S400B</option><option selected>S500B</option>
-        </select></div></div>
+        <select id="swp" onchange="onChange()"></select></div></div>
       <div class="mat-vals">
         <div class="mv"><div class="mvl">f<sub>cd</sub></div><div class="mvv" id="fcd_d">20.00</div><div class="mvu">MPa</div></div>
         <div class="mv"><div class="mvl">f<sub>yd</sub></div><div class="mvv" id="fyd_d">434.8</div><div class="mvu">MPa</div></div>
@@ -217,10 +216,11 @@ table.der caption{caption-side:top;text-align:left;font-size:10.5px;font-weight:
           <button data-v="base" onclick="setSeg('level','base')" data-i18n="lv_base">Baza</button>
           <button data-v="cur" class="on" onclick="setSeg('level','cur')" data-i18n="lv_cur">Curent</button>
         </div></div>
-      <div class="toggle-row"><span class="tlbl" data-i18n="signConv">Conventie semn N<sub>Ed</sub></span>
-        <div class="seg" id="seg_sign">
-          <button data-v="pos" onclick="setSeg('sign','pos')" data-i18n="sg_pos">N&gt;0 compresiune</button>
-          <button data-v="neg" class="on" onclick="setSeg('sign','neg')" data-i18n="sg_neg">N&lt;0 compresiune</button>
+      <div class="toggle-row" data-nopreset="1"><span class="tlbl" data-i18n="signConv">Conventie semn N<sub>Ed</sub></span>
+        <span class="info-wrap"><button class="info-btn" type="button" onclick="toggleInfo(this,event)">i</button><div class="info-pop" onclick="event.stopPropagation()" data-i18n="i_sign"></div></span>
+        <div class="seg" id="seg_sign" data-nopreset="1">
+          <button data-v="neg" class="on" onclick="setSignConv('neg')" data-i18n="sg_neg">N&lt;0 compresiune</button>
+          <button data-v="pos" onclick="setSignConv('pos')" data-i18n="sg_pos">N&gt;0 compresiune</button>
         </div></div>
       <div class="toggle-row" style="padding-bottom:2px"><span class="tlbl" data-i18n="lastLvl">Nod la ultimul nivel (capat superior stalp)</span>
         <span class="info-wrap"><button class="info-btn" type="button" onclick="toggleInfo(this,event)">i</button><div class="info-pop" onclick="event.stopPropagation()" data-i18n="i_lastlvl"></div></span>
@@ -353,40 +353,91 @@ table.der caption{caption-side:top;text-align:left;font-size:10.5px;font-weight:
 
 </div>
 <div class="author-footer" data-i18n="footer">Lucrare de disertație — Janos Patrik · UTCN · Facultatea de Construcții · 2026</div>
+<div class="version-footer" id="versionFooter">&mdash;</div>
 
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
+
+<!-- ═══ nucleu de calcul comun — trebuie incarcat INAINTE de scriptul modulului ═══ -->
+<script src="engine.js"></script>
+
 <script>
 /* ════════════════════════════════════════════════════════════════════
-   MODULE 08 — BEAM-COLUMN JOINT (NOD DE CADRU), P 100-1/2013 §5.3.3.4,
-   §5.3.4.2.3, §5.2.3.3.3.  Column M_Rd uses the same 2D fibre engine as
-   modules 06/07, restricted to uniaxial bending about the axis whose
-   section depth is h_c (the column side parallel to the beams), so the
-   capacity and the joint always refer to the same direction.
-   ════════════════════════════════════════════════════════════════════ */
+   MODULUL 08 — NOD DE CADRU GRINDA-STALP, P 100-1/2013 §5.2.3.3.3,
+   §5.3.3.4, §5.3.4.2.3, §5.4.4.3.
 
-const CONC={'C12/15':{fck:12},'C16/20':{fck:16},'C20/25':{fck:20},'C25/30':{fck:25},'C30/37':{fck:30},
-            'C35/45':{fck:35},'C40/50':{fck:40},'C45/55':{fck:45},'C50/60':{fck:50},'C55/67':{fck:55},'C60/75':{fck:60}};
-const STEEL={'S240B':{fyk:240},'S400B':{fyk:400},'S500B':{fyk:500}};
-const NGY=40,NGZ=40;                 // same discretisation as modules 06/07
+   Tot calculul este in engine.js: JP.joint.* pentru verificarile nodului
+   si JP.column.mrdUniaxial() pentru M_Rd al stalpilor, pe directia in care
+   se verifica nodul (adancimea h_c). Aici raman doar interfata, desenele,
+   exportul PDF si presetarile.
+
+   ATENTIE — M_Rd al stalpilor se schimba fata de versiunea 1.x, pentru ca
+   nucleul aplica alte conventii decat codul local de dinainte:
+     1. pozitia barelor foloseste acoperirea mecanica c_nom + Ø_etr + Ø/2;
+        versiunea veche punea centrul barei pe fata interioara a etrierului,
+        deci cu Ø/2 prea aproape de margine — brat de parghie prea mare;
+     2. aria de beton este BRUTA, armatura se adauga peste;
+     3. curbura este limitata si de pivotul A (eps_ud) si de pivotul C.
+   Pe stalpul lamelar 300x1000 din exemplu, efectul net este M_Rd mai mic cu
+   ~4,4 %, deci Sum M_Rc scade si verificarea (5.4) devine mai severa. Este
+   sensul corect: versiunea veche era neacoperitoare.
+   Momentele capabile ale GRINZILOR nu se schimba — acelasi bloc dreptunghiular.
+   ════════════════════════════════════════════════════════════════════ */
+const MODULE_ID='08', MODULE_VERSION='2.1.0';
+
 const PI=Math.PI;
-function barA(d){return d*d*PI/4;}
 function gv(id){const e=document.getElementById(id);const v=parseFloat(e&&e.value);return isFinite(v)?v:0;}
 function gvi(id){return Math.max(0,Math.round(gv(id)));}
 function sv(id){const e=document.getElementById(id);return e?e.value:'';}
 
-/* ── segmented-control state (data-v kept stable so presets survive a language switch) ── */
-let SEG={duct:'DCM',joint:'int',level:'cur',sign:'neg',top:'no',four:'no'};
+/* ── starea comutatoarelor (data-v stabil, ca presetarile sa supravietuiasca
+      unei schimbari de limba). Conventia de semn NU mai este aici: este o
+      preferinta de utilizator, comuna cu modulele 03/06/07. ── */
+let SEG={duct:'DCM',joint:'int',level:'cur',top:'no',four:'no'};
 function setSeg(k,v){SEG[k]=v;paintSegs();onChange();saveCurrentPreset();}
 function paintSegs(){
-  const map={duct:'seg_duct',joint:'seg_joint',level:'seg_level',sign:'seg_sign',top:'seg_top',four:'seg_four'};
+  const map={duct:'seg_duct',joint:'seg_joint',level:'seg_level',top:'seg_top',four:'seg_four'};
   Object.keys(map).forEach(k=>{
     const el=document.getElementById(map[k]);if(!el)return;
     el.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.v===SEG[k]));
   });
+  const sg=document.getElementById('seg_sign');
+  if(sg)sg.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.v===signConv));
   document.getElementById('pnl_bR').style.display=(SEG.joint==='end')?'none':'';
   const tb=document.querySelector('#elemTabs button[data-e="bR"]');
   if(tb){tb.disabled=(SEG.joint==='end');if(tb.disabled&&selected==='bR')selected='bL';}
+}
+
+/* ── Conventia de semn pentru N, comuna cu modulele 03 / 06 / 07 ──────────
+   Nucleul lucreaza intern cu COMPRESIUNEA POZITIVA; conversia se face aici,
+   la granita, atat pentru valorile citite cat si pentru cele afisate. */
+let signConv=(function(){try{return localStorage.getItem('sw_signconv')||'neg';}catch(e){return 'neg';}})();
+function sgnN(){return signConv==='neg'?-1:1;}
+function convN(v){return sgnN()*v;}
+function setSignConv(mode){
+  if(mode===signConv)return;
+  signConv=mode;
+  try{localStorage.setItem('sw_signconv',mode);}catch(e){}
+  /* Schimbarea conventiei negheaza valorile din casute, ca un stalp comprimat
+     sa nu devina in tacere unul intins. */
+  ['cI_N','cS_N'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(!el)return;
+    const cur=parseFloat(el.value);
+    if(isFinite(cur)&&cur!==0)el.value=String(-cur);
+  });
+  paintSegs();onChange();saveCurrentPreset();
+}
+
+if(typeof JP==='undefined'){
+  document.getElementById('statusStrip').className='status-strip on';
+  document.getElementById('statusMsg').textContent=
+    'engine.js nu s-a incarcat. Verificati ca fisierul este in acelasi folder cu aceasta pagina.';
+}
+function stampVersion(){
+  const eng=(typeof JP!=='undefined')?JP.VERSION:'?';
+  const el=document.getElementById('versionFooter');
+  if(el)el.textContent='JP Design · M'+MODULE_ID+' v'+MODULE_VERSION+' · engine v'+eng+' · P 100-1/2013';
 }
 
 /* ══════════════ i18n ══════════════ */
@@ -469,18 +520,20 @@ const T={
          en:'<b>Interior</b>: beams on both faces &rarr; (5.11), (5.26) with 0.30, (5.29).<br><b>End</b> (edge or corner in the direction considered): a single beam &rarr; (5.12), (5.27) with 0.25, (5.30) and the 20% increase of A<sub>sh</sub>. The right beam is hidden.'},
  i_level:{ro:'Intervine numai in (5.10) la DCH: &gamma;<sub>Rd</sub> = 1,30 pentru nivelul de la baza constructiei si 1,20 pentru restul nivelurilor. La DCM, &gamma;<sub>Rd</sub> = 1,0 indiferent de nivel (5.4.3.3).',
           en:'Affects (5.10) for DCH only: &gamma;<sub>Rd</sub> = 1.30 at the base level and 1.20 at all other levels. For DCM, &gamma;<sub>Rd</sub> = 1.0 regardless of level (5.4.3.3).'},
+ i_sign:{ro:'Alegerea este o preferinta de utilizator, comuna cu modulele 03, 06 si 07 (cheia <code>sw_signconv</code>), deci nu se salveaza in presetare. Nucleul lucreaza intern cu compresiunea pozitiva; conversia se face doar la interfata. Schimbarea comutatorului negheaza valorile din casute, ca un stalp comprimat sa nu devina in tacere unul intins.',
+         en:'This is a user preference shared with modules 03, 06 and 07 (the <code>sw_signconv</code> key), so it is not stored in the preset. The engine works internally with compression positive; conversion happens only at the interface. Flipping the switch negates the values in the boxes, so a compressed column does not silently become a tensioned one.'},
  i_lastlvl:{ro:'Conform 5.2.3.3.3(3), relatia (5.4) nu se verifica la capatul superior al stalpilor de la ultimul nivel. Celelalte verificari raman active.',
             en:'Per 5.2.3.3.3(3), expression (5.4) need not be checked at the upper end of the columns of the top level. The other checks remain active.'},
  i_dir:{ro:'Verificarea nodului se face <b>intr-o singura directie</b>. <b>h<sub>c</sub></b> este latura stalpului paralela cu axa grinzilor &mdash; adica adancimea nodului pe directia lui V<sub>jhd</sub>. <b>b<sub>c</sub></b> este latura perpendiculara.<br><br>Aceeasi directie se foloseste si pentru M<sub>Rd</sub> al stalpilor: incovoierea are loc pe adancimea h<sub>c</sub>. Astfel capacitatea stalpului si nodul se refera intotdeauna la aceeasi axa.<br><br>Ex. stalp lamelar 300&times;1000 cu grinzi pe fata lunga: h<sub>c</sub> = 300, b<sub>c</sub> = 1000.',
         en:'The joint is checked <b>in one direction at a time</b>. <b>h<sub>c</sub></b> is the column side parallel to the beam axis &mdash; the joint depth along V<sub>jhd</sub>. <b>b<sub>c</sub></b> is the perpendicular side.<br><br>The same direction drives the column M<sub>Rd</sub>: bending acts over the depth h<sub>c</sub>. Capacity and joint therefore always refer to the same axis.<br><br>E.g. a 300&times;1000 blade column with beams on the long face: h<sub>c</sub> = 300, b<sub>c</sub> = 1000.'},
- i_lcl:{ro:'Folosita pentru V<sub>c</sub> = (M<sub>dc,inf</sub> + M<sub>dc,sup</sub>) / l<sub>cl</sub>, forta taietoare din stalpul de deasupra nodului (5.3.3.3(2) si (3)), care se scade in (5.11)/(5.12).',
-        en:'Used for V<sub>c</sub> = (M<sub>dc,inf</sub> + M<sub>dc,sup</sub>) / l<sub>cl</sub>, the shear in the column above the joint (5.3.3.3(2) and (3)), subtracted in (5.11)/(5.12).'},
- i_vc:{ro:'V<sub>c</sub> <b>reduce</b> V<sub>jhd</sub>, deci o valoare supraestimata este neacoperitoare. Valoarea implicita rezulta din momentele de proiectare (5.10) si l<sub>cl</sub>. Introdu 0 pentru ipoteza acoperitoare, sau o valoare proprie din ETABS.',
-       en:'V<sub>c</sub> <b>reduces</b> V<sub>jhd</sub>, so an overestimate is unsafe. The default follows from the design moments (5.10) and l<sub>cl</sub>. Enter 0 for the safe-side assumption, or your own value from ETABS.'},
- i_mrd:{ro:'Calculat cu metoda fibrelor (retea 40&times;40, lege parabola-dreptunghi SR EN 1992-1-1, otel elastic&ndash;perfect plastic), la N<sub>Ed</sub> introdus, pe directia nodului. Daca introduci o valoare manuala &ne; 0, aceasta este folosita in locul celei calculate.',
-        en:'Computed with the fibre method (40&times;40 mesh, parabola-rectangle law per SR EN 1992-1-1, elastic&ndash;perfectly plastic steel), at the given N<sub>Ed</sub>, in the joint direction. If a manual value &ne; 0 is entered, it is used instead.'},
- i_mrb:{ro:'Sectiune simplu armata: x = A<sub>s</sub>f<sub>yd</sub> / (&lambda;&eta;f<sub>cd</sub>b<sub>w</sub>), z = d &minus; &lambda;x/2, M<sub>Rb</sub> = A<sub>s</sub>f<sub>yd</sub>z. Armatura comprimata si armatura din placa in latimea activa nu sunt luate in considerare.',
-        en:'Singly reinforced section: x = A<sub>s</sub>f<sub>yd</sub> / (&lambda;&eta;f<sub>cd</sub>b<sub>w</sub>), z = d &minus; &lambda;x/2, M<sub>Rb</sub> = A<sub>s</sub>f<sub>yd</sub>z. Compression steel and slab reinforcement within the effective width are not accounted for.'},
+ i_lcl:{ro:'Lungimea libera a stalpului <b>de deasupra</b> nodului. Folosita pentru V<sub>c</sub> = 2·M<sub>dc,sup</sub> / l<sub>cl</sub>, forta taietoare din acel stalp (5.3.3.4(2) coroborat cu 5.3.3.3(2) si (3)), care se scade in (5.11)/(5.12). Cu datele unui singur nod, momentul de la capatul superior al stalpului se ia egal cu cel de la baza lui, de unde factorul 2.',
+        en:'Clear length of the column <b>above</b> the joint. Used for V<sub>c</sub> = 2·M<sub>dc,sup</sub> / l<sub>cl</sub>, the shear in that column (5.3.3.4(2) with 5.3.3.3(2) and (3)), subtracted in (5.11)/(5.12). With the data of a single joint, the moment at the far end of that column is taken equal to the one at its base, hence the factor 2.'},
+ i_vc:{ro:'V<sub>c</sub> <b>reduce</b> V<sub>jhd</sub>, deci o valoare supraestimata este neacoperitoare. Se ia forta taietoare din stalpul <b>de deasupra</b> nodului, din momentul lui de proiectare (5.10) si din l<sub>cl</sub>: V<sub>c</sub> = 2·M<sub>dc,sup</sub>/l<sub>cl</sub>.',
+       en:'V<sub>c</sub> <b>reduces</b> V<sub>jhd</sub>, so an overestimate is unsafe. It is the shear in the column <b>above</b> the joint, from its design moment (5.10) and l<sub>cl</sub>: V<sub>c</sub> = 2·M<sub>dc,sup</sub>/l<sub>cl</sub>.'},
+ i_mrd:{ro:'Calculat cu nucleul comun (JP.column.mrdUniaxial), retea 40&times;40, lege parabola-dreptunghi SR EN 1992-1-1, otel elastic&ndash;perfect plastic, pivotii A si C, arie de beton bruta, bare la c<sub>nom</sub> + &Oslash;<sub>etr</sub> + &Oslash;/2 de fata. Se rezolva ambele sensuri de incovoiere pe adancimea h<sub>c</sub> si se retine cel mai mic. Este exact acelasi calcul ca in modulele 06 si 07. Daca introduci o valoare manuala &ne; 0, aceasta este folosita in locul celei calculate.',
+        en:'Computed with the shared engine (JP.column.mrdUniaxial): 40&times;40 mesh, parabola-rectangle law per SR EN 1992-1-1, elastic&ndash;perfectly plastic steel, pivots A and C, gross concrete area, bars at c<sub>nom</sub> + &Oslash;<sub>st</sub> + &Oslash;/2 from the face. Both bending senses over the depth h<sub>c</sub> are solved and the smaller is retained. This is exactly the same calculation as in modules 06 and 07. If a manual value &ne; 0 is entered, it is used instead.'},
+ i_mrb:{ro:'Sectiune simplu armata: x = A<sub>s</sub>f<sub>yd</sub> / (&lambda;&eta;f<sub>cd</sub>b<sub>w</sub>), z = d &minus; &lambda;x/2, M<sub>Rb</sub> = A<sub>s</sub>f<sub>yd</sub>z. Armatura comprimata si armatura din placa in latimea activa nu sunt luate in considerare. Nu s-a schimbat la migrarea pe nucleu.',
+        en:'Singly reinforced section: x = A<sub>s</sub>f<sub>yd</sub> / (&lambda;&eta;f<sub>cd</sub>b<sub>w</sub>), z = d &minus; &lambda;x/2, M<sub>Rb</sub> = A<sub>s</sub>f<sub>yd</sub>z. Compression steel and slab reinforcement within the effective width are not accounted for. Unchanged by the engine migration.'},
  i_legs:{ro:'A<sub>sh</sub> din (5.29)/(5.30) este o <b>arie totala pe inaltimea nodului</b>, distribuita uniform (5.3.4.2.3(4)) &mdash; nu o numaratoare de ramuri taiate de o fisura la 45&deg; ca la forta taietoare in grinzi.<br><br>Singurul filtru este <b>directia</b>: conteaza numai ramurile <b>paralele cu axa grinzilor</b>, adica paralele cu V<sub>jhd</sub>. Ramurile perpendiculare apartin verificarii pe cealalta directie.<br><br>Etrierul perimetral contribuie cu cele <b>2 ramuri de lungime h<sub>c</sub></b>. Fiecare agrafa care traverseaza dimensiunea h<sub>c</sub> adauga 1 ramura. La stalpi lamelari cu grinzi pe fata lunga, acestea sunt ramurile scurte plus agrafele &mdash; vezi schita, ramurile efective sunt albastre.',
          en:'A<sub>sh</sub> in (5.29)/(5.30) is a <b>total area over the joint height</b>, uniformly distributed (5.3.4.2.3(4)) &mdash; not a count of legs crossed by a 45&deg; crack as in beam shear.<br><br>The only filter is <b>direction</b>: only legs <b>parallel to the beam axis</b>, i.e. parallel to V<sub>jhd</sub>, count. Perpendicular legs belong to the check in the other direction.<br><br>The perimeter stirrup contributes its <b>2 legs of length h<sub>c</sub></b>. Every tie crossing the h<sub>c</sub> dimension adds 1 leg. For blade columns with beams on the long face these are the short legs plus the ties &mdash; see the sketch, effective legs are blue.'},
  i_smax:{ro:'s<sub>max</sub> este pasul cel mai mare la care cele n seturi mai incap pe inaltimea utila a nodului: s<sub>max</sub> = h<sub>jw</sub>/(n&minus;1). Campul nu accepta valori peste aceasta limita &mdash; daca ai nevoie de un pas mai mare, reduce numarul de seturi.',
@@ -510,6 +563,8 @@ const T={
  chkAsh:{ro:'Armatura transversala orizontala A<sub>sh</sub>',en:'Horizontal transverse reinforcement A<sub>sh</sub>'},
  chkAsv:{ro:'Armatura verticala in nod A<sub>sv</sub>',en:'Vertical reinforcement in the joint A<sub>sv</sub>'},
  chkDet:{ro:'Alcatuirea nodului',en:'Joint detailing'},
+ resStale:{ro:'Rezultatele nu se afiseaza cat timp datele de intrare nu permit calculul. Corecteaza problema semnalata mai sus.',
+           en:'Results are not shown while the input does not allow the calculation. Correct the problem reported above.'},
  vOk:{ro:'VERIFICA',en:'PASS'}, vNo:{ro:'NU VERIFICA',en:'FAIL'}, vNa:{ro:'NU SE APLICA',en:'N/A'}, vInfo:{ro:'INFORMATIV',en:'INFO'},
  sumTotal:{ro:'Verificari',en:'Checks'}, sumOk:{ro:'Verifica',en:'Pass'}, sumNo:{ro:'Nu verifica',en:'Fail'}, sumWorst:{ro:'Cea mai solicitata',en:'Governing'},
  senseA:{ro:'Sens 1 (grinda stanga intinsa sus)',en:'Sense 1 (left beam in hogging)'},
@@ -523,6 +578,12 @@ const T={
            en:(n,s,h,sm)=>`${n} sets at ${s} mm span (${n}&minus;1)&times;${s} = ${(n-1)*s} mm, more than the usable joint height h<sub>jw</sub> = ${h} mm. Maximum spacing: ${sm} mm.`},
  ovrWarn:{ro:'M<sub>Rd</sub> manual difera cu peste 15% de valoarea calculata &mdash; verifica daca se refera la aceeasi directie de incovoiere.',
           en:'The manual M<sub>Rd</sub> differs by more than 15% from the computed value &mdash; check that it refers to the same bending direction.'},
+ wEuk:{ro:c=>'Clasa '+c+' nu are eps_uk declarat; s-a presupus 50 permil. De confirmat inainte de folosire intr-o nota de calcul.',
+       en:c=>'Class '+c+' has no declared eps_uk; 50 per mille assumed. Confirm before using in a calculation note.'},
+ wCol:{ro:r=>'Stalpul '+(r==='inf'?'inferior':'superior')+': N_Ed este in afara capacitatii axiale a sectiunii, M_Rd nu este valabil.',
+       en:r=>'The '+(r==='inf'?'lower':'upper')+' column: N_Ed lies outside the section axial capacity, M_Rd is not valid.'},
+ stDegenerate:{ro:'Sectiune de stalp degenerata: b_c sau h_c este nul.',en:'Degenerate column section: b_c or h_c is zero.'},
+ stInvalid:{ro:'Date de intrare invalide: verificati geometria si materialele.',en:'Invalid input: check geometry and materials.'},
  /* pdf */
  pdfTitle:{ro:'NOTA DE CALCUL — NOD DE CADRU GRINDA-STALP',en:'CALCULATION REPORT — BEAM-COLUMN JOINT'},
  pdfSub:{ro:'P 100-1/2013 (modificat si completat 2019) — sectiunile 5.2.3.3.3, 5.3.3.4, 5.3.4.2.3',en:'P 100-1/2013 (amended 2019) — clauses 5.2.3.3.3, 5.3.3.4, 5.3.4.2.3'},
@@ -535,6 +596,9 @@ const T={
  pdfNodeElev:{ro:'Vedere laterala nod',en:'Joint elevation'},
  pdfLegLegend:{ro:'albastru = ramuri efective (paralele cu V_jhd) · gri = ramuri perpendiculare',
                en:'blue = effective legs (parallel to V_jhd) · grey = perpendicular legs'},
+ pdfSignConv:{ro:'Conventie semn N',en:'N sign convention'},
+ pdfConvNote:{ro:'Conventii nucleu: arie de beton bruta, bare la c_nom + D_etr + D/2, pivotii A si C.',
+              en:'Engine conventions: gross concrete area, bars at c_nom + D_st + D/2, pivots A and C.'},
  pdfGenerated:{ro:'Generat: ',en:'Generated: '},
  pdfPage:{ro:'Pagina',en:'Page'}, pdfOf:{ro:'din',en:'of'},
  pdfDisc:{ro:'Responsabilitatea pentru rezultatele obtinute revine in exclusivitate utilizatorului. Toate valorile trebuie verificate inainte de utilizare.',
@@ -543,7 +607,7 @@ const T={
  pdfError:{ro:'Eroare la generare:',en:'Generation error:'}
 };
 function t(k,...a){const e=T[k];if(!e)return k;const v=(e[LANG]!==undefined)?e[LANG]:e.ro;return typeof v==='function'?v(...a):v;}
-function tp(k){return String(t(k)).replace(/<[^>]*>/g,'').replace(/&minus;/g,'-').replace(/&middot;/g,'.').replace(/&times;/g,'x').replace(/&ge;/g,'>=').replace(/&le;/g,'<=').replace(/&Sigma;/g,'Sum').replace(/&gamma;/g,'g').replace(/&nu;/g,'v').replace(/&mdash;/g,'-').replace(/&ndash;/g,'-').replace(/&amp;/g,'&').replace(/&Oslash;/g,'D').replace(/&rho;/g,'rho').replace(/&lambda;/g,'lambda').replace(/&eta;/g,'eta');}
+function tp(k,...a){return String(t(k,...a)).replace(/<[^>]*>/g,'').replace(/&minus;/g,'-').replace(/&middot;/g,'.').replace(/&times;/g,'x').replace(/&ge;/g,'>=').replace(/&le;/g,'<=').replace(/&Sigma;/g,'Sum').replace(/&gamma;/g,'g').replace(/&nu;/g,'v').replace(/&mdash;/g,'-').replace(/&ndash;/g,'-').replace(/&gt;/g,'>').replace(/&lt;/g,'<').replace(/&nbsp;/g,' ').replace(/&amp;/g,'&').replace(/&Oslash;/g,'D').replace(/&rho;/g,'rho').replace(/&lambda;/g,'lambda').replace(/&eta;/g,'eta');}
 function applyStaticLang(){
   document.documentElement.lang=LANG;
   document.querySelectorAll('[data-i18n]').forEach(el=>{
@@ -551,6 +615,7 @@ function applyStaticLang(){
     if(T[k]){const v=T[k][LANG];if(v!==undefined&&typeof v!=='function')el.innerHTML=v;}
   });
   document.querySelectorAll('#langSeg button').forEach(b=>b.classList.toggle('on',b.dataset.lang===LANG));
+  stampVersion();
 }
 function setLang(l){LANG=l;try{localStorage.setItem('sw_lang',l);}catch(e){}buildDynamicPanels();applyStaticLang();paintSegs();onChange();}
 
@@ -589,6 +654,17 @@ addEventListener('scroll',closeAllInfo,true);
 addEventListener('resize',closeAllInfo);
 function togglePanel(id){document.getElementById(id).classList.toggle('collapsed');}
 function toggleDet(id){document.getElementById(id).classList.toggle('open');}
+
+/* Listele de materiale vin din nucleu: versiunea 1.x avea doar 3 clase de otel
+   si ii lipseau cele preluate din modulul 04. */
+function fillMaterialSelects(){
+  const cur={cp:sv('cp')||'C30/37', sp:sv('sp')||'S500B', swp:sv('swp')||'S500B'};
+  const cOpts=Object.keys(JP.CONC).map(k=>`<option${k===cur.cp?' selected':''}>${k}</option>`).join('');
+  const sOpts=k2=>Object.keys(JP.STEEL).map(k=>`<option${k===k2?' selected':''}>${k}</option>`).join('');
+  document.getElementById('cp').innerHTML=cOpts;
+  document.getElementById('sp').innerHTML=sOpts(cur.sp);
+  document.getElementById('swp').innerHTML=sOpts(cur.swp);
+}
 
 /* ══════════════ dynamic input panels (beams + columns) ══════════════ */
 function beamPanelHtml(p){
@@ -641,180 +717,104 @@ function buildDynamicPanels(){
   document.getElementById('body_cS').innerHTML=colPanelHtml('cS');
 }
 
-/* ══════════════ ENGINE ══════════════ */
-function lamEta(fck){return fck<=50?{lam:0.8,eta:1.0}:{lam:0.8-(fck-50)/400,eta:1.0-(fck-50)/200};}
+/* ══════════════ CALCUL — totul prin nucleu ══════════════ */
+let S=null, selected='bL', LASTRES=null;
 
-function readMat(){
-  const fck=CONC[sv('cp')].fck, fyk=STEEL[sv('sp')].fyk, fywk=STEEL[sv('swp')].fyk;
-  const {lam,eta}=lamEta(fck);
-  return {fck,fcd:fck/1.5,fyk,fyd:fyk/1.15,fywk,fywd:fywk/1.15,lam,eta,Es:200000};
-}
-function readBeam(p,M){
-  const bw=gv(p+'_bw'),hb=gv(p+'_hb'),cn=gv(p+'_cnom'),dsw=gv(p+'_dsw');
-  const nt=gvi(p+'_nt'),dt=gv(p+'_dt'),nb=gvi(p+'_nb'),db=gv(p+'_db');
-  function cap(n,dia){
-    const As=n*barA(dia);
-    const d=hb-(cn+dsw+dia/2);
-    const x=(bw>0&&M.fcd>0)?As*M.fyd/(M.lam*M.eta*M.fcd*bw):0;
-    const z=d-M.lam*x/2;
-    return {As,d,x,z,M:As*M.fyd*z/1e6,n,dia};
-  }
-  return {bw,hb,cn,dsw,top:cap(nt,dt),bot:cap(nb,db)};
-}
-function buildColModel(bc,hc,cn,dsw,b,M){
-  const inset=cn+dsw;
-  const halfY=bc/2-inset, halfZ=hc/2-inset;
-  const sf=[];
-  const perCorner=Math.max(0,Math.round(b.cn_/4));
-  const Acor=barA(b.cd);
-  [[-halfY,-halfZ],[halfY,-halfZ],[halfY,halfZ],[-halfY,halfZ]].forEach(([y,z])=>sf.push({y,z,A:Acor*perCorner,grp:'cor'}));
-  const Afb=barA(b.fbd);
-  if(b.fbn>0)for(let s=0;s<2;s++){const z=(s===0)?-halfZ:halfZ;
-    for(let i=0;i<b.fbn;i++)sf.push({y:-halfY+(halfY*2)*(i+1)/(b.fbn+1),z,A:Afb,grp:'fb'});}
-  const Afh=barA(b.fhd);
-  if(b.fhn>0)for(let s=0;s<2;s++){const y=(s===0)?-halfY:halfY;
-    for(let i=0;i<b.fhn;i++)sf.push({y,z:-halfZ+(halfZ*2)*(i+1)/(b.fhn+1),A:Afh,grp:'fh'});}
-  const cF=[];
-  for(let i=0;i<NGY;i++){const y=-bc/2+(i+0.5)*(bc/NGY);
-    for(let j=0;j<NGZ;j++)cF.push({y,z:-hc/2+(j+0.5)*(hc/NGZ)});}
-  const As_tot=sf.reduce((s,f)=>s+f.A,0);
-  const As_dir=sf.filter(f=>f.grp!=='fb').reduce((s,f)=>s+f.A,0);  // corners + h_c-face bars
-  return {bc,hc,fcd:M.fcd,fyd:M.fyd,Es:M.Es,ec2:0.002,ecu:0.0035,
-          sf,cF,dAg:(bc/NGY)*(hc/NGZ),As_tot,As_dir,Ac:bc*hc,halfY,halfZ,
-          nBars:4*perCorner+2*b.fbn+2*b.fhn,cnt:{cor:4*perCorner,fb:2*b.fbn,fh:2*b.fhn},bars:b};
-}
-function sigC(e,m){if(e<=0)return 0;const r=e/m.ec2;return e<=m.ec2?m.fcd*(2*r-r*r):m.fcd;}
-function sigS(e,m){let s=e*m.Es;if(s>m.fyd)s=m.fyd;if(s<-m.fyd)s=-m.fyd;return s;}
-function dmaxT(th,b,h){const cx=Math.cos(th),cz=Math.sin(th);let d=-Infinity;
-  for(const[y,z]of[[-b/2,-h/2],[b/2,-h/2],[b/2,h/2],[-b/2,h/2]]){const v=y*cx+z*cz;if(v>d)d=v;}return d;}
-function secF(X,th,m){
-  const cx=Math.cos(th),cz=Math.sin(th),na=dmaxT(th,m.bc,m.hc)-X;
-  let Fc=0,Mc=0;
-  for(const f of m.cF){const d=f.y*cx+f.z*cz;const e=m.ecu*(d-na)/X;
-    if(e<=0)continue;const F=sigC(e,m)*m.dAg;Fc+=F;Mc+=F*f.z;}
-  let Fs=0,Ms=0;
-  for(const s of m.sf){const d=s.y*cx+s.z*cz;const e=m.ecu*(d-na)/X;
-    const F=(sigS(e,m)-sigC(e,m))*s.A;   // subtract the concrete displaced by the bar
-    Fs+=F;Ms+=F*s.z;}
-  return {N:(Fc+Fs)/1e3,My:(Mc+Ms)/1e6};
-}
-function solveX(th,Nt,m){
-  const F=X=>secF(X,th,m).N-Nt;
-  let lo=1,hi=Math.max(m.bc,m.hc)*8,flo=F(lo),fhi=F(hi),g=0;
-  while(flo*fhi>0&&g++<200){
-    if(Math.abs(flo)<Math.abs(fhi)){lo/=2;if(lo<1e-6)break;flo=F(lo);}
-    else{hi*=2;if(hi>1e9)break;fhi=F(hi);}
-  }
-  if(flo*fhi>0){const X=(Math.abs(flo)<Math.abs(fhi))?lo:hi;return{X,...secF(X,th,m),converged:false};}
-  for(let i=0;i<60;i++){const mid=(lo+hi)/2,fm=F(mid);
-    if(flo*fm<=0){hi=mid;fhi=fm;}else{lo=mid;flo=fm;}
-    if(Math.abs(fm)<1e-7)break;}
-  const X=(lo+hi)/2;
-  return{X,...secF(X,th,m),converged:true};
-}
-// uniaxial M_Rd about the axis whose section depth is h_c, both senses, minimum retained
-function MRdCol(m,N){
-  const a=solveX(PI/2,N,m), b=solveX(-PI/2,N,m);
-  const ok=a.converged&&b.converged;
-  return {MRd:Math.min(Math.abs(a.My),Math.abs(b.My)),x:Math.max(a.X,b.X),ok};
-}
-
-/* ══════════════ MAIN CALCULATION ══════════════ */
-let S=null, selected='bL';
-function compute(){
-  const M=readMat();
+function readInputs(){
   const end=(SEG.joint==='end');
-  const bc=gv('bc'),hc=gv('hc'),ccn=gv('c_cnom'),cdsw=gv('c_dsw'),lcl=gv('lcl');
-  const bL=readBeam('bL',M);
-  const bR=end?null:readBeam('bR',M);
-  const sgn=(SEG.sign==='neg')?-1:1;
-  function readCol(p){
-    const b={cn_:gvi(p+'_cn'),cd:gv(p+'_cd'),fbn:gvi(p+'_fbn'),fbd:gv(p+'_fbd'),fhn:gvi(p+'_fhn'),fhd:gv(p+'_fhd')};
-    const m=buildColModel(bc,hc,ccn,cdsw,b,M);
-    const N=sgn*gv(p+'_N');
-    const r=(bc>0&&hc>0)?MRdCol(m,N):{MRd:0,x:0,ok:false};
-    const ovr=gv(p+'_ovr');
-    return {m,N,MRdCalc:r.MRd,x:r.x,conv:r.ok,ovr,MRd:(ovr>0?ovr:r.MRd)};
-  }
-  const cI=readCol('cI'), cS=readCol('cS');
+  const beam=p=>({bw:gv(p+'_bw'),hb:gv(p+'_hb'),cnom:gv(p+'_cnom'),dsw:gv(p+'_dsw'),
+                  nt:gvi(p+'_nt'),dt:gv(p+'_dt'),nb:gvi(p+'_nb'),db:gv(p+'_db')});
+  const col=p=>({N:convN(gv(p+'_N')),                       // -> conventia nucleului
+                 cor_n:gvi(p+'_cn'),cor_d:gv(p+'_cd'),
+                 fb_n:gvi(p+'_fbn'),fb_d:gv(p+'_fbd'),
+                 fh_n:gvi(p+'_fhn'),fh_d:gv(p+'_fhd'),
+                 MRdOverride:gv(p+'_ovr')});
+  return {
+    concrete:sv('cp'), steel:sv('sp'), steelW:sv('swp'),
+    duct:SEG.duct, jointType:SEG.joint, level:SEG.level,
+    topLevel:(SEG.top==='yes'), fourBeams:(SEG.four==='yes'),
+    bc:gv('bc'), hc:gv('hc'), cnom:gv('c_cnom'), dsw:gv('c_dsw'), lcl:gv('lcl'),
+    beamL:beam('bL'), beamR:end?null:beam('bR'),
+    colI:col('cI'), colS:col('cS'),
+    joint:{n1:gvi('j_n1'),d1:gv('j_d1'),n2:gvi('j_n2'),d2:gv('j_d2'),
+           nSets:gvi('j_nset'),s:gv('j_s'),
+           nCol:gvi('j_ncol'),dCol:gv('j_dcol'),sCol:gv('j_scol')}
+  };
+}
 
-  /* overstrength factors */
-  const DCH=(SEG.duct==='DCH');
-  const g54  = DCH?1.3:1.2;                       // (5.4)
-  const gb   = DCH?1.2:1.0;                       // (5.9)   5.4.3.2 -> 1.0 for DCM
-  const gc   = DCH?(SEG.level==='base'?1.3:1.2):1.0; // (5.10) base 1.3 / other 1.2 for DCH; 1.0 DCM
-  const gj   = DCH?1.1:1.0;                       // (5.11)/(5.12)  5.4.3.4 -> 1.0 for DCM
-
-  const SMRc = cI.MRd + cS.MRd;
-
-  /* two senses of seismic action */
-  function mkSense(name,lblKey){
-    let SMRb, As1, As2, Acomp, parts;
-    if(end){
-      if(name==='A'){SMRb=bL.top.M; As1=bL.top.As; As2=0; Acomp=bL.bot.As; parts=[['M_Rb,L,sup',bL.top.M]];}
-      else          {SMRb=bL.bot.M; As1=bL.bot.As; As2=0; Acomp=bL.top.As; parts=[['M_Rb,L,inf',bL.bot.M]];}
-    } else {
-      if(name==='A'){SMRb=bL.top.M+bR.bot.M; As1=bL.top.As; As2=bR.bot.As; Acomp=0;
-                     parts=[['M_Rb,L,sup',bL.top.M],['M_Rb,R,inf',bR.bot.M]];}
-      else          {SMRb=bL.bot.M+bR.top.M; As1=bR.top.As; As2=bL.bot.As; Acomp=0;
-                     parts=[['M_Rb,L,inf',bL.bot.M],['M_Rb,R,sup',bR.top.M]];}
-    }
-    const rat54 = SMRc>0 ? g54*SMRb/SMRc : Infinity;
-    const kRcRb = SMRb>0 ? Math.min(1,SMRc/SMRb) : 1;
-    const kRbRc = SMRc>0 ? Math.min(1,SMRb/SMRc) : 1;
-    const MdcI = gc*cI.MRd*kRbRc, MdcS = gc*cS.MRd*kRbRc;
-    const Vc   = lcl>0 ? (MdcI+MdcS)*1e6/lcl/1e3 : 0;
-    const Astens = end ? As1 : (As1+As2);
-    const Vjhd = gj*Astens*M.fyd/1e3 - Vc;
-    /* (5.29)/(5.30) */
-    const nud = (bc*hc*M.fcd)>0 ? Math.max(0,cI.N)*1e3/(bc*hc*M.fcd) : 0;
-    const Abase = end ? Acomp : (As1+As2);
-    const AshReq0 = M.fywd>0 ? 0.8*Abase*M.fyd*(1-0.8*nud)/M.fywd : 0;
-    const AshReq = end ? AshReq0*1.2 : AshReq0;
-    return {name,lblKey,SMRb,parts,As1,As2,Acomp,Astens,rat54,kRcRb,kRbRc,
-            MdbParts:parts.map(([k,v])=>[k,gb*v*kRcRb]),MdcI,MdcS,Vc,Vjhd,nud,Abase,AshReq};
-  }
-  const sA=mkSense('A',end?'senseAe':'senseA'), sB=mkSense('B',end?'senseBe':'senseB');
-  const senses=[sA,sB];
-
-  /* geometry of the joint */
-  const bwMin = end ? bL.bw : Math.min(bL.bw,bR.bw);
-  const bj = Math.min(bc, bwMin+0.5*hc);
-  const hjc = hc-2*ccn-2*cdsw-cI.m.bars.cd/2-cI.m.bars.cd/2;
-  function hjwOf(b){return b.hb-2*b.cn-2*b.dsw-b.top.dia/2-b.bot.dia/2;}
-  const hjw = end ? hjwOf(bL) : Math.min(hjwOf(bL),hjwOf(bR));
-
-  /* joint stirrups */
-  const n1=gvi('j_n1'),d1=gv('j_d1'),n2=gvi('j_n2'),d2=gv('j_d2');
-  const nSet=Math.max(1,gvi('j_nset')), sJ=gv('j_s');
-  const AshSet = n1*barA(d1)+n2*barA(d2);
-  /* largest spacing at which nSet hoops still fit inside the usable joint height */
-  const sMax = (nSet>1) ? Math.floor(hjw/(nSet-1)) : Math.floor(hjw);
-  const AshProv = AshSet*nSet;
-  const nCol=gvi('j_ncol'),dCol=gv('j_dcol'),sCol=gv('j_scol');
-  const AswCol = nCol*barA(dCol);
-
-  /* governing values (envelope of both senses) */
-  const govVj  = senses.reduce((a,b)=>b.Vjhd>a.Vjhd?b:a);
-  const govAsh = senses.reduce((a,b)=>b.AshReq>a.AshReq?b:a);
-  const gov54  = senses.reduce((a,b)=>b.rat54>a.rat54?b:a);
-
-  const kDiag = end?0.25:0.30;
-  const VRdj  = kDiag*bj*hc*M.fcd/1e3;
-
-  const AsvReq = hjw>0 ? (2/3)*AshProv*(hjc/hjw) : 0;
-  const AsvProv = Math.min(cI.m.As_dir, cS.m.As_dir);
-
-  /* detailing */
-  const ratJoint = sJ>0 ? AshSet/sJ : 0;
-  const ratCol   = sCol>0 ? AswCol/sCol : 0;
-  const sLimit   = (SEG.four==='yes') ? Math.min(2*sCol,150) : sCol;
-
-  S={M,end,bc,hc,ccn,cdsw,lcl,bL,bR,cI,cS,g54,gb,gc,gj,SMRc,senses,sA,sB,
-     bj,bwMin,hjc,hjw,n1,d1,n2,d2,nSet,sJ,sMax,AshSet,AshProv,nCol,dCol,sCol,AswCol,
-     govVj,govAsh,gov54,kDiag,VRdj,AsvReq,AsvProv,ratJoint,ratCol,sLimit,
-     skip54:(SEG.top==='yes')};
+/* Adaptor: nucleul intoarce modelul si rezultatele cu numele lui; restul
+   modulului (desene, tabele, PDF) foloseste forma `S` de dinainte de migrare.
+   Se traduce o singura data, aici, ca sa nu se atinga codul de randare. */
+function adaptColumn(c, geom){
+  const mo=c.model;
+  const grp=g=>mo.steelFibers.filter(f=>f.grp===g);
+  const cnt=g=>grp(g).length;
+  return {
+    m:{ hc:geom.hc, bc:geom.bc,
+        sf:mo.steelFibers,
+        cnt:{cor:cnt('cor'), fb:cnt('topb'), fh:cnt('sidh')},
+        bars:{cd:mo.bars.cor_d, fbd:mo.bars.topb_d, fhd:mo.bars.sidh_d,
+              fbn:mo.bars.topb_n, fhn:mo.bars.sidh_n},
+        As_tot:mo.As_tot, As_dir:c.As_dir, Ac:mo.Ac, model:mo },
+    N:convN(c.N),                 // inapoi in conventia utilizatorului, pentru afisare
+    Neng:c.N,
+    MRdCalc:c.MRdCalc, MRd:c.MRd, ovr:c.ovr, x:c.X, conv:c.converged, pivot:c.pivot
+  };
+}
+function compute(){
+  if(typeof JP==='undefined')return null;
+  const inp=readInputs();
+  const m=JP.joint.buildModel(inp);
+  const r=JP.joint.solve(m,LANG);
+  LASTRES=r;
+  const v=r.value;
+  if(!v){ S=null; return null; }
+  const geom={bc:m.bc,hc:m.hc};
+  const lbl=n=>(m.end?(n==='A'?'senseAe':'senseBe'):(n==='A'?'senseA':'senseB'));
+  v.senses.forEach(s=>{s.lblKey=lbl(s.name);});
+  const bAd=b=>b?Object.assign({},b,{cn:b.cnom}):null;
+  S={
+    M:m.mat, end:m.end,
+    bc:m.bc, hc:m.hc, ccn:m.cnom, cdsw:m.dsw, lcl:m.lcl,
+    bL:bAd(m.beamL), bR:bAd(m.beamR),
+    cI:adaptColumn(m.colI,geom), cS:adaptColumn(m.colS,geom),
+    g54:v.g54, gb:v.gb, gc:v.gc, gj:v.gj, SMRc:v.SMRc,
+    senses:v.senses, sA:v.sA, sB:v.sB,
+    bj:m.bj, bwMin:m.bwMin, hjc:m.hjc, hjw:m.hjw,
+    n1:m.n1, d1:m.d1, n2:m.n2, d2:m.d2,
+    nSet:m.nSets, sJ:m.s, sMax:m.sMax, AshSet:m.AshSet, AshProv:m.AshProv,
+    nCol:m.nCol, dCol:m.dCol, sCol:m.sCol, AswCol:m.AswCol,
+    govVj:v.govVj, govAsh:v.govAsh, gov54:v.gov54,
+    kDiag:v.kDiag, VRdj:v.VRdj, AsvReq:v.AsvReq, AsvProv:v.AsvProv,
+    ratJoint:v.ratJoint, ratCol:v.ratCol, sLimit:v.sLimit, fits:v.fits,
+    skip54:m.topLevel, res:v
+  };
   return S;
+}
+function showStatus(){
+  const strip=document.getElementById('statusStrip');
+  const msg=document.getElementById('statusMsg');
+  const ico=document.getElementById('statusIco');
+  if(typeof JP==='undefined')return;
+  const items=[]; let fatal=false;
+  const r=LASTRES;
+  if(r&&!r.ok){
+    fatal=true;
+    // Nucleul spune EXACT ce numar de bare nu se poate dispune si in ce
+    // element; textul lui este mai util decat "date invalide".
+    if(r.code===JP.CODES.BAR_COUNT)            items.push(r.message);
+    else if(r.code===JP.CODES.DEGENERATE)      items.push(t('stDegenerate'));
+    else                                       items.push(t('stInvalid'));
+  }
+  ((r&&r.warnings)||[]).forEach(w=>{
+    if(w.code==='EUK_ASSUMED')items.push(t('wEuk',w.ref));
+    else if(w.code==='COL_NO_BRACKET'){items.push(t('wCol',w.ref));fatal=true;}
+    else if(w.code==='SETS_DONT_FIT'&&S)items.push(t('setsWarn',S.nSet,F0(S.sJ),F0(S.hjw),F0(S.sMax)));
+  });
+  if(!items.length){strip.className='status-strip';msg.innerHTML='';return;}
+  msg.innerHTML=items.length===1?items[0]:'<ul><li>'+items.join('</li><li>')+'</li></ul>';
+  ico.textContent=fatal?'!':'~';
+  strip.className='status-strip on'+(fatal?'':' warn');
 }
 
 /* ══════════════ RENDER ══════════════ */
@@ -825,12 +825,25 @@ const F3=v=>(isFinite(v)?v.toFixed(3):'—');
 const PCT=v=>(isFinite(v)?(v*100).toFixed(1)+' %':'—');
 
 function onChange(){
+  if(typeof JP==='undefined')return;
   compute();
+  showStatus();
+  // Fara aceasta ramura, panourile de rezultat ramaneau pe ecran cu valorile
+  // ULTIMEI sectiuni valide, sub un mesaj care spune ca sectiunea curenta nu
+  // se poate calcula — cifre care nu corespund datelor din pagina.
+  if(!S){ clearResults(); return; }
   renderInputs();
   drawAllSketches();
   renderResults();
   renderElem();
   saveCurrentPreset();
+}
+function clearResults(){
+  const w=document.getElementById('resWrap');
+  if(w)w.innerHTML='<div class="op" style="padding:18px;color:#8E8E93;font-size:13px">'
+    +t('resStale')+'</div>';
+  const sb=document.getElementById('summaryBar');
+  if(sb)sb.innerHTML='';
 }
 function renderInputs(){
   const M=S.M;
@@ -850,13 +863,13 @@ function renderInputs(){
   });
   [['cI',S.cI],['cS',S.cS]].forEach(([p,c])=>{
     const as=document.getElementById(p+'_as_r');
-    if(as)as.textContent=`${c.m.nBars} ${LANG==='ro'?'bare':'bars'} · ${F0(c.m.As_tot)} mm²`;
+    if(as)as.textContent=`${c.m.sf.length} ${LANG==='ro'?'pozitii':'positions'} · ${F0(c.m.As_tot)} mm²`;
     const rh=document.getElementById(p+'_rho_r');
     if(rh)rh.textContent=(100*c.m.As_tot/c.m.Ac).toFixed(2)+' %';
     const mc=document.getElementById(p+'_mrdc_r');
     if(mc)mc.textContent=F1(c.MRdCalc)+' kNm'+(c.conv?'':' (!)');
     const mu=document.getElementById(p+'_mrdu_r');
-    if(mu)mu.textContent=F1(c.MRd)+' kNm'+(c.ovr>0?(LANG==='ro'?' (manual)':' (manual)'):'');
+    if(mu)mu.textContent=F1(c.MRd)+' kNm'+(c.ovr>0?' (manual)':'');
     const w=document.getElementById(p+'_ovrwarn');
     if(w)w.innerHTML=(c.ovr>0&&c.MRdCalc>0&&Math.abs(c.ovr-c.MRdCalc)/c.MRdCalc>0.15)?`<div class="warnbox">${t('ovrWarn')}</div>`:'';
     document.getElementById('bdg_'+p).textContent=`N=${F0(c.N)} kN · M_Rd=${F1(c.MRd)} kNm`;
@@ -868,8 +881,8 @@ function renderInputs(){
   if(sIn){sIn.max=S.sMax;sIn.classList.toggle('warn',over);}
   if(hint){hint.innerHTML=t('smaxLbl',F0(S.sMax));hint.classList.toggle('no',over);}
 }
-/* keep s within the spacing that actually fits nSet hoops in the joint (clamped on commit,
-   not on every keystroke, so typing "100" doesn't get truncated mid-entry) */
+/* pasul se limiteaza la commit, nu la fiecare tasta, ca "100" sa nu fie taiat
+   in timp ce se tasteaza */
 function clampS(){
   if(!S)return;
   const sIn=document.getElementById('j_s');
@@ -878,8 +891,10 @@ function clampS(){
 }
 
 /* ── result panel builder ── */
-function rp(id,titleKey,cls,infoKey,val,verdict,util,det){
-  const pillCls=verdict==='ok'?'ok':(verdict==='no'?'no':(verdict==='na'?'na':'na'));
+// noBar: verificarile care sunt o REGULA de alcatuire, nu un raport
+// cerere/capacitate, nu au procent — se afiseaza doar verdictul.
+function rp(id,titleKey,cls,infoKey,val,verdict,util,det,noBar){
+  const pillCls=verdict==='ok'?'ok':(verdict==='no'?'no':'na');
   const pillTxt=verdict==='ok'?t('vOk'):(verdict==='no'?t('vNo'):(verdict==='na'?t('vNa'):t('vInfo')));
   const u=Math.max(0,Math.min(100,(util||0)*100));
   return `<div class="op rp" id="${id}">
@@ -890,7 +905,7 @@ function rp(id,titleKey,cls,infoKey,val,verdict,util,det){
       <span class="verdict-pill ${pillCls}">${pillTxt}</span>
       <span class="chev"></span>
     </div>
-    <div class="ubar ${verdict==='no'?'no':''}"><div style="width:${u}%"></div></div>
+    ${noBar?'':`<div class="ubar ${verdict==='no'?'no':''}"><div style="width:${u}%"></div></div>`}
     <div class="rpd">${det}</div>
   </div>`;
 }
@@ -901,15 +916,12 @@ function tbl(rows,caption){
 }
 
 function renderResults(){
-  const s=S, M=s.M, out=[];
-  const sgn=v=>v;
+  const s=S, M=s.M, v=s.res, out=[];
   let nOk=0,nNo=0,worst=0;
 
   /* ── 5.4 ── */
   {
-    const na=s.skip54;
-    const util=s.gov54.rat54;
-    const ok=util<=1.0000001;
+    const na=s.skip54, util=v.u54, ok=util<=1.0000001;
     const rows=[];
     s.senses.forEach(x=>{
       rows.push([`${t(x.lblKey)} — ΣM<sub>Rb</sub>`,x.parts.map(p=>`${p[0]} = ${F1(p[1])}`).join(' + '),`${F1(x.SMRb)} kNm`,x===s.gov54]);
@@ -923,7 +935,7 @@ function renderResults(){
     if(!na){ok?nOk++:nNo++; worst=Math.max(worst,util);}
   }
 
-  /* ── design action effects (5.9 / 5.10) ── */
+  /* ── eforturi de proiectare (5.9 / 5.10) ── */
   {
     const rows=[];
     s.senses.forEach(x=>{
@@ -931,7 +943,7 @@ function renderResults(){
         `γ<sub>Rd</sub>M<sub>Rb</sub>·min(1; ΣM<sub>Rc</sub>/ΣM<sub>Rb</sub>) = ${F2(s.gb)}·M<sub>Rb</sub>·${F3(x.kRcRb)}`,`${F1(p[1])} kNm`]));
       rows.push([`M<sub>dc,inf</sub> — ${t(x.lblKey)}`,`γ<sub>Rd</sub>M<sub>Rc</sub>·min(1; ΣM<sub>Rb</sub>/ΣM<sub>Rc</sub>) = ${F2(s.gc)}·${F1(s.cI.MRd)}·${F3(x.kRbRc)}`,`${F1(x.MdcI)} kNm`]);
       rows.push([`M<sub>dc,sup</sub> — ${t(x.lblKey)}`,`${F2(s.gc)}·${F1(s.cS.MRd)}·${F3(x.kRbRc)}`,`${F1(x.MdcS)} kNm`]);
-      rows.push([`V<sub>c</sub> — ${t(x.lblKey)}`,`(M<sub>dc,inf</sub>+M<sub>dc,sup</sub>)/l<sub>cl</sub> = (${F1(x.MdcI)}+${F1(x.MdcS)})·10⁶/${F0(s.lcl)}`,`${F1(x.Vc)} kN`]);
+      rows.push([`V<sub>c</sub> — ${t(x.lblKey)}`,`2·M<sub>dc,sup</sub>/l<sub>cl</sub> = 2·${F1(x.MdcS)}·10⁶/${F0(s.lcl)}`,`${F1(x.Vc)} kN`]);
     });
     rows.push(['γ<sub>Rd</sub> '+(LANG==='ro'?'grinzi':'beams'),'(5.9) — 1,2 DCH / 1,0 DCM',F2(s.gb)]);
     rows.push(['γ<sub>Rd</sub> '+(LANG==='ro'?'stalpi':'columns'),'(5.10) — '+(SEG.duct==='DCH'?(SEG.level==='base'?'1,30 '+(LANG==='ro'?'baza':'base'):'1,20 '+(LANG==='ro'?'nivel curent':'typical level')):'1,0 (DCM)'),F2(s.gc)]);
@@ -950,10 +962,9 @@ function renderResults(){
     out.push(rp('r3','chkVjhd',s.end?'(5.12)':'(5.11)','i_vjhd',`${F1(s.govVj.Vjhd)} kN`,'info',0,tbl(rows)));
   }
 
-  /* ── diagonal compression (5.26/5.27) ── */
+  /* ── compresiune diagonala (5.26/5.27) ── */
   {
-    const util=s.VRdj>0?s.govVj.Vjhd/s.VRdj:Infinity;
-    const ok=util<=1.0000001;
+    const util=v.uDiag, ok=util<=1.0000001;
     const rows=[
       ['b<sub>j</sub>',`min(b<sub>c</sub>; b<sub>w</sub>+0,5h<sub>c</sub>) = min(${F0(s.bc)}; ${F0(s.bwMin)}+0,5·${F0(s.hc)}) &nbsp;(5.28)`,`${F0(s.bj)} mm`],
       ['h<sub>c</sub>',LANG==='ro'?'latura paralela cu grinzile':'side parallel to the beams',`${F0(s.hc)} mm`],
@@ -969,11 +980,9 @@ function renderResults(){
 
   /* ── A_sh (5.29/5.30) ── */
   {
-    const req=s.govAsh.AshReq;
-    const util=s.AshProv>0?req/s.AshProv:Infinity;
-    const ok=util<=1.0000001;
+    const util=v.uAsh, ok=util<=1.0000001;
     const rows=[];
-    rows.push(['ν<sub>d</sub>',`N<sub>Ed,inf</sub>/(b<sub>c</sub>h<sub>c</sub>f<sub>cd</sub>) = ${F0(s.cI.N)}·10³/(${F0(s.bc)}·${F0(s.hc)}·${F2(M.fcd)})`,F3(s.govAsh.nud)]);
+    rows.push(['ν<sub>d</sub>',`N<sub>Ed,inf</sub>/(b<sub>c</sub>h<sub>c</sub>f<sub>cd</sub>) = ${F0(s.cI.Neng)}·10³/(${F0(s.bc)}·${F0(s.hc)}·${F2(M.fcd)})`,F3(s.govAsh.nud)]);
     s.senses.forEach(x=>{
       const base=s.end?`0,8·A<sub>s2</sub>f<sub>yd</sub>(1−0,8ν<sub>d</sub>)/f<sub>ywd</sub> ·1,20`:`0,8(A<sub>s1</sub>+A<sub>s2</sub>)f<sub>yd</sub>(1−0,8ν<sub>d</sub>)/f<sub>ywd</sub>`;
       rows.push([`A<sub>sh,nec</sub> — ${t(x.lblKey)}`,`${base} &nbsp;(A = ${F0(x.Abase)} mm²)`,`${F0(x.AshReq)} mm²`,x===s.govAsh]);
@@ -982,15 +991,14 @@ function renderResults(){
       `${s.n1}×Ø${F0(s.d1)} + ${s.n2}×Ø${F0(s.d2)}`,`${F0(s.AshSet)} mm²`]);
     rows.push(['A<sub>sh,ef</sub>',`${F0(s.AshSet)} × ${s.nSet} ${LANG==='ro'?'seturi':'sets'}`,`${F0(s.AshProv)} mm² = ${(s.AshProv/100).toFixed(2)} cm²`,true]);
     rows.push([LANG==='ro'?'Raport':'Ratio','A<sub>sh,nec</sub> / A<sub>sh,ef</sub>',PCT(util),true]);
-    const warn=(s.sJ>s.sMax+1e-9)?`<div class="warnbox">${t('setsWarn',s.nSet,F0(s.sJ),F0(s.hjw),F0(s.sMax))}</div>`:'';
+    const warn=(!s.fits)?`<div class="warnbox">${t('setsWarn',s.nSet,F0(s.sJ),F0(s.hjw),F0(s.sMax))}</div>`:'';
     out.push(rp('r5','chkAsh',s.end?'(5.30)':'(5.29)','i_ash',PCT(util),ok?'ok':'no',util,warn+tbl(rows)));
     ok?nOk++:nNo++; worst=Math.max(worst,util);
   }
 
   /* ── A_sv (5.31) ── */
   {
-    const util=s.AsvProv>0?s.AsvReq/s.AsvProv:Infinity;
-    const ok=util<=1.0000001;
+    const util=v.uAsv, ok=util<=1.0000001;
     const rows=[
       ['h<sub>jc</sub>',`h<sub>c</sub> − 2c<sub>nom</sub> − 2Ø<sub>sw</sub> − Ø<sub>bara</sub>`,`${F0(s.hjc)} mm`],
       ['h<sub>jw</sub>',`h<sub>b</sub> − 2c<sub>nom</sub> − 2Ø<sub>sw</sub> − Ø<sub>sus</sub>/2 − Ø<sub>jos</sub>/2`,`${F0(s.hjw)} mm`],
@@ -1003,12 +1011,12 @@ function renderResults(){
     ok?nOk++:nNo++; worst=Math.max(worst,util);
   }
 
-  /* ── detailing ── */
+  /* ── alcatuire ── */
   {
-    const okQty=s.ratJoint>=s.ratCol-1e-9;
-    const okSp=s.sJ<=s.sLimit+1e-9;
-    const ok=okQty&&okSp;
-    const util=s.ratJoint>0?Math.max(s.ratCol/s.ratJoint,s.sJ/(s.sLimit||1)):Infinity;
+    // Alcatuirea se respecta sau nu; un "procent de utilizare" aici nu
+    // inseamna nimic (era 100 % ori de cate ori trecea) si nu intra in
+    // "cea mai solicitata verificare" — la fel ca in nucleu (pct:false).
+    const okQty=v.okQty, okSp=v.okSp, ok=okQty&&okSp&&s.fits;
     const rows=[
       [`A<sub>sw</sub>/s ${LANG==='ro'?'nod':'joint'}`,`${F0(s.AshSet)} / ${F0(s.sJ)}`,`${F3(s.ratJoint)} mm²/mm`,true],
       [`A<sub>sw</sub>/s ${LANG==='ro'?'zona critica stalp':'column critical zone'}`,`${s.nCol}×Ø${F0(s.dCol)} = ${F0(s.AswCol)} / ${F0(s.sCol)}`,`${F3(s.ratCol)} mm²/mm`,true],
@@ -1017,8 +1025,8 @@ function renderResults(){
       [`s ${LANG==='ro'?'prevazut':'provided'}`,'—',`${F0(s.sJ)} mm`,true],
       [`5.3.4.2.3(4)`,LANG==='ro'?'etrierii se distribuie uniform pe inaltimea nodului: (n−1)·s ≤ h<sub>jw</sub>':'hoops uniformly distributed over the joint height: (n−1)·s ≤ h<sub>jw</sub>',`(${s.nSet}−1)×${F0(s.sJ)} = ${F0((s.nSet-1)*s.sJ)} ≤ ${F0(s.hjw)} mm`]
     ];
-    out.push(rp('r7','chkDet','5.3.4.2.3(4)(6) · 5.4.4.3','i_detail',PCT(util),ok?'ok':'no',util,tbl(rows)));
-    ok?nOk++:nNo++; worst=Math.max(worst,util);
+    out.push(rp('r7','chkDet','5.3.4.2.3(4)(6) · 5.4.4.3','i_detail','',ok?'ok':'no',0,tbl(rows),true));
+    ok?nOk++:nNo++;
   }
 
   document.getElementById('resWrap').innerHTML=out.join('');
@@ -1042,10 +1050,9 @@ function dimV(y1,y2,x,lbl){
   <line x1="${x-3}" y1="${y1}" x2="${x+3}" y2="${y1}" stroke="${CDM}" stroke-width=".7"/>
   <line x1="${x-3}" y1="${y2}" x2="${x+3}" y2="${y2}" stroke="${CDM}" stroke-width=".7"/>`+svgText(x+9,(y1+y2)/2,lbl,{r:90});
 }
-
 /* beam cross-section */
 function drawBeamSection(svgId,b,title){
-  const el=document.getElementById(svgId); if(!el)return;
+  const el=document.getElementById(svgId); if(!el||!b||!(b.bw>0)||!(b.hb>0))return;
   const VW=340,VH=250,PL=42,PR=48,PT=26,PB=44;
   const scl=Math.min((VW-PL-PR)/b.bw,(VH-PT-PB)/b.hb);
   const w=b.bw*scl,h=b.hb*scl, x0=(VW-w)/2, y0=PT+((VH-PT-PB)-h)/2;
@@ -1078,13 +1085,13 @@ function drawColSection(svgId,c,opt){
   const el=document.getElementById(svgId); if(!el)return;
   opt=opt||{};
   const m=c.m;
+  if(!(m.hc>0)||!(m.bc>0))return;
   const VW=opt.VW||340,VH=opt.VH||250,PL=40,PR=44,PT=opt.PT||26,PB=42;
   const scl=Math.min((VW-PL-PR)/m.hc,(VH-PT-PB)/m.bc);
   const w=m.hc*scl,h=m.bc*scl, x0=(VW-w)/2, y0=PT+((VH-PT-PB)-h)/2;
   const X=z=>x0+w/2+z*scl;      // z (along h_c) -> horizontal
   const Y=y=>y0+h/2-y*scl;      // y (along b_c) -> vertical
   let o=`<rect x="${x0}" y="${y0}" width="${w}" height="${h}" fill="${CGY}" stroke="${CDK}" stroke-width="1.2"/>`;
-  const insZ=(S.ccn+S.cdsw)*scl, insY=(S.ccn+S.cdsw)*scl;
   const sx=x0+S.ccn*scl, sy=y0+S.ccn*scl, sw=w-2*S.ccn*scl, sh=h-2*S.ccn*scl;
   if(opt.legs){
     /* perimeter stirrup: legs parallel to h_c (horizontal here) are effective */
@@ -1138,11 +1145,11 @@ function drawNodeElevation(){
   const s=S;
   const VW=560,VH=400,PAD=34;
   const hc=s.hc, hbL=s.bL.hb, hbR=s.end?s.bL.hb:s.bR.hb, hb=Math.max(hbL,hbR);
+  if(!(hc>0)||!(hb>0))return;
   const beamStub=1.45*Math.max(hc,hb), colStub=1.15*Math.max(hb,hc*0.9);
   const totW=hc+(s.end?beamStub:2*beamStub), totH=hb+2*colStub;
   const scl=Math.min((VW-2*PAD)/totW,(VH-2*PAD)/totH);
-  const cx=VW/2 + (s.end? beamStub*scl/2*0 : 0);
-  const cy=VH/2;
+  const cx=VW/2, cy=VH/2;
   const X=mm=>cx+mm*scl, Y=mm=>cy+mm*scl;
   const jx1=X(-hc/2), jx2=X(hc/2), jy1=Y(-hb/2), jy2=Y(hb/2);
   const colTop=Y(-hb/2-colStub), colBot=Y(hb/2+colStub);
@@ -1150,19 +1157,15 @@ function drawNodeElevation(){
   const sel=selected;
   const hl=e=>sel===e?`stroke="${CBL}" stroke-width="2"`:`stroke="${CDK}" stroke-width="1.2"`;
   let o='';
-  /* beams */
   const byL1=Y(-hbL/2), byL2=Y(hbL/2);
   o+=`<g class="hit" onclick="selElem('bL')"><rect class="hl" x="${bxL}" y="${byL1}" width="${jx1-bxL}" height="${byL2-byL1}" fill="${sel==='bL'?'#EBF3FF':'#EFEFEF'}" ${hl('bL')}/></g>`;
   if(!s.end){
     const byR1=Y(-hbR/2), byR2=Y(hbR/2);
     o+=`<g class="hit" onclick="selElem('bR')"><rect class="hl" x="${jx2}" y="${byR1}" width="${bxR-jx2}" height="${byR2-byR1}" fill="${sel==='bR'?'#EBF3FF':'#EFEFEF'}" ${hl('bR')}/></g>`;
   }
-  /* columns */
   o+=`<g class="hit" onclick="selElem('cS')"><rect class="hl" x="${jx1}" y="${colTop}" width="${jx2-jx1}" height="${jy1-colTop}" fill="${sel==='cS'?'#EBF3FF':'#E9E9EE'}" ${hl('cS')}/></g>`;
   o+=`<g class="hit" onclick="selElem('cI')"><rect class="hl" x="${jx1}" y="${jy2}" width="${jx2-jx1}" height="${colBot-jy2}" fill="${sel==='cI'?'#EBF3FF':'#E9E9EE'}" ${hl('cI')}/></g>`;
-  /* joint core */
   o+=`<g class="hit" onclick="selElem('jt')"><rect class="hl" x="${jx1}" y="${jy1}" width="${jx2-jx1}" height="${jy2-jy1}" fill="${sel==='jt'?'#DCE9FA':'#DEDEE4'}" ${hl('jt')}/></g>`;
-  /* beam bars running through */
   const insB=(s.bL.cn+s.bL.dsw)*scl;
   function beamBars(y1,y2,x1,x2){
     return `<line x1="${x1}" y1="${y1+insB}" x2="${x2}" y2="${y1+insB}" stroke="${CDK}" stroke-width="1.6"/>
@@ -1170,11 +1173,10 @@ function drawNodeElevation(){
   }
   o+=beamBars(byL1,byL2,bxL+6,s.end?jx2-insB*0.6:jx2);
   if(!s.end)o+=beamBars(Y(-hbR/2),Y(hbR/2),jx1,bxR-6);
-  if(s.end){ /* hooks bent into the joint at an end joint */
+  if(s.end){
     o+=`<line x1="${jx2-insB*0.6}" y1="${byL1+insB}" x2="${jx2-insB*0.6}" y2="${byL1+insB+(jy2-jy1)*0.45}" stroke="${CDK}" stroke-width="1.6"/>`;
     o+=`<line x1="${jx2-insB*0.6}" y1="${byL2-insB}" x2="${jx2-insB*0.6}" y2="${byL2-insB-(jy2-jy1)*0.45}" stroke="${CDK}" stroke-width="1.6"/>`;
   }
-  /* column bars */
   const insC=(s.ccn+s.cdsw)*scl;
   o+=`<line x1="${jx1+insC}" y1="${colTop+4}" x2="${jx1+insC}" y2="${colBot-4}" stroke="${CDK}" stroke-width="1.6"/>`;
   o+=`<line x1="${jx2-insC}" y1="${colTop+4}" x2="${jx2-insC}" y2="${colBot-4}" stroke="${CDK}" stroke-width="1.6"/>`;
@@ -1184,12 +1186,10 @@ function drawNodeElevation(){
       o+=`<line x1="${X(zz)}" y1="${colTop+4}" x2="${X(zz)}" y2="${colBot-4}" stroke="${CDM}" stroke-width="1.2" stroke-dasharray="5,3"/>`;
     }
   }
-  /* joint hoops */
   for(let i=0;i<s.nSet;i++){
     const yy=jy1+insB+((jy2-jy1)-2*insB)*(s.nSet>1?i/(s.nSet-1):0.5);
     o+=`<line x1="${jx1+insC}" y1="${yy}" x2="${jx2-insC}" y2="${yy}" stroke="${CBL}" stroke-width="1.5"/>`;
   }
-  /* dims + labels — kept out of the drawing band so nothing overlaps */
   o+=dimH(jx1,jx2,colBot+16,`h_c = ${F0(hc)} mm`);
   o+=dimV(jy1,jy2,VW-32,`h_b = ${F0(hb)} mm`);
   o+=svgText((bxL+jx1)/2,byL1-7,`M_Rb⁻ ${F1(s.bL.top.M)} / M_Rb⁺ ${F1(s.bL.bot.M)}`,{c:CBL,s:8,w:600});
@@ -1234,7 +1234,7 @@ function renderElem(){
       [t('barsFh'),`${c.m.cnt.fh}Ø${F0(c.m.bars.fhd)}`],
       ['A<sub>s</sub> / ρ',`${F0(c.m.As_tot)} mm² / ${(100*c.m.As_tot/c.m.Ac).toFixed(2)} %`],
       ['N<sub>Ed</sub>',`${F0(c.N)} kN`],
-      ['ν<sub>d</sub>',F3(Math.max(0,c.N)*1e3/(s.bc*s.hc*s.M.fcd))],
+      ['ν<sub>d</sub>',F3(Math.max(0,c.Neng)*1e3/(s.bc*s.hc*s.M.fcd))],
       [t('mrdCalc'),`${F1(c.MRdCalc)} kNm`],
       [t('mrdUsed'),`${F1(c.MRd)} kNm`]
     ];
@@ -1284,10 +1284,11 @@ function swapCol(){
 function generatePdf(){
   const btn=document.getElementById('rptBtn'),st=document.getElementById('rptStatus');
   if(typeof window.jspdf==='undefined'){st.textContent=t('pdfLoading');return;}
+  if(!S)return;
   btn.disabled=true;btn.textContent=t('generating');
   setTimeout(()=>{
     try{buildPdf();st.textContent=t('statusDownloaded');setTimeout(()=>st.textContent='',4000);}
-    catch(e){console.error(e);st.textContent=t('pdfError')+' '+(e&&e.message||e);}
+    catch(e){console.error(e);st.textContent=t('pdfError')+' '+((e&&e.message)||e);}
     finally{btn.disabled=false;btn.textContent=t('downloadPdf');}
   },30);
 }
@@ -1296,7 +1297,7 @@ function buildPdf(){
   const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
   const pW=210,pH=297,ml=13,mr=13,cw=pW-ml-mr;
   const ds=new Date().toLocaleDateString(LANG==='en'?'en-GB':'ro-RO');
-  const s=S,M=s.M;
+  const s=S,M=s.M,v=s.res;
   function hdr(){
     doc.setFillColor(40,80,140);doc.rect(0,0,pW,13,'F');
     doc.setTextColor(255,255,255);doc.setFontSize(9.5);doc.setFont('helvetica','bold');
@@ -1315,12 +1316,13 @@ function buildPdf(){
     return y+2;
   }
   let y=sec(tp('pdfS1'),19);
-  const ductLbl=SEG.duct, jtLbl=s.end?tp('jt_end'):tp('jt_int');
+  const jtLbl=s.end?tp('jt_end'):tp('jt_int');
   const inRows=[
     ['Beton / Otel / Otel transv.',`${sv('cp')} / ${sv('sp')} / ${sv('swp')}`],
     ['f_cd / f_yd / f_ywd [MPa]',`${F2(M.fcd)} / ${F1(M.fyd)} / ${F1(M.fywd)}`],
-    [tp('ductClass')+' / '+tp('jointType'),`${ductLbl} / ${jtLbl}`],
+    [tp('ductClass')+' / '+tp('jointType'),`${SEG.duct} / ${jtLbl}`],
     [tp('levelLbl'),SEG.level==='base'?tp('lv_base'):tp('lv_cur')],
+    [tp('pdfSignConv'),signConv==='neg'?tp('sg_neg'):tp('sg_pos')],
     ['h_c x b_c [mm]',`${F0(s.hc)} x ${F0(s.bc)}`],
     ['c_nom / D_sw stalp [mm]',`${F0(s.ccn)} / ${F0(s.cdsw)}`],
     ['l_cl [mm]',F0(s.lcl)],
@@ -1339,8 +1341,8 @@ function buildPdf(){
     ['M_Rb,L (sus / jos)','A_s·f_yd·z, z = d - lambda·x/2',`${F1(s.bL.top.M)} / ${F1(s.bL.bot.M)} kNm`],
   ];
   if(!s.end)capRows.push(['M_Rb,R (sus / jos)','A_s·f_yd·z',`${F1(s.bR.top.M)} / ${F1(s.bR.bot.M)} kNm`]);
-  capRows.push(['M_Rd,inf','metoda fibrelor, N = '+F0(s.cI.N)+' kN'+(s.cI.ovr>0?' (manual)':''),`${F1(s.cI.MRd)} kNm`]);
-  capRows.push(['M_Rd,sup','metoda fibrelor, N = '+F0(s.cS.N)+' kN'+(s.cS.ovr>0?' (manual)':''),`${F1(s.cS.MRd)} kNm`]);
+  capRows.push(['M_Rd,inf','metoda fibrelor (nucleu), N = '+F0(s.cI.N)+' kN'+(s.cI.ovr>0?' (manual)':''),`${F1(s.cI.MRd)} kNm`]);
+  capRows.push(['M_Rd,sup','metoda fibrelor (nucleu), N = '+F0(s.cS.N)+' kN'+(s.cS.ovr>0?' (manual)':''),`${F1(s.cS.MRd)} kNm`]);
   capRows.push(['Sum M_Rc','M_Rd,inf + M_Rd,sup',`${F1(s.SMRc)} kNm`]);
   s.senses.forEach(x=>capRows.push([`Sum M_Rb — ${tp(x.lblKey)}`,'(5.4)',`${F1(x.SMRb)} kNm`]));
   capRows.push(['b_j','min(b_c; b_w + 0,5 h_c)   (5.28)',`${F0(s.bj)} mm`]);
@@ -1349,32 +1351,35 @@ function buildPdf(){
   doc.autoTable({startY:y+2,head:[[tp('colParam'),tp('colForm'),tp('colVal')]],body:capRows,
     margin:{left:ml,right:mr},tableWidth:cw,theme:'grid',styles:ST,headStyles:HS,
     columnStyles:{0:{cellWidth:40},2:{halign:'right',fontStyle:'bold',cellWidth:32}},didDrawPage:hdr});
+  let yc=doc.lastAutoTable.finalY+3;
+  doc.setFontSize(6.6);doc.setFont('helvetica','italic');doc.setTextColor(108,108,112);
+  doc.text(tp('pdfConvNote'),ml,yc,{maxWidth:cw});
+  doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);
 
-  y=sec(tp('pdfS3'),doc.lastAutoTable.finalY+7);
-  const u54=s.gov54.rat54, uD=s.govVj.Vjhd/s.VRdj, uA=s.govAsh.AshReq/s.AshProv, uV=s.AsvReq/s.AsvProv;
-  const okQty=s.ratJoint>=s.ratCol-1e-9, okSp=s.sJ<=s.sLimit+1e-9;
+  y=sec(tp('pdfS3'),yc+6);
   const V=(b)=>b?tp('vOk'):tp('vNo');
   const ckRows=[
-    ['(5.4)',`Sum M_Rc >= g_Rd Sum M_Rb : ${F1(s.SMRc)} >= ${F2(s.g54)}·${F1(s.gov54.SMRb)} = ${F1(s.g54*s.gov54.SMRb)} kNm`,PCT(u54),s.skip54?tp('vNa'):V(u54<=1)],
+    ['(5.4)',`Sum M_Rc >= g_Rd Sum M_Rb : ${F1(s.SMRc)} >= ${F2(s.g54)}·${F1(s.gov54.SMRb)} = ${F1(s.g54*s.gov54.SMRb)} kNm`,PCT(v.u54),s.skip54?tp('vNa'):V(v.u54<=1)],
     [s.end?'(5.12)':'(5.11)',`V_jhd = ${F1(s.govVj.Vjhd)} kN  (V_c = ${F1(s.govVj.Vc)} kN)`,'—','—'],
-    [s.end?'(5.27)':'(5.26)',`V_jhd <= ${F2(s.kDiag)}·b_j·h_c·f_cd : ${F1(s.govVj.Vjhd)} <= ${F1(s.VRdj)} kN`,PCT(uD),V(uD<=1)],
-    [s.end?'(5.30)':'(5.29)',`A_sh,nec = ${F0(s.govAsh.AshReq)} mm2  <=  A_sh,ef = ${F0(s.AshProv)} mm2`,PCT(uA),V(uA<=1)],
-    ['(5.31)',`A_sv,nec = ${F0(s.AsvReq)} mm2  <=  A_sv,ef = ${F0(s.AsvProv)} mm2`,PCT(uV),V(uV<=1)],
-    ['5.3.4.2.3(6)',`A_sw/s nod = ${F3(s.ratJoint)} >= zona critica ${F3(s.ratCol)} mm2/mm`,'—',V(okQty)],
-    ['5.4.4.3(2)',`s = ${F0(s.sJ)} mm <= ${F0(s.sLimit)} mm`,'—',V(okSp)]
+    [s.end?'(5.27)':'(5.26)',`V_jhd <= ${F2(s.kDiag)}·b_j·h_c·f_cd : ${F1(s.govVj.Vjhd)} <= ${F1(s.VRdj)} kN`,PCT(v.uDiag),V(v.uDiag<=1)],
+    [s.end?'(5.30)':'(5.29)',`A_sh,nec = ${F0(s.govAsh.AshReq)} mm2  <=  A_sh,ef = ${F0(s.AshProv)} mm2`,PCT(v.uAsh),V(v.uAsh<=1)],
+    ['(5.31)',`A_sv,nec = ${F0(s.AsvReq)} mm2  <=  A_sv,ef = ${F0(s.AsvProv)} mm2`,PCT(v.uAsv),V(v.uAsv<=1)],
+    ['5.3.4.2.3(6)',`A_sw/s nod = ${F3(s.ratJoint)} >= zona critica ${F3(s.ratCol)} mm2/mm`,'—',V(v.okQty)],
+    ['5.3.4.2.3(4)',`(${s.nSet}-1)x${F0(s.sJ)} = ${F0((s.nSet-1)*s.sJ)} mm <= h_jw = ${F0(s.hjw)} mm`,'—',V(s.fits)],
+    ['5.4.4.3(2)',`s = ${F0(s.sJ)} mm <= ${F0(s.sLimit)} mm`,'—',V(v.okSp)]
   ];
   doc.autoTable({startY:y+2,head:[['Rel.','Verificare','Utilizare','Verdict']],body:ckRows,
     margin:{left:ml,right:mr},tableWidth:cw,theme:'grid',styles:ST,headStyles:HS,
     columnStyles:{0:{cellWidth:20},2:{halign:'right',cellWidth:16},3:{halign:'center',fontStyle:'bold',cellWidth:22}},
     didParseCell:function(d){
       if(d.section==='body'&&d.column.index===3){
-        const v=ckRows[d.row.index][3];
-        if(v===tp('vOk'))d.cell.styles.textColor=[46,125,50];
-        else if(v===tp('vNo'))d.cell.styles.textColor=[192,57,43];
+        const vv=ckRows[d.row.index][3];
+        if(vv===tp('vOk'))d.cell.styles.textColor=[46,125,50];
+        else if(vv===tp('vNo'))d.cell.styles.textColor=[192,57,43];
       }},
     didDrawPage:hdr});
 
-  /* ── 4. SECTIONS (vector drawings, same geometry as the on-screen sketches) ── */
+  /* ── 4. SECTIUNI (grafica vectoriala, aceeasi geometrie ca pe ecran) ── */
   doc.addPage(); hdr();
   y=sec(tp('pdfS4'),19);
   const colW=(cw-8)/2;
@@ -1387,12 +1392,13 @@ function buildPdf(){
   pdfNodeElev(doc,ml,yy,cw,96,tp('pdfNodeElev'));
 
   const tot=doc.internal.getNumberOfPages();
+  const stamp='P 100-1/2013 · SR EN 1992-1-1  |  M'+MODULE_ID+' v'+MODULE_VERSION+' / engine v'+JP.VERSION;
   for(let i=1;i<=tot;i++){
     doc.setPage(i);
     doc.setFontSize(6.5);doc.setTextColor(0,0,0);doc.setFont('helvetica','italic');
     doc.text(tp('pdfDisc'),ml,pH-6);
     doc.setFont('helvetica','normal');
-    doc.text('P 100-1/2013 · SR EN 1992-1-1',ml,pH-2.5);
+    doc.text(stamp,ml,pH-2.5);
     doc.text(`${tp('pdfPage')} ${i} ${tp('pdfOf')} ${tot}`,pW-mr,pH-2.5,{align:'right'});
     doc.text(tp('pdfGenerated')+ds,pW/2,pH-2.5,{align:'center'});
   }
@@ -1418,9 +1424,9 @@ function pdfDimH(doc,x1,x2,y,lbl){
   doc.line(x1,y,x2,y);doc.line(x1,y-0.8,x1,y+0.8);doc.line(x2,y-0.8,x2,y+0.8);
   pdfLbl(doc,(x1+x2)/2,y+2.6,lbl);
 }
-/* beam cross-section */
 function pdfBeamSec(doc,b,x,y,w,h,title){
   pdfBox(doc,x,y,w,h,title);
+  if(!b||!(b.bw>0)||!(b.hb>0))return;
   const top=y+8, av=h-15, aw=w-6;
   const scl=Math.min((aw*0.42)/b.bw,av/b.hb);
   const bw=b.bw*scl, bh=b.hb*scl;
@@ -1444,7 +1450,6 @@ function pdfBeamSec(doc,b,x,y,w,h,title){
   pdfLbl(doc,x0+bw/2,y0-1.4,`${b.top.n}D${F0(b.top.dia)}`,{c:PB_DARK,b:1,s:5.6});
   pdfLbl(doc,x0+bw/2,y0+bh+3.2,`${b.bot.n}D${F0(b.bot.dia)}`,{c:PB_DARK,b:1,s:5.6});
   pdfDimH(doc,x0,x0+bw,y0+bh+6.2,`b_w = ${F0(b.bw)}`);
-  /* value column on the right */
   const tx=x+w*0.60;
   const lines=[
     [`h_b`,`${F0(b.hb)} mm`],
@@ -1460,12 +1465,12 @@ function pdfBeamSec(doc,b,x,y,w,h,title){
     pdfLbl(doc,x+w-3,ly,l[1],{a:'right',s:5.4,c:PB_DARK,b:(i>3?1:0)});
   });
 }
-/* column cross-section, h_c drawn horizontally (parallel to the beams) */
 function pdfColSec(doc,c,x,y,w,h,opt){
   opt=opt||{};
   pdfBox(doc,x,y,w,h,opt.title);
-  /* the legs variant needs head-room for the V_jhd arrow and a footer line for the legend */
-  const m=c.m, top=y+(opt.legs?13:9), av=h-(opt.legs?26:16), aw=w-6;
+  const m=c.m;
+  if(!(m.hc>0)||!(m.bc>0))return;
+  const top=y+(opt.legs?13:9), av=h-(opt.legs?26:16), aw=w-6;
   const scl=Math.min((aw*0.40)/m.hc,av/m.bc);
   const cw2=m.hc*scl, ch=m.bc*scl;
   const cx=x+w*0.30, x0=cx-cw2/2, y0=top+(av-ch)/2;
@@ -1479,7 +1484,6 @@ function pdfColSec(doc,c,x,y,w,h,opt){
     doc.line(sx,sy,sx,sy+sh2);doc.line(sx+sw2,sy,sx+sw2,sy+sh2);
     doc.setDrawColor(...PB_BLUE);doc.setLineWidth(0.38);
     for(let i=0;i<S.n2;i++){const yy=sy+sh2*(i+1)/(S.n2+1);doc.line(sx,yy,sx+sw2,yy);}
-    /* V_jhd arrow */
     doc.setDrawColor(...PB_RED);doc.setLineWidth(0.3);
     const ay=y0-2.4;doc.line(x0-1,ay,x0+cw2+1,ay);
     pdfLbl(doc,x0+cw2/2,ay-1.3,'V_jhd',{c:PB_RED,b:1,s:5.4});
@@ -1510,14 +1514,13 @@ function pdfColSec(doc,c,x,y,w,h,opt){
   });
   if(opt.legs)pdfLbl(doc,x+w/2,y+h-2,tp('pdfLegLegend'),{s:4.6});
 }
-/* node elevation */
 function pdfNodeElev(doc,x,y,w,h,title){
   pdfBox(doc,x,y,w,h,title);
   const s=S;
   const hc=s.hc, hbL=s.bL.hb, hbR=s.end?s.bL.hb:s.bR.hb, hb=Math.max(hbL,hbR);
+  if(!(hc>0)||!(hb>0))return;
   const beamStub=1.45*Math.max(hc,hb), colStub=1.1*Math.max(hb,hc*0.9);
   const totW=hc+(s.end?beamStub:2*beamStub), totH=hb+2*colStub;
-  /* drawing keeps the left ~62% of the box, the values list takes the rest */
   const top=y+8, av=h-13, aw=w*0.60;
   const scl=Math.min(aw/totW,av/totH);
   const cx=x+w*0.32, cy=top+av/2;
@@ -1525,18 +1528,14 @@ function pdfNodeElev(doc,x,y,w,h,title){
   const jx1=X(-hc/2), jx2=X(hc/2), jy1=Y(-hb/2), jy2=Y(hb/2);
   const colTop=Y(-hb/2-colStub), colBot=Y(hb/2+colStub);
   const bxL=X(-hc/2-beamStub), bxR=X(hc/2+beamStub);
-  /* beams */
   doc.setFillColor(239,239,239);doc.setDrawColor(...PB_DARK);doc.setLineWidth(0.28);
   doc.rect(bxL,Y(-hbL/2),jx1-bxL,hbL*scl,'FD');
   if(!s.end)doc.rect(jx2,Y(-hbR/2),bxR-jx2,hbR*scl,'FD');
-  /* columns */
   doc.setFillColor(233,233,238);
   doc.rect(jx1,colTop,jx2-jx1,jy1-colTop,'FD');
   doc.rect(jx1,jy2,jx2-jx1,colBot-jy2,'FD');
-  /* joint core */
   doc.setFillColor(222,222,228);
   doc.rect(jx1,jy1,jx2-jx1,jy2-jy1,'FD');
-  /* beam bars through the joint */
   const insB=(s.bL.cn+s.bL.dsw)*scl;
   doc.setDrawColor(...PB_DARK);doc.setLineWidth(0.38);
   doc.line(bxL+1,Y(-hbL/2)+insB,s.end?jx2-insB*0.6:jx2,Y(-hbL/2)+insB);
@@ -1548,7 +1547,6 @@ function pdfNodeElev(doc,x,y,w,h,title){
     doc.line(jx2-insB*0.6,Y(-hbL/2)+insB,jx2-insB*0.6,Y(-hbL/2)+insB+(jy2-jy1)*0.45);
     doc.line(jx2-insB*0.6,Y(hbL/2)-insB,jx2-insB*0.6,Y(hbL/2)-insB-(jy2-jy1)*0.45);
   }
-  /* column bars */
   const insC=(s.ccn+s.cdsw)*scl;
   doc.line(jx1+insC,colTop+0.6,jx1+insC,colBot-0.6);
   doc.line(jx2-insC,colTop+0.6,jx2-insC,colBot-0.6);
@@ -1560,21 +1558,17 @@ function pdfNodeElev(doc,x,y,w,h,title){
     }
     doc.setLineDashPattern([],0);
   }
-  /* joint hoops */
   doc.setDrawColor(...PB_BLUE);doc.setLineWidth(0.35);
   for(let i=0;i<s.nSet;i++){
     const yy=jy1+insB+((jy2-jy1)-2*insB)*(s.nSet>1?i/(s.nSet-1):0.5);
     doc.line(jx1+insC,yy,jx2-insC,yy);
   }
-  /* labels */
   pdfDimH(doc,jx1,jx2,colBot+3,`h_c = ${F0(hc)} mm`);
   pdfLbl(doc,(bxL+jx1)/2,Y(-hbL/2)-1.3,`M_Rb- ${F1(s.bL.top.M)} / M_Rb+ ${F1(s.bL.bot.M)}`,{c:PB_BLUE,b:1,s:5.2});
   if(!s.end)pdfLbl(doc,(jx2+bxR)/2,Y(-hbR/2)-1.3,`M_Rb- ${F1(s.bR.top.M)} / M_Rb+ ${F1(s.bR.bot.M)}`,{c:PB_BLUE,b:1,s:5.2});
   pdfLbl(doc,jx2+2,colTop+3,`M_Rd,sup = ${F1(s.cS.MRd)} kNm`,{a:'left',c:PB_BLUE,b:1,s:5.2});
   pdfLbl(doc,jx2+2,colBot-1.4,`M_Rd,inf = ${F1(s.cI.MRd)} kNm`,{a:'left',c:PB_BLUE,b:1,s:5.2});
   pdfLbl(doc,x+4,top+1.5,`V_jhd = ${F1(s.govVj.Vjhd)} kN`,{a:'left',c:PB_RED,b:1,s:6});
-  /* values list filling the right-hand side of the box */
-  const u54=s.gov54.rat54, uD=s.govVj.Vjhd/s.VRdj, uA=s.govAsh.AshReq/s.AshProv;
   const tx=x+w*0.66;
   const lines=[
     ['Tip nod',s.end?tp('jt_end'):tp('jt_int')],
@@ -1583,11 +1577,11 @@ function pdfNodeElev(doc,x,y,w,h,title){
     ['h_jw / h_jc',`${F0(s.hjw)} / ${F0(s.hjc)} mm`],
     ['Sum M_Rc',`${F1(s.SMRc)} kNm`],
     ['g_Rd Sum M_Rb',`${F1(s.g54*s.gov54.SMRb)} kNm`],
-    [`(5.4)`,PCT(u54)],
+    [`(5.4)`,PCT(s.res.u54)],
     ['V_jhd / V_Rd,j',`${F1(s.govVj.Vjhd)} / ${F1(s.VRdj)} kN`],
-    [s.end?'(5.27)':'(5.26)',PCT(uD)],
+    [s.end?'(5.27)':'(5.26)',PCT(s.res.uDiag)],
     ['A_sh nec / ef',`${F0(s.govAsh.AshReq)} / ${F0(s.AshProv)} mm2`],
-    [s.end?'(5.30)':'(5.29)',PCT(uA)]
+    [s.end?'(5.30)':'(5.29)',PCT(s.res.uAsh)]
   ];
   lines.forEach((l,i)=>{
     const ly=top+4+i*4.6;
@@ -1596,20 +1590,35 @@ function pdfNodeElev(doc,x,y,w,h,title){
   });
 }
 
-/* ══════════════ PRESETS P1..P5 ══════════════ */
+/* ══════════════ PRESETARI P1..P5 ══════════════ */
 let currentPreset='P1';
 const KEY=p=>'sw_mod8_'+p;
 function captureState(){
   const st={inputs:{},segs:Object.assign({},SEG)};
   document.querySelectorAll('#inputsWrap input[id], #inputsWrap select[id]').forEach(el=>{st.inputs[el.id]=el.value;});
+  st.segs._signconv=signConv;   /* eticheta, nu setare — vezi applyState */
   return st;
 }
 function applyState(st){
   st=st||{};
-  /* an empty preset starts from the page defaults rather than inheriting the previous one */
+  /* o presetare goala porneste de la valorile implicite ale paginii, nu de la
+     cele ale presetarii anterioare */
   const src=st.inputs||(typeof DEFAULTS!=='undefined'?DEFAULTS.inputs:null);
   if(src)Object.keys(src).forEach(id=>{const el=document.getElementById(id);if(el)el.value=src[id];});
-  SEG=Object.assign({duct:'DCM',joint:'int',level:'cur',sign:'neg',top:'no',four:'no'},st.segs||{});
+  SEG=Object.assign({duct:'DCM',joint:'int',level:'cur',top:'no',four:'no'},st.segs||{});
+  delete SEG.sign; delete SEG._signconv;
+  /* Presetarile salvate inainte de mutarea conventiei pe cheia comuna poarta
+     eticheta veche in segs.sign (implicit 'neg' in modulul 08). Daca difera de
+     conventia activa, valorile N se negheaza, ca sensul fizic sa se pastreze. */
+  const savedSign=(st.segs&&(st.segs._signconv||st.segs.sign))||'neg';
+  if(savedSign!==signConv){
+    ['cI_N','cS_N'].forEach(id=>{
+      const el=document.getElementById(id);
+      if(!el)return;
+      const cur=parseFloat(el.value);
+      if(isFinite(cur)&&cur!==0)el.value=String(-cur);
+    });
+  }
 }
 function saveCurrentPreset(){try{localStorage.setItem(KEY(currentPreset),JSON.stringify(captureState()));}catch(e){}}
 function loadPreset(p){try{const s=localStorage.getItem(KEY(p));return s?JSON.parse(s):null;}catch(e){return null;}}
@@ -1620,14 +1629,16 @@ function switchPreset(p){
   document.getElementById('presetSel').value=p;
   const st=loadPreset(p);
   buildDynamicPanels();
-  applyState(st);            /* null → falls back to DEFAULTS inside applyState */
+  applyState(st);
   applyStaticLang();paintSegs();onChange();
+  saveCurrentPreset();   /* persista eventuala migrare de semn */
 }
 
 /* ══════════════ BOOT ══════════════ */
 document.querySelectorAll('#langSeg button').forEach(b=>b.addEventListener('click',()=>setLang(b.dataset.lang)));
 buildDynamicPanels();
-const DEFAULTS=captureState();   /* pristine page values, used when a preset slot is empty */
+if(typeof JP!=='undefined')fillMaterialSelects();
+const DEFAULTS=captureState();   /* valorile curate ale paginii, pentru o presetare goala */
 (function(){
   try{const ap=localStorage.getItem('sw_mod8_active');if(ap)currentPreset=ap;}catch(e){}
   document.getElementById('presetSel').value=currentPreset;

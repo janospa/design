@@ -6,16 +6,11 @@
 <meta name="theme-color" content="#F5F5F7">
 <meta name="description" content="Moment capabil M_Rd — diagramă de interacțiune N-M, metoda fibrelor">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='2' y='4' width='8' height='24' rx='1.5' fill='%238E8E93'/><rect x='10' y='11' width='12' height='10' rx='1' fill='%23C7C7CC'/><rect x='22' y='4' width='8' height='24' rx='1.5' fill='%238E8E93'/></svg>">
-<title>Moment capabil — SW Design</title>
+<title>Moment capabil — JP Design</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1C1E}
-
-
-
-
-
 .wrap{max-width:1080px;margin:0 auto;padding:20px 16px}
 .cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
 .slabel{font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:#1C1C1E;padding:0 0 7px;margin-top:14px}
@@ -32,6 +27,7 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
 .rc input[type=number]{width:78px;padding:5px 8px;font-size:13px;border:1px solid #C7C7CC;border-radius:7px;background:#fff;color:#1C1C1E;font-family:'Inter',sans-serif;-moz-appearance:textfield;appearance:textfield;text-align:right}
 .rc input[type=number]::-webkit-inner-spin-button,.rc input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
 .rc input:focus{outline:none;box-shadow:0 0 0 2px rgba(0,122,255,.2);border-color:#007AFF}
+.rc input.warn{border-color:#C0392B}
 .ru{font-size:12px;color:#8E8E93;min-width:30px}
 .sel-field{margin-bottom:10px}
 .sel-field label{display:block;font-size:12px;color:#8E8E93;margin-bottom:5px;font-weight:500}
@@ -68,10 +64,15 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
 .chk{display:flex;justify-content:space-between;align-items:center;padding:8px 11px;border-radius:8px;font-size:13px;margin-top:8px}
 .chk.ok{background:#EAF6EC;color:#2E7D32}
 .chk.no{background:#FDECEC;color:#C0392B}
+.chk.na{background:#F2F2F7;color:#8E8E93}
 .chk .util-wrap{display:flex;align-items:center;gap:8px;margin-left:auto}
 .chk .util-track{width:60px;height:7px;background:rgba(0,0,0,.08);border-radius:4px;overflow:hidden}
 .chk .util-fill{height:100%;border-radius:4px;transition:width .3s}
 .chk .util-pct{font-size:11px;font-weight:500;min-width:42px;text-align:right;font-feature-settings:"tnum" 1}
+.status-strip{display:none;align-items:flex-start;gap:8px;padding:9px 11px;border-radius:8px;font-size:12px;line-height:1.45;margin-top:8px;background:#FDECEC;color:#C0392B;border:1px solid #F2C2C2}
+.status-strip.on{display:flex}
+.status-strip.warn{background:#FFF6E5;color:#8A5A00;border-color:#F5DCA8}
+.status-strip .sico{font-weight:600;flex-shrink:0}
 .cleg{display:flex;gap:14px;margin-bottom:6px;font-size:12px;color:#1C1C1E;flex-wrap:wrap}
 .cleg span{display:flex;align-items:center;gap:4px}
 .note{font-size:12px;color:#8E8E93;line-height:1.5}
@@ -98,7 +99,8 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
 .preset-bar label{font-size:14px;font-weight:500;color:#8E8E93}
 .preset-bar select{padding:6px 28px 6px 10px;font-size:14px;border:1px solid #C7C7CC;border-radius:8px;background:#fff;color:#1C1C1E;font-family:'Inter',sans-serif;-webkit-appearance:none;appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238E8E93'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
 .preset-bar select:focus{outline:none;box-shadow:0 0 0 2px rgba(0,122,255,.2);border-color:#007AFF}
-.author-footer{text-align:center;font-size:11px;font-weight:500;color:#8E8E93;padding:16px 16px 24px;letter-spacing:.02em}
+.author-footer{text-align:center;font-size:11px;font-weight:500;color:#8E8E93;padding:16px 16px 4px;letter-spacing:.02em}
+.version-footer{text-align:center;font-size:10px;color:#AEAEB2;padding:0 16px 24px;letter-spacing:.02em;font-feature-settings:"tnum" 1}
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:1000;align-items:center;justify-content:center}
 .modal-overlay.show{display:flex}
 .modal{background:#fff;border-radius:16px;padding:24px;max-width:340px;width:90%;box-shadow:0 16px 48px rgba(0,0,0,.2)}
@@ -202,15 +204,16 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
     <div class="ph" data-i18n="s3longReinf">3. Armare longitudinala</div>
     <div class="pb">
       <div class="sub" data-i18n="be1bars">Bulb 1 &mdash; bare</div>
-      <div class="row"><div class="rl"><span data-i18n="atCorners">La colturi</span> <span class="rn">(<span data-i18n="pcsDia">buc / &Oslash;</span>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="b1c_n" value="4" step="1" oninput="calc()" style="width:48px"><input type="number" inputmode="numeric" id="b1c_d" value="25" step="1" oninput="calc()" style="width:48px"><span class="ru">mm</span></div></div>
+      <div class="row"><div class="rl"><span data-i18n="atCorners">La colturi</span> <span class="rn">(<span data-i18n="pcsDia">buc / &Oslash;</span>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="b1c_n" value="4" step="4" min="0" oninput="calc()" style="width:48px"><input type="number" inputmode="numeric" id="b1c_d" value="25" step="1" oninput="calc()" style="width:48px"><span class="ru">mm</span></div></div>
       <div class="row"><div class="rl"><span data-i18n="lateralShort">Lateral, latura scurta</span> <span class="rn">(<span data-i18n="pcsDia">buc / &Oslash;</span>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="b1s_n" value="2" step="1" oninput="calc()" style="width:48px"><input type="number" inputmode="numeric" id="b1s_d" value="25" step="1" oninput="calc()" style="width:48px"><span class="ru">mm</span></div></div>
       <div class="row"><div class="rl"><span data-i18n="lateralLong">Lateral, latura lunga</span> <span class="rn">(<span data-i18n="pcsDiaRow">buc / &Oslash; / rand</span>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="b1l_n" value="9" step="1" oninput="calc()" style="width:40px"><input type="number" inputmode="numeric" id="b1l_d" value="25" step="1" oninput="calc()" style="width:40px"><input type="number" inputmode="numeric" id="b1l_r" value="3" step="1" oninput="calc()" style="width:40px"></div></div>
       <div class="count-box"><span data-i18n="totalBarsBE1">Total bare Bulb 1</span><span id="cnt_b1">&mdash;</span></div>
       <div class="sub" data-i18n="be2bars">Bulb 2 &mdash; bare</div>
-      <div class="row"><div class="rl"><span data-i18n="atCorners">La colturi</span> <span class="rn">(<span data-i18n="pcsDia">buc / &Oslash;</span>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="b2c_n" value="4" step="1" oninput="calc()" style="width:48px"><input type="number" inputmode="numeric" id="b2c_d" value="25" step="1" oninput="calc()" style="width:48px"><span class="ru">mm</span></div></div>
+      <div class="row"><div class="rl"><span data-i18n="atCorners">La colturi</span> <span class="rn">(<span data-i18n="pcsDia">buc / &Oslash;</span>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="b2c_n" value="4" step="4" min="0" oninput="calc()" style="width:48px"><input type="number" inputmode="numeric" id="b2c_d" value="25" step="1" oninput="calc()" style="width:48px"><span class="ru">mm</span></div></div>
       <div class="row"><div class="rl"><span data-i18n="lateralShort">Lateral, latura scurta</span> <span class="rn">(<span data-i18n="pcsDia">buc / &Oslash;</span>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="b2s_n" value="2" step="1" oninput="calc()" style="width:48px"><input type="number" inputmode="numeric" id="b2s_d" value="25" step="1" oninput="calc()" style="width:48px"><span class="ru">mm</span></div></div>
       <div class="row"><div class="rl"><span data-i18n="lateralLong">Lateral, latura lunga</span> <span class="rn">(<span data-i18n="pcsDiaRow">buc / &Oslash; / rand</span>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="b2l_n" value="9" step="1" oninput="calc()" style="width:40px"><input type="number" inputmode="numeric" id="b2l_d" value="25" step="1" oninput="calc()" style="width:40px"><input type="number" inputmode="numeric" id="b2l_r" value="3" step="1" oninput="calc()" style="width:40px"></div></div>
       <div class="count-box"><span data-i18n="totalBarsBE2">Total bare Bulb 2</span><span id="cnt_b2">&mdash;</span></div>
+      <div class="note" style="padding:6px 0 0" data-i18n="barRuleNote">Barele „la colturi” se numara pe toate cele 4 colturi ale bulbului: un pachet de bare la fiecare colt da 4, 8, 12 … Barele de pe latura lunga trebuie sa se imparta exact in numarul de randuri.</div>
       <div class="sub" data-i18n="webLongBars">Inima &mdash; bare longitudinale</div>
       <div class="row"><div class="rl"><span data-i18n="longBars">Bare long.</span> <span class="rn">(<span data-i18n="diaSpacingRow">&Oslash; / s / rand</span>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="in_d" value="12" step="1" oninput="calc()" style="width:40px"><input type="number" inputmode="numeric" id="in_s" value="150" step="10" oninput="calc()" style="width:40px"><input type="number" inputmode="numeric" id="in_r" value="2" step="1" oninput="calc()" style="width:40px"></div></div>
       <div class="count-box"><span data-i18n="totalBarsWeb">Total bare Inima</span><span id="cnt_web">&mdash;</span></div>
@@ -222,15 +225,23 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
     <div class="pb">
       <div class="row"><div class="rl"><span data-i18n="cover">Acoperire</span> <span class="rn">(c<sub>nom</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="cnom" value="35" step="5" oninput="calc()"><span class="ru">mm</span></div></div>
       <div class="row"><div class="rl"><span data-i18n="stirrupDia">Diametru etrier</span> <span class="rn">(&Oslash;<sub>etr</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="detr" value="10" step="2" oninput="calc()"><span class="ru">mm</span></div></div>
+      <div class="note" style="padding:6px 0 0" data-i18n="coverNote">Centrul barei se aseaza la c<sub>nom</sub> + &Oslash;<sub>etr</sub> + &Oslash;<sub>bara</sub>/2 de fata bulbului (acoperirea mecanica), la fel ca la modulul 06. Aceste doua campuri influenteaza direct M<sub>Rd</sub>.</div>
     </div>
   </div>
 
   <div class="ip">
     <div class="ph" data-i18n="s5extForces">5. Eforturi exterioare</div>
     <div class="pb">
+      <div class="toggle-row" data-nopreset="1" style="padding-bottom:10px;border-bottom:1px solid #E0E0E5;margin-bottom:6px">
+        <span data-i18n="signLabel">Convenție semn N</span>
+        <div class="seg" data-nopreset="1">
+          <button id="seg-sign-neg" class="on" data-v="neg" onclick="setSignConv('neg')" data-i18n="signNeg">N&lt;0 compresiune</button>
+          <button id="seg-sign-pos" data-v="pos" onclick="setSignConv('pos')" data-i18n="signPos">N&gt;0 compresiune</button>
+        </div>
+      </div>
       <div class="row"><div class="rl"><span data-i18n="bendMoment">Moment incovoietor</span> <span class="rn">(M<sub>Ed</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="med" value="15000" step="100" oninput="calc()"><span class="ru">kNm</span></div></div>
-      <div class="row"><div class="rl"><span data-i18n="axialForce">Forta axiala</span> <span class="rn">(N<sub>Ed</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="ned" value="20000" step="100" oninput="calc()"><span class="ru">kN</span></div></div>
-      <div class="note" style="padding-top:6px" data-i18n="forcesNote">M<sub>Ed</sub> &gt; 0 comprima Bulb 2 (dreapta). M<sub>Ed</sub> &lt; 0 comprima Bulb 1 (stanga). N<sub>Ed</sub> &gt; 0 = compresiune.</div>
+      <div class="row"><div class="rl"><span data-i18n="axialForce">Forta axiala</span> <span class="rn">(N<sub>Ed</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="ned" value="-20000" step="100" oninput="calc()"><span class="ru">kN</span></div></div>
+      <div class="note" style="padding-top:6px" id="forcesNote">M<sub>Ed</sub> &gt; 0 comprima Bulb 2 (dreapta). M<sub>Ed</sub> &lt; 0 comprima Bulb 1 (stanga). N<sub>Ed</sub> &lt; 0 = compresiune (ETABS).</div>
     </div>
   </div>
 </div>
@@ -248,6 +259,7 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
       <div style="margin-top:10px">
         <div class="chk" id="util_chk"><span data-i18n-sym="utilMed">Utilizare M<sub>Ed</sub> / M<sub>Rd</sub></span><div class="util-wrap"><div class="util-track"><div class="util-fill" id="util_f" style="width:0%"></div></div><span class="util-pct" id="util_t">&mdash;</span></div></div>
       </div>
+      <div class="status-strip" id="statusStrip"><span class="sico" id="statusIco">!</span><span id="statusMsg"></span></div>
     </div>
   </div>
 
@@ -288,8 +300,8 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
     <div class="ph" data-i18n="axialCapLimits">Capacitati axiale limita</div>
     <div class="pb">
       <div class="res-grid">
-        <div class="rc2"><div class="rl2">N<sub>Rd,u+</sub> (<span data-i18n="compression">compresiune</span>)</div><div class="rv" id="nrdc_r">&mdash;</div><div class="ru2">kN</div></div>
-        <div class="rc2"><div class="rl2">N<sub>Rd,u&minus;</sub> (<span data-i18n="tension">intindere</span>)</div><div class="rv" id="nrdt_r">&mdash;</div><div class="ru2">kN</div></div>
+        <div class="rc2"><div class="rl2">N<sub>Rd,c</sub> (<span data-i18n="compression">compresiune</span>)</div><div class="rv" id="nrdc_r">&mdash;</div><div class="ru2">kN</div></div>
+        <div class="rc2"><div class="rl2">N<sub>Rd,t</sub> (<span data-i18n="tension">intindere</span>)</div><div class="rv" id="nrdt_r">&mdash;</div><div class="ru2">kN</div></div>
       </div>
     </div>
   </div>
@@ -317,6 +329,7 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
 </div>
 </div>
 <div class="author-footer" data-i18n="footer">Lucrare de disertație — Janos Patrik · UTCN · Facultatea de Construcții · 2026</div>
+<div class="version-footer" id="versionFooter">&mdash;</div>
 
 <div class="modal-overlay" id="exportModal">
   <div class="modal">
@@ -332,24 +345,75 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
+
+<!-- ═══ nucleu de calcul comun — trebuie incarcat INAINTE de scriptul modulului ═══ -->
+<script src="engine.js"></script>
+
 <script>
-const CONC={'C12/15':{fck:12},'C16/20':{fck:16},'C20/25':{fck:20},'C25/30':{fck:25},'C30/37':{fck:30},'C35/45':{fck:35},'C40/50':{fck:40},'C45/55':{fck:45},'C50/60':{fck:50},'C55/67':{fck:55},'C60/75':{fck:60}};
-// euk = alungirea caracteristica la forta maxima; eud = 0,9*euk (SR EN 1992-1-1).
-// Limiteaza deformatia otelului pe ramura de intindere a diagramei N-M.
-const STEEL={'S240B':{fyk:240,euk:0.05},'S400B':{fyk:400,euk:0.05},
-             'S500B':{fyk:500,euk:0.05},'S 500':{fyk:500,euk:0.05}};
+/* ═══════════════════════════════════════════════════════════════════════════
+   MODULUL 03 — MOMENT CAPABIL M_Rd
+   Tot calculul este in engine.js (JP.*). Aici ramane doar: interfata, desenul
+   sectiunii, graficul, exportul PDF si sistemul de presetari.
+
+   Semnul lui N: nucleul lucreaza intern cu COMPRESIUNEA POZITIVA. Interfata
+   poate afisa oricare din cele doua conventii; conversia se face numai la
+   granita, prin sgnN() — vezi setSignConv().
+
+   v1.5.0 (engine 2.2.0) — REZULTATELE SE SCHIMBA. Barele bulbilor se aseaza
+   acum la acoperirea mecanica (centrul barei la c_nom + Ø_etrier + Ø_bara/2 de
+   fata bulbului), la fel ca la modulul 06. Pana acum lumpurile de capat stateau
+   chiar pe fetele bulbului, deci bratul de parghie era supraestimat: pe peretele
+   de referinta M_Rd scade cu ~0,28 % la N = 20 000 kN si cu ~2 % pe ramura de
+   intindere. Sensul este cel corect — versiunea anterioara era neacoperitoare.
+   Consecinta vizibila: c_nom si Ø_etrier chiar misca acum M_Rd; inainte nu
+   aveau niciun efect asupra rezultatului.
+   Tot de la 2.2.0, un numar de bare care nu se poate dispune in sectiune
+   (bare la colturi care nu sunt multiplu de 4, bare pe latura lunga care nu se
+   impart exact in randuri) opreste calculul cu codul BAR_COUNT, in loc sa fie
+   rotunjit tacut.
+   ═══════════════════════════════════════════════════════════════════════════ */
+const MODULE_ID='03', MODULE_VERSION='1.5.0';
+
+if(typeof JP==='undefined'){
+  document.getElementById('statusStrip').className='status-strip on';
+  document.getElementById('statusMsg').textContent=
+    'engine.js nu s-a incarcat. Verificati ca fisierul este in acelasi folder cu aceasta pagina.';
+}
+
 let curC='C50/60',curS='S 500',confMode='none',nmchart=null,lastCalc={};
-// NF = numarul de fibre de integrare pe inaltimea sectiunii.
-// Integrarea este in trepte: fortele se schimba discret cand axa neutra
-// traverseaza o fibra. Un NF prea mic subestimeaza M_Rd si lasa un rezidual de
-// echilibru care NU poate fi eliminat prin mai multe iteratii de bisectie
-// (functia sare peste tinta), ci doar marind NF.
-// Convergenta pe un perete tipic (l_w=2750, bulbi 650x400, C50/60):
-//   NF=100 -> M_Rd=10271 kNm (rezidual -223 kN)   [valoare veche, imprecisa]
-//   NF=1000 -> M_Rd=10578 kNm (rezidual  -37 kN)
-//   NF=5000 -> M_Rd=10619 kNm (rezidual   -6 kN)
-//   NF=20000-> M_Rd=10625 kNm (rezidual   -2 kN)  [diferenta 0,06% fata de 5000]
-const NF=5000;
+
+/* ─── Conventia de semn pentru N ────────────────────────────────────────────
+   ETABS raporteaza compresiunea NEGATIV; nucleul lucreaza cu compresiunea
+   POZITIVA. Conversia se face numai la granita: sgnN() inmulteste atat
+   valoarea introdusa (inainte de a intra in nucleu) cat si toate valorile
+   afisate (dupa ce ies din nucleu). Astfel nucleul nu afla niciodata de
+   existenta conventiei, iar raportul tiparit arata exact ca modelul ETABS.
+   Este preferinta utilizatorului, nu o proprietate a peretelui, deci se
+   pastreaza global (localStorage), nu in presetari — de aceea comutatorul
+   este marcat data-nopreset. Cheia este comuna cu celelalte module care vor
+   fi migrate pe acelasi nucleu.
+   ──────────────────────────────────────────────────────────────────────── */
+let signConv=(function(){try{return localStorage.getItem('sw_signconv')||'neg';}catch(e){return 'neg';}})();
+function sgnN(){return signConv==='neg'?-1:1;}
+function convN(v){return sgnN()*v;}   // interfata -> nucleu SI nucleu -> interfata
+function setSignConv(mode){
+  signConv=mode;
+  try{localStorage.setItem('sw_signconv',mode);}catch(e){}
+  document.getElementById('seg-sign-neg').classList.toggle('on',mode==='neg');
+  document.getElementById('seg-sign-pos').classList.toggle('on',mode==='pos');
+  // Valoarea din caseta se reinterpreteaza in noua conventie, deci se inverseaza
+  // ca peretele sa ramana acelasi. Altfel un click pe comutator ar transforma
+  // silentios compresiunea in intindere.
+  const el=document.getElementById('ned');
+  const cur=parseFloat(el.value);
+  if(isFinite(cur)&&cur!==0)el.value=String(-cur);
+  updSignNote();
+  calc();
+}
+function updSignNote(){
+  const el=document.getElementById('forcesNote');
+  if(el)el.innerHTML=t(signConv==='neg'?'forcesNoteNeg':'forcesNotePos');
+}
 
 // ═══════════════ i18n ═══════════════
 let LANG=(function(){try{return localStorage.getItem('sw_lang')||'ro';}catch(e){return 'ro';}})();
@@ -393,11 +457,20 @@ const T={
   totalBarsWeb:{ro:'Total bare Inima',en:'Total bars Web'},
   webLongBars:{ro:'Inima &mdash; bare longitudinale',en:'Web &mdash; longitudinal bars'},
   longBars:{ro:'Bare long.',en:'Long. bars'},
+  barRuleNote:{ro:'Barele „la colturi” se numara pe toate cele 4 colturi ale bulbului: un pachet de bare la fiecare colt da 4, 8, 12 … Barele de pe latura lunga trebuie sa se imparta exact in numarul de randuri.',
+               en:'The “at corners” bars are counted over all 4 corners of the boundary element: one bundle at each corner gives 4, 8, 12 … The long-side bars must divide exactly into the number of rows.'},
   cover:{ro:'Acoperire',en:'Cover'},
   stirrupDia:{ro:'Diametru etrier',en:'Stirrup diameter'},
+  coverNote:{ro:'Centrul barei se aseaza la c<sub>nom</sub> + &Oslash;<sub>etr</sub> + &Oslash;<sub>bara</sub>/2 de fata bulbului (acoperirea mecanica), la fel ca la modulul 06. Aceste doua campuri influenteaza direct M<sub>Rd</sub>.',
+             en:'The bar centre sits at c<sub>nom</sub> + &Oslash;<sub>st</sub> + &Oslash;<sub>bar</sub>/2 from the boundary-element face (mechanical cover), as in module 06. These two fields affect M<sub>Rd</sub> directly.'},
   bendMoment:{ro:'Moment incovoietor',en:'Bending moment'},
   axialForce:{ro:'Forta axiala',en:'Axial force'},
-  forcesNote:{ro:'M<sub>Ed</sub> &gt; 0 comprima Bulb 2 (dreapta). M<sub>Ed</sub> &lt; 0 comprima Bulb 1 (stanga). N<sub>Ed</sub> &gt; 0 = compresiune.',en:'M<sub>Ed</sub> &gt; 0 compresses BE 2 (right). M<sub>Ed</sub> &lt; 0 compresses BE 1 (left). N<sub>Ed</sub> &gt; 0 = compression.'},
+  // Nota de semne se recompune la fiecare schimbare de conventie (vezi updSignNote).
+  forcesNoteNeg:{ro:'M<sub>Ed</sub> &gt; 0 comprima Bulb 2 (dreapta). M<sub>Ed</sub> &lt; 0 comprima Bulb 1 (stanga). N<sub>Ed</sub> &lt; 0 = compresiune (ETABS).',en:'M<sub>Ed</sub> &gt; 0 compresses BE 2 (right). M<sub>Ed</sub> &lt; 0 compresses BE 1 (left). N<sub>Ed</sub> &lt; 0 = compression (ETABS).'},
+  forcesNotePos:{ro:'M<sub>Ed</sub> &gt; 0 comprima Bulb 2 (dreapta). M<sub>Ed</sub> &lt; 0 comprima Bulb 1 (stanga). N<sub>Ed</sub> &gt; 0 = compresiune.',en:'M<sub>Ed</sub> &gt; 0 compresses BE 2 (right). M<sub>Ed</sub> &lt; 0 compresses BE 1 (left). N<sub>Ed</sub> &gt; 0 = compression.'},
+  signLabel:{ro:'Conventie semn N',en:'N sign convention'},
+  signNeg:{ro:'N&lt;0 compresiune',en:'N&lt;0 compression'},
+  signPos:{ro:'N&gt;0 compresiune',en:'N&gt;0 compression'},
   momentResistTitle:{ro:'Momentul capabil M<sub>Rd</sub>',en:'Moment resistance M<sub>Rd</sub>'},
   compZone:{ro:'zona comprimata',en:'compression zone'},
   utilMed:{ro:'Utilizare M<sub>Ed</sub> / M<sub>Rd</sub>',en:'Utilization M<sub>Ed</sub> / M<sub>Rd</sub>'},
@@ -429,21 +502,28 @@ const T={
   ecuBulbConf:{ro:'&epsilon;<sub>cu2,c</sub> (bulb, confinat)',en:'&epsilon;<sub>cu2,c</sub> (BE, confined)'},
   ecuBulbUnconf:{ro:'&epsilon;<sub>cu2</sub> (bulb, neconfinat)',en:'&epsilon;<sub>cu2</sub> (BE, unconfined)'},
   // conf note
-  confNoteBulb:{ro:'f<sub>cd,c</sub> = f<sub>ck,c</sub> / 1.5. Lege parabola-dreptunghi.<br>La \u201eBulbi\u201d se confineaza numai bulbii.<br>Valorile f<sub>ck,c</sub>, \u03B5<sub>c2,c</sub>, \u03B5<sub>cu2,c</sub> se preiau manual din Modulul 02 \u2014 Beton confinat.',en:'f<sub>cd,c</sub> = f<sub>ck,c</sub> / 1.5. Parabola-rectangle law.<br>Under \u201cBEs\u201d only the boundary elements are confined.<br>The values f<sub>ck,c</sub>, \u03B5<sub>c2,c</sub>, \u03B5<sub>cu2,c</sub> are taken manually from Module 02 \u2014 Confined concrete.'},
-  confNoteAll:{ro:'f<sub>cd,c</sub> = f<sub>ck,c</sub> / 1.5. Lege parabola-dreptunghi.<br>La \u201eBulbi+inim\u0103\u201d se confineaza si inima cu proprietati separate.<br>Valorile f<sub>ck,c</sub>, \u03B5<sub>c2,c</sub>, \u03B5<sub>cu2,c</sub> se preiau manual din Modulul 02 \u2014 Beton confinat.',en:'f<sub>cd,c</sub> = f<sub>ck,c</sub> / 1.5. Parabola-rectangle law.<br>Under \u201cBEs+web\u201d the web is also confined with separate properties.<br>The values f<sub>ck,c</sub>, \u03B5<sub>c2,c</sub>, \u03B5<sub>cu2,c</sub> are taken manually from Module 02 \u2014 Confined concrete.'},
+  confNoteBulb:{ro:'f<sub>cd,c</sub> = f<sub>ck,c</sub> / 1.5. Lege parabola-dreptunghi.<br>La „Bulbi” se confineaza numai bulbii.<br>Valorile f<sub>ck,c</sub>, ε<sub>c2,c</sub>, ε<sub>cu2,c</sub> se preiau manual din Modulul 02 — Beton confinat.',en:'f<sub>cd,c</sub> = f<sub>ck,c</sub> / 1.5. Parabola-rectangle law.<br>Under “BEs” only the boundary elements are confined.<br>The values f<sub>ck,c</sub>, ε<sub>c2,c</sub>, ε<sub>cu2,c</sub> are taken manually from Module 02 — Confined concrete.'},
+  confNoteAll:{ro:'f<sub>cd,c</sub> = f<sub>ck,c</sub> / 1.5. Lege parabola-dreptunghi.<br>La „Bulbi+inimă” se confineaza si inima cu proprietati separate.<br>Valorile f<sub>ck,c</sub>, ε<sub>c2,c</sub>, ε<sub>cu2,c</sub> se preiau manual din Modulul 02 — Beton confinat.',en:'f<sub>cd,c</sub> = f<sub>ck,c</sub> / 1.5. Parabola-rectangle law.<br>Under “BEs+web” the web is also confined with separate properties.<br>The values f<sub>ck,c</sub>, ε<sub>c2,c</sub>, ε<sub>cu2,c</sub> are taken manually from Module 02 — Confined concrete.'},
   // sketch
   skBE1:{ro:(n)=>`Bulb 1 (${n} bare)`,en:(n)=>`BE 1 (${n} bars)`},
   skBE2ref:{ro:(n)=>`Bulb 2 ref (${n} bare)`,en:(n)=>`BE 2 ref (${n} bars)`},
   // chart dataset labels
   chartCurve:{ro:'Curba',en:'Curve'},
+  // status
+  stNoBracket:{ro:'N<sub>Ed</sub> este in afara capacitatii axiale a sectiunii. M<sub>Rd</sub> nu este valabil.',en:'N<sub>Ed</sub> lies outside the section axial capacity. M<sub>Rd</sub> is not valid.'},
+  stResidual:{ro:'Echilibrul nu a fost satisfacut exact. Rezultatul este aproximativ.',en:'Equilibrium was not satisfied exactly. The result is approximate.'},
+  stInvalid:{ro:'Date de intrare invalide: verificati geometria si materialele.',en:'Invalid input: check geometry and materials.'},
+  stDegenerate:{ro:'Sectiune degenerata: aria de beton sau de armatura este nula.',en:'Degenerate section: zero concrete or reinforcement area.'},
+  stExceeds:{ro:(l,v)=>` ${l} = ${v} kN.`,en:(l,v)=>` ${l} = ${v} kN.`},
+  utilNA:{ro:'Utilizare &mdash; indisponibila',en:'Utilization &mdash; unavailable'},
   // PDF
-  pdfHeaderTitle:{ro:'NOTA DE CALCUL \u2014 MOMENT CAPABIL PERETE',en:'CALCULATION REPORT \u2014 WALL MOMENT RESISTANCE'},
+  pdfHeaderTitle:{ro:'NOTA DE CALCUL — MOMENT CAPABIL PERETE',en:'CALCULATION REPORT — WALL MOMENT RESISTANCE'},
   pdfHeaderSub:{ro:'Metoda exacta - CR 2-2022 / SR EN 1992-1-1',en:'Exact method - CR 2-2022 / SR EN 1992-1-1'},
   pdfWallData:{ro:'Perete: ',en:'Wall: '},
   pdfDate:{ro:'Data: ',en:'Date: '},
   pdfBigTitle:{ro:'MOMENT CAPABIL M.Rd',en:'MOMENT RESISTANCE M.Rd'},
-  pdfSubtitle:{ro:'Metoda exacta \u2014 discretizare in fibre, CR 2-2022 / SR EN 1992-1-1',en:'Exact method \u2014 fibre discretization, CR 2-2022 / SR EN 1992-1-1'},
-  pdfAppLine:{ro:'Aplicatie dezvoltata in cadrul lucrarii de disertatie \u2014 Janos Patrik',en:'Application developed within the dissertation \u2014 Janos Patrik'},
+  pdfSubtitle:{ro:'Metoda exacta — discretizare in fibre, CR 2-2022 / SR EN 1992-1-1',en:'Exact method — fibre discretization, CR 2-2022 / SR EN 1992-1-1'},
+  pdfAppLine:{ro:'Aplicatie dezvoltata in cadrul lucrarii de disertatie — Janos Patrik',en:'Application developed within the dissertation — Janos Patrik'},
   pdfMrdBox:{ro:'Moment capabil M.Rd',en:'Moment resistance M.Rd'},
   pdfColParam:{ro:'Parametru',en:'Parameter'},
   pdfColNot:{ro:'Notatie',en:'Notation'},
@@ -454,6 +534,7 @@ const T={
   pdfSec4:{ro:'4. REZULTAT',en:'4. RESULT'},
   pdfSec5:{ro:'5. CAPACITATI AXIALE LIMITA',en:'5. LIMIT AXIAL CAPACITIES'},
   pdfSec6:{ro:'6. DIAGRAMA DE INTERACTIUNE N-M',en:'6. N-M INTERACTION DIAGRAM'},
+  pdfSec7:{ro:'7. CONVENTII SI LIMITARI',en:'7. CONVENTIONS AND LIMITATIONS'},
   pdfInWallLen:{ro:'Lungimea peretelui',en:'Wall length'},
   pdfInWebThick:{ro:'Grosimea inimii',en:'Web thickness'},
   pdfInBE1:{ro:'Bulb 1: lungime / latime',en:'BE 1: length / width'},
@@ -470,6 +551,13 @@ const T={
   pdfInExtMoment:{ro:'Moment exterior',en:'External moment'},
   pdfInAxialForce:{ro:'Forta axiala',en:'Axial force'},
   pdfInNfibres:{ro:'Numar fibre beton',en:'No. concrete fibres'},
+  pdfInConvention:{ro:'Conventie aria de beton',en:'Concrete area convention'},
+  pdfInSignConv:{ro:'Conventie semn N',en:'N sign convention'},
+  pdfInCover:{ro:'Acoperire / etrier (c_nom / D_etr)',en:'Cover / stirrup (c_nom / D_st)'},
+  pdfSignNeg:{ro:'N < 0 compresiune (ETABS)',en:'N < 0 compression (ETABS)'},
+  pdfSignPos:{ro:'N > 0 compresiune',en:'N > 0 compression'},
+  pdfConvGross:{ro:'brut (A_c integral)',en:'gross (full A_c)'},
+  pdfConvNet:{ro:'net (A_c - A_s)',en:'net (A_c - A_s)'},
   pdfCompZoneHeight:{ro:'Inaltimea zonei comprimate',en:'Compression zone depth'},
   pdfNint:{ro:'Forta axiala interna',en:'Internal axial force'},
   pdfNext:{ro:'Forta axiala externa',en:'External axial force'},
@@ -481,11 +569,25 @@ const T={
   pdfUtilization:{ro:'Utilizare',en:'Utilization'},
   pdfVerdictPass:{ro:'VERIFICA (M_Ed <= M_Rd)',en:'PASS (M_Ed <= M_Rd)'},
   pdfVerdictFail:{ro:'NU VERIFICA',en:'FAIL'},
+  pdfVerdictNA:{ro:'REZULTAT INVALID — VEZI OBSERVATIA',en:'INVALID RESULT — SEE NOTE'},
   pdfCentricComp:{ro:'Compresiune centrica',en:'Centric compression'},
   pdfCentricTens:{ro:'Intindere centrica',en:'Centric tension'},
   pdfUltStrainWeb:{ro:'Def. ultima inima',en:'Ultimate strain web'},
   pdfUltStrainBulb:{ro:'Def. ultima bulb',en:'Ultimate strain BE'},
   pdfPermil:{ro:'permil',en:'per mille'},
+  pdfLim1:{ro:e=>'- Curbura este limitata de prima limita atinsa: eps_cu (beton) sau eps_ud = '+e+' permil (otel).',
+           en:e=>'- Curvature limited by whichever is reached first: eps_cu (concrete) or eps_ud = '+e+' per mille (steel).'},
+  pdfPivotRow:{ro:'Limita care guverneaza',en:'Governing limit'},
+  pdfPivotConc:{ro:'beton (eps_cu)',en:'concrete (eps_cu)'},
+  pdfPivotSteel:{ro:'otel (eps_ud)',en:'steel (eps_ud)'},
+  pdfPivotSquash:{ro:'sectiune integral comprimata (pivot C, eps_c2)',en:'fully compressed section (pivot C, eps_c2)'},
+  pdfLim2:{ro:'- Betonul se integreaza pe aria bruta; armatura se adauga peste (conventie fib).',en:'- Concrete integrated over the gross area; reinforcement added on top (fib convention).'},
+  pdfLim3:{ro:'- Barele sunt grupate in fibre echivalente pe lungimea sectiunii, cu centrul la',en:'- Bars are lumped into equivalent fibres along the section length, their centre at'},
+  pdfLim3b:{ro:'  c_nom + D_etrier + D_bara/2 de fata bulbului (acoperirea mecanica).',en:'  c_nom + D_stirrup + D_bar/2 from the boundary-element face (mechanical cover).'},
+  pdfLim4:{ro:'- M_Rd se raporteaza la centrul de greutate geometric al betonului.',en:'- M_Rd is referred to the geometric centroid of the concrete.'},
+  pdfLim5:{ro:'- Valorile axiale sunt raportate in conventia de semn declarata mai sus.',en:'- Axial values are reported in the sign convention stated above.'},
+  pdfLim6:{ro:'- La sectiune integral comprimata deformatia este limitata la eps_c2 (pivot C), deci',en:'- For a fully compressed section the strain is limited to eps_c2 (pivot C), so'},
+  pdfLim6b:{ro:'  N_Rd,c foloseste sigma_s = Es*eps_c2, nu f_yd.',en:'  N_Rd,c uses sigma_s = Es*eps_c2, not f_yd.'},
   pdfDisc1:{ro:'Responsabilitatea pentru rezultatele obtinute revine in exclusivitate utilizatorului.',en:'Responsibility for the obtained results rests solely with the user.'},
   pdfDisc2:{ro:'Toate valorile trebuie verificate inainte de utilizare.',en:'All values must be verified before use.'},
   pdfPage:{ro:(i,n)=>'Pagina '+i+' din '+n,en:(i,n)=>'Page '+i+' of '+n},
@@ -506,12 +608,21 @@ function applyStaticLang(){
     if(T[k]){const v=T[k][LANG];if(v!==undefined&&typeof v!=='function')el.innerHTML=v;}
   });
   document.querySelectorAll('#langSeg button').forEach(b=>b.classList.toggle('on',b.dataset.lang===LANG));
+  updSignNote();
+  stampVersion();
 }
 function setLang(l){LANG=l;try{localStorage.setItem('sw_lang',l);}catch(e){}applyStaticLang();calc();}
 
+// Amprenta de versiune: identifica exact ce a produs un rezultat tiparit.
+function stampVersion(){
+  const eng=(typeof JP!=='undefined')?JP.VERSION:'?';
+  document.getElementById('versionFooter').textContent=
+    'JP Design · M'+MODULE_ID+' v'+MODULE_VERSION+' · engine v'+eng+' · CR 2-1-1.1/2022';
+}
+
 function gv(id){return parseFloat(document.getElementById(id)?.value)||0;}
 function updMat(){
-  const fck=CONC[curC].fck, fyk=STEEL[curS].fyk;
+  const fck=JP.CONC[curC].fck, fyk=JP.STEEL[curS].fyk;
   document.getElementById('fcd_d').textContent=(fck/1.5).toFixed(2);
   document.getElementById('fyd_d').textContent=(fyk/1.15).toFixed(1);
 }
@@ -522,7 +633,6 @@ function setConf(mode){
   document.getElementById('seg-ca').classList.toggle('on',mode==='all');
   document.getElementById('conf-fields').classList.toggle('on',mode!=='none');
   document.getElementById('conf-web-fields').classList.toggle('on',mode==='all');
-  // Update note
   const note=document.getElementById('confNote');
   if(mode==='none'){note.innerHTML='';}
   else if(mode==='bulb'){note.innerHTML=t('confNoteBulb');}
@@ -530,298 +640,144 @@ function setConf(mode){
   calc();
 }
 
-function buildModel(){
-  const lw=gv('lw'),bw0=gv('bw0');
-  const bf1=gv('bf1'),lf1=gv('lf1'),li1=0;
-  const bf2=gv('bf2'),lf2=gv('lf2'),li2=0;
-  const cnom=gv('cnom'),detr=gv('detr');
-  const lwi=lw-bf1-bf2-li1-li2;
-  const fck=CONC[curC].fck, fcd=fck/1.5;
-  const fckc=gv('fckc'), fcdc=fckc/1.5;
-  const fyd=STEEL[curS].fyk/1.15;
-  const eud=0.9*STEEL[curS].euk;   // deformatia ultima de calcul a otelului
-  const Es=200000;
-  const ec2_nc=0.002, ecu_nc=0.0035;
-  const ec2_c=gv('ec2c')/1000, ecu_c=gv('ecu2c')/1000;
-  const fckcw=gv('fckcw'), fcdcw=fckcw/1.5;
-  const ec2_cw=gv('ec2cw')/1000, ecu_cw=gv('ecu2cw')/1000;
-  const PI=Math.PI;
-  function barA(d){return d*d*PI/4;}
-
-  const b2c_n=gv('b2c_n'),b2c_d=gv('b2c_d'),b2s_n=gv('b2s_n'),b2s_d=gv('b2s_d'),b2l_n=gv('b2l_n'),b2l_d=gv('b2l_d'),b2l_r=Math.max(1,gv('b2l_r'));
-  const b1c_n=gv('b1c_n'),b1c_d=gv('b1c_d'),b1s_n=gv('b1s_n'),b1s_d=gv('b1s_d'),b1l_n=gv('b1l_n'),b1l_d=gv('b1l_d'),b1l_r=Math.max(1,gv('b1l_r'));
-  const in_d=gv('in_d'),in_s=gv('in_s'),in_r=Math.max(0,gv('in_r'));
-
-  const nWeb=(in_r>0 && in_s>0)?Math.max(0,Math.floor(lwi/in_s)):0;
-
-  function bulbFibers(c_n,c_d,s_n,s_d,l_n,l_d,l_r,bulbLen,refStart){
-    const Acorner=barA(c_d), Ashort=barA(s_d), Along=barA(l_d);
-    const fibers=[];
-    fibers.push({A:Acorner*(c_n/2)+Ashort*(s_n/2),l:refStart});
-    fibers.push({A:Acorner*(c_n/2)+Ashort*(s_n/2),l:refStart+bulbLen});
-    const barsPerRow=Math.max(0,Math.round(l_n/l_r));
-    for(let i=0;i<barsPerRow;i++){
-      const pos=refStart + bulbLen*(i+1)/(barsPerRow+1);
-      fibers.push({A:Along*l_r,l:pos});
+// Citeste interfata si construieste modelul prin engine.js.
+function readInputs(){
+  return {
+    lw:gv('lw'), bw0:gv('bw0'),
+    bf1:gv('bf1'), lf1:gv('lf1'), li1:0,
+    bf2:gv('bf2'), lf2:gv('lf2'), li2:0,
+    cnom:gv('cnom'), detr:gv('detr'),
+    concrete:curC, steel:curS, confMode:confMode,
+    fckc:gv('fckc'), ec2c:gv('ec2c'), ecu2c:gv('ecu2c'),
+    fckcw:gv('fckcw'), ec2cw:gv('ec2cw'), ecu2cw:gv('ecu2cw'),
+    bars:{
+      b1c_n:gv('b1c_n'), b1c_d:gv('b1c_d'), b1s_n:gv('b1s_n'), b1s_d:gv('b1s_d'),
+      b1l_n:gv('b1l_n'), b1l_d:gv('b1l_d'), b1l_r:Math.max(1,gv('b1l_r')),
+      b2c_n:gv('b2c_n'), b2c_d:gv('b2c_d'), b2s_n:gv('b2s_n'), b2s_d:gv('b2s_d'),
+      b2l_n:gv('b2l_n'), b2l_d:gv('b2l_d'), b2l_r:Math.max(1,gv('b2l_r')),
+      in_d:gv('in_d'), in_s:gv('in_s'), in_r:Math.max(0,gv('in_r'))
     }
-    return fibers;
-  }
-  const f2=bulbFibers(b2c_n,b2c_d,b2s_n,b2s_d,b2l_n,b2l_d,b2l_r,bf2,0);
-  const Aweb_row=(in_r>0)?barA(in_d)*in_r:0;
-  const webFibers=[];
-  const webStart=bf2+li2;
-  const webStep=nWeb>0?lwi/nWeb:0;
-  for(let i=0;i<nWeb;i++){const l=webStart+(i+0.5)*webStep;webFibers.push({A:Aweb_row,l});}
-  const f1=bulbFibers(b1c_n,b1c_d,b1s_n,b1s_d,b1l_n,b1l_d,b1l_r,bf1,lw-bf1);
-  const steelFibers=[...f2,...webFibers,...f1];
-
-  const As_b1=b1c_n*barA(b1c_d)+b1s_n*barA(b1s_d)+b1l_n*barA(b1l_d);
-  const As_b2=b2c_n*barA(b2c_d)+b2s_n*barA(b2s_d)+b2l_n*barA(b2l_d);
-  const As_web=(in_r>0 && in_s>0)?barA(in_d)*in_r*nWeb:0;
-  const As_tot=As_b1+As_b2+As_web;
-  const Ac=bf1*lf1+li1*bw0 + bf2*lf2+li2*bw0 + lwi*bw0;
-
-  const cntB1 = b1c_n + b1s_n + b1l_n;
-  const cntB2 = b2c_n + b2s_n + b2l_n;
-  const cntWeb = nWeb * in_r;
-
-  return {lw,bw0,bf1,lf1,li1,bf2,lf2,li2,lwi,cnom,detr,
-    fck,fcd,fckc,fcdc,fyd,eud,Es,ec2_nc,ecu_nc,ec2_c,ecu_c,fckcw,fcdcw,ec2_cw,ecu_cw,
-    steelFibers,As_b1,As_b2,As_web,As_tot,Ac,cntB1,cntB2,cntWeb,
-    bars:{b1c_n,b1c_d,b1s_n,b1s_d,b1l_n,b1l_d,b1l_r,b2c_n,b2c_d,b2s_n,b2s_d,b2l_n,b2l_d,b2l_r,in_d,in_s,in_r,nWeb}};
+  };
 }
 
-function sigC(eps,m,zone){
-  if(eps<=0) return 0;
-  // Determine if THIS zone is confined under the current mode, and pick props.
-  let fcd,ec2,ecu;
-  const bulbConf=(confMode==='bulb'||confMode==='all');
-  const webConf=(confMode==='all');
-  if(zone==='bulb'&&bulbConf){ fcd=m.fcdc; ec2=m.ec2_c; ecu=m.ecu_c; }
-  else if(zone==='web'&&webConf){ fcd=m.fcdcw; ec2=m.ec2_cw; ecu=m.ecu_cw; }
-  else { fcd=m.fcd; ec2=(zone==='bulb')?m.ec2_nc:m.ec2_nc; ecu=m.ecu_nc; }
-  const r=eps/ec2;
-  // Lege parabola-dreptunghi (SR EN 1992-1-1:2004 / Encipedia Anexa A):
-  // parabola pana la ec2, apoi palier constant la fcd pana la ecu.
-  // NU se anuleaza tensiunea peste ecu ("if(eps>ecu) return 0"): epsEdge este
-  // calibrat astfel incat fibra critica sa fie EXACT la ecu, iar erorile de
-  // virgula mobila o pot plasa cu un ulp deasupra pragului. Tensiunea ei ar
-  // sari atunci de la fcd la 0 (salt de fcd*w*dx ~ 7 kN pe o fibra de bulb),
-  // ceea ce introducea dinti de fierastrau in N(X) si impiedica bisectia sa
-  // atinga echilibrul exact. ecu este limita domeniului, nu un prag peste care
-  // contributia dispare: fibra ramane la palierul fcd.
-  if(eps<=ec2) return fcd*(2*r-r*r);
-  return fcd;
-}
-function sigS(eps,m){let s=eps*m.Es;if(s>m.fyd)s=m.fyd;if(s<-m.fyd)s=-m.fyd;return s;}
-
-function widthAt(l,m){
-  const lwi=m.lwi;
-  if(l<=m.bf2) return {w:m.lf2,zone:'bulb'};
-  if(l<=m.bf2+m.li2) return {w:m.bw0,zone:'bulb'};
-  if(l<=m.bf2+m.li2+lwi) return {w:m.bw0,zone:'web'};
-  if(l<=m.bf2+m.li2+lwi+m.li1) return {w:m.bw0,zone:'bulb'};
-  return {w:m.lf1,zone:'bulb'};
+// Afiseaza starea returnata de engine: OK / avertisment / eroare.
+function showStatus(r,m){
+  const strip=document.getElementById('statusStrip');
+  const msg=document.getElementById('statusMsg');
+  const ico=document.getElementById('statusIco');
+  markBarFields(m);
+  if(r.ok){strip.className='status-strip';msg.innerHTML='';return;}
+  let txt='';
+  if(r.code===JP.CODES.NO_BRACKET){
+    txt=t('stNoBracket');
+    // Limita depasita se raporteaza in conventia utilizatorului, altfel
+    // mesajul ar contrazice valoarea din caseta.
+    if(r.partial&&r.partial.exceeded)
+      txt+=t('stExceeds',r.partial.exceeded.limit,convN(r.partial.exceeded.value).toFixed(0));
+  }
+  else if(r.code===JP.CODES.RESIDUAL_HIGH) txt=t('stResidual');
+  else if(r.code===JP.CODES.DEGENERATE)    txt=t('stDegenerate');
+  // Nucleul compune deja mesajul in limba ceruta si spune EXACT ce numar de
+  // bare nu se poate dispune, deci se afiseaza ca atare.
+  else if(r.code===JP.CODES.BAR_COUNT)     txt=r.message;
+  else                                     txt=t('stInvalid');
+  msg.innerHTML=txt;
+  ico.textContent=(r.code===JP.CODES.RESIDUAL_HIGH)?'~':'!';
+  strip.className='status-strip on'+((r.code===JP.CODES.RESIDUAL_HIGH)?' warn':'');
 }
 
-// EN 1992 strain-plane forces at neutral-axis depth X (mm from compressed edge).
-// True pivot construction (monotonic, no cusp):
-//  - Bending (X <= L): compressed edge pinned at its zone ecu; linear to N.A.
-//  - Compression (X > L): plane rotates about the fixed pivot at depth
-//    c = (1 - ec2/ecu)*L from the compressed edge, where strain = ec2.
-// Strain-controlled section forces at neutral-axis depth X (mm from the most
-// compressed edge). With the parabola-rectangle law (flat plateau f_cd from
-// ec2 to ecu) the diagram closes smoothly: the limiting fiber sits at its
-// zone's ecu, the strain plane is linear eps(lc)=epsEdge*(X-lc)/X, and as X
-// grows the whole section reaches the plateau -> N approaches Ac*fcd squash.
-function sectionForces(X,m,compFromRef){
-  const L=m.lw;
-  const dx=L/NF;
-  const bulbConf=(confMode==='bulb'||confMode==='all');
-  const webConf=(confMode==='all');
-  const ecuB=bulbConf?m.ecu_c:m.ecu_nc;
-  const ecuW=webConf?m.ecu_cw:m.ecu_nc;
-  // Pin curvature so the binding zone is exactly at its ultimate strain.
-  let epsEdge=Infinity;          // strain at compressed edge (lc=0)
-  for(let i=0;i<NF;i++){
-    const lc=(i+0.5)*dx;
-    const shp=(X-lc)/X;
-    if(shp<=0) continue;
-    const lpos=compFromRef?lc:(L-lc);
-    const {zone}=widthAt(lpos,m);
-    const ecuZ=(zone==='bulb')?ecuB:ecuW;
-    const e=ecuZ/shp;            // edge strain that brings THIS fiber to its ecu
-    if(e<epsEdge) epsEdge=e;     // tightest governs
-  }
-  if(!isFinite(epsEdge)) epsEdge=0;
-  // La X foarte mic nicio fibra nu are shp>0 si epsEdge ramane 0 => toate
-  // fortele ies nule, deci N_int sare artificial la 0. Este o degenerare
-  // numerica, nu o stare fizica: sectiunea complet intinsa are N = N_Rd,t, nu 0.
-  // Se evita pornind bisectia de la X >= 1 mm (vezi solveX).
-  let Fb=0,Fbl=0;
-  for(let i=0;i<NF;i++){
-    const lc=(i+0.5)*dx;
-    const eps=epsEdge*(X-lc)/X;
-    const lpos=compFromRef?lc:(L-lc);
-    const {w,zone}=widthAt(lpos,m);
-    const sig=sigC(eps,m,zone);
-    const F=sig*w*dx;
-    Fb+=F;Fbl+=F*lpos;
-  }
-  let Fa=0,Fal=0;
-  for(const sf of m.steelFibers){
-    const lc=compFromRef?sf.l:(L-sf.l);
-    const eps=epsEdge*(X-lc)/X;
-    const sig=sigS(eps,m);
-    const F=sig*sf.A;
-    Fa+=F;Fal+=F*sf.l;
-  }
-  return {Fb:Fb/1e3,Fa:Fa/1e3,Fbl,Fal,Nint:(Fb+Fa)/1e3,epsEdge};
+/* Coloreaza chenarul campului care poarta numarul de bare imposibil, ca
+   utilizatorul sa vada unde, nu doar ce. */
+function markBarFields(m){
+  const map={cornerB1:'b1c_n',cornerB2:'b2c_n',longB1:'b1l_n',longB2:'b2l_n'};
+  const bad={};
+  ((m&&m.barIssues)||[]).forEach(function(i){bad[map[i.key]]=true;});
+  Object.keys(map).forEach(function(k){
+    const el=document.getElementById(map[k]);
+    if(el)el.classList.toggle('warn',!!bad[map[k]]);
+  });
 }
-function solveX(Ntarget,m,compFromRef){
-  const F=X=>sectionForces(X,m,compFromRef).Nint-Ntarget;
-  // Bisectie pe X (pozitia axei neutre, mm de la marginea comprimata).
-  // ATENTIE: la X -> 0 sectiunea degenereaza (nicio fibra nu mai are shp>0,
-  // epsEdge devine 0 si toate fortele ies nule) => N_int sare artificial la 0.
-  // Capatul inferior TREBUIE luat la X mic dar nenul (1 mm), unde sectiunea este
-  // efectiv toata intinsa si N_int ~ N_Rd,t. Pornind de la X=1e-3 (punct
-  // degenerat) bisectia esua pentru N negativ, desi solutia exista.
-  let lo=1,hi=m.lw*6;
-  let flo=F(lo),fhi=F(hi);
-  let guard=0;
-  while(flo*fhi>0 && guard++<200){
-    if(Math.abs(flo)<Math.abs(fhi)){lo/=2; if(lo<1e-6) break; flo=F(lo);}
-    else{hi*=2; if(hi>m.lw*1e6) break; fhi=F(hi);}
-  }
-  if(flo*fhi>0){
-    // tinta in afara capacitatii sectiunii (N_Ed < N_Rd,t sau > N_Rd,c)
-    const X=(Math.abs(flo)<Math.abs(fhi))?lo:hi;
-    return{X,...sectionForces(X,m,compFromRef),converged:false};
-  }
-  for(let it=0;it<200;it++){
-    const mid=(lo+hi)/2, fm=F(mid);
-    if(flo*fm<=0){hi=mid;fhi=fm;}else{lo=mid;flo=fm;}
-    if(Math.abs(fm)<1e-9) break;
-  }
-  const X=(lo+hi)/2;
-  return{X,...sectionForces(X,m,compFromRef),converged:true};
-}
-// Centrul de greutate GEOMETRIC al sectiunii de beton, masurat de la marginea
-// de referinta (l=0). Este axa fata de care ETABS raporteaza eforturile pe
-// *pier*, deci M_Rd trebuie raportat la aceeasi axa pentru consistenta cu
-// modelul. Se calculeaza doar din forma sectiunii de beton (fara armatura si
-// fara ponderare cu f_cd). La sectiune simetrica coincide cu mijlocul geometric
-// l_w/2; la bulbi diferiti geometric este deplasat spre bulbul mai mare.
-function geomCG(m){
-  const zones=[[0,m.bf2,m.lf2],[m.bf2,m.li2,m.bw0],
-               [m.bf2+m.li2,m.lwi,m.bw0],
-               [m.bf2+m.li2+m.lwi,m.li1,m.bw0],
-               [m.bf2+m.li2+m.lwi+m.li1,m.bf1,m.lf1]];
-  let SA=0,SS=0;
-  for(const [l0,len,w] of zones){
-    if(len<=0) continue;
-    const A=len*w;
-    SA+=A; SS+=A*(l0+len/2);
-  }
-  return SS/SA;
-}
-function momentRd(res,m){
-  const Mfb=res.Fbl/1e6,Mfa=res.Fal/1e6,N=res.Nint;
-  return -Mfa-Mfb+N*(geomCG(m)/1e3);
-}
+
+function setTxt(id,v){document.getElementById(id).textContent=v;}
 
 function calc(){
-  const m=buildModel();
-  document.getElementById('cnt_b1').textContent=m.cntB1+' '+t('barsWord');
-  document.getElementById('cnt_b2').textContent=m.cntB2+' '+t('barsWord');
-  document.getElementById('cnt_web').textContent=m.cntWeb+' '+t('barsWord');
-  const Ned=gv('ned'),Med=gv('med');
-  const compFromRef=Med>=0;
-  const res=solveX(Ned,m,compFromRef);
-  const Mrd=Math.abs(momentRd(res,m));
-  document.getElementById('mrd_r').textContent=Mrd.toFixed(1);
-  document.getElementById('x_r').textContent=res.X.toFixed(1);
-  document.getElementById('nint_r').textContent=res.Nint.toFixed(1);
-  document.getElementById('next_r').textContent=Ned.toFixed(1);
-  const dEq=Ned-res.Nint;
+  if(typeof JP==='undefined')return;
+  const inp=readInputs();
+  const m=JP.wall.buildModel(inp);
+  setTxt('cnt_b1',m.cntB1+' '+t('barsWord'));
+  setTxt('cnt_b2',m.cntB2+' '+t('barsWord'));
+  setTxt('cnt_web',m.cntWeb+' '+t('barsWord'));
+
+  // Ned se converteste in conventia interna a nucleului (compresiune pozitiva).
+  const NedUser=gv('ned'),Med=gv('med');
+  const Ned=convN(NedUser);
+  const r=JP.wall.solve(m,Ned,Med,LANG);
+  showStatus(r,m);
+
+  // Rezultatele partiale se afiseaza si la eroare — utilizatorul vede CU CAT
+  // depaseste, nu doar o celula goala. Dar M_Rd si utilizarea se blocheaza,
+  // pentru ca nu sunt valabile.
+  const v=r.value||r.partial;
+  if(!v){
+    ['mrd_r','x_r','nint_r','next_r','diff_r','fb_r','fa_r','nrdc_r','nrdt_r'].forEach(id=>setTxt(id,'—'));
+    setTxt('util_t','—');
+    document.getElementById('util_f').style.width='0%';
+    document.getElementById('util_chk').className='chk na';
+    drawSketch(m,0,true);
+    lastCalc={};return;
+  }
+
+  // Toate marimile axiale se afiseaza in conventia utilizatorului. Fortele
+  // sectionale F_b / F_a rezulta din integrare si rezistenta nu are semn
+  // convenit, deci se afiseaza la fel in ambele conventii.
+  setTxt('mrd_r', r.ok? v.Mrd.toFixed(1) : '—');
+  setTxt('x_r',   r.ok? v.X.toFixed(1)   : '—');
+  setTxt('nint_r',convN(v.Nint).toFixed(1));
+  setTxt('next_r',NedUser.toFixed(1));
   const diffEl=document.getElementById('diff_r');
-  diffEl.textContent=dEq.toFixed(2);
-  // Echilibrul trebuie satisfacut exact (rezidual ~0). Un rezidual semnificativ
-  // inseamna ca N_Ed depaseste capacitatea sectiunii (in afara curbei N-M) sau
-  // ca solverul nu a convergit: rezultatul M_Rd NU este valabil.
-  const eqBad=(res.converged===false)||Math.abs(dEq)>Math.max(0.01,Math.abs(Ned)*1e-5);
-  diffEl.style.color=eqBad?'#C0392B':'';
-  diffEl.title=eqBad?'Echilibru nesatisfacut: N_Ed in afara capacitatii sectiunii sau solver neconvergent. M_Rd nu este valabil.':'';
-  document.getElementById('fb_r').textContent=res.Fb.toFixed(1);
-  document.getElementById('fa_r').textContent=res.Fa.toFixed(1);
-  const util=Math.abs(Med)/Mrd*100;
-  document.getElementById('util_t').textContent=util.toFixed(1)+' %';
+  diffEl.textContent=convN(v.residual).toFixed(2);
+  diffEl.style.color=r.ok?'':'#C0392B';
+  setTxt('fb_r',v.Fb.toFixed(1));
+  setTxt('fa_r',v.Fa.toFixed(1));
+  setTxt('nrdc_r',convN(v.NRdc).toFixed(0));
+  setTxt('nrdt_r',convN(v.NRdt).toFixed(0));
+
+  // utilizare
   const uf=document.getElementById('util_f');
-  uf.style.width=Math.min(100,util)+'%';
-  uf.style.background=util<=100?'#2E7D32':'#C0392B';
-  document.getElementById('util_chk').className='chk '+(util<=100?'ok':'no');
-  const NRdt=-(m.As_tot*m.fyd)/1e3;
-  // ── N-M envelope: single strain-controlled sweep of neutral-axis depth X ──
-  // sectionForces() already pins the curvature to whichever zone (bulb ecu_c
-  // or web ecu_nc) crushes first. Sweeping X from small (bending) to large
-  // (compression) traces the whole envelope; as X grows the section tends to
-  // uniform strain and N approaches the squash apex naturally.
-  // Sectiune nesimetrica (bulbi armati diferit): M_Rd(+) != M_Rd(-) la acelasi N.
-  // Se genereaza DOUA ramuri distincte, baleiate dupa X (nu dupa N), fiecare cu
-  // semnul ei; unite dau conturul inchis, asimetric, al diagramei de interactiune.
-  const nDiv=120,xStart=1,xEnd=m.lw*60;
-  const branch=[[],[]];   // 0 = M pozitiv (compFromRef=true), 1 = M negativ
-  for(let side=0;side<=1;side++){
-    const cfr=(side===0);
-    for(let i=0;i<=nDiv;i++){
-      const f=i/nDiv;
-      const X=xStart*Math.pow(xEnd/xStart,f);
-      const r=sectionForces(X,m,cfr);
-      const Mabs=Math.abs(momentRd(r,m));
-      branch[side].push({M:(side===0? Mabs : -Mabs),N:r.Nint});
-    }
+  const chk=document.getElementById('util_chk');
+  if(r.ok){
+    const util=v.util;
+    setTxt('util_t',util.toFixed(1)+' %');
+    uf.style.width=Math.min(100,util)+'%';
+    uf.style.background=util<=100?'#2E7D32':'#C0392B';
+    chk.className='chk '+(util<=100?'ok':'no');
+  }else{
+    setTxt('util_t','—');
+    uf.style.width='0%';
+    chk.className='chk na';
   }
-  // Apex N_Rd,c = squash load with the parabola-rectangle plateau: each zone
-  // at its own f_cd plateau + steel at yield.
-  let NRdc;
-  {
-    const Ab=m.bf1*m.lf1+m.bf2*m.lf2;
-    const Aw=m.Ac-Ab;
-    const bulbConf=(confMode==='bulb'||confMode==='all');
-    const webConf=(confMode==='all');
-    const fbulb=bulbConf?m.fcdc:m.fcd;
-    const fweb=webConf?m.fcdcw:m.fcd;
-    NRdc=(Aw*fweb + Ab*fbulb + m.As_tot*m.fyd)/1e3;
-  }
-  document.getElementById('nrdc_r').textContent=NRdc.toFixed(0);
-  document.getElementById('nrdt_r').textContent=NRdt.toFixed(0);
-  // strain capacities display
+
+  // capacitati de deformatie
   const webConfD=(confMode==='all'), bulbConfD=(confMode==='bulb'||confMode==='all');
-  document.getElementById('ecu_web_r').textContent=((webConfD?m.ecu_cw:m.ecu_nc)*1000).toFixed(2);
-  document.getElementById('ecu_bulb_r').textContent=((bulbConfD?m.ecu_c:m.ecu_nc)*1000).toFixed(2);
+  setTxt('ecu_web_r',((webConfD?m.ecu_cw:m.ecu_nc)*1000).toFixed(2));
+  setTxt('ecu_bulb_r',((bulbConfD?m.ecu_c:m.ecu_nc)*1000).toFixed(2));
   document.getElementById('ecu_web_lbl').innerHTML=webConfD?t('ecuWebConf'):t('ecuWebUnconf');
   document.getElementById('ecu_bulb_lbl').innerHTML=bulbConfD?t('ecuBulbConf'):t('ecuBulbUnconf');
-  // Curatare pe fiecare ramura separat: sortare dupa N, un punct per banda de N,
-  // apoi monotonizare in jurul punctului de balans (|M| maxim) al ramurii.
-  // Baleiajul dupa X produce puncte ordonate natural dupa N (X creste => N
-  // creste monoton). Nu se filtreaza si nu se monotonizeaza nimic: fiecare
-  // punct este o solutie exacta a echilibrului sectiunii.
-  // ATENTIE: la sectiune NESIMETRICA nu se adauga puncte terminale cu M=0.
-  // Momentul este raportat la mijlocul geometric (l_w/2), deci compresiunea
-  // centrica NU are M=0, ci M = N*e, unde e este excentricitatea centrului de
-  // greutate al sectiunii fata de mijloc. Fortarea unui punct M=0 ar introduce
-  // exact cotitura artificiala de la capatul curbei. Apexul rezulta din
-  // integrare, prin baleiaj pana la X mare (deformatie cvasi-uniforma).
-  function cleanBranch(arr,sgn){
-    return arr.slice().sort((a,b)=>a.N-b.N);
-  }
-  // Se afiseaza o singura ramura: cea corespunzatoare sensului lui M_Ed
-  // (compFromRef). Valorile se raporteaza in modul, ca in varianta initiala.
-  const brSel=cleanBranch(branch[compFromRef?0:1],compFromRef?+1:-1);
-  const ptsClean=brSel.map(p=>({M:Math.abs(p.M),N:p.N}));
-  drawSketch(m,res.X,compFromRef);
-  drawNM(ptsClean,{M:Math.abs(Med),N:Ned},{M:Mrd,N:Ned});
-  lastCalc={m,Ned,Med,Mrd,X:res.X,Nint:res.Nint,Fb:res.Fb,Fa:res.Fa,util,NRdc,NRdt,pts:ptsClean,compFromRef,confMode,concrete:curC,steel:curS};
+
+  // desen + diagrama
+  drawSketch(m,r.ok?v.X:0,v.compFromRef);
+  const nm=JP.wall.interactionNM(m,v.compFromRef?'pos':'neg');
+  // Curba se transpune in conventia utilizatorului, ca axa N a graficului sa
+  // coincida cu semnele din ETABS.
+  const pts=nm.ok?nm.value.map(p=>({M:p.M,N:convN(p.N)})):[];
+  drawNM(pts,{M:Math.abs(Med),N:NedUser},r.ok?{M:v.Mrd,N:NedUser}:null);
+
+  lastCalc={m:m,Ned:NedUser,Med:Med,Mrd:v.Mrd,X:v.X,Nint:convN(v.Nint),
+            Fb:v.Fb,Fa:v.Fa,util:v.util,
+            NRdc:convN(v.NRdc),NRdt:convN(v.NRdt),pts:pts,
+            compFromRef:v.compFromRef,confMode:confMode,concrete:curC,steel:curS,
+            signConv:signConv,pivot:v.pivot,
+            status:{ok:r.ok,code:r.code,message:r.message}};
 }
 
 function drawSketch(m,X,compFromRef){
@@ -835,33 +791,43 @@ function drawSketch(m,X,compFromRef){
   function X2(l){return ox+l*scl;}
   let o='';
   const webY=oyC-(m.bw0*scl)/2;
-  const webConfFill=(confMode==='all')?'#DDEEFF':'#E8E8ED';
-  const bulbConfFill=(confMode==='bulb'||confMode==='all')?'#DDEEFF':'#E8E8ED';
+  const webConfFill=(m.confMode==='all')?'#DDEEFF':'#E8E8ED';
+  const bulbConfFill=(m.confMode==='bulb'||m.confMode==='all')?'#DDEEFF':'#E8E8ED';
   o+=`<rect x="${X2(m.bf1+m.li1)}" y="${webY}" width="${(m.lw-m.bf1-m.li1-m.bf2-m.li2)*scl}" height="${m.bw0*scl}" fill="${webConfFill}" stroke="#C7C7CC" stroke-width="0.8"/>`;
   const b1Y=oyC-(m.lf1*scl)/2, b2Y=oyC-(m.lf2*scl)/2;
   o+=`<rect x="${X2(0)}" y="${b1Y}" width="${m.bf1*scl}" height="${m.lf1*scl}" fill="${bulbConfFill}" stroke="${dark}" stroke-width="1.2"/>`;
   o+=`<rect x="${X2(m.lw-m.bf2)}" y="${b2Y}" width="${m.bf2*scl}" height="${m.lf2*scl}" fill="${bulbConfFill}" stroke="${dark}" stroke-width="1.2"/>`;
   const compW=X*scl;
-  if(compFromRef){
-    o+=`<rect x="${X2(m.lw)-compW}" y="${oyC-maxH*scl/2-3}" width="${compW}" height="${maxH*scl+6}" fill="#0066CC" opacity="0.10"/>`;
-    o+=`<text x="${X2(m.lw)-compW/2}" y="${oyC-maxH*scl/2-18}" text-anchor="middle" font-size="8" fill="${blue}" font-family="Inter,sans-serif">X=${X.toFixed(0)}</text>`;
-  } else {
-    o+=`<rect x="${X2(0)}" y="${oyC-maxH*scl/2-3}" width="${compW}" height="${maxH*scl+6}" fill="#0066CC" opacity="0.10"/>`;
-    o+=`<text x="${X2(0)+compW/2}" y="${oyC-maxH*scl/2-18}" text-anchor="middle" font-size="8" fill="${blue}" font-family="Inter,sans-serif">X=${X.toFixed(0)}</text>`;
+  if(X>0){
+    if(compFromRef){
+      o+=`<rect x="${X2(m.lw)-compW}" y="${oyC-maxH*scl/2-3}" width="${compW}" height="${maxH*scl+6}" fill="#0066CC" opacity="0.10"/>`;
+      o+=`<text x="${X2(m.lw)-compW/2}" y="${oyC-maxH*scl/2-18}" text-anchor="middle" font-size="8" fill="${blue}" font-family="Inter,sans-serif">X=${X.toFixed(0)}</text>`;
+    } else {
+      o+=`<rect x="${X2(0)}" y="${oyC-maxH*scl/2-3}" width="${compW}" height="${maxH*scl+6}" fill="#0066CC" opacity="0.10"/>`;
+      o+=`<text x="${X2(0)+compW/2}" y="${oyC-maxH*scl/2-18}" text-anchor="middle" font-size="8" fill="${blue}" font-family="Inter,sans-serif">X=${X.toFixed(0)}</text>`;
+    }
   }
   const bk=m.bars;
-  const inset=(m.cnom+m.detr)*scl;
+  /* Acoperirea mecanica, aceeasi ca in nucleu: centrul barei la
+     c_nom + Ø_etrier + Ø_bara/2 de fata. Desenul foloseste diametrul fiecarui
+     grup, ca barele sa apara exact unde sunt si in calcul. */
+  const cmec=d=>(m.cnom+m.detr+(d||0)/2)*scl;
   function drawBulb(xLeft,bulbLen,bulbWid,bars,isB1){
     const cn=bars[isB1?'b1c_n':'b2c_n'];
+    const cd=bars[isB1?'b1c_d':'b2c_d'];
     const sn=bars[isB1?'b1s_n':'b2s_n'];
+    const sd=bars[isB1?'b1s_d':'b2s_d'];
     const ln=bars[isB1?'b1l_n':'b2l_n'];
+    const ld=bars[isB1?'b1l_d':'b2l_d'];
     const lr=Math.max(1,bars[isB1?'b1l_r':'b2l_r']);
-    const x0=X2(xLeft)+inset, x1=X2(xLeft+bulbLen)-inset;
-    const yTop=oyC-(bulbWid*scl)/2+inset, yBot=oyC+(bulbWid*scl)/2-inset;
+    const iC=cmec(cd), iS=cmec(sd), iL=cmec(ld);
+    const x0=X2(xLeft)+iC, x1=X2(xLeft+bulbLen)-iC;
+    const yTop=oyC-(bulbWid*scl)/2+iC, yBot=oyC+(bulbWid*scl)/2-iC;
+    const yTopL=oyC-(bulbWid*scl)/2+iL, yBotL=oyC+(bulbWid*scl)/2-iL;
     let s='';
     const R=2.0;
     const ys=[];
-    for(let r=0;r<lr;r++){ ys.push(lr===1? (yTop+yBot)/2 : yTop+(yBot-yTop)*r/(lr-1)); }
+    for(let r=0;r<lr;r++){ ys.push(lr===1? (yTopL+yBotL)/2 : yTopL+(yBotL-yTopL)*r/(lr-1)); }
     const barsPerRow=Math.max(0,Math.round(ln/lr));
     ys.forEach(yy=>{
       for(let k=0;k<barsPerRow;k++){
@@ -874,8 +840,9 @@ function drawSketch(m,X,compFromRef){
     s+=`<circle cx="${x0}" cy="${yBot}" r="${R}" fill="${dark}"/>`;
     s+=`<circle cx="${x1}" cy="${yBot}" r="${R}" fill="${dark}"/>`;
     const perShort=Math.max(0,Math.round(sn/2));
+    const x0s=X2(xLeft)+iS, x1s=X2(xLeft+bulbLen)-iS;
     for(let e=0;e<2;e++){
-      const xx=e===0?x0:x1;
+      const xx=e===0?x0s:x1s;
       for(let k=1;k<=perShort;k++){
         const yy=yTop+(yBot-yTop)*k/(perShort+1);
         s+=`<circle cx="${xx}" cy="${yy}" r="${R}" fill="${dark}"/>`;
@@ -886,8 +853,9 @@ function drawSketch(m,X,compFromRef){
   o+=drawBulb(0,m.bf1,m.lf1,bk,true);
   o+=drawBulb(m.lw-m.bf2,m.bf2,m.lf2,bk,false);
   const wx0=X2(m.bf1+m.li1), wx1=X2(m.lw-m.bf2-m.li2);
-  const wyTop=webY+inset*0.6, wyBot=webY+m.bw0*scl-inset*0.6;
-  const nW=bk.nWeb;
+  const insetW=(m.cnom+m.detr)*scl;
+  const wyTop=webY+insetW*0.6, wyBot=webY+m.bw0*scl-insetW*0.6;
+  const nW=m.nWeb;
   const webRows=Math.max(0,bk.in_r);
   if(nW>0 && webRows>0){
     const ys=[];
@@ -911,12 +879,13 @@ function drawSketch(m,X,compFromRef){
 function drawNM(pts,extPt,rdPt){
   if(nmchart){nmchart.destroy();nmchart=null;}
   const curve=pts.map(p=>({x:p.M,y:p.N}));
+  const ds=[
+    {label:t('chartCurve'),data:curve,showLine:true,borderColor:'#0066CC',borderWidth:2,pointRadius:0,pointHitRadius:6,pointBackgroundColor:'#0066CC',tension:0,fill:false,order:2},
+    {label:'Ext',data:[{x:extPt.M,y:extPt.N}],borderColor:'#C0392B',backgroundColor:'#C0392B',pointRadius:6,pointStyle:'rectRot',showLine:false,order:1}
+  ];
+  if(rdPt)ds.push({label:'Rd',data:[{x:rdPt.M,y:rdPt.N}],borderColor:'#2E7D32',backgroundColor:'#2E7D32',pointRadius:5,pointStyle:'circle',showLine:false,order:1});
   nmchart=new Chart(document.getElementById('nmchart'),{type:'scatter',
-    data:{datasets:[
-      {label:t('chartCurve'),data:curve,showLine:true,borderColor:'#0066CC',borderWidth:2,pointRadius:0,pointHitRadius:6,pointBackgroundColor:'#0066CC',tension:0,fill:false,order:2},
-      {label:'Ext',data:[{x:extPt.M,y:extPt.N}],borderColor:'#C0392B',backgroundColor:'#C0392B',pointRadius:6,pointStyle:'rectRot',showLine:false,order:1},
-      {label:'Rd',data:[{x:rdPt.M,y:rdPt.N}],borderColor:'#2E7D32',backgroundColor:'#2E7D32',pointRadius:5,pointStyle:'circle',showLine:false,order:1}
-    ]},
+    data:{datasets:ds},
     options:{responsive:true,maintainAspectRatio:false,animation:false,
       plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`M=${c.parsed.x.toFixed(0)} kNm, N=${c.parsed.y.toFixed(0)} kN`}}},
       scales:{x:{type:'linear',title:{display:true,text:'M (kNm)',color:'#1C1C1E',font:{size:12,family:'Inter,sans-serif'}},grid:{color:'rgba(0,0,0,0.05)'},ticks:{color:'#8E8E93',font:{size:11}}},
@@ -951,7 +920,7 @@ function generatePdf(){
 function describePreset(s){
   if(!s)return '';
   const lw=s.lw||'?', bw=s.bw0||'?', c=s.cp||'C50/60';
-  return bw+'\u00d7'+lw+' '+c;
+  return bw+'×'+lw+' '+c;
 }
 function toggleModalPreset(el){
   if(el.classList.contains('empty')&&!el.classList.contains('sel'))return;
@@ -979,7 +948,11 @@ function exportSelected(){
     if(queue.length===0){
       const pW=210,ml=15,mr=15,cw=pW-ml-mr,ds=new Date().toLocaleDateString(LANG==='en'?'en-GB':'ro-RO');
       const tp=doc.internal.getNumberOfPages();
-      for(let i=1;i<=tp;i++){doc.setPage(i);doc.setFontSize(7.5);doc.setTextColor(0,0,0);doc.setDrawColor(40,80,140);doc.setFont('helvetica','normal');doc.line(ml,285,ml+cw,285);doc.text('CR 2-1-1.1/2022 / SR EN 1992-1-1',ml,289);doc.text(t('pdfPage',i,tp),pW-mr,289,{align:'right'});doc.text(t('pdfGenerated')+ds,pW/2,289,{align:'center'});}
+      // Subsolul poarta amprenta de versiune: o nota tiparita trebuie sa poata fi
+      // reprodusa exact, deci trebuie sa se stie ce a produs-o.
+      const stamp='CR 2-1-1.1/2022 / SR EN 1992-1-1  |  M'+MODULE_ID+' v'+MODULE_VERSION+
+                  ' / engine v'+JP.VERSION;
+      for(let i=1;i<=tp;i++){doc.setPage(i);doc.setFontSize(7.5);doc.setTextColor(0,0,0);doc.setDrawColor(40,80,140);doc.setFont('helvetica','normal');doc.line(ml,285,ml+cw,285);doc.text(stamp,ml,289);doc.text(t('pdfPage',i,tp),pW-mr,289,{align:'right'});doc.text(t('pdfGenerated')+ds,pW/2,289,{align:'center'});}
       const fname=selected.length===1?t('pdfFnamePrefix')+selected[0]+'.pdf':t('pdfFnamePrefix')+selected.join('_')+'.pdf';
       doc.save(fname);
       switchPreset(origPreset);
@@ -1003,13 +976,13 @@ function exportSelected(){
 function buildPdfPage(doc,nmImg,skImg,pName){
   pName=pName||currentPreset;
   const d=lastCalc,m=d.m;const pW=210,ml=15,mr=15,cw=pW-ml-mr;const ds=new Date().toLocaleDateString(LANG==='en'?'en-GB':'ro-RO');let y=0;
+  const valid=!d.status||d.status.ok;
   function hdr(){doc.setFillColor(40,80,140);doc.rect(0,0,210,14,'F');doc.setTextColor(255,255,255);doc.setFontSize(11);doc.setFont('helvetica','bold');doc.text(t('pdfHeaderTitle'),ml,9);doc.setFontSize(8);doc.setFont('helvetica','normal');doc.text(t('pdfHeaderSub'),ml,13);doc.text(t('pdfWallData')+pName+'  |  '+t('pdfDate')+ds,pW-mr,9,{align:'right'});doc.setTextColor(0,0,0);y=20;}
   function cy(n=10){if(y+n>275){doc.addPage();hdr();}}
-  function sT(t){cy(12);doc.setFillColor(240,245,250);doc.rect(ml,y-4,cw,8,'F');doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor(0,102,204);doc.text(t,ml+2,y+1);doc.setTextColor(0,0,0);doc.setFont('helvetica','normal');y+=8;}
+  function sT(tx){cy(12);doc.setFillColor(240,245,250);doc.rect(ml,y-4,cw,8,'F');doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor(0,102,204);doc.text(tx,ml+2,y+1);doc.setTextColor(0,0,0);doc.setFont('helvetica','normal');y+=8;}
   function row(l,f,v,h){cy(6);doc.setFontSize(8.5);doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);doc.text(l,ml,y);if(f){doc.setTextColor(0,0,0);doc.setFontSize(7.5);doc.text(f,ml+78,y);}doc.setFontSize(9);doc.setFont('helvetica','bold');if(h)doc.setTextColor(0,102,204);else doc.setTextColor(0,0,0);doc.text(v,pW-mr,y,{align:'right'});doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);y+=5.5;}
   function hl(){cy(3);doc.setDrawColor(180,200,220);doc.line(ml,y,ml+cw,y);y+=3;}
   hdr();
-  // Tabular header
   doc.autoTable({startY:22,body:[
     [{content:t('pdfBigTitle'),colSpan:2,styles:{fontSize:14,fontStyle:'bold',halign:'center',textColor:[28,28,30],fillColor:[255,255,255],cellPadding:{top:6,bottom:2}}}],
     [{content:t('pdfSubtitle'),colSpan:2,styles:{fontSize:9.5,halign:'center',textColor:[0,0,0],fillColor:[255,255,255],cellPadding:{top:1,bottom:2}}}],
@@ -1022,36 +995,61 @@ function buildPdfPage(doc,nmImg,skImg,pName){
   didParseCell:function(data){if(data.row.index===3){data.cell.styles.lineWidth={top:0.4,bottom:0.4};data.cell.styles.lineColor=[0,102,204];}},
   });
   y=doc.lastAutoTable.finalY+6;
-  // M_Rd highlight box
+  // caseta M_Rd
   doc.setFillColor(240,245,250);doc.roundedRect(ml,y,cw,18,2,2,'F');
   doc.setFontSize(9);doc.setTextColor(0,0,0);doc.text(t('pdfMrdBox'),ml+4,y+7);
-  doc.setFontSize(16);doc.setFont('helvetica','bold');doc.setTextColor(0,102,204);doc.text(d.Mrd.toFixed(1)+' kNm',pW-mr-4,y+11,{align:'right'});doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);y+=24;
+  doc.setFontSize(16);doc.setFont('helvetica','bold');
+  if(valid){doc.setTextColor(0,102,204);doc.text(d.Mrd.toFixed(1)+' kNm',pW-mr-4,y+11,{align:'right'});}
+  else{doc.setTextColor(192,57,43);doc.setFontSize(11);doc.text(t('pdfVerdictNA'),pW-mr-4,y+11,{align:'right'});}
+  doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);y+=24;
+  // Daca rezultatul nu este valabil, motivul se tipareste — un raport cu o
+  // celula goala este o raspundere; unul care spune de ce, nu.
+  if(!valid){
+    cy(10);doc.setFontSize(8.5);doc.setFont('helvetica','bold');doc.setTextColor(192,57,43);
+    doc.text(d.status.message,ml,y,{maxWidth:cw});doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);y+=9;
+  }
   sT(t('pdfSec1'));
   doc.autoTable({startY:y,head:[[t('pdfColParam'),t('pdfColNot'),t('pdfColVal')]],body:[
     [t('pdfInWallLen'),'l_w',m.lw+' mm'],[t('pdfInWebThick'),'b_w0',m.bw0+' mm'],
     [t('pdfInBE1'),'bf / lf',m.bf1+' / '+m.lf1+' mm'],
     [t('pdfInBE2'),'bf / lf',m.bf2+' / '+m.lf2+' mm'],
     [t('pdfInTotBarsBE1'),'-',m.cntB1+' '+t('pdfBarsUnit')],[t('pdfInTotBarsBE2'),'-',m.cntB2+' '+t('pdfBarsUnit')],
+    [t('pdfInCover'),'c_nom / D_etr',m.cnom+' / '+m.detr+' mm'],
     [t('pdfInConcClass'),'-',d.concrete+(d.confMode==='bulb'?t('pdfConfBulb'):d.confMode==='all'?t('pdfConfAll'):'')],[t('pdfInSteelClass'),'-',d.steel],
     [t('pdfInConcDesStr'),'f_cd',m.fcd.toFixed(2)+' MPa'],[t('pdfInSteelDesStr'),'f_yd',m.fyd.toFixed(1)+' MPa'],
-    [t('pdfInExtMoment'),'M_Ed',d.Med.toFixed(1)+' kNm'],[t('pdfInAxialForce'),'N_Ed',d.Ned.toFixed(1)+' kN'],[t('pdfInNfibres'),'N_f',''+NF]],
+    [t('pdfInExtMoment'),'M_Ed',d.Med.toFixed(1)+' kNm'],[t('pdfInAxialForce'),'N_Ed',d.Ned.toFixed(1)+' kN'],
+    [t('pdfInNfibres'),'N_f',''+m.NF],
+    [t('pdfInConvention'),'-',m.deductSteel?t('pdfConvNet'):t('pdfConvGross')],
+    [t('pdfInSignConv'),'-',(d.signConv==='pos')?t('pdfSignPos'):t('pdfSignNeg')]],
     margin:{left:ml,right:mr},tableWidth:cw,theme:'grid',styles:{lineColor:[180,200,220],lineWidth:0.3,fontSize:8.5,textColor:[0,0,0]},headStyles:{fillColor:[200,215,235],textColor:[0,0,0],fontStyle:'bold',lineColor:[200,215,235]},alternateRowStyles:{fillColor:[240,245,252]},columnStyles:{0:{cellWidth:100},1:{cellWidth:30,fontStyle:'italic'},2:{halign:'right'}}});
   y=doc.lastAutoTable.finalY+6;
   if(skImg){cy(50);sT(t('pdfSec2'));const iw=160,ih=72;doc.addImage(skImg,'PNG',(pW-iw)/2,y,iw,ih);y+=ih+6;}
   cy(30);sT(t('pdfSec3'));
-  doc.setFontSize(7.5);doc.setTextColor(0,0,0);doc.setFont('helvetica','italic');doc.text('N = SUM(F_a)+SUM(F_b)   M_Rd = -SUM(F_a*l)-SUM(F_b*l)+N*(l_w/2)',ml,y);doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);y+=6;
-  row(t('pdfCompZoneHeight'),'X',d.X.toFixed(1)+' mm',true);row(t('pdfNint'),'N_int',d.Nint.toFixed(1)+' kN');row(t('pdfNext'),'N_ext',d.Ned.toFixed(1)+' kN');row(t('pdfDiff'),'diff',(d.Ned-d.Nint).toFixed(2)+' kN');row(t('pdfSumFb'),'SUM F_b',d.Fb.toFixed(1)+' kN');row(t('pdfSumFa'),'SUM F_a',d.Fa.toFixed(1)+' kN');hl();
-  cy(20);sT(t('pdfSec4'));row(t('pdfMomentResist'),'M_Rd',d.Mrd.toFixed(1)+' kNm',true);row(t('pdfExtMoment'),'M_Ed',d.Med.toFixed(1)+' kNm');row(t('pdfUtilization'),'M_Ed/M_Rd',d.util.toFixed(1)+' %',true);
-  const verdict=d.util<=100?t('pdfVerdictPass'):t('pdfVerdictFail');cy(7);doc.setFontSize(9);doc.setFont('helvetica','bold');doc.setTextColor(d.util<=100?46:192,d.util<=100?125:57,d.util<=100?50:43);doc.text(verdict,ml,y);doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);y+=7;hl();
-  cy(18);sT(t('pdfSec5'));row(t('pdfCentricComp'),'N_Rd,u+',d.NRdc.toFixed(0)+' kN');row(t('pdfCentricTens'),'N_Rd,u-',d.NRdt.toFixed(0)+' kN');row(t('pdfUltStrainWeb'),'eps_cu2',((d.confMode==='all'?d.m.ecu_cw:d.m.ecu_nc)*1000).toFixed(2)+' '+t('pdfPermil'));row(t('pdfUltStrainBulb'),(d.confMode==='bulb'||d.confMode==='all')?'eps_cu2,c':'eps_cu2',(((d.confMode==='bulb'||d.confMode==='all')?d.m.ecu_c:d.m.ecu_nc)*1000).toFixed(2)+' '+t('pdfPermil'));hl();
+  doc.setFontSize(7.5);doc.setTextColor(0,0,0);doc.setFont('helvetica','italic');doc.text('N = SUM(F_a)+SUM(F_b)   M_Rd = -SUM(F_a*l)-SUM(F_b*l)+N*l_cg',ml,y);doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);y+=6;
+  row(t('pdfCompZoneHeight'),'X',d.X.toFixed(1)+' mm',true);row(t('pdfNint'),'N_int',d.Nint.toFixed(1)+' kN');row(t('pdfNext'),'N_ext',d.Ned.toFixed(1)+' kN');row(t('pdfDiff'),'diff',(d.Ned-d.Nint).toFixed(2)+' kN');row(t('pdfSumFb'),'SUM F_b',d.Fb.toFixed(1)+' kN');row(t('pdfSumFa'),'SUM F_a',d.Fa.toFixed(1)+' kN');
+  row(t('pdfPivotRow'),'-',d.pivot==='steel'?t('pdfPivotSteel'):d.pivot==='squash'?t('pdfPivotSquash'):t('pdfPivotConc'));hl();
+  cy(20);sT(t('pdfSec4'));
+  row(t('pdfMomentResist'),'M_Rd',valid?d.Mrd.toFixed(1)+' kNm':'-',true);
+  row(t('pdfExtMoment'),'M_Ed',d.Med.toFixed(1)+' kNm');
+  row(t('pdfUtilization'),'M_Ed/M_Rd',valid?d.util.toFixed(1)+' %':'-',true);
+  const verdict=!valid?t('pdfVerdictNA'):(d.util<=100?t('pdfVerdictPass'):t('pdfVerdictFail'));
+  cy(7);doc.setFontSize(9);doc.setFont('helvetica','bold');
+  if(!valid)doc.setTextColor(192,57,43);else doc.setTextColor(d.util<=100?46:192,d.util<=100?125:57,d.util<=100?50:43);
+  doc.text(verdict,ml,y);doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);y+=7;hl();
+  cy(18);sT(t('pdfSec5'));row(t('pdfCentricComp'),'N_Rd,c',d.NRdc.toFixed(0)+' kN');row(t('pdfCentricTens'),'N_Rd,t',d.NRdt.toFixed(0)+' kN');row(t('pdfUltStrainWeb'),'eps_cu2',((d.confMode==='all'?m.ecu_cw:m.ecu_nc)*1000).toFixed(2)+' '+t('pdfPermil'));row(t('pdfUltStrainBulb'),(d.confMode==='bulb'||d.confMode==='all')?'eps_cu2,c':'eps_cu2',(((d.confMode==='bulb'||d.confMode==='all')?m.ecu_c:m.ecu_nc)*1000).toFixed(2)+' '+t('pdfPermil'));hl();
   if(nmImg){cy(95);sT(t('pdfSec6'));const iw=160,ih=95;doc.addImage(nmImg,'PNG',(pW-iw)/2,y,iw,ih);y+=ih+4;}
-  // Disclaimer at bottom of last page
+  // Conventii si limitari — declarate explicit, nu lasate implicite.
+  cy(34);sT(t('pdfSec7'));
+  doc.setFontSize(7.5);doc.setTextColor(0,0,0);
+  [t('pdfLim1',(m.eud*1000).toFixed(1)),t('pdfLim2'),t('pdfLim3'),t('pdfLim3b'),t('pdfLim4'),t('pdfLim5'),t('pdfLim6'),t('pdfLim6b')].forEach(function(line){
+    cy(5);doc.text(line,ml,y,{maxWidth:cw});y+=4.5;
+  });
+  // disclaimer pe ultima pagina
   doc.setFontSize(7.5);doc.setFont('helvetica','italic');doc.setTextColor(0,0,0);
   doc.text(t('pdfDisc1'),ml,276);
   doc.text(t('pdfDisc2'),ml,280);
   doc.setFont('helvetica','normal');
 }
-
 
 // ─── Preset system: 5 wall slots ───
 let currentPreset='P1';
@@ -1060,10 +1058,19 @@ function captureState(){
   const state={};
   document.querySelectorAll('input[id],select[id]').forEach(el=>{if(el.id!=='presetSel')state[el.id]=el.value;});
   document.querySelectorAll('input[type=checkbox][id]').forEach(el=>{state['_chk_'+el.id]=el.checked;});
+  // Comutatoarele marcate data-nopreset sunt preferinte globale (ex. conventia
+  // de semn pentru N), nu proprietati ale peretelui: nu intra in presetare.
+  // Indicii .seg rezulta din lista completa, deci sarirea unuia NU deplaseaza
+  // numerotarea si presetarile salvate anterior raman valabile.
   document.querySelectorAll('.seg').forEach((seg,i)=>{
+    if(seg.dataset.nopreset)return;
     const on=seg.querySelector('.on');
     if(on)state['_seg_'+i]=on.dataset.v||on.textContent;
   });
+  // Conventia sub care a fost salvata presetarea. NU este un comutator
+  // restaurabil, ci eticheta de semn a valorii N_Ed memorate: fara ea, o
+  // presetare salvata cu N>0 compresiune s-ar reciti ca intindere.
+  state._signconv=signConv;
   return state;
 }
 function applyState(state){
@@ -1075,6 +1082,7 @@ function applyState(state){
     if(state['_chk_'+el.id]!==undefined)el.checked=state['_chk_'+el.id];
   });
   document.querySelectorAll('.seg').forEach((seg,i)=>{
+    if(seg.dataset.nopreset)return;
     const sv=state['_seg_'+i];
     if(!sv)return;
     seg.querySelectorAll('button').forEach(b=>{
@@ -1083,9 +1091,24 @@ function applyState(state){
     });
   });
   curC=document.getElementById('cp').value;curS=document.getElementById('sp').value;
-  // Restore confMode from seg
-  const confSeg=document.querySelector('.seg');
-  if(confSeg){const on=confSeg.querySelector('.on');if(on)confMode=on.dataset.v||'none';}
+  // Modul de confinare se citeste din butonul activ, identificat prin id — nu
+  // prin poziția lui in pagina, ca adaugarea altor comutatoare sa nu il mute.
+  ['none','bulb','all'].forEach(mv=>{
+    const b=document.querySelector('.seg button[data-v="'+mv+'"]');
+    if(b&&b.classList.contains('on'))confMode=mv;
+  });
+  // ── Reconciliere semn N intre presetare si conventia curenta ──────────────
+  // Presetarile salvate inainte de introducerea comutatorului nu au eticheta
+  // _signconv; ele au fost salvate cand singura conventie era N>0 compresiune,
+  // deci se presupune 'pos'. Daca eticheta difera de conventia activa, valoarea
+  // restaurata se inverseaza, altfel un perete comprimat s-ar reciti silentios
+  // ca perete intins.
+  const savedSign=state._signconv||'pos';
+  if(savedSign!==signConv){
+    const el=document.getElementById('ned');
+    const cur=parseFloat(el.value);
+    if(isFinite(cur)&&cur!==0)el.value=String(-cur);
+  }
   updMat();
 }
 function saveCurrentPreset(){
@@ -1114,9 +1137,13 @@ function loadPreset(p){
 })();
 
 document.querySelectorAll('#langSeg button').forEach(b=>b.addEventListener('click',()=>setLang(b.dataset.lang)));
+// Comutatorul de semn se sincronizeaza cu valoarea salvata inainte de primul
+// calc, dar FARA a inversa valoarea din caseta (asta se face doar la click).
+document.getElementById('seg-sign-neg').classList.toggle('on',signConv==='neg');
+document.getElementById('seg-sign-pos').classList.toggle('on',signConv==='pos');
 applyStaticLang();
 setConf(confMode);
-updMat();calc();
+if(typeof JP!=='undefined'){updMat();calc();}
 </script>
 </body>
 </html>
