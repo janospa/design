@@ -20,6 +20,8 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
 .ph .chev{margin-left:auto;width:9px;height:9px;border-right:1.6px solid #8E8E93;border-bottom:1.6px solid #8E8E93;transform:rotate(45deg);transition:transform .15s;flex-shrink:0}
 .ip.collapsed .ph .chev{transform:rotate(-45deg)}
 .ip.collapsed .pb-outer{display:none}
+.op.collapsed .ph .chev{transform:rotate(-45deg)}
+.op.collapsed .pb-outer{display:none}
 .ph .badge{margin-left:auto;font-size:10px;font-weight:600;letter-spacing:.02em;text-transform:none;color:#6C6C70;background:#E4E4E9;border-radius:20px;padding:2px 9px;white-space:nowrap}
 .ph .badge+.chev{margin-left:8px}
 .info-wrap{position:relative;display:inline-flex;flex-shrink:0}
@@ -61,6 +63,7 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
 .seg{display:inline-flex;background:#E0E0E5;border-radius:8px;padding:2px;gap:2px}
 .seg button{padding:6px 13px;font-size:12px;font-weight:500;border:none;border-radius:6px;background:transparent;color:#8E8E93;cursor:pointer;font-family:'Inter',sans-serif;transition:all .12s}
 .seg button.on{background:#fff;color:#1C1C1E;box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.seg.mini button{padding:4px 10px;font-size:11px}
 .note{font-size:12px;color:#8E8E93;line-height:1.5}
 .geom-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}
 @media(max-width:680px){.geom-grid{grid-template-columns:1fr}}
@@ -177,6 +180,32 @@ table.der tr.gov td{background:#F5F9FF}
 .empty-state{padding:40px 20px;text-align:center;color:#8E8E93;font-size:13px}
 .progress-bar{height:3px;background:#E0E0E5;overflow:hidden}
 .progress-fill{height:100%;background:#007AFF;width:0%;transition:width .15s}
+
+/* ── vedere linie de stalp (interactiva) ── */
+.nv-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:0}
+.nv-left{padding:10px 12px 14px;border-right:1px solid #E0E0E5;min-width:0}
+.nv-right{padding:10px 14px 16px;min-width:0}
+@media(max-width:900px){.nv-grid{grid-template-columns:1fr}.nv-left{border-right:none;border-bottom:1px solid #E0E0E5}}
+.nv-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:0 0 8px}
+.nv-bar .nvl{font-size:11px;font-weight:500;letter-spacing:.04em;text-transform:uppercase;color:#8E8E93}
+.nv-bar .nvleg{font-size:11px;color:#8E8E93;margin-left:auto;text-transform:none;letter-spacing:0}
+.nv-bar select{padding:5px 26px 5px 9px;font-size:12.5px;border:1px solid #C7C7CC;border-radius:7px;background:#fff;color:#1C1C1E;font-family:'Inter',sans-serif;-webkit-appearance:none;appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5'%3E%3Cpath d='M0 0l4 5 4-5z' fill='%23AEAEB2'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center}
+.nv-bar select:focus{outline:none;border-color:#007AFF;box-shadow:0 0 0 2px rgba(0,122,255,.15)}
+.nv-scroll{overflow:auto;max-height:660px;background:#FBFBFC;border:1px solid #ECECF0;border-radius:10px;padding:6px}
+.nv-scroll svg{display:block;margin:0 auto}
+.nv-scroll svg .hit{cursor:pointer}
+.nv-scroll svg .hit:hover .hl{stroke:#007AFF;stroke-width:2}
+.nv-note{font-size:11.5px;color:#8E8E93;line-height:1.55;padding:9px 2px 0}
+.nv-warn{background:#FFF6E5;border:1px solid #F2DDA8;border-radius:8px;padding:7px 10px;margin:0 0 9px;font-size:11.5px;color:#7A5A12;line-height:1.45}
+.elem-tabs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:10px}
+.elem-tabs button{padding:5px 10px;font-size:11.5px;font-weight:500;border:1px solid #DCDCE0;border-radius:7px;background:#fff;color:#8E8E93;cursor:pointer;font-family:'Inter',sans-serif;transition:all .12s}
+.elem-tabs button.on{background:#1C1C1E;border-color:#1C1C1E;color:#fff}
+.elem-tabs button:disabled{opacity:.35;cursor:default}
+.dt-row{display:flex;justify-content:space-between;gap:10px;padding:4px 0;border-bottom:1px solid #ECECF0;font-size:12.5px}
+.dt-row:last-child{border-bottom:none}
+.dt-k{color:#6C6C70}
+.dt-v{font-weight:500;color:#1C1C1E;font-feature-settings:"tnum" 1;text-align:right;white-space:nowrap}
+
 .back-btn{display:inline-flex;align-items:center;gap:5px;font-family:'Inter',sans-serif;font-size:14px;font-weight:500;color:#8E8E93;background:transparent;border:none;cursor:pointer;padding:12px 16px;text-decoration:none;line-height:1}
 .back-btn svg{width:16px;height:16px;stroke:#8E8E93;stroke-width:2.5;fill:none;stroke-linecap:round;stroke-linejoin:round}
 .back-btn:hover{color:#1C1C1E}
@@ -316,6 +345,43 @@ table.der tr.gov td{background:#F5F9FF}
     <div class="report-status" id="rptStatus"></div>
   </div>
 
+  <!-- ══════ 4. VEDERE LINIE DE STALP — ARMARE (interactiva) ══════ -->
+  <div class="op" id="pnl_view" style="display:none">
+    <div class="ph" onclick="togglePanel('pnl_view')"><span data-i18n="t_view">Vedere nod &mdash; armare (toata linia de st&acirc;lp)</span><span class="badge" id="bdg_view">&mdash;</span><span class="chev"></span></div>
+    <div class="pb-outer"><div class="nv-grid">
+      <div class="nv-left">
+        <div class="nv-bar">
+          <span class="nvl" data-i18n="nv_zoom">Zoom</span>
+          <div class="seg mini" id="seg_zoom">
+            <button data-v="0.7" onclick="nvSetZoom(0.7)">&minus;</button>
+            <button data-v="1" class="on" onclick="nvSetZoom(1)">100%</button>
+            <button data-v="1.45" onclick="nvSetZoom(1.45)">+</button>
+          </div>
+          <span class="nvleg" id="nvLegend"></span>
+        </div>
+        <div class="nv-scroll" id="nvScroll"><svg id="nvSvg" viewBox="0 0 200 40"></svg></div>
+        <div class="nv-note" data-i18n="n_view"></div>
+      </div>
+      <div class="nv-right">
+        <div class="nv-bar">
+          <span class="nvl" data-i18n="nv_lvl">Nivel</span>
+          <select id="nvLvlSel" onchange="nvSetLvl(this.value)"></select>
+        </div>
+        <div class="elem-tabs" id="nvTabs">
+          <button data-e="bL" onclick="nvSetKind('bL')" data-i18n="e_bL">Grinda st&acirc;nga</button>
+          <button data-e="bR" onclick="nvSetKind('bR')" data-i18n="e_bR">Grinda dreapta</button>
+          <button data-e="cI" onclick="nvSetKind('cI')" data-i18n="e_cI">St&acirc;lp inf.</button>
+          <button data-e="cS" onclick="nvSetKind('cS')" data-i18n="e_cS">St&acirc;lp sup.</button>
+          <button data-e="jt" onclick="nvSetKind('jt')" data-i18n="e_jt">Nod</button>
+        </div>
+        <div id="nvWarn"></div>
+        <div class="detail-h" id="nvTitle">&mdash;</div>
+        <svg id="nvElemSvg" viewBox="0 0 340 250" style="display:block;width:100%;max-width:330px;margin:0 auto 10px"></svg>
+        <div id="nvVals"></div>
+      </div>
+    </div></div>
+  </div>
+
   <div class="op" id="emptyPanel">
     <div class="empty-state" data-i18n="emptyStateMsg">Niciun nivel introdus. Defineste seturile mai sus, apoi adauga niveluri.</div>
     <div style="text-align:center;padding:0 20px 24px"><button class="btn-sm primary" onclick="addRow()" data-i18n="addRowBtn">+ Adauga nivel</button></div>
@@ -350,8 +416,13 @@ table.der tr.gov td{background:#F5F9FF}
    randului (primul rand = baza, ultimul = ultimul nivel), fiindca randurile
    sunt ordonate de jos in sus. Ambele pot fi fortate manual din panoul de
    detaliu al randului, pentru cazurile in care tabelul nu incepe la baza.
+
+   VEDEREA LINIEI DE STALP (v1.2). Acelasi desen interactiv ca in modulul 08,
+   dar pentru TOATA linia: nodurile se stivuiesc de la baza la ultimul nivel,
+   iar orice element (grinda, stalp, nod) se poate alege cu un clic, ca sa i se
+   vada sectiunea si armarea in panoul din dreapta.
    ═══════════════════════════════════════════════════════════════════════════ */
-const MODULE_ID='09', MODULE_VERSION='1.1.0';
+const MODULE_ID='09', MODULE_VERSION='1.2.0';
 
 let curC='C30/37', curS='S500B', curSW='S500B';
 let SEG={duct:'DCM',joint:'int',four:'no'};
@@ -377,6 +448,7 @@ const F1=v=>(isFinite(v)?v.toFixed(1):'—');
 const F2=v=>(isFinite(v)?v.toFixed(2):'—');
 const F3=v=>(isFinite(v)?v.toFixed(3):'—');
 const PCT=v=>(isFinite(v)?(v*100).toFixed(1)+' %':'—');
+const PI=Math.PI;
 
 /* ══════════════ i18n ══════════════ */
 let LANG=(function(){try{return localStorage.getItem('sw_lang')||'en';}catch(e){return 'en';}})();
@@ -496,6 +568,34 @@ const T={
  dtTop:{ro:'Nod la ultimul nivel &mdash; se sare (5.4)',en:'Top-level joint &mdash; skip (5.4)'},
  dtAuto:{ro:'automat',en:'auto'},
  colParam:{ro:'Marime',en:'Quantity'}, colForm:{ro:'Relatie',en:'Expression'}, colVal:{ro:'Valoare',en:'Value'},
+ /* ── vedere linie de stalp ── */
+ t_view:{ro:'Vedere nod &mdash; armare (toata linia de st&acirc;lp)',en:'Joint view &mdash; reinforcement (whole column line)'},
+ n_view:{ro:'Nodurile sunt stivuite de la baza la ultimul nivel. Sectiunea unui nod este cea a setului de st&acirc;lp <b>inferior</b>. Segmentul dintre doua noduri este desenat din doua jumatati: cea de jos este st&acirc;lpul <i>superior</i> al nivelului de dedesubt, cea de sus este st&acirc;lpul <i>inferior</i> al nivelului de deasupra &mdash; daca cele doua seturi difera, se vede o treapta. Sectiunile si inaltimile elementelor sunt la scara; inaltimile libere ale st&acirc;lpilor sunt reprezentate schematic si cotate pe desen.',
+        en:'Joints are stacked from the base to the top level. A joint takes the section of its <b>lower</b> column set. The segment between two joints is drawn as two halves: the lower one is the <i>upper</i> column of the storey below, the upper one is the <i>lower</i> column of the storey above &mdash; if the two sets differ, a step appears. Member sections and depths are to scale; the column clear heights are schematic and dimensioned on the drawing.'},
+ nv_lvl:{ro:'Nivel',en:'Storey'},
+ nv_zoom:{ro:'Zoom',en:'Zoom'},
+ nv_empty:{ro:'Adauga niveluri in tabel.',en:'Add storeys in the table.'},
+ nv_legend:{ro:'verde = verifica · rosu = nu verifica · gri = necalculat',en:'green = pass · red = fail · grey = not computed'},
+ nv_diff:{ro:'Setul de st&acirc;lp de deasupra acestui nod difera de setul de st&acirc;lp de sub nodul urmator &mdash; este acelasi tronson de st&acirc;lp. Foloseste &bdquo;&Icirc;nlantuie N &amp; seturi&rdquo; din bara tabelului.',
+          en:'The column set above this joint differs from the column set below the next joint &mdash; it is the same column segment. Use “Chain N &amp; sets” in the table toolbar.'},
+ nv_notdone:{ro:'Randul nu este calculat &mdash; valorile de verificare apar dupa recalculare.',
+             en:'This row is not computed &mdash; check values appear after recalculation.'},
+ e_bL:{ro:'Grinda st&acirc;nga',en:'Left beam'}, e_bR:{ro:'Grinda dreapta',en:'Right beam'},
+ e_cI:{ro:'St&acirc;lp inf.',en:'Lower col.'}, e_cS:{ro:'St&acirc;lp sup.',en:'Upper col.'}, e_jt:{ro:'Nod',en:'Joint'},
+ dTop:{ro:'Armatura superioara',en:'Top reinforcement'},
+ dBot:{ro:'Armatura inferioara',en:'Bottom reinforcement'},
+ dCor:{ro:'La colturi',en:'At corners'},
+ dFb:{ro:'Pe fetele de lungime b<sub>c</sub>',en:'On the b<sub>c</sub>-long faces'},
+ dFh:{ro:'Pe fetele de lungime h<sub>c</sub>',en:'On the h<sub>c</sub>-long faces'},
+ dAxial:{ro:'N<sub>Ed</sub>',en:'N<sub>Ed</sub>'},
+ dMrd:{ro:'M<sub>Rd</sub> (metoda fibrelor)',en:'M<sub>Rd</sub> (fibre method)'},
+ dRho:{ro:'A<sub>s</sub> / &rho;',en:'A<sub>s</sub> / &rho;'},
+ dPerim:{ro:'Etrier perimetral',en:'Perimeter stirrup'},
+ dTies:{ro:'Agrafe / etrieri interiori',en:'Ties / inner stirrups'},
+ dSetsS:{ro:'Seturi &times; pas',en:'Sets &times; spacing'},
+ dLegend:{ro:'albastru = ramuri efective · gri = ramuri perpendiculare',en:'blue = effective legs · grey = perpendicular legs'},
+ dSet:{ro:'Set',en:'Set'},
+ dLcl:{ro:'l<sub>cl</sub> (peste nod)',en:'l<sub>cl</sub> (above joint)'},
  /* info */
  i_duct:{ro:'Determina factorii de suprarezistenta &gamma;<sub>Rd</sub>: <b>(5.4)</b> 1,3 DCH / 1,2 DCM; <b>(5.9)</b> grinzi 1,2 DCH / 1,0 DCM; <b>(5.10)</b> stalpi 1,3 la baza si 1,2 la restul nivelurilor la DCH, 1,0 la DCM; <b>(5.11)/(5.12)</b> 1,1 DCH / 1,0 DCM. Nivelul de la baza se deduce din pozitia randului.',
         en:'Sets the overstrength factors &gamma;<sub>Rd</sub>: <b>(5.4)</b> 1.3 DCH / 1.2 DCM; <b>(5.9)</b> beams 1.2 DCH / 1.0 DCM; <b>(5.10)</b> columns 1.3 at the base and 1.2 at other levels for DCH, 1.0 for DCM; <b>(5.11)/(5.12)</b> 1.1 DCH / 1.0 DCM. The base level follows from the row position.'},
@@ -511,7 +611,7 @@ function tp(k,...a){return String(t(k,...a)).replace(/<[^>]*>/g,'').replace(/&mi
   .replace(/&times;/g,'x').replace(/&ge;/g,'>=').replace(/&le;/g,'<=').replace(/&Sigma;/g,'Sum').replace(/&gamma;/g,'g')
   .replace(/&nu;/g,'v').replace(/&mdash;/g,'-').replace(/&ndash;/g,'-').replace(/&amp;/g,'&').replace(/&Oslash;/g,'D')
   .replace(/&rho;/g,'rho').replace(/&#8741;/g,'||').replace(/&#8593;/g,'').replace(/&acirc;/g,'a').replace(/&icirc;/g,'i')
-  .replace(/&Icirc;/g,'I').replace(/&nbsp;/g,' ').trim();}
+  .replace(/&Icirc;/g,'I').replace(/&nbsp;/g,' ').replace(/&bdquo;/g,'"').replace(/&rdquo;/g,'"').trim();}
 function applyStaticLang(){
   document.documentElement.lang=LANG;
   document.querySelectorAll('[data-i18n]').forEach(el=>{
@@ -560,7 +660,13 @@ function closeAllInfo(){
 document.addEventListener('click',closeAllInfo);
 addEventListener('scroll',closeAllInfo,true);
 addEventListener('resize',closeAllInfo);
-function togglePanel(id){document.getElementById(id).classList.toggle('collapsed');}
+/* Vederea nu se deseneaza cat timp panoul este inchis — la 10 niveluri costa
+   cat o recalculare, si nimeni nu se uita la ea. Se deseneaza la deschidere. */
+function togglePanel(id){
+  const el=document.getElementById(id);
+  el.classList.toggle('collapsed');
+  if(id==='pnl_view'&&!el.classList.contains('collapsed'))nvRender();
+}
 
 /* ══════════════ global config ══════════════ */
 function fillMaterialSelects(){
@@ -595,6 +701,7 @@ function setSignConv(mode){
 }
 function onGlobalChange(){
   MAT=readMat();
+  nvFlush();
   const el=id=>document.getElementById(id);
   el('fcd_d').textContent=F2(MAT.fcd); el('fyd_d').textContent=F1(MAT.fyd);
   el('fywd_d').textContent=F1(MAT.fywd); el('lam_d').textContent=F2(MAT.lam); el('eta_d').textContent=F2(MAT.eta);
@@ -793,6 +900,10 @@ function isTop(r,idx){return r.ovrTop!==null?!!r.ovrTop:(idx===rows.length-1);}
 
 function computeRow(idx){
   const r=rows[idx];
+  /* Un rand sters in timp ce lotul inca ruleaza lasa un indice mort in coada.
+     Fara aceasta verificare, lotul cadea cu o eroare si tabelul ramanea pe
+     jumatate calculat, fara niciun semn in pagina. */
+  if(!r)return;
   const end=(SEG.joint==='end');
   const cI=getSet(setsC,r.cI), cS=getSet(setsC,r.cS);
   const bL=getSet(setsB,r.bL), bR=end?null:getSet(setsB,r.bR), j=getSet(setsJ,r.j);
@@ -837,6 +948,9 @@ function computeRow(idx){
 /* ══════════════ batch ══════════════ */
 function recalcAll(){runBatch(false);}
 function recalcPending(){runBatch(true);}
+/* Orice lot nou il opreste pe cel in curs: altfel doua bucle scriu in acelasi
+   tabel, iar cea veche lucreaza pe indici care intre timp s-au renumerotat. */
+let batchGen=0;
 function runBatch(pendingOnly){
   if(typeof JP==='undefined')return;
   if(!pendingOnly)rows.forEach(r=>{r.status='pending';r.res=null;});
@@ -844,17 +958,23 @@ function runBatch(pendingOnly){
   rows.forEach((r,i)=>{if(r.status!=='done')todo.push(i);});
   const btn=document.getElementById('recalcBtn');
   const pb=document.getElementById('progressBar'),pf=document.getElementById('progressFill');
-  if(!todo.length){renderSummary();if(btn)btn.disabled=false;if(pb)pb.style.display='none';return;}
+  if(!todo.length){renderSummary();nvRender();if(btn)btn.disabled=false;if(pb)pb.style.display='none';return;}
   if(btn)btn.disabled=true;
   if(pb){pb.style.display='';pf.style.width='0%';}
+  const gen=++batchGen;
   let k=0;
   const now=(typeof performance!=='undefined'&&performance.now)?()=>performance.now():()=>Date.now();
   function step(){
+    if(gen!==batchGen)return;          // a pornit un lot mai nou
     const t0=now();
-    while(k<todo.length&&(now()-t0)<30){ computeRow(todo[k]); updateRowCells(todo[k]); k++; }
+    while(k<todo.length&&(now()-t0)<30){
+      const ri=todo[k];
+      if(rows[ri]){computeRow(ri);updateRowCells(ri);}
+      k++;
+    }
     if(pf)pf.style.width=(100*k/todo.length).toFixed(0)+'%';
     if(k<todo.length)requestAnimationFrame(step);
-    else{renderSummary();if(btn)btn.disabled=false;setTimeout(()=>{if(pb)pb.style.display='none';},400);}
+    else{renderSummary();nvRender();if(btn)btn.disabled=false;setTimeout(()=>{if(pb)pb.style.display='none';},400);}
   }
   requestAnimationFrame(step);
 }
@@ -935,8 +1055,10 @@ function renderTable(){
   tb.innerHTML=html;
   document.getElementById('tableTitle').textContent=t('tableTitleN',rows.length);
   renderSummary();
+  nvRender();
 }
 function updateRowCells(idx){
+  if(!rows[idx])return;
   const tb=document.getElementById('tbodyRows'); if(!tb)return;
   const trs=[...tb.querySelectorAll('tr')].filter(tr=>!tr.classList.contains('detail-row'));
   const tr=trs[idx]; if(!tr)return;
@@ -971,7 +1093,7 @@ function editRow(idx,field,val){
     delete rowDebounce[idx];
     if(!rows[idx])return;             // randul a fost sters intre timp
     computeRow(idx);
-    if(rows[idx]._expanded)renderTable(); else {updateRowCells(idx);renderSummary();}
+    if(rows[idx]._expanded)renderTable(); else {updateRowCells(idx);renderSummary();nvRender();}
     renderSets();   // marcajul "folosit" pe cartonase
     saveCurrentPreset();
   },260);
@@ -984,11 +1106,13 @@ function cancelRowTimers(){
 function addRow(){
   const last=rows[rows.length-1];
   rows.push(newRow(last?{Ni:last.Ns,Ns:last.Ns,lcl:last.lcl,cI:last.cS,cS:last.cS,bL:last.bL,bR:last.bR,j:last.j}:{}));
+  NV.lvl=rows.length-1;
   showPanels();renderTable();renderSets();recalcPending();saveCurrentPreset();
 }
 function delRow(idx){
   cancelRowTimers();
   rows.splice(idx,1);
+  if(NV.lvl>=rows.length)NV.lvl=Math.max(0,rows.length-1);
   if(!rows.length){showPanels();saveCurrentPreset();return;}
   rows.forEach(r=>{r.status='pending';r.res=null;});   // baza / ultimul nivel se muta
   renderTable();renderSets();recalcAll();saveCurrentPreset();
@@ -996,7 +1120,7 @@ function delRow(idx){
 function clearTable(){
   if(rows.length&&!confirm(tp('confirmClear')))return;
   cancelRowTimers();
-  rows=[];showPanels();renderTable();renderSets();saveCurrentPreset();
+  rows=[];NV.lvl=0;showPanels();renderTable();renderSets();saveCurrentPreset();
 }
 /* Completeaza N si setul de stalp de deasupra nodului din randul imediat superior. */
 function chainUp(){
@@ -1028,6 +1152,7 @@ function renderSummary(){
 function showPanels(){
   const has=rows.length>0;
   document.getElementById('resultsPanel').style.display=has?'':'none';
+  document.getElementById('pnl_view').style.display=has?'':'none';
   document.getElementById('emptyPanel').style.display=has?'none':'';
 }
 
@@ -1106,6 +1231,432 @@ function setOvr(idx,field,val){
   r.status='pending';r.res=null;
   computeRow(idx);renderTable();saveCurrentPreset();
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   VEDERE NOD — ARMARE, PE TOATA LINIA DE STALP
+   ───────────────────────────────────────────────────────────────────────────
+   Acelasi desen interactiv ca in modulul 08, dar pentru intreaga linie: toate
+   nodurile din tabel, stivuite de la baza (randul 1) la ultimul nivel. Orice
+   element se alege cu un clic si i se vede sectiunea si armarea in dreapta.
+
+   SCARA. Sectiunile si inaltimile elementelor (h_c, b_c, h_b) sunt la o scara
+   UNICA, ca proportiile sa fie reale acolo unde conteaza pentru armare.
+   Inaltimile libere ale stalpilor NU pot fi la aceeasi scara — la 6 niveluri
+   desenul ar avea 19 m inaltime si 1,7 m latime, deci nimic nu s-ar mai citi.
+   Ele sunt reprezentate schematic, proportional intre ele, si cotate pe desen.
+
+   TRONSONUL DINTRE DOUA NODURI este acelasi element fizic vazut de doua ori:
+   "stalp superior" al nivelului de dedesubt si "stalp inferior" al nivelului de
+   deasupra. Se deseneaza in doua jumatati, fiecare cu setul ei, tocmai ca o
+   nepotrivire intre ele sa se vada ca o treapta, nu sa treaca neobservata.
+   ═══════════════════════════════════════════════════════════════════════════ */
+let NV={kind:'jt',lvl:0,zoom:1,_scroll:false};
+const NVC={};
+function nvFlush(){for(const k in NVC)delete NVC[k];}
+function nvKey(p,s){
+  return p+'|'+[s.id,s.hc,s.bc,s.cnom,s.dsw,s.cor_n,s.cor_d,s.fb_n,s.fb_d,s.fh_n,s.fh_d,
+                s.bw,s.hb,s.nt,s.dt,s.nb,s.db,curC,curS,curSW].join(',');
+}
+function nvCol(s){
+  const k=nvKey('C',s);
+  if(!NVC[k]){ if(Object.keys(NVC).length>180)nvFlush(); try{NVC[k]=colStats(s);}catch(e){return null;} }
+  return NVC[k];
+}
+function nvBeam(s){
+  const k=nvKey('B',s);
+  if(!NVC[k]){ if(Object.keys(NVC).length>180)nvFlush(); try{NVC[k]=beamStats(s);}catch(e){return null;} }
+  return NVC[k];
+}
+
+/* ── ajutoare de desen ── */
+const NVDK='#1C1C1E',NVDM='#AEAEB2',NVLB='#6C6C70',NVBL='#0066CC',NVRD='#C0392B',NVGY='#E8E8ED';
+function nvT(x,y,s,o){o=o||{};
+  return `<text x="${x}" y="${y}" pointer-events="none" text-anchor="${o.a||'middle'}" font-size="${o.s||7.5}" `
+   +`fill="${o.c||NVLB}" font-family="Inter,sans-serif"${o.w?` font-weight="${o.w}"`:''}`
+   +`${o.r?` transform="rotate(${o.r} ${x} ${y})"`:''}>${s}</text>`;}
+function nvLine(x1,y1,x2,y2,c,w,dash){
+  return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${c}" stroke-width="${w}" `
+   +`pointer-events="none"${dash?` stroke-dasharray="${dash}"`:''}/>`;}
+function nvDimH(x1,x2,y,lbl){
+  return nvLine(x1,y,x2,y,NVDM,.7)+nvLine(x1,y-3,x1,y+3,NVDM,.7)+nvLine(x2,y-3,x2,y+3,NVDM,.7)
+    +nvT((x1+x2)/2,y+10,lbl);}
+function nvDimV(y1,y2,x,lbl){
+  return nvLine(x,y1,x,y2,NVDM,.7)+nvLine(x-3,y1,x+3,y1,NVDM,.7)+nvLine(x-3,y2,x+3,y2,NVDM,.7)
+    +nvT(x+9,(y1+y2)/2,lbl,{r:90});}
+
+/* ── aranjarea in plan a desenului ── */
+function nvLayout(){
+  const end=(SEG.joint==='end');
+  const items=[]; let maxHc=1,maxHb=1,maxLcl=1;
+  rows.forEach((r,i)=>{
+    const cI=getSet(setsC,r.cI), cS=getSet(setsC,r.cS);
+    const bL=getSet(setsB,r.bL), bR=end?null:getSet(setsB,r.bR), j=getSet(setsJ,r.j);
+    if(!cI||!cS||!bL||!j||(!end&&!bR))return;
+    const hb=Math.max(bL.hb||0,bR?(bR.hb||0):0);
+    if(!(cI.hc>0)||!(cI.bc>0)||!(hb>0))return;
+    maxHc=Math.max(maxHc,cI.hc||0,cS.hc||0);
+    maxHb=Math.max(maxHb,hb);
+    maxLcl=Math.max(maxLcl,r.lcl||0);
+    items.push({idx:i,r:r,cI:cI,cS:cS,bL:bL,bR:bR,j:j,hb:hb});
+  });
+  if(!items.length)return null;
+  let sH=Math.min(76/maxHc,116/maxHb);
+  sH=Math.max(0.035,Math.min(sH,0.65));
+  const hcPxMax=maxHc*sH;
+  const stub=Math.max(58,0.8*maxHb*sH);
+  const LG=64, RG=136, PT=18, PB=34;
+  const cx=LG+stub+hcPxMax/2;
+  const VW=LG+stub+hcPxMax+stub+RG;
+  const colH=l=>56+46*Math.min(1,Math.max(0,(l||0))/maxLcl);
+  const bands=[]; let y=PT;
+  for(let k=items.length-1;k>=0;k--){
+    const it=items[k], h=colH(it.r.lcl);
+    if(k===items.length-1){
+      bands.push({t:'col',y:y,h:h,set:it.cS,kind:'cS',lvl:it.idx,
+                  lbl:`${it.cS.name} · l<tspan baseline-shift="sub" font-size="5.5">cl</tspan> ${F0(it.r.lcl)}`});
+    } else {
+      const up=items[k+1], diff=(up.cI.id!==it.cS.id);
+      bands.push({t:'col',y:y,h:h/2,set:up.cI,kind:'cI',lvl:up.idx,diff:diff,
+                  lbl:diff?`${up.cI.name} ⚠`:''});
+      bands.push({t:'col',y:y+h/2,h:h/2,set:it.cS,kind:'cS',lvl:it.idx,diff:diff,
+                  lbl:`${it.cS.name} · l<tspan baseline-shift="sub" font-size="5.5">cl</tspan> ${F0(it.r.lcl)}`});
+    }
+    y+=h;
+    const jh=Math.max(14,it.hb*sH);
+    bands.push({t:'joint',y:y,h:jh,it:it});
+    it._jy=y; it._jh=jh;
+    y+=jh;
+  }
+  bands.push({t:'col',y:y,h:stub,set:items[0].cI,kind:'cI',lvl:items[0].idx,base:true,
+              lbl:items[0].cI.name});
+  y+=stub;
+  return {items:items,bands:bands,sH:sH,cx:cx,VW:VW,VH:y+PB,stub:stub,LG:LG,
+          rx:cx+hcPxMax/2+stub+7};
+}
+
+/* culoarea nodului = verdictul randului; asa se citeste toata linia dintr-o privire */
+function nvJointFill(r){
+  if(r.status!=='done')return '#E4E4E9';
+  if(!r.res||!r.res.ok)return '#EFEFF2';
+  return r.res.value.allOk?'#E3F3E5':'#FADFDF';
+}
+
+function nvDrawElevation(L,svg){
+  const sH=L.sH, cx=L.cx, end=(SEG.joint==='end');
+  const selKey=NV.kind+':'+NV.lvl;
+  let oR='', oB='';
+  L.bands.forEach(bd=>{
+    if(bd.t==='col'){
+      const s=bd.set, w=Math.max(4,(s.hc||0)*sH), x0=cx-w/2;
+      const on=((bd.kind+':'+bd.lvl)===selKey);
+      oR+=`<g class="hit" onclick="nvPick('${bd.kind}',${bd.lvl})">`
+        +`<rect class="hl" x="${x0}" y="${bd.y}" width="${w}" height="${bd.h}" fill="${on?'#EBF3FF':'#E9E9EE'}" `
+        +`stroke="${on?'#007AFF':NVDK}" stroke-width="${on?2:1.1}"><title>${esc(s.name)}</title></rect></g>`;
+      const ins=Math.min(w/2-1,((s.cnom||0)+(s.dsw||0))*sH);
+      oB+=nvLine(x0+ins,bd.y+1,x0+ins,bd.y+bd.h-1,NVDK,1.4);
+      oB+=nvLine(x0+w-ins,bd.y+1,x0+w-ins,bd.y+bd.h-1,NVDK,1.4);
+      const nfh=Math.max(0,Math.round(s.fh_n||0));
+      for(let i=0;i<nfh;i++){
+        const xx=x0+ins+(w-2*ins)*(i+1)/(nfh+1);
+        oB+=nvLine(xx,bd.y+1,xx,bd.y+bd.h-1,NVDM,1,'4,3');
+      }
+      if(bd.base){
+        const yb=bd.y+bd.h, seg=Math.max(5,w/4);
+        let d=`M${x0-5} ${yb}`;
+        for(let i=0;i<4;i++)d+=` l${(seg/2).toFixed(2)} -5 l${(seg/2).toFixed(2)} 5`;
+        oB+=`<path d="${d}" fill="none" stroke="${NVDM}" stroke-width="1" pointer-events="none"/>`;
+      }
+      if(bd.lbl)oB+=nvT(L.rx,bd.y+bd.h/2+3,bd.lbl,{a:'start',s:7.5,c:bd.diff?NVRD:NVLB,w:bd.diff?600:400});
+      return;
+    }
+    /* ── nod + grinzi ── */
+    const it=bd.it, r=it.r;
+    const hcJ=Math.max(4,(it.cI.hc||0)*sH), x0=cx-hcJ/2, x1=cx+hcJ/2;
+    const jy1=bd.y, jy2=bd.y+bd.h, jcy=(jy1+jy2)/2;
+    const insC=Math.min(hcJ/2-1,((it.cI.cnom||0)+(it.cI.dsw||0))*sH);
+    /* grinzi */
+    [['bL',it.bL,true],['bR',it.bR,false]].forEach(([kd,bs,isL])=>{
+      if(!bs)return;
+      const hbp=Math.max(6,(bs.hb||0)*sH);
+      const by1=jcy-hbp/2, by2=jcy+hbp/2;
+      const bx1=isL?(x0-L.stub):x1, bx2=isL?x0:(x1+L.stub);
+      const on=((kd+':'+it.idx)===selKey);
+      oR+=`<g class="hit" onclick="nvPick('${kd}',${it.idx})">`
+        +`<rect class="hl" x="${bx1}" y="${by1}" width="${bx2-bx1}" height="${hbp}" `
+        +`fill="${on?'#EBF3FF':'#EFEFEF'}" stroke="${on?'#007AFF':NVDK}" stroke-width="${on?2:1.1}">`
+        +`<title>${esc(bs.name)}</title></rect></g>`;
+      const insB=Math.min(hbp/2-1,((bs.cnom||0)+(bs.dsw||0))*sH);
+      const barA=isL?(bx1+4):x0, barB=isL?(end?x1-insB*0.6:x1):(bx2-4);
+      oB+=nvLine(barA,by1+insB,barB,by1+insB,NVDK,1.5);
+      oB+=nvLine(barA,by2-insB,barB,by2-insB,NVDK,1.5);
+      if(end&&isL){
+        oB+=nvLine(x1-insB*0.6,by1+insB,x1-insB*0.6,by1+insB+bd.h*0.42,NVDK,1.5);
+        oB+=nvLine(x1-insB*0.6,by2-insB,x1-insB*0.6,by2-insB-bd.h*0.42,NVDK,1.5);
+      }
+      oB+=nvT((bx1+bx2)/2,by1-3.5,esc(bs.name),{s:7,c:NVLB});
+    });
+    /* nodul propriu-zis */
+    const onJ=(('jt:'+it.idx)===selKey);
+    oR+=`<g class="hit" onclick="nvPick('jt',${it.idx})">`
+      +`<rect class="hl" x="${x0}" y="${jy1}" width="${hcJ}" height="${bd.h}" `
+      +`fill="${onJ?'#DCE9FA':nvJointFill(r)}" stroke="${onJ?'#007AFF':NVDK}" stroke-width="${onJ?2.2:1.2}">`
+      +`<title>${esc(it.j.name)}</title></rect></g>`;
+    /* barele stalpului trec prin nod */
+    oB+=nvLine(x0+insC,jy1,x0+insC,jy2,NVDK,1.4);
+    oB+=nvLine(x1-insC,jy1,x1-insC,jy2,NVDK,1.4);
+    /* etrierii din nod, distribuiti uniform pe inaltimea utila (5.3.4.2.3(4)) */
+    const insBJ=Math.min(bd.h/2-1,((it.bL.cnom||0)+(it.bL.dsw||0))*sH);
+    const nS=Math.max(1,Math.round(it.j.nSets||1));
+    for(let i=0;i<nS;i++){
+      const yy=jy1+insBJ+((bd.h-2*insBJ))*(nS>1?i/(nS-1):0.5);
+      oB+=nvLine(x0+insC,yy,x1-insC,yy,NVBL,1.5);
+    }
+    /* eticheta de nivel, in stanga */
+    const nm=esc(r.name||String(it.idx+1));
+    const tag=(isBase(r,it.idx)?' ▾':'')+(isTop(r,it.idx)?' ▴':'');
+    oB+=nvT(L.LG-8,jcy+3,nm+tag,{a:'end',s:8.5,c:NVDK,w:600});
+    /* la dreapta: V_jhd si utilizarea determinanta */
+    const done=(r.status==='done'&&r.res&&r.res.ok);
+    if(done){
+      const v=r.res.value;
+      oB+=nvT(L.rx,jcy-1,`V<tspan baseline-shift="sub" font-size="5.5">jhd</tspan> = ${F1(v.govVj.Vjhd)} kN`,
+              {a:'start',s:7.5,c:NVRD,w:600});
+      oB+=nvT(L.rx,jcy+9,`${esc(it.j.name)} · max ${PCT(v.worst)}`,{a:'start',s:7,c:NVLB});
+    } else {
+      oB+=nvT(L.rx,jcy+3,esc(it.j.name),{a:'start',s:7.5,c:NVDM});
+    }
+  });
+  /* cota generala, sub linia de rupere de la baza — nu peste stalp */
+  const bb=L.bands[L.bands.length-1];
+  if(bb&&bb.base&&bb.set){
+    const w=Math.max(4,(bb.set.hc||0)*L.sH);
+    oB+=nvDimH(L.cx-w/2,L.cx+w/2,bb.y+bb.h+13,`h_c = ${F0(bb.set.hc)} mm`);
+  }
+  svg.setAttribute('viewBox',`0 0 ${L.VW.toFixed(1)} ${L.VH.toFixed(1)}`);
+  svg.style.width=(L.VW*NV.zoom).toFixed(0)+'px';
+  svg.style.height=(L.VH*NV.zoom).toFixed(0)+'px';
+  svg.innerHTML=oR+oB;
+}
+
+/* ── sectiuni pentru panoul din dreapta ── */
+function nvDrawBeamSec(id,b){
+  const el=document.getElementById(id); if(!el||!b||!(b.bw>0)||!(b.hb>0))return;
+  el.setAttribute('viewBox','0 0 340 250');
+  const VW=340,VH=250,PL=46,PR=50,PT=24,PB=42;
+  const scl=Math.min((VW-PL-PR)/b.bw,(VH-PT-PB)/b.hb);
+  const w=b.bw*scl,h=b.hb*scl,x0=(VW-w)/2,y0=PT+((VH-PT-PB)-h)/2;
+  let o=`<rect x="${x0}" y="${y0}" width="${w}" height="${h}" fill="${NVGY}" stroke="${NVDK}" stroke-width="1.2"/>`;
+  o+=`<rect x="${x0+b.cnom*scl}" y="${y0+b.cnom*scl}" width="${w-2*b.cnom*scl}" height="${h-2*b.cnom*scl}" fill="none" stroke="${NVLB}" stroke-width="1" rx="3"/>`;
+  const ins=(b.cnom+b.dsw)*scl;
+  function bars(n,dia,yy){
+    if(n<=0)return'';
+    let s='';const r=Math.max(2.2,dia*scl/2);
+    for(let i=0;i<n;i++){const xx=(n===1)?x0+w/2:x0+ins+r+(w-2*ins-2*r)*i/(n-1);
+      s+=`<circle cx="${xx}" cy="${yy}" r="${r}" fill="${NVDK}"/>`;}
+    return s;
+  }
+  const yT=y0+ins+Math.max(2.2,b.top.dia*scl/2), yB=y0+h-ins-Math.max(2.2,b.bot.dia*scl/2);
+  o+=bars(b.top.n,b.top.dia,yT)+bars(b.bot.n,b.bot.dia,yB);
+  o+=nvT(x0+w/2,y0-8,`${b.top.n}Ø${F0(b.top.dia)}`,{c:NVDK,w:600,s:9});
+  o+=nvT(x0+w/2,y0+h+16,`${b.bot.n}Ø${F0(b.bot.dia)}`,{c:NVDK,w:600,s:9});
+  o+=nvT(x0-8,yT+3,`M<tspan baseline-shift="sub" font-size="6">Rb</tspan>⁻ = ${F1(b.top.M)}`,{a:'end',c:NVBL,s:8.5,w:600});
+  o+=nvT(x0-8,yB+3,`M<tspan baseline-shift="sub" font-size="6">Rb</tspan>⁺ = ${F1(b.bot.M)}`,{a:'end',c:NVBL,s:8.5,w:600});
+  o+=nvDimH(x0,x0+w,VH-22,`b_w = ${F0(b.bw)} mm`);
+  o+=nvDimV(y0,y0+h,x0+w+16,`h_b = ${F0(b.hb)} mm`);
+  el.innerHTML=o;
+}
+function nvDrawColSec(id,m,cnom,opt){
+  const el=document.getElementById(id); if(!el||!m||!(m.h>0)||!(m.b>0))return;
+  opt=opt||{};
+  el.setAttribute('viewBox','0 0 340 250');
+  const VW=340,VH=250,PL=42,PR=46,PT=opt.legs?30:24,PB=opt.legs?44:40;
+  const scl=Math.min((VW-PL-PR)/m.h,(VH-PT-PB)/m.b);
+  const w=m.h*scl,h=m.b*scl,x0=(VW-w)/2,y0=PT+((VH-PT-PB)-h)/2;
+  const X=z=>x0+w/2+z*scl, Y=y=>y0+h/2-y*scl;
+  let o=`<rect x="${x0}" y="${y0}" width="${w}" height="${h}" fill="${NVGY}" stroke="${NVDK}" stroke-width="1.2"/>`;
+  const sx=x0+cnom*scl, sy=y0+cnom*scl, sw=w-2*cnom*scl, sh=h-2*cnom*scl;
+  if(opt.legs){
+    /* ramurile paralele cu h_c (orizontale aici) sunt cele efective */
+    o+=nvLine(sx,sy,sx+sw,sy,NVBL,2);
+    o+=nvLine(sx,sy+sh,sx+sw,sy+sh,NVBL,2);
+    o+=nvLine(sx,sy,sx,sy+sh,NVDM,1.2);
+    o+=nvLine(sx+sw,sy,sx+sw,sy+sh,NVDM,1.2);
+    const n2=Math.max(0,Math.round(opt.n2||0));
+    for(let i=0;i<n2;i++){
+      const yy=sy+sh*(i+1)/(n2+1);
+      o+=nvLine(sx,yy,sx+sw,yy,NVBL,1.6,'4,2.5');
+    }
+  } else {
+    o+=`<rect x="${sx}" y="${sy}" width="${sw}" height="${sh}" fill="none" stroke="${NVLB}" stroke-width="1" rx="3"/>`;
+  }
+  m.steelFibers.forEach(f=>{ if(f.A>0)
+    o+=`<circle cx="${X(f.z)}" cy="${Y(f.y)}" r="${Math.max(2.2,Math.sqrt(4*f.A/PI)*scl/2)}" fill="${NVDK}"/>`;});
+  o+=nvDimH(x0,x0+w,opt.legs?VH-28:VH-20,`h_c = ${F0(m.h)} mm`);
+  o+=nvDimV(y0,y0+h,x0+w+14,`b_c = ${F0(m.b)} mm`);
+  if(opt.legs){
+    const ax=x0+w/2, ay=y0-14;
+    o+=nvLine(ax-22,ay,ax+22,ay,NVRD,1.4);
+    o+=`<polyline points="${ax+16},${ay-3.5} ${ax+22},${ay} ${ax+16},${ay+3.5}" fill="none" stroke="${NVRD}" stroke-width="1.4" pointer-events="none"/>`;
+    o+=`<polyline points="${ax-16},${ay-3.5} ${ax-22},${ay} ${ax-16},${ay+3.5}" fill="none" stroke="${NVRD}" stroke-width="1.4" pointer-events="none"/>`;
+    o+=nvT(ax,ay-6,'V_jhd',{c:NVRD,s:8.5,w:600});
+    o+=nvT(VW/2,VH-5,tp('dLegend'),{s:7.5});
+  } else if(opt.mrd!==undefined){
+    o+=nvT(VW/2,y0-8,`M_Rd = ${F1(opt.mrd)} kNm · N_Ed = ${F0(opt.N)} kN`,{c:NVBL,s:8.5,w:600});
+  }
+  el.innerHTML=o;
+}
+
+/* ── panoul din dreapta ── */
+function nvFillLvlSel(L){
+  const sel=document.getElementById('nvLvlSel');
+  sel.innerHTML=L.items.map(it=>{
+    const nm=it.r.name||String(it.idx+1);
+    const tg=(isBase(it.r,it.idx)?' ('+tp('tagBase')+')':'')+(isTop(it.r,it.idx)?' ('+tp('tagTop')+')':'');
+    return `<option value="${it.idx}"${it.idx===NV.lvl?' selected':''}>${esc(nm+tg)}</option>`;
+  }).join('');
+}
+function nvPaintTabs(){
+  const end=(SEG.joint==='end');
+  document.querySelectorAll('#nvTabs button').forEach(b=>{
+    b.classList.toggle('on',b.dataset.e===NV.kind);
+    if(b.dataset.e==='bR')b.disabled=end;
+  });
+}
+function nvDetail(L){
+  const it=L.items.find(x=>x.idx===NV.lvl)||L.items[0];
+  const r=it.r, end=(SEG.joint==='end');
+  const done=(r.status==='done'&&r.res&&r.res.ok);
+  const v=done?r.res.value:null, m=done?r.m:null;
+  const mat=MAT||readMat();
+  const ttl=document.getElementById('nvTitle'), vals=document.getElementById('nvVals');
+  const wrn=document.getElementById('nvWarn');
+  const lvlName=esc(r.name||String(it.idx+1));
+  let out=[], warns=[];
+  if(!done)warns.push(t('nv_notdone'));
+
+  if(NV.kind==='bL'||NV.kind==='bR'){
+    const s=(NV.kind==='bL')?it.bL:it.bR;
+    const b=s?nvBeam(s):null;
+    ttl.innerHTML=t(NV.kind==='bL'?'e_bL':'e_bR')+' · '+lvlName;
+    if(b){
+      nvDrawBeamSec('nvElemSvg',b);
+      out=[
+        [t('dSet'),esc(s.name)],
+        ['b<sub>w</sub> × h<sub>b</sub>',`${F0(b.bw)} × ${F0(b.hb)} mm`],
+        [t('dTop'),`${b.top.n}Ø${F0(b.top.dia)} — ${F0(b.top.As)} mm²`],
+        [t('dBot'),`${b.bot.n}Ø${F0(b.bot.dia)} — ${F0(b.bot.As)} mm²`],
+        ['d<sub>sup</sub> / d<sub>inf</sub>',`${F0(b.top.d)} / ${F0(b.bot.d)} mm`],
+        ['x<sub>sup</sub> / x<sub>inf</sub>',`${F1(b.top.x)} / ${F1(b.bot.x)} mm`],
+        ['z<sub>sup</sub> / z<sub>inf</sub>',`${F1(b.top.z)} / ${F1(b.bot.z)} mm`],
+        ['M<sub>Rb</sub><sup>−</sup>',`${F1(b.top.M)} kNm`],
+        ['M<sub>Rb</sub><sup>+</sup>',`${F1(b.bot.M)} kNm`]
+      ];
+    }
+  } else if(NV.kind==='cI'||NV.kind==='cS'){
+    const s=(NV.kind==='cI')?it.cI:it.cS;
+    const c=s?nvCol(s):null;
+    const N=(NV.kind==='cI')?r.Ni:r.Ns;
+    const MRd=m?((NV.kind==='cI')?m.colI.MRd:m.colS.MRd):NaN;
+    ttl.innerHTML=t(NV.kind==='cI'?'e_cI':'e_cS')+' · '+lvlName;
+    if(c){
+      const nud=(s.bc*s.hc*mat.fcd)>0?Math.max(0,convN(N))*1e3/(s.bc*s.hc*mat.fcd):0;
+      nvDrawColSec('nvElemSvg',c.model,s.cnom,{mrd:MRd,N:N});
+      out=[
+        [t('dSet'),esc(s.name)],
+        ['h<sub>c</sub> × b<sub>c</sub>',`${F0(s.hc)} × ${F0(s.bc)} mm`],
+        ['c<sub>nom</sub> / Ø<sub>sw</sub>',`${F0(s.cnom)} / ${F0(s.dsw)} mm`],
+        [t('dCor'),`${c.model.cntCorner}Ø${F0(c.model.bars.cor_d)}`],
+        [t('dFb'),`${c.model.cntTop}Ø${F0(c.model.bars.topb_d)}`],
+        [t('dFh'),`${c.model.cntSide}Ø${F0(c.model.bars.sidh_d)}`],
+        [t('dRho'),`${F0(c.As)} mm² / ${F2(c.rho)} %`],
+        [t('dAxial'),`${F0(N)} kN`],
+        ['ν<sub>d</sub>',F3(nud)],
+        [t('dMrd'),isFinite(MRd)?`${F1(MRd)} kNm`:'—'],
+        [t('dLcl'),`${F0(r.lcl)} mm`]
+      ];
+      if(NV.kind==='cS'&&r.geomDiff)warns.push(t('warnGeom'));
+      /* acelasi tronson fizic ca stalpul inferior al nivelului urmator */
+      if(NV.kind==='cS'){
+        const up=L.items[L.items.findIndex(x=>x.idx===it.idx)+1];
+        if(up&&up.cI.id!==it.cS.id)warns.push(t('nv_diff'));
+      }
+      if(NV.kind==='cI'){
+        const dn=L.items[L.items.findIndex(x=>x.idx===it.idx)-1];
+        if(dn&&dn.cS.id!==it.cI.id)warns.push(t('nv_diff'));
+      }
+    }
+  } else {
+    const c=nvCol(it.cI), j=it.j;
+    ttl.innerHTML=t('e_jt')+' · '+lvlName;
+    if(c){
+      nvDrawColSec('nvElemSvg',c.model,it.cI.cnom,{legs:true,n2:j.n2});
+      const st=jointStats(j);
+      out=[
+        [t('dSet'),esc(j.name)],
+        ['b<sub>j</sub> (5.28)',m?`${F0(m.bj)} mm`:'—'],
+        ['h<sub>c</sub>',`${F0(it.cI.hc)} mm`],
+        ['h<sub>jc</sub> / h<sub>jw</sub>',m?`${F0(m.hjc)} / ${F0(m.hjw)} mm`:'—'],
+        [t('dPerim'),`${j.n1}×Ø${F0(j.d1)}`],
+        [t('dTies'),`${j.n2}×Ø${F0(j.d2)}`],
+        [t('dSetsS'),`${j.nSets} × ${F0(j.s)} mm`],
+        ['A<sub>sh,ef</sub>',`${F0(st.AshProv)} mm²`],
+        ['A<sub>sh,nec</sub>',v?`${F0(v.govAsh.AshReq)} mm²`:'—'],
+        ['A<sub>sv,ef</sub> / A<sub>sv,nec</sub>',v?`${F0(v.AsvProv)} / ${F0(v.AsvReq)} mm²`:'—'],
+        ['V<sub>jhd</sub>',v?`${F1(v.govVj.Vjhd)} kN`:'—'],
+        ['V<sub>Rd,j</sub>',v?`${F1(v.VRdj)} kN`:'—'],
+        ['Σ M<sub>Rc</sub>',v?`${F1(v.SMRc)} kNm`:'—'],
+        [t('sumWorst'),v?PCT(v.worst):'—']
+      ];
+      if(v)out.push([t('colVerdict'),v.allOk
+        ?`<span class="verdict-pill ok">${t('vOk')}</span>`
+        :`<span class="verdict-pill no">${t('vNo')}</span>`]);
+      else if(r.status==='done')warns.push(esc(statusText(r)));
+    }
+  }
+  wrn.innerHTML=warns.filter(Boolean).map(w=>`<div class="nv-warn">${w}</div>`).join('');
+  vals.innerHTML=out.map(x=>`<div class="dt-row"><span class="dt-k">${x[0]}</span><span class="dt-v">${x[1]}</span></div>`).join('');
+}
+function nvScrollToSel(L){
+  const sc=document.getElementById('nvScroll');
+  const it=L.items.find(x=>x.idx===NV.lvl);
+  if(!sc||!it||it._jy===undefined)return;
+  const mid=(it._jy+it._jh/2)*NV.zoom;
+  sc.scrollTop=Math.max(0,mid-sc.clientHeight/2);
+}
+function nvRender(){
+  const pnl=document.getElementById('pnl_view');
+  if(!pnl||typeof JP==='undefined')return;
+  const bdg=document.getElementById('bdg_view');
+  if(bdg)bdg.textContent=rows.length+' ×';
+  if(pnl.classList.contains('collapsed')||pnl.style.display==='none')return;
+  const svg=document.getElementById('nvSvg');
+  const L=nvLayout();
+  if(!L){
+    svg.removeAttribute('style');
+    svg.setAttribute('viewBox','0 0 220 44');
+    svg.innerHTML=nvT(110,26,tp('nv_empty'),{s:9});
+    document.getElementById('nvLvlSel').innerHTML='';
+    document.getElementById('nvTitle').innerHTML='&mdash;';
+    document.getElementById('nvVals').innerHTML='';
+    document.getElementById('nvWarn').innerHTML='';
+    document.getElementById('nvElemSvg').innerHTML='';
+    return;
+  }
+  if(!L.items.some(it=>it.idx===NV.lvl))NV.lvl=L.items[0].idx;
+  if(SEG.joint==='end'&&NV.kind==='bR')NV.kind='bL';
+  nvDrawElevation(L,svg);
+  nvFillLvlSel(L);
+  nvPaintTabs();
+  nvDetail(L);
+  document.getElementById('nvLegend').innerHTML=t('nv_legend');
+  document.querySelectorAll('#seg_zoom button').forEach(b=>
+    b.classList.toggle('on',parseFloat(b.dataset.v)===NV.zoom));
+  if(NV._scroll){NV._scroll=false;nvScrollToSel(L);}
+}
+function nvPick(kind,lvl){NV.kind=kind;NV.lvl=lvl;nvRender();}
+function nvSetKind(k){NV.kind=k;NV._scroll=true;nvRender();}
+function nvSetLvl(v){NV.lvl=parseInt(v,10)||0;NV._scroll=true;nvRender();}
+function nvSetZoom(z){NV.zoom=z;NV._scroll=true;nvRender();}
 
 /* ══════════════ copy ══════════════ */
 function copyTable(){
@@ -1301,6 +1852,7 @@ function captureState(){
                        ovrBase:r.ovrBase,ovrTop:r.ovrTop}))};
 }
 function applyState(st){
+  nvFlush(); NV.lvl=0;
   if(!st){
     curC='C30/37';curS='S500B';curSW='S500B';
     SEG={duct:'DCM',joint:'int',four:'no'};
@@ -1369,6 +1921,7 @@ applyStaticLang();
 if(typeof JP!=='undefined'){
   onGlobalChange();
   showPanels();
+  nvRender();
 }
 </script>
 </body>

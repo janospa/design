@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#F5F5F7">
-<meta name="description" content="Verificare biaxiala in tabel — import combinatii de incarcare din ETABS/Excel, verificare in lot pentru o sectiune de stalp fixa">
+<meta name="description" content="Verificare biaxiala in tabel — import combinatii de incarcare din ETABS/Excel (format simplu sau tabel ETABS brut), verificare in lot si tabel centralizator pentru o sectiune de stalp fixa">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='4' y='6' width='24' height='4' rx='1' fill='%238E8E93'/><rect x='4' y='14' width='24' height='4' rx='1' fill='%23C7C7CC'/><rect x='4' y='22' width='24' height='4' rx='1' fill='%238E8E93'/></svg>">
 <title>Stalp — verificare biaxiala batch — JP Design</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
@@ -154,6 +154,12 @@ table.results tr.row-pending td{color:#AEAEB2}
 .empty-state{padding:40px 20px;text-align:center;color:#8E8E93;font-size:13px}
 .progress-bar{height:3px;background:#E0E0E5;overflow:hidden}
 .progress-fill{height:100%;background:#007AFF;width:0%;transition:width .15s}
+/* ── tabel centralizator ── */
+table.results tr.sum-row{cursor:pointer}
+table.results tr.sum-row:hover td{background:#EFF5FF}
+table.results tr.sum-row:hover td:first-child{background:#E6EFFC}
+.sum-sub{font-size:11px;color:#8E8E93}
+.sum-hint{font-size:12px;color:#8E8E93;padding:10px 15px 0;line-height:1.5}
 @media(max-width:680px){.wrap{padding:14px 10px}.rc input[type=number],.sel-field select{font-size:16px}.rl{font-size:14px}.ph{font-size:12px}table.results{font-size:11.5px}}
 .back-btn{display:inline-flex;align-items:center;gap:5px;font-family:'Inter',sans-serif;font-size:14px;font-weight:500;color:#8E8E93;background:transparent;border:none;cursor:pointer;padding:12px 16px;text-decoration:none;line-height:1}
 .back-btn svg{width:16px;height:16px;stroke:#8E8E93;stroke-width:2.5;fill:none;stroke-linecap:round;stroke-linejoin:round}
@@ -257,8 +263,15 @@ table.results tr.row-pending td{color:#AEAEB2}
 
   <!-- ═══ PASTE ZONE ═══ -->
   <div class="op">
-    <div class="ph"><span data-i18n="pasteTitle">Import combinatii de incarcare</span><span class="info-wrap"><button class="info-btn" type="button" onclick="toggleInfo(this,event)">i</button><div class="info-pop wide" onclick="event.stopPropagation()" data-i18n="pasteInfo">&mdash;</div></span></div>
+    <div class="ph"><span data-i18n="pasteTitle">Import combinatii de incarcare</span><span class="info-wrap"><button class="info-btn" type="button" onclick="toggleInfo(this,event)">i</button><div class="info-pop wide" id="pasteInfoPop" onclick="event.stopPropagation()">&mdash;</div></span></div>
     <div class="pb" style="padding-top:4px">
+      <div class="toggle-row" data-nopreset="1" style="padding-bottom:10px">
+        <span data-i18n="importFmtLabel">Format import</span>
+        <div class="seg" data-nopreset="1">
+          <button id="seg-fmt-simple" class="on" data-v="simple" onclick="setImportFmt('simple')" data-i18n="fmtSimple">Simplu (7 coloane)</button>
+          <button id="seg-fmt-etabs" data-v="etabs" onclick="setImportFmt('etabs')" data-i18n="fmtEtabs">Tabel ETABS brut</button>
+        </div>
+      </div>
       <div class="toggle-row" style="padding-bottom:10px">
         <span data-i18n="mapLabel">Convenție axe ETABS</span>
         <div class="seg">
@@ -276,10 +289,30 @@ table.results tr.row-pending td{color:#AEAEB2}
       <div class="paste-zone" id="pasteZone" onclick="focusPasteInput()" tabindex="0">
         <svg class="pz-icon" viewBox="0 0 24 24" fill="none" stroke="#0066CC" stroke-width="1.4"><rect x="4" y="3" width="13" height="17" rx="1.5"/><path d="M8 8h5M8 11.5h5M8 15h3"/><path d="M15 3v3a1 1 0 0 0 1 1h3"/></svg>
         <div class="pz-title" data-i18n="pasteZoneTitle">Click aici, apoi Ctrl+V</div>
-        <div class="pz-sub" data-i18n="pasteZoneSub">Story &middot; Column &middot; Output Case &middot; Station &middot; N &middot; M2 &middot; M3 (fara antet, separate prin Tab)</div>
+        <div class="pz-sub" id="pzSub">&mdash;</div>
       </div>
       <textarea class="paste-input" id="pasteInput" onpaste="handlePaste(event)"></textarea>
     </div>
+  </div>
+
+  <!-- ═══ TABEL CENTRALIZATOR ═══ -->
+  <div class="op" id="summaryPanel" style="display:none">
+    <div class="table-toolbar">
+      <span class="ttl" id="sumTableTitle" data-i18n="sumTableTitle">Tabel centralizator</span>
+      <div class="seg" data-nopreset="1">
+        <button id="seg-grp-storycol" class="on" data-v="storycol" onclick="setGrouping('storycol')" data-i18n="grpStoryCol">Nivel + stâlp</button>
+        <button id="seg-grp-col" data-v="col" onclick="setGrouping('col')" data-i18n="grpCol">Doar stâlp</button>
+      </div>
+      <button class="btn-sm" id="copySumBtn" onclick="copySummaryTable()" data-i18n="copyBtn">Copiaza tabelul</button>
+    </div>
+    <div class="tbl-wrap">
+      <table class="results" id="summaryTable">
+        <thead><tr id="sumTheadRow"></tr></thead>
+        <tbody id="sumTbodyRows"></tbody>
+      </table>
+    </div>
+    <div class="sum-hint" id="sumHint" data-i18n="sumHint">Click pe un rând pentru a deschide combinația determinantă în tabelul detaliat.</div>
+    <div style="height:12px"></div>
   </div>
 
   <!-- ═══ RESULTS TABLE ═══ -->
@@ -301,6 +334,10 @@ table.results tr.row-pending td{color:#AEAEB2}
     </div>
     <div class="report-bar">
       <span class="report-lbl" data-i18n="exportCalcReport">Export raport de calcul (PDF)</span>
+      <div class="seg" data-nopreset="1">
+        <button id="seg-pdf-sum" class="on" data-v="sum" onclick="setPdfScope('sum')" data-i18n="pdfScopeSum">Doar centralizator</button>
+        <button id="seg-pdf-full" data-v="full" onclick="setPdfScope('full')" data-i18n="pdfScopeFull">Complet</button>
+      </div>
       <button class="report-btn" id="rptBtn" onclick="generatePdf()" data-i18n="downloadPdf">Descarca PDF</button>
     </div>
     <div class="report-status" id="rptStatus"></div>
@@ -336,8 +373,13 @@ table.results tr.row-pending td{color:#AEAEB2}
      3. curbura este limitata de pivotul A (eps_ud) si de pivotul C
         (sectiune integral comprimata -> eps_c2), nu numai de eps_cu.
    Validarea fata de XD-CoSec trebuie refacuta.
+
+   v2.1 adauga: (a) al doilea format de import — tabelul ETABS brut
+   "Element Forces - Columns", citit dupa ANTET, nu dupa pozitie, deci merge
+   si daca ascunzi sau reordonezi coloane; (b) tabelul centralizator, cu
+   utilizarea maxima pe fiecare stalp.
    ═══════════════════════════════════════════════════════════════════════════ */
-const MODULE_ID='07', MODULE_VERSION='2.0.1';
+const MODULE_ID='07', MODULE_VERSION='2.1.0';
 
 /* Captura de ecran cu formatul ETABS, afisata in popover-ul de import.
    Se completeaza cu sirul "data:image/png;base64,..." din versiunea
@@ -368,6 +410,19 @@ function mapMz(M2,M3){return axisMap==='swap'?M3:M2;}
 let signConv=(function(){try{return localStorage.getItem('sw_signconv')||'neg';}catch(e){return 'neg';}})();
 function sgnN(){return signConv==='neg'?-1:1;}
 function convN(v){return sgnN()*v;}
+
+/* ─── Format de import ───────────────────────────────────────────────────────
+   'simple' = blocul de 7 coloane fara antet (formatul istoric; singurul
+   disponibil cand datele NU vin din ETABS — dintr-un alt program sau scrise
+   de mana). 'etabs' = tabelul brut "Element Forces - Columns", copiat direct
+   din ETABS sau din exportul lui in Excel, cu antet cu tot.
+   Este o preferinta de utilizator, nu o proprietate a sectiunii -> global. */
+let importFmt=(function(){try{return localStorage.getItem('sw_col_importfmt')||'simple';}catch(e){return 'simple';}})();
+/* Gruparea din tabelul centralizator — tot preferinta de utilizator. */
+let grouping=(function(){try{return localStorage.getItem('sw_col_grouping')||'storycol';}catch(e){return 'storycol';}})();
+/* Continutul raportului PDF: numai centralizatorul (implicit — la cateva sute
+   de combinatii tabelul detaliat ar da zeci de pagini) sau complet. */
+let pdfScope=(function(){try{return localStorage.getItem('sw_col_pdfscope')||'sum';}catch(e){return 'sum';}})();
 
 if(typeof JP==='undefined'){
   document.getElementById('statusStrip').className='status-strip on';
@@ -413,12 +468,19 @@ const T={
   signNeg:{ro:'N&lt;0 compresiune',en:'N&lt;0 compression'},
   mapStd:{ro:'M2&rarr;Mz, M3&rarr;My',en:'M2&rarr;Mz, M3&rarr;My'},
   mapSwap:{ro:'M2&rarr;My, M3&rarr;Mz',en:'M2&rarr;My, M3&rarr;Mz'},
+  importFmtLabel:{ro:'Format import',en:'Import format'},
+  fmtSimple:{ro:'Simplu (7 coloane)',en:'Simple (7 columns)'},
+  fmtEtabs:{ro:'Tabel ETABS brut',en:'Raw ETABS table'},
   pasteTitle:{ro:'Import combinatii de incarcare',en:'Import load combinations'},
-  pasteInfo:{
-    ro:'Copiaza din Excel/ETABS un bloc de date FARA antet, cu coloanele in aceasta ordine: Story, Column, Output Case, Station, N, M2, M3. Valorile trebuie separate prin Tab (formatul implicit la copiere din Excel). Semnul lui N se stabileste din comutatorul de mai sus.<br><br><b>Recomandare:</b> sorteaza intai valorile in Excel si pastreaza doar combinatiile critice pentru fiecare stalp (ex. N max cu M aferente, M2 max cu rest aferente, M3 max cu rest aferente).'+IMG_TAG,
-    en:'Copy a block of data from Excel/ETABS WITHOUT a header row, with columns in this order: Story, Column, Output Case, Station, N, M2, M3. Values must be Tab-separated (the default when copying from Excel). The sign of N is set by the toggle above.<br><br><b>Tip:</b> first sort the values in Excel and keep only the critical combinations per column (e.g. max N with concurrent M, max M2 with the rest concurrent, max M3 with the rest concurrent).'+IMG_TAG},
+  pasteInfoSimple:{
+    ro:'<b>Format simplu (7 coloane).</b> Copiaza un bloc de date FARA antet, cu coloanele exact in aceasta ordine: Story, Column, Output Case, Station, N, M2, M3. Valorile separate prin Tab (implicit la copiere din Excel). Foloseste acest format cand datele NU vin din ETABS — din alt program sau scrise de mana.<br><br>Semnul lui N se stabileste din comutatorul de mai sus. Zecimalele pot fi cu punct sau cu virgula.',
+    en:'<b>Simple format (7 columns).</b> Copy a block of data WITHOUT a header row, columns in exactly this order: Story, Column, Output Case, Station, N, M2, M3. Tab-separated (the default when copying from Excel). Use this when the data does NOT come from ETABS — another program, or typed by hand.<br><br>The sign of N is set by the toggle above. Decimals may use a dot or a comma.'},
+  pasteInfoEtabs:{
+    ro:'<b>Tabel ETABS brut.</b> Copiaza tabelul <i>Element Forces - Columns</i> asa cum este, CU randul de antet. Banner-ul "TABLE: ...", randul de unitati si randurile goale sunt ignorate automat.<br><br>Coloanele sunt citite dupa <b>numele din antet</b>, nu dupa pozitie: poti ascunde sau reordona coloane in Excel fara sa strici importul. Sunt necesare: Story, Column, Output Case, Station, P, M2, M3. <i>Step Type</i> (Max/Min) se adauga la numele combinatiei, ca sa nu se piarda ramurile infasuratoarelor.<br><br>P se preia ca N, in conventia de semn aleasa mai sus (implicit N&lt;0 = compresiune, ca in ETABS). Zecimalele pot fi cu punct sau cu virgula.'+IMG_TAG,
+    en:'<b>Raw ETABS table.</b> Copy the <i>Element Forces - Columns</i> table as it is, WITH its header row. The "TABLE: ..." banner, the units row and blank lines are skipped automatically.<br><br>Columns are read by <b>header name</b>, not by position: you can hide or reorder columns in Excel without breaking the import. Required: Story, Column, Output Case, Station, P, M2, M3. <i>Step Type</i> (Max/Min) is appended to the combination name so envelope branches are not lost.<br><br>P is taken as N, in the sign convention chosen above (default N&lt;0 = compression, as in ETABS). Decimals may use a dot or a comma.'+IMG_TAG},
   pasteZoneTitle:{ro:'Click aici, apoi Ctrl+V',en:'Click here, then Ctrl+V'},
   pasteZoneSub:{ro:'Story &middot; Column &middot; Output Case &middot; Station &middot; N &middot; M2 &middot; M3 (fara antet, separate prin Tab)',en:'Story &middot; Column &middot; Output Case &middot; Station &middot; N &middot; M2 &middot; M3 (no header, Tab-separated)'},
+  pasteZoneSubEtabs:{ro:'Tabelul ETABS <i>Element Forces - Columns</i>, cu antet (banner-ul si randul de unitati se ignora)',en:'The ETABS <i>Element Forces - Columns</i> table, with its header (banner and units row are skipped)'},
   recalcAllBtn:{ro:'Recalculeaza tot',en:'Recalculate all'},
   copyBtn:{ro:'Copiaza tabelul',en:'Copy table'},
   copiedBtn:{ro:'Copiat ✓',en:'Copied ✓'},
@@ -447,6 +509,8 @@ const T={
   emptyStateMsg:{ro:'Nicio combinatie importata inca. Defineste sectiunea mai sus, apoi lipeste datele din Excel/ETABS.',en:'No combinations imported yet. Define the section above, then paste data from Excel/ETABS.'},
   exportCalcReport:{ro:'Export raport de calcul (PDF)',en:'Export calculation report (PDF)'},
   downloadPdf:{ro:'Descarca PDF',en:'Download PDF'},
+  pdfScopeSum:{ro:'Doar centralizator',en:'Summary only'},
+  pdfScopeFull:{ro:'Complet',en:'Full'},
   generating:{ro:'Se genereaza...',en:'Generating...'},
   pdfLoading:{ro:'Libraria PDF se incarca...',en:'PDF library is loading...'},
   footer:{ro:'Lucrare de disertație — Janos Patrik · UTCN · Facultatea de Construcții · 2026',en:'Dissertation — Janos Patrik · UTCN · Faculty of Civil Engineering · 2026'},
@@ -467,6 +531,18 @@ const T={
   verdictFail:{ro:'NU VERIFICA',en:'FAIL'},
   verdictInvalid:{ro:'INVALID',en:'INVALID'},
   verdictPending:{ro:'&mdash;',en:'&mdash;'},
+  // ─── tabel centralizator ───
+  sumTableTitle:{ro:'Tabel centralizator',en:'Summary table'},
+  sumTableTitleN:{ro:(g,n)=>`Tabel centralizator — ${g} elemente din ${n} combinatii`,en:(g,n)=>`Summary table — ${g} elements from ${n} combinations`},
+  grpStoryCol:{ro:'Nivel + stâlp',en:'Story + column'},
+  grpCol:{ro:'Doar stâlp',en:'Column only'},
+  sumHint:{ro:'Click pe un rând pentru a deschide combinația determinantă în tabelul detaliat.',en:'Click a row to open its governing combination in the detailed table.'},
+  csGovStory:{ro:'Nivel det.',en:'Gov. story'},
+  csNComb:{ro:'Nr. comb.',en:'No. comb.'},
+  csInvalid:{ro:'Invalide',en:'Invalid'},
+  csGovCase:{ro:'Combinatie determinanta',en:'Governing combination'},
+  csUtilMax:{ro:'Utilizare max.',en:'Max utilization'},
+  sumEmptyPending:{ro:'Se calculeaza...',en:'Calculating...'},
   // status (contractul {ok, code, message} al nucleului)
   stNoBracket:{ro:'N_Ed este in afara capacitatii axiale a sectiunii. Rezultatul nu este valabil.',en:'N_Ed lies outside the section axial capacity. The result is not valid.'},
   stResidual:{ro:'Echilibrul nu a fost satisfacut exact. Rezultatul este aproximativ.',en:'Equilibrium was not satisfied exactly. The result is approximate.'},
@@ -483,10 +559,14 @@ const T={
   sectionSummary:{ro:(b,h,tot,rho)=>`Sectiune curenta: ${b}×${h} mm, ${tot} bare, ρ = ${rho}%. Se aplica identic tuturor rândurilor din tabel.`,en:(b,h,tot,rho)=>`Current section: ${b}×${h} mm, ${tot} bars, ρ = ${rho}%. Applied identically to every row in the table.`},
   confirmClear:{ro:'Sigur vrei sa stergi toate combinatiile importate?',en:'Are you sure you want to clear all imported combinations?'},
   pasteParseError:{ro:n=>`${n} rand(uri) nu au putut fi interpretate si au fost ignorate (verifica formatul: Story, Column, Output Case, Station, N, M2, M3).`,en:n=>`${n} row(s) could not be parsed and were skipped (check the format: Story, Column, Output Case, Station, N, M2, M3).`},
+  pasteNoHeader:{ro:'Nu am gasit randul de antet al tabelului ETABS si nici asezarea standard a coloanelor. Copiaza tabelul "Element Forces - Columns" impreuna cu antetul, sau comuta pe formatul simplu (7 coloane).',
+                 en:'No ETABS header row was found, and the columns do not match the standard layout either. Copy the "Element Forces - Columns" table together with its header row, or switch to the simple 7-column format.'},
   pdfTitle:{ro:'VERIFICARE BIAXIALA IN TABEL — COMBINATII DE INCARCARE',en:'BIAXIAL CHECK — TABLE OF LOAD COMBINATIONS'},
   pdfSub:{ro:'Metoda fibrelor 2D - CR 2-2022 / SR EN 1992-1-1',en:'2D fibre method - CR 2-2022 / SR EN 1992-1-1'},
   pdfDate:{ro:'Data: ',en:'Date: '},
   pdfSecTitle:{ro:'SECTIUNE (comuna pentru toate combinatiile)',en:'SECTION (shared by all combinations)'},
+  pdfSumTitle:{ro:'TABEL CENTRALIZATOR — UTILIZARE MAXIMA PE ELEMENT',en:'SUMMARY TABLE — MAXIMUM UTILIZATION PER ELEMENT'},
+  pdfSumNote:{ro:(n)=>'Selectat din '+n+' combinatii. Pentru fiecare element se retine combinatia cu utilizarea maxima.',en:(n)=>'Selected out of '+n+' combinations. For each element the combination with the highest utilization is kept.'},
   pdfInWidth:{ro:'Latime b',en:'Width b'},
   pdfInHeight:{ro:'Inaltime h',en:'Height h'},
   pdfInTotBars:{ro:'Total bare',en:'Total bars'},
@@ -538,6 +618,7 @@ function applyStaticLang(){
     if(T[k]){const v=T[k][LANG];if(v!==undefined&&typeof v!=='function')el.innerHTML=v;}
   });
   document.querySelectorAll('#langSeg button').forEach(b=>b.classList.toggle('on',b.dataset.lang===LANG));
+  updatePasteHint();   // depinde si de formatul de import, nu doar de limba
   stampVersion();
 }
 function setLang(l){LANG=l;try{localStorage.setItem('sw_lang',l);}catch(e){}applyStaticLang();renderTable();updSectionSummary();showSectionStatus();}
@@ -643,6 +724,34 @@ function setSignConv(mode){
     recalcAll();
   }
   saveCurrentPreset();
+}
+/* Formatul de import nu atinge datele deja importate — schimba doar felul in
+   care se citeste URMATOAREA lipire. */
+function setImportFmt(mode){
+  importFmt=mode;
+  try{localStorage.setItem('sw_col_importfmt',mode);}catch(e){}
+  document.getElementById('seg-fmt-simple').classList.toggle('on',mode==='simple');
+  document.getElementById('seg-fmt-etabs').classList.toggle('on',mode==='etabs');
+  updatePasteHint();
+}
+function updatePasteHint(){
+  const sub=document.getElementById('pzSub');
+  if(sub) sub.innerHTML=(importFmt==='etabs')?t('pasteZoneSubEtabs'):t('pasteZoneSub');
+  const pop=document.getElementById('pasteInfoPop');
+  if(pop) pop.innerHTML=(importFmt==='etabs')?t('pasteInfoEtabs'):t('pasteInfoSimple');
+}
+function setGrouping(mode){
+  grouping=mode;
+  try{localStorage.setItem('sw_col_grouping',mode);}catch(e){}
+  document.getElementById('seg-grp-storycol').classList.toggle('on',mode==='storycol');
+  document.getElementById('seg-grp-col').classList.toggle('on',mode==='col');
+  renderSummaryTable();
+}
+function setPdfScope(mode){
+  pdfScope=mode;
+  try{localStorage.setItem('sw_col_pdfscope',mode);}catch(e){}
+  document.getElementById('seg-pdf-sum').classList.toggle('on',mode==='sum');
+  document.getElementById('seg-pdf-full').classList.toggle('on',mode==='full');
 }
 
 // ═══════════════════ Model (nucleu comun) ═══════════════════
@@ -786,25 +895,112 @@ function newRow(o){
     N:convN(o.Nraw),My:mapMy(o.M2,o.M3),Mz:mapMz(o.M2,o.M3),
     res:null,status:'pending',_expanded:false};
 }
-function parseAndAppend(text){
-  const lines=text.split(/\r\n|\n|\r/).map(l=>l.trim()).filter(l=>l.length>0);
-  let errCount=0;
-  const newRows=[];
-  for(const line of lines){
-    const cols=line.split('\t');
-    if(cols.length<7){errCount++;continue;}
-    const [story,column,outputCase,station,nStr,m2Str,m3Str]=cols;
-    const N=parseFloat(String(nStr).replace(',','.'));
-    const M2=parseFloat(String(m2Str).replace(',','.'));
-    const M3=parseFloat(String(m3Str).replace(',','.'));
-    if(!isFinite(N)||!isFinite(M2)||!isFinite(M3)){errCount++;continue;}
-    newRows.push(newRow({story,column,outputCase,station,Nraw:N,M2,M3}));
+
+/* ─── Numere: acceptam zecimala cu punct SAU cu virgula ──────────────────────
+   Un export ETABS deschis intr-un Excel romanesc scrie "-19,3762"; acelasi
+   export pe un Excel englezesc scrie "-19.3762", iar la mii poate aparea
+   "1.234,56" sau "1,234.56". Regula: daca apar ambele separatoare, ULTIMUL
+   este zecimala; daca apare doar virgula, o singura virgula este zecimala, iar
+   mai multe inseamna separator de mii. */
+function parseNum(s){
+  if(s===undefined||s===null)return NaN;
+  let x=String(s).trim().replace(/[\s  ]/g,'');
+  if(!x)return NaN;
+  const hasDot=x.indexOf('.')>=0, hasCom=x.indexOf(',')>=0;
+  if(hasDot&&hasCom){
+    if(x.lastIndexOf(',')>x.lastIndexOf('.')) x=x.replace(/\./g,'').replace(',','.');
+    else x=x.replace(/,/g,'');
+  } else if(hasCom){
+    x=((x.split(',').length-1)===1)?x.replace(',','.'):x.replace(/,/g,'');
   }
-  if(newRows.length===0 && errCount>0){alert(t('pasteParseError',errCount));return;}
+  const v=parseFloat(x);
+  return isFinite(v)?v:NaN;
+}
+
+/* ─── Tabelul ETABS brut: citire DUPA ANTET ──────────────────────────────────
+   Coloanele se identifica dupa numele din antet, nu dupa pozitie. Asa poti
+   ascunde coloane in Excel (Unique Name, Case Type, Element, Location...) sau
+   sa le reordonezi, fara sa strici importul. Randul "TABLE: ...", randul de
+   unitati (m, kN, kN-m) si randurile goale nu contin numar in coloana P, deci
+   sunt sarite automat. */
+function normHdr(s){return String(s||'').trim().toLowerCase().replace(/\s+/g,' ');}
+const HDR_MAP={
+  'story':'story','nivel':'story','etaj':'story',
+  'column':'column','frame':'column','stalp':'column','stâlp':'column','pier':'column',
+  'unique name':'unique',
+  'output case':'case','case':'case','combo':'case','load case/combo':'case','combination':'case',
+  'case type':'casetype',
+  'step type':'step','step':'step',
+  'station':'station',
+  'p':'P','v2':'V2','v3':'V3','t':'T','m2':'M2','m3':'M3',
+  'element':'element','elem station':'elemstation','location':'location'
+};
+// Asezarea standard a tabelului "Element Forces - Columns", pentru cazul in
+// care se lipesc numai randurile de date, fara antet.
+const ETABS_STD={story:0,column:1,unique:2,case:3,casetype:4,step:5,station:6,
+                 P:7,V2:8,V3:9,T:10,M2:11,M3:12};
+function findEtabsHeader(cellsArr){
+  for(let i=0;i<Math.min(cellsArr.length,12);i++){
+    const map={};
+    cellsArr[i].forEach((c,j)=>{const k=HDR_MAP[normHdr(c)];if(k&&map[k]===undefined)map[k]=j;});
+    if(map.P!==undefined&&map.M2!==undefined&&map.M3!==undefined&&
+       (map.column!==undefined||map.story!==undefined)) return {idx:i,map:map};
+  }
+  return null;
+}
+function parseEtabsTable(text){
+  const lines=text.split(/\r\n|\n|\r/).filter(l=>l.trim().length>0);
+  const cells=lines.map(l=>l.split('\t'));
+  const hdr=findEtabsHeader(cells);
+  let map,start;
+  if(hdr){ map=hdr.map; start=hdr.idx+1; }
+  else {
+    map=ETABS_STD; start=0;
+    const plausible=cells.some(c=>c.length>=13&&isFinite(parseNum(c[7]))&&
+                                 isFinite(parseNum(c[11]))&&isFinite(parseNum(c[12])));
+    if(!plausible) return {rows:[],skipped:0,err:'noheader'};
+  }
+  const out=[]; let skipped=0;
+  const g=(c,k)=>(map[k]!==undefined?String(c[map[k]]||'').trim():'');
+  for(let i=start;i<cells.length;i++){
+    const c=cells[i];
+    const P=parseNum(c[map.P]),M2=parseNum(c[map.M2]),M3=parseNum(c[map.M3]);
+    if(!isFinite(P)||!isFinite(M2)||!isFinite(M3)){
+      // Banner-ul, randul de unitati si liniile goale NU sunt erori.
+      const pRaw=String(c[map.P]||'').trim();
+      if(c.length>=8 && pRaw && !/^[a-z\-\/ ]+$/i.test(pRaw)) skipped++;
+      continue;
+    }
+    const stepRaw=g(c,'step');
+    const step=/^(single value|none)?$/i.test(stepRaw)?'':stepRaw;
+    let cs=g(c,'case');
+    cs=step?(cs?cs+' ('+step+')':step):cs;   // Max/Min intra in numele combinatiei
+    out.push(newRow({story:g(c,'story'),column:g(c,'column'),outputCase:cs,
+                     station:g(c,'station'),Nraw:P,M2:M2,M3:M3}));
+  }
+  return {rows:out,skipped:skipped};
+}
+/* ─── Formatul simplu, istoric: 7 coloane, fara antet ───────────────────── */
+function parseSimpleTable(text){
+  const lines=text.split(/\r\n|\n|\r/).map(l=>l.trim()).filter(l=>l.length>0);
+  const out=[]; let skipped=0;
+  for(const line of lines){
+    const c=line.split('\t');
+    if(c.length<7){skipped++;continue;}
+    const N=parseNum(c[4]),M2=parseNum(c[5]),M3=parseNum(c[6]);
+    if(!isFinite(N)||!isFinite(M2)||!isFinite(M3)){skipped++;continue;}
+    out.push(newRow({story:c[0],column:c[1],outputCase:c[2],station:c[3],Nraw:N,M2:M2,M3:M3}));
+  }
+  return {rows:out,skipped:skipped};
+}
+function parseAndAppend(text){
+  const res=(importFmt==='etabs')?parseEtabsTable(text):parseSimpleTable(text);
+  if(res.err==='noheader'){ alert(t('pasteNoHeader')); return; }
+  const newRows=res.rows, errCount=res.skipped||0;
+  if(newRows.length===0){ alert(t('pasteParseError',errCount)); return; }
   rows=rows.concat(newRows);
   if(errCount>0) setTimeout(()=>alert(t('pasteParseError',errCount)),50);
-  document.getElementById('resultsPanel').style.display='';
-  document.getElementById('emptyPanel').style.display='none';
+  showPanels();
   recalcPending();   // se calculeaza doar randurile noi
   saveCurrentPreset();
 }
@@ -815,8 +1011,7 @@ function clearTable(){
 }
 function clearTableSilent(){
   rows=[];
-  document.getElementById('resultsPanel').style.display='none';
-  document.getElementById('emptyPanel').style.display='';
+  showPanels();
 }
 function deleteRow(idx){
   rows.splice(idx,1);
@@ -837,7 +1032,7 @@ function runBatch(pendingOnly){
   renderTable();
   const btn=document.getElementById('recalcBtn');
   const progBar=document.getElementById('progressBar'), progFill=document.getElementById('progressFill');
-  if(todo.length===0){ renderSummary(); btn.disabled=false; progBar.style.display='none'; return; }
+  if(todo.length===0){ renderSummary(); renderSummaryTable(); btn.disabled=false; progBar.style.display='none'; return; }
   btn.disabled=true;
   progBar.style.display=''; progFill.style.width='0%';
   let k=0;
@@ -857,7 +1052,7 @@ function runBatch(pendingOnly){
     }
     progFill.style.width=(todo.length?(100*k/todo.length):100).toFixed(0)+'%';
     if(k<todo.length) requestAnimationFrame(step);
-    else { renderSummary(); btn.disabled=false; setTimeout(()=>{progBar.style.display='none';},400); }
+    else { renderSummary(); renderSummaryTable(); btn.disabled=false; setTimeout(()=>{progBar.style.display='none';},400); }
   }
   requestAnimationFrame(step);
 }
@@ -895,7 +1090,7 @@ function renderTable(){
     const c=rowCells(r);
     const expanded=(r._expanded)?' expanded':'';
     const chevBtn=`<button class="row-exp${expanded}" onclick="toggleRowDetail(${idx})" title="${esc(t('detailToggle'))}"><span class="chev-r"></span></button>`;
-    html+=`<tr class="${c.cls}">
+    html+=`<tr class="${c.cls}" id="row-${idx}">
       <td class="exp-cell">${chevBtn}</td>
       <td class="lbl-col"><input class="cell-in lbl-in" type="text" value="${esc(r.story)}" oninput="editCell(${idx},'story',this.value)" placeholder="&mdash;"></td>
       <td class="lbl-col"><input class="cell-in lbl-in" type="text" value="${esc(r.column)}" oninput="editCell(${idx},'column',this.value)" placeholder="&mdash;"></td>
@@ -916,6 +1111,7 @@ function renderTable(){
   rows.forEach((r,idx)=>{ if(r._expanded) drawDetail(r,idx); });
   document.getElementById('tableTitle').textContent=t('tableTitleN',rows.length);
   renderSummary();
+  renderSummaryTable();
 }
 function fmtIn(v){ if(v===undefined||v===null||!isFinite(v))return ''; return (Math.round(v*100)/100); }
 function updateRowResultCells(idx){
@@ -940,7 +1136,7 @@ function editCell(idx,field,value){
   const r=rows[idx];
   if(!r)return;
   if(field==='Nraw'||field==='M2'||field==='M3'){
-    const num=parseFloat(String(value).replace(',','.'));
+    const num=parseNum(value);
     r[field]=isFinite(num)?num:0;
     r.N=convN(r.Nraw); r.My=mapMy(r.M2,r.M3); r.Mz=mapMz(r.M2,r.M3);
     r.status='pending'; r.res=null;
@@ -948,6 +1144,7 @@ function editCell(idx,field,value){
     editDebounce=setTimeout(()=>{ recomputeRow(idx); saveCurrentPreset(); },250);
   } else {
     r[field]=value;
+    renderSummaryTable();   // eticheta schimbata -> gruparea se poate schimba
     saveCurrentPreset();
   }
 }
@@ -963,11 +1160,11 @@ function recomputeRow(idx){
   if(r._expanded){ renderTable(); return; }
   updateRowResultCells(idx);
   renderSummary();
+  renderSummaryTable();
 }
 function addManualRow(){
   rows.push(newRow({Nraw:0,M2:0,M3:0}));
-  document.getElementById('resultsPanel').style.display='';
-  document.getElementById('emptyPanel').style.display='none';
+  showPanels();
   renderTable();
   saveCurrentPreset();
   setTimeout(()=>{
@@ -1001,6 +1198,115 @@ function renderSummary(){
     html+=`<div class="sum-chip"><div class="sc-l">${t('sumInvalid')}</div><div class="sc-v">${invalid.length}</div></div>`;
   }
   bar.innerHTML=html;
+}
+
+/* ═══════════════════ TABEL CENTRALIZATOR ═══════════════════
+   Dintr-un lot mare de combinatii se retine, pentru fiecare element, numai
+   combinatia cu utilizarea maxima. Gruparea implicita este pe Nivel + Stalp
+   (elementul fizic distinct); varianta "Doar stalp" agrega toate nivelurile
+   unui stalp si arata nivelul determinant.
+   Randurile fara rezultat valabil NU pot intra in maxim — se numara separat,
+   ca sa nu treaca neobservate. */
+function buildSummary(){
+  const groups=new Map();
+  rows.forEach((r,idx)=>{
+    const key=(grouping==='col')?(r.column||'—')
+                                :((r.story||'—')+'\u0000'+(r.column||'—'));
+    let g=groups.get(key);
+    if(!g){g={story:r.story||'',column:r.column||'',n:0,invalid:0,pending:0,
+              worst:null,worstIdx:-1};groups.set(key,g);}
+    g.n++;
+    if(r.status!=='done'){g.pending++;return;}
+    if(r.res&&r.res.ok){
+      if(!g.worst||r.res.value.util>g.worst.res.value.util){
+        g.worst=r; g.worstIdx=idx;
+        g.story=r.story||g.story; g.column=r.column||g.column;
+      }
+    } else g.invalid++;
+  });
+  const arr=[...groups.values()];
+  // cel mai solicitat element primul — asta se citeste intai intr-un centralizator
+  arr.sort((a,b)=>{
+    const ua=a.worst?a.worst.res.value.util:-1, ub=b.worst?b.worst.res.value.util:-1;
+    if(ub!==ua)return ub-ua;
+    return String(a.column).localeCompare(String(b.column),undefined,{numeric:true});
+  });
+  return arr;
+}
+function renderSummaryTable(){
+  const panel=document.getElementById('summaryPanel');
+  if(!panel)return;
+  if(!rows.length){panel.style.display='none';return;}
+  panel.style.display='';
+  const groups=buildSummary();
+  document.getElementById('sumTableTitle').textContent=
+    t('sumTableTitleN',groups.length,rows.length);
+  const storyHdr=(grouping==='col')?t('csGovStory'):t('colStory');
+  document.getElementById('sumTheadRow').innerHTML=`
+    <th>${t('colColumn')}</th><th>${storyHdr}</th>
+    <th class="grp-start">${t('csNComb')}</th><th>${t('csInvalid')}</th>
+    <th class="grp-start">${t('csGovCase')}</th><th>${t('colStation')}</th>
+    <th class="grp-start">${t('colN')}</th><th>${t('colM2')}</th><th>${t('colM3')}</th>
+    <th class="grp-start">${t('colMyRd')}</th><th>${t('colMzRd')}</th>
+    <th>${t('csUtilMax')}</th><th>${t('colVerdict')}</th>`;
+  let html='';
+  groups.forEach(g=>{
+    const w=g.worst;
+    if(!w){
+      const msg=g.pending?t('sumEmptyPending'):t('verdictInvalid');
+      html+=`<tr class="row-invalid">
+        <td class="lbl-col">${esc(g.column)||'&mdash;'}</td><td class="lbl-col">${esc(g.story)||'&mdash;'}</td>
+        <td class="grp-start">${g.n}</td><td>${g.invalid||'&mdash;'}</td>
+        <td class="lbl-col grp-start" colspan="7">${esc(msg)}</td>
+        <td>&mdash;</td>
+        <td><span class="verdict-pill na">${t('verdictInvalid')}</span></td></tr>`;
+      return;
+    }
+    const v=w.res.value, pass=v.util<=100;
+    const cls=pass?'row-ok':'row-fail';
+    html+=`<tr class="sum-row ${cls}" onclick="focusGoverningRow(${g.worstIdx})" title="${esc(t('sumHint'))}">
+      <td class="lbl-col">${esc(g.column)||'&mdash;'}</td><td class="lbl-col">${esc(g.story)||'&mdash;'}</td>
+      <td class="grp-start">${g.n}</td><td>${g.invalid?g.invalid:'&mdash;'}</td>
+      <td class="lbl-col grp-start">${esc(w.outputCase)||'&mdash;'}</td><td class="lbl-col">${esc(w.station)||'&mdash;'}</td>
+      <td class="grp-start">${fmtIn(w.Nraw)}</td><td>${fmtIn(w.M2)}</td><td>${fmtIn(w.M3)}</td>
+      <td class="grp-start">${v.MyRd.toFixed(1)}</td><td>${v.MzRd.toFixed(1)}</td>
+      <td><b>${v.util.toFixed(1)} %</b></td>
+      <td><span class="verdict-pill ${pass?'ok':'no'}">${pass?t('verdictOk'):t('verdictFail')}</span></td></tr>`;
+  });
+  document.getElementById('sumTbodyRows').innerHTML=html;
+}
+// Din centralizator inapoi in tabelul detaliat: se desfasoara randul
+// determinant si se aduce in ecran.
+function focusGoverningRow(idx){
+  if(idx<0||!rows[idx])return;
+  if(!rows[idx]._expanded) toggleRowDetail(idx);
+  setTimeout(()=>{
+    const tr=document.getElementById('row-'+idx);
+    if(tr&&tr.scrollIntoView) tr.scrollIntoView({behavior:'smooth',block:'center'});
+  },60);
+}
+function copySummaryTable(){
+  const btn=document.getElementById('copySumBtn');
+  const storyHdr=(grouping==='col')?t('csGovStory'):t('colStory');
+  const header=[t('colColumn'),storyHdr,t('csNComb'),t('csInvalid'),t('csGovCase'),t('colStation'),
+    'N (kN)','M2 (kNm)','M3 (kNm)','My,Rd (kNm)','Mz,Rd (kNm)',t('csUtilMax'),t('colVerdict')];
+  const strip=s=>String(s).replace(/<[^>]*>/g,'').replace(/&mdash;/g,'-').replace(/&amp;/g,'&');
+  const lines=[header.join('\t')];
+  buildSummary().forEach(g=>{
+    const w=g.worst;
+    if(!w){ lines.push([g.column,g.story,g.n,g.invalid||0,'-','-','-','-','-','-','-','-',strip(t('verdictInvalid'))].join('\t')); return; }
+    const v=w.res.value;
+    lines.push([g.column,g.story,g.n,g.invalid||0,w.outputCase,w.station,
+      fmtIn(w.Nraw),fmtIn(w.M2),fmtIn(w.M3),v.MyRd.toFixed(1),v.MzRd.toFixed(1),
+      v.util.toFixed(1)+'%',
+      strip(v.util<=100?t('verdictOk'):t('verdictFail'))].join('\t'));
+  });
+  const tsv=lines.join('\n');
+  const done=()=>{btn.textContent=t('copiedBtn');btn.disabled=true;
+    setTimeout(()=>{btn.textContent=t('copyBtn');btn.disabled=false;},1600);};
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(tsv).then(done).catch(()=>fallbackCopy(tsv,done));
+  } else fallbackCopy(tsv,done);
 }
 
 // ─── Panoul de detaliu: diagrama My-Mz + sectiunea cu zona comprimata + valori ───
@@ -1204,10 +1510,47 @@ function buildPdfDoc(){
   const secTableEndY=doc.lastAutoTable.finalY;
   drawSectionInPdf(doc,m,ml+leftW+10,y,pW-mr-(ml+leftW+10));
 
-  // ── Rezultate ──
-  let y2=secTableEndY+8;
+  // ── Tabel centralizator (mereu prezent — este rezultatul care se citeste) ──
+  let yS=secTableEndY+8;
   doc.setFontSize(9);doc.setFont('helvetica','bold');doc.setTextColor(0,102,204);
-  doc.text(t('pdfResultsTitle'),ml,y2);doc.setTextColor(0,0,0);doc.setFont('helvetica','normal');
+  doc.text(t('pdfSumTitle'),ml,yS);doc.setTextColor(0,0,0);doc.setFont('helvetica','normal');
+  doc.setFontSize(7);doc.setTextColor(108,108,112);
+  doc.text(t('pdfSumNote',rows.length),ml,yS+4);doc.setTextColor(0,0,0);
+  const groups=buildSummary();
+  const storyHdr=(grouping==='col')?t('csGovStory'):t('colStory');
+  const sumBody=groups.map(g=>{
+    const w=g.worst;
+    if(!w) return [g.column,g.story,String(g.n),String(g.invalid||0),'-','-','-','-','-','-','-','-',t('pdfInvalidCell')];
+    const v=w.res.value;
+    return [g.column,g.story,String(g.n),g.invalid?String(g.invalid):'-',
+      w.outputCase,w.station,
+      String(fmtIn(w.Nraw)),String(fmtIn(w.M2)),String(fmtIn(w.M3)),
+      v.MyRd.toFixed(1),v.MzRd.toFixed(1),v.util.toFixed(1)+'%',
+      (v.util<=100?t('verdictOk'):t('verdictFail'))];
+  });
+  doc.autoTable({
+    startY:yS+7,
+    head:[[t('colColumn'),storyHdr,t('csNComb'),t('csInvalid'),t('csGovCase'),t('colStation'),
+           t('colN'),t('colM2'),t('colM3'),t('colMyRd'),t('colMzRd'),t('csUtilMax'),t('colVerdict')]],
+    body:sumBody,
+    margin:{left:ml,right:mr},tableWidth:cw,theme:'grid',
+    styles:{lineColor:[180,200,220],lineWidth:0.25,fontSize:7.5,textColor:[0,0,0],cellPadding:1.6},
+    headStyles:{fillColor:[200,215,235],textColor:[0,0,0],fontStyle:'bold',lineColor:[200,215,235],fontSize:7.5},
+    columnStyles:{2:{halign:'right'},3:{halign:'right'},6:{halign:'right'},7:{halign:'right'},8:{halign:'right'},
+                  9:{halign:'right'},10:{halign:'right'},11:{halign:'right',fontStyle:'bold'},12:{halign:'center',fontStyle:'bold'}},
+    didParseCell:function(data){
+      if(data.section==='body'&&data.column.index===12){
+        const vt=sumBody[data.row.index][12];
+        if(vt===t('verdictOk')) data.cell.styles.textColor=[46,125,50];
+        else if(vt===t('verdictFail')) data.cell.styles.textColor=[192,57,43];
+        else data.cell.styles.textColor=[108,108,112];
+      }
+    },
+    didDrawPage:function(){hdr();}
+  });
+  let lastY=doc.lastAutoTable.finalY;
+
+  // ── Rezultate pe combinatii (optional) ──
   const obs=[];
   const body=rows.map((r,i)=>{
     const okv=r.status==='done'&&r.res&&r.res.ok;
@@ -1226,25 +1569,32 @@ function buildPdfDoc(){
       verdict
     ];
   });
-  doc.autoTable({
-    startY:y2+4,
-    head:[[t('colStory'),t('colColumn'),t('colCase'),t('colStation'),t('colN'),t('colM2'),t('colM3'),t('colMyRd'),t('colMzRd'),t('colUtil'),t('colVerdict')]],
-    body,
-    margin:{left:ml,right:mr},tableWidth:cw,theme:'grid',
-    styles:{lineColor:[180,200,220],lineWidth:0.25,fontSize:7.5,textColor:[0,0,0],cellPadding:1.6},
-    headStyles:{fillColor:[200,215,235],textColor:[0,0,0],fontStyle:'bold',lineColor:[200,215,235],fontSize:7.5},
-    columnStyles:{4:{halign:'right'},5:{halign:'right'},6:{halign:'right'},7:{halign:'right'},8:{halign:'right'},9:{halign:'right'},10:{halign:'center',fontStyle:'bold'}},
-    didParseCell:function(data){
-      if(data.section==='body'&&data.column.index===10){
-        const vt=body[data.row.index][10];
-        if(vt===t('verdictOk')) data.cell.styles.textColor=[46,125,50];
-        else if(vt===t('verdictFail')) data.cell.styles.textColor=[192,57,43];
-        else if(vt===t('pdfInvalidCell')) data.cell.styles.textColor=[108,108,112];
-      }
-    },
-    didDrawPage:function(){hdr();}
-  });
-  let y3=doc.lastAutoTable.finalY+7;
+  if(pdfScope==='full'){
+    let y2=lastY+8;
+    if(y2>pH-45){doc.addPage();hdr();y2=19;}
+    doc.setFontSize(9);doc.setFont('helvetica','bold');doc.setTextColor(0,102,204);
+    doc.text(t('pdfResultsTitle'),ml,y2);doc.setTextColor(0,0,0);doc.setFont('helvetica','normal');
+    doc.autoTable({
+      startY:y2+4,
+      head:[[t('colStory'),t('colColumn'),t('colCase'),t('colStation'),t('colN'),t('colM2'),t('colM3'),t('colMyRd'),t('colMzRd'),t('colUtil'),t('colVerdict')]],
+      body,
+      margin:{left:ml,right:mr},tableWidth:cw,theme:'grid',
+      styles:{lineColor:[180,200,220],lineWidth:0.25,fontSize:7.5,textColor:[0,0,0],cellPadding:1.6},
+      headStyles:{fillColor:[200,215,235],textColor:[0,0,0],fontStyle:'bold',lineColor:[200,215,235],fontSize:7.5},
+      columnStyles:{4:{halign:'right'},5:{halign:'right'},6:{halign:'right'},7:{halign:'right'},8:{halign:'right'},9:{halign:'right'},10:{halign:'center',fontStyle:'bold'}},
+      didParseCell:function(data){
+        if(data.section==='body'&&data.column.index===10){
+          const vt=body[data.row.index][10];
+          if(vt===t('verdictOk')) data.cell.styles.textColor=[46,125,50];
+          else if(vt===t('verdictFail')) data.cell.styles.textColor=[192,57,43];
+          else if(vt===t('pdfInvalidCell')) data.cell.styles.textColor=[108,108,112];
+        }
+      },
+      didDrawPage:function(){hdr();}
+    });
+    lastY=doc.lastAutoTable.finalY;
+  }
+  let y3=lastY+7;
   function need(n){ if(y3+n>pH-14){doc.addPage();hdr();y3=19;} }
   // ── Observatii (randuri fara rezultat valabil) ──
   if(obs.length){
@@ -1361,10 +1711,17 @@ function syncToggleUI(){
   document.getElementById('seg-map-swap').classList.toggle('on',axisMap==='swap');
   document.getElementById('seg-sign-neg').classList.toggle('on',signConv==='neg');
   document.getElementById('seg-sign-pos').classList.toggle('on',signConv==='pos');
+  document.getElementById('seg-fmt-simple').classList.toggle('on',importFmt==='simple');
+  document.getElementById('seg-fmt-etabs').classList.toggle('on',importFmt==='etabs');
+  document.getElementById('seg-grp-storycol').classList.toggle('on',grouping==='storycol');
+  document.getElementById('seg-grp-col').classList.toggle('on',grouping==='col');
+  document.getElementById('seg-pdf-sum').classList.toggle('on',pdfScope==='sum');
+  document.getElementById('seg-pdf-full').classList.toggle('on',pdfScope==='full');
 }
 function showPanels(){
   const has=rows.length>0;
   document.getElementById('resultsPanel').style.display=has?'':'none';
+  document.getElementById('summaryPanel').style.display=has?'':'none';
   document.getElementById('emptyPanel').style.display=has?'none':'';
 }
 function switchPreset(p){
