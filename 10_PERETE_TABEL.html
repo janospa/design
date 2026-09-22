@@ -311,6 +311,21 @@ table.results tr.sum-row:hover td:first-child{background:#E6EFFC}
           <button id="seg-mom-m2" data-v="M2" onclick="setMomAxis('M2')">M2</button>
         </div>
       </div>
+      <div class="toggle-row" data-nopreset="1" style="padding-bottom:10px">
+        <span data-i18n="solverLabel">Solver</span>
+        <div class="seg" data-nopreset="1">
+          <button id="seg-solv-uni" class="on" data-v="uni" onclick="setSolver('uni')" data-i18n="solvUni">Uniaxial (M03)</button>
+          <button id="seg-solv-bi" data-v="bi" onclick="setSolver('bi')" data-i18n="solvBi">Biaxial (M11)</button>
+        </div>
+      </div>
+      <div class="toggle-row" data-nopreset="1" id="cmpRow" style="padding-bottom:10px;display:none">
+        <span data-i18n="compareLabel">Compara cu uniaxial</span>
+        <div class="seg" data-nopreset="1">
+          <button id="seg-cmp-off" class="on" data-v="off" onclick="setCompare(false)" data-i18n="cmpOff">Nu</button>
+          <button id="seg-cmp-on" data-v="on" onclick="setCompare(true)" data-i18n="cmpOn">Da</button>
+        </div>
+      </div>
+      <div class="note" id="solverNote" style="padding-bottom:10px"></div>
       <div class="toggle-row" data-nopreset="1" style="padding-bottom:12px;border-bottom:1px solid #E0E0E5;margin-bottom:14px">
         <span data-i18n="signLabel">Convenție semn N</span>
         <div class="seg" data-nopreset="1">
@@ -390,6 +405,8 @@ table.results tr.sum-row:hover td:first-child{background:#E6EFFC}
 
 <!-- ═══ nucleu de calcul comun — trebuie incarcat INAINTE de scriptul modulului ═══ -->
 <script src="engine.js"></script>
+<!-- extensia biaxiala; optionala — fara ea modulul ruleaza numai uniaxial -->
+<script src="engine-poly.js"></script>
 
 <script>
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -408,11 +425,11 @@ table.results tr.sum-row:hover td:first-child{background:#E6EFFC}
      - simplu, 7 coloane fara antet (cand datele nu vin din ETABS);
      - tabelul ETABS brut "Pier Forces", citit DUPA ANTET.
    ═══════════════════════════════════════════════════════════════════════════ */
-const MODULE_ID='10', MODULE_VERSION='1.0.0';
+const MODULE_ID='10', MODULE_VERSION='1.1.0';
 
 let curC='C50/60',curS='S 500',confMode='none';
 let rows=[];      // {story,pier,outputCase,location,Nraw,M2,M3,N,M,res,status,_expanded}
-let currentModel=null;
+let currentModel=null, currentModelBi=null;
 
 /* ─── Care moment lucreaza in planul peretelui ───────────────────────────────
    La Pier Forces, momentul din planul peretelui este de regula M3, iar M2 este
@@ -422,6 +439,26 @@ let currentModel=null;
    relipire. Este o proprietate a modelului -> intra in presetare. */
 let momAxis=(function(){try{return localStorage.getItem('sw_wall_momaxis')||'M3';}catch(e){return 'M3';}})();
 function mapM(M2,M3){return momAxis==='M2'?M2:M3;}
+/* Momentul din AFARA planului este celalalt. Uniaxial este ignorat; biaxial
+   intra in calcul si de regula scade capacitatea in plan. */
+function mapMout(M2,M3){return momAxis==='M2'?M3:M2;}
+
+/* ─── Solver: uniaxial (JP.wall, ca modulul 03) sau biaxial (JP.poly, ca
+   modulul 11) ───────────────────────────────────────────────────────────────
+   Implicit UNIAXIAL, deci comportamentul existent al modulului NU se schimba.
+   Datele importate sunt aceleasi in ambele cazuri: tabelul pastreaza oricum
+   si M2 si M3 pe fiecare rand, iar biaxialul doar nu mai arunca unul dintre
+   ele. Preferinta de utilizator -> cheie globala, nu presetare. */
+let solverMode=(function(){try{return localStorage.getItem('sw_wall_solver')||'uni';}catch(e){return 'uni';}})();
+/* Comparatia ruleaza AMBELE solvere pe fiecare rand si arata cele doua
+   utilizari plus diferenta — raspunsul empiric la "conteaza M2 la peretii
+   mei". Costa inca un solve pe rand, deci este optionala. */
+let compareMode=(function(){try{return localStorage.getItem('sw_wall_compare')==='1';}catch(e){return false;}})();
+/* Malaj mai grosier decat la modulul 11: in lot conteaza timpul pe rand.
+   NT = 12 da ~0,2 % fata de modulul 03 si ~11 ms pe rand. */
+const BATCH_NT=12;
+function polyReady(){return typeof JP!=='undefined'&&!!JP.poly;}
+function isBi(){return solverMode==='bi'&&polyReady();}
 
 /* ─── Conventia de semn pentru N (comuna cu modulele 03 / 06 / 07) ───────────
    Nucleul lucreaza intern cu COMPRESIUNEA POZITIVA. Conversia se face numai la
@@ -531,6 +568,8 @@ const T={
   colX:{ro:'X (mm)',en:'X (mm)'},
   colUtil:{ro:'Utilizare',en:'Utilization'},
   colVerdict:{ro:'Verdict',en:'Verdict'},
+  colUtilUni:{ro:'Utilizare uniax.',en:'Util. uniaxial'},
+  colDelta:{ro:'Δ biax.',en:'Δ biaxial'},
   verdictOk:{ro:'VERIFICA',en:'PASS'},
   verdictFail:{ro:'NU VERIFICA',en:'FAIL'},
   verdictInvalid:{ro:'INVALID',en:'INVALID'},
@@ -540,6 +579,23 @@ const T={
   sumFail:{ro:'Nu verifica',en:'Fail'},
   sumWorst:{ro:'Cea mai defavorabila',en:'Governing (worst)'},
   sumInvalid:{ro:'Rezultat invalid',en:'Invalid result'},
+  // solver
+  solverLabel:{ro:'Solver',en:'Solver'},
+  solvUni:{ro:'Uniaxial (M03)',en:'Uniaxial (M03)'},
+  solvBi:{ro:'Biaxial (M11)',en:'Biaxial (M11)'},
+  solvUniNote:{ro:'Incovoiere in planul peretelui. Momentul din afara planului este ignorat &mdash; identic cu modulul 03.',
+               en:'In-plane bending only. The out-of-plane moment is ignored &mdash; identical to module 03.'},
+  solvBiNote:{ro:'Incovoiere biaxiala pe sectiunea 2D: ambele momente actioneaza simultan, axa neutra este inclinata &mdash; ca in modulul 11.',
+              en:'Biaxial bending on the 2D section: both moments act together and the neutral axis is inclined &mdash; as in module 11.'},
+  compareLabel:{ro:'Compara cu uniaxial',en:'Compare with uniaxial'},
+  cmpOff:{ro:'Nu',en:'No'},
+  cmpOn:{ro:'Da',en:'Yes'},
+  cmpOnNote:{ro:'Fiecare rand este calculat si uniaxial, pentru a arata cat costa momentul din afara planului.',
+             en:'Every row is also solved uniaxially, to show what the out-of-plane moment costs.'},
+  noPoly:{ro:'engine-poly.js nu s-a incarcat, deci solverul biaxial nu este disponibil. Verificati ca fisierul este in acelasi folder cu aceasta pagina.',
+          en:'engine-poly.js did not load, so the biaxial solver is unavailable. Check that the file sits in the same folder as this page.'},
+  noPolyNote:{ro:'<b>engine-poly.js nu s-a incarcat</b> &mdash; solverul biaxial nu este disponibil; se foloseste cel uniaxial.',
+              en:'<b>engine-poly.js did not load</b> &mdash; the biaxial solver is unavailable; the uniaxial one is used.'},
   // centralizator
   sumTableTitle:{ro:'Tabel centralizator',en:'Summary table'},
   sumTableTitleN:{ro:(g,n)=>`Tabel centralizator — ${g} elemente din ${n} combinatii`,en:(g,n)=>`Summary table — ${g} elements from ${n} combinations`},
@@ -556,10 +612,15 @@ const T={
   detailToggle:{ro:'Arată/ascunde detalii de calcul',en:'Show/hide calculation details'},
   detailUnavailable:{ro:'Detaliile apar după calcul.',en:'Details appear after calculation.'},
   detailDiagram:{ro:'Diagramă de interacțiune N–M',en:'N–M interaction diagram'},
+  detailDiagramBi:{ro:'Diagramă de interacțiune M_y–M_z',en:'M_y–M_z interaction diagram'},
   detailSection:{ro:'Secțiune — zonă comprimată',en:'Section — compression zone'},
   detailValues:{ro:'Valori',en:'Values'},
   dtN:{ro:'N_Ed',en:'N_Ed'},
   dtMEd:{ro:'M_Ed',en:'M_Ed'},
+  dtMin:{ro:'M_Ed in plan',en:'M_Ed in-plane'},
+  dtMout:{ro:'M_Ed in afara planului',en:'M_Ed out-of-plane'},
+  dtTheta:{ro:'θ (inclinarea axei neutre)',en:'θ (neutral axis inclination)'},
+  dtUtilUni:{ro:'Utilizare uniaxiala',en:'Uniaxial utilization'},
   dtMRd:{ro:'M_Rd',en:'M_Rd'},
   dtX:{ro:'X (zonă comprimată)',en:'X (compression zone)'},
   dtNint:{ro:'N_int',en:'N_int'},
@@ -601,6 +662,9 @@ const T={
   pdfResultsTitle:{ro:'REZULTATE PE COMBINATII',en:'RESULTS PER COMBINATION'},
   pdfObsTitle:{ro:'OBSERVATII',en:'NOTES'},
   pdfLimTitle:{ro:'CONVENTII SI LIMITARI',en:'CONVENTIONS AND LIMITATIONS'},
+  pdfInSolver:{ro:'Solver',en:'Solver'},
+  pdfSolvUni:{ro:'Uniaxial (in planul peretelui)',en:'Uniaxial (in-plane)'},
+  pdfSolvBi:{ro:'Biaxial (M_y + M_z, axa neutra inclinata)',en:'Biaxial (M_y + M_z, inclined neutral axis)'},
   pdfInWallLen:{ro:'Lungimea peretelui l_w',en:'Wall length l_w'},
   pdfInWebThick:{ro:'Grosimea inimii b_w0',en:'Web thickness b_w0'},
   pdfInBE1:{ro:'Bulb 1: lungime / latime',en:'BE 1: length / width'},
@@ -656,7 +720,7 @@ function applyStaticLang(){
   updConfNote();
   stampVersion();
 }
-function setLang(l){LANG=l;try{localStorage.setItem('sw_lang',l);}catch(e){}applyStaticLang();renderTable();updSectionSummary();showSectionStatus();}
+function setLang(l){LANG=l;try{localStorage.setItem('sw_lang',l);}catch(e){}applyStaticLang();updSolverNote();renderTable();updSectionSummary();showSectionStatus();}
 function stampVersion(){
   const eng=(typeof JP!=='undefined')?JP.VERSION:'?';
   document.getElementById('versionFooter').textContent=
@@ -746,7 +810,7 @@ function setMomAxis(mode){
   document.getElementById('seg-mom-m3').classList.toggle('on',mode==='M3');
   document.getElementById('seg-mom-m2').classList.toggle('on',mode==='M2');
   if(rows.length){
-    rows.forEach(r=>{r.M=mapM(r.M2,r.M3);r.status='pending';r.res=null;});
+    rows.forEach(r=>{r.M=mapM(r.M2,r.M3);r.Mout=mapMout(r.M2,r.M3);r.status='pending';r.res=null;r.resUni=null;});
     recalcAll();
   }
   saveCurrentPreset();
@@ -762,7 +826,7 @@ function setSignConv(mode){
   if(rows.length){
     rows.forEach(r=>{
       if(isFinite(r.Nraw)&&r.Nraw!==0)r.Nraw=-r.Nraw;
-      r.N=convN(r.Nraw); r.status='pending'; r.res=null;
+      r.N=convN(r.Nraw); r.status='pending'; r.res=null; r.resUni=null;
     });
     renderTable();
     recalcAll();
@@ -781,6 +845,34 @@ function updatePasteHint(){
   if(sub) sub.innerHTML=(importFmt==='etabs')?t('pasteZoneSubEtabs'):t('pasteZoneSub');
   const pop=document.getElementById('pasteInfoPop');
   if(pop) pop.innerHTML=(importFmt==='etabs')?t('pasteInfoEtabs'):t('pasteInfoSimple');
+}
+function setSolver(mode){
+  if(mode==='bi'&&!polyReady()){alert(t('noPoly'));return;}
+  if(mode===solverMode)return;
+  solverMode=mode;
+  try{localStorage.setItem('sw_wall_solver',mode);}catch(e){}
+  document.getElementById('seg-solv-uni').classList.toggle('on',mode==='uni');
+  document.getElementById('seg-solv-bi').classList.toggle('on',mode==='bi');
+  document.getElementById('cmpRow').style.display=(mode==='bi')?'':'none';
+  updSolverNote();
+  currentModel=null;currentModelBi=null;
+  if(rows.length) recalcAll(); else renderTable();
+}
+function setCompare(on){
+  compareMode=!!on;
+  try{localStorage.setItem('sw_wall_compare',on?'1':'0');}catch(e){}
+  document.getElementById('seg-cmp-off').classList.toggle('on',!on);
+  document.getElementById('seg-cmp-on').classList.toggle('on',!!on);
+  updSolverNote();
+  if(rows.length) recalcAll(); else renderTable();
+}
+function updSolverNote(){
+  const el=document.getElementById('solverNote');
+  if(!el)return;
+  if(!polyReady()){el.innerHTML=t('noPolyNote');return;}
+  el.innerHTML=(solverMode==='bi')
+    ? t('solvBiNote')+(compareMode?(' '+t('cmpOnNote')):'')
+    : t('solvUniNote');
 }
 function setGrouping(mode){
   grouping=mode;
@@ -816,9 +908,31 @@ function readInputs(){
   };
 }
 function buildModel(){ return JP.wall.buildModel(readInputs()); }
-function evalCombo(m,Ned,Med){
+/* Acelasi perete, construit pentru solverul biaxial. Malaj de lot (BATCH_NT). */
+function buildModelBi(){
+  const inp=readInputs();
+  inp.opts=Object.assign({},inp.opts||{},{NT:BATCH_NT});
+  return JP.poly.buildWall2D(inp);
+}
+function evalUni(m,Ned,Med){
   try{ return JP.wall.solve(m,Ned,Med,LANG); }
   catch(e){ return {ok:false,code:'EXCEPTION',message:String((e&&e.message)||e),value:null,partial:null}; }
+}
+function evalBi(m,Ned,Mout,Min){
+  try{ return JP.poly.solve(m,Ned,Mout,Min,LANG); }
+  catch(e){ return {ok:false,code:'EXCEPTION',message:String((e&&e.message)||e),value:null,partial:null}; }
+}
+/* Vedere unificata a rezultatului, ca tabelul sa nu se ramifice peste tot.
+   Uniaxial: M_Ed este momentul din plan, M_Rd este M_Rd al modulului 03.
+   Biaxial:  M_Ed este REZULTANTA, M_Rd este capacitatea pe directia ei. */
+function resultView(r){
+  if(!r||!r.res||r.status!=='done') return null;
+  const res=r.res, v=res.value;
+  if(!res.ok||!v) return {ok:false};
+  if(r.bi) return {ok:true,mEd:v.MEd,mRd:v.MRd,X:v.X,util:v.util,
+                   theta:v.thetaDeg,mzRd:v.MzRd,myRd:v.MyRd};
+  return {ok:true,mEd:Math.abs(r.M),mRd:v.Mrd,X:v.X,util:v.util,theta:null,
+          mzRd:v.Mrd,myRd:0};
 }
 function statusText(res){
   if(!res)return '';
@@ -875,6 +989,7 @@ function showSectionStatus(){
 function onSectionChange(){
   if(typeof JP==='undefined')return;
   currentModel=buildModel();
+  currentModelBi=isBi()?buildModelBi():null;
   const m=currentModel;
   document.getElementById('cnt_b1').textContent=m.cntB1+' '+t('barsWord');
   document.getElementById('cnt_b2').textContent=m.cntB2+' '+t('barsWord');
@@ -997,8 +1112,8 @@ function handlePaste(ev){
 function newRow(o){
   return {story:o.story||'',pier:o.pier||'',outputCase:o.outputCase||'',location:o.location||'',
     Nraw:o.Nraw,M2:o.M2,M3:o.M3,
-    N:convN(o.Nraw),M:mapM(o.M2,o.M3),
-    res:null,status:'pending',_expanded:false};
+    N:convN(o.Nraw),M:mapM(o.M2,o.M3),Mout:mapMout(o.M2,o.M3),
+    res:null,resUni:null,bi:false,status:'pending',_expanded:false};
 }
 /* Zecimala cu punct SAU cu virgula; separator de mii in ambele conventii. */
 function parseNum(s){
@@ -1116,7 +1231,8 @@ function recalcPending(){ runBatch(true); }
 function runBatch(pendingOnly){
   if(typeof JP==='undefined')return;
   if(!currentModel) currentModel=buildModel();
-  if(!pendingOnly) rows.forEach(r=>{r.status='pending';r.res=null;});
+  if(isBi()&&!currentModelBi) currentModelBi=buildModelBi();
+  if(!pendingOnly) rows.forEach(r=>{r.status='pending';r.res=null;r.resUni=null;});
   const todo=[];
   rows.forEach((r,idx)=>{ if(r.status!=='done') todo.push(idx); });
   renderTable();
@@ -1126,14 +1242,23 @@ function runBatch(pendingOnly){
   btn.disabled=true;
   progBar.style.display=''; progFill.style.width='0%';
   let k=0;
-  const m=currentModel;
+  const m=currentModel, mBi=currentModelBi, bi=isBi(), cmp=bi&&compareMode;
   const now=(typeof performance!=='undefined'&&performance.now)?()=>performance.now():()=>Date.now();
   function step(){
     const t0=now();
     while(k<todo.length && (now()-t0)<30){
       const idx=todo[k];
       const row=rows[idx];
-      row.res=evalCombo(m,row.N,row.M);
+      row.bi=bi;
+      if(bi){
+        row.res=evalBi(mBi,row.N,row.Mout,row.M);
+        // Comparatia foloseste nucleul UNIAXIAL pe acelasi rand, deci
+        // diferenta arata exact ce aduce momentul din afara planului.
+        row.resUni=cmp?evalUni(m,row.N,row.M):null;
+      }else{
+        row.res=evalUni(m,row.N,row.M);
+        row.resUni=null;
+      }
       row.status='done';
       updateRowResultCells(idx);
       k++;
@@ -1146,30 +1271,44 @@ function runBatch(pendingOnly){
 }
 
 // ═══════════════════ Table rendering ═══════════════════
+/* Utilizarea uniaxiala a aceluiasi rand (numai cand comparatia e pornita). */
+function uniUtil(r){
+  return (r&&r.resUni&&r.resUni.ok&&r.resUni.value)?r.resUni.value.util:null;
+}
 function rowCells(r){
-  let mRd='&mdash;',xv='&mdash;',util='&mdash;',
+  let mEd='&mdash;',mRd='&mdash;',xv='&mdash;',util='&mdash;',uUni='&mdash;',dUni='&mdash;',
       verdict=`<span class="verdict-pill pending">${t('verdictPending')}</span>`,cls='row-pending';
   if(r.status==='done'){
-    if(r.res&&r.res.ok){
-      const v=r.res.value;
-      mRd=v.Mrd.toFixed(1); xv=v.X.toFixed(0); util=v.util.toFixed(1)+' %';
-      const pass=v.util<=100;
+    const w=resultView(r);
+    if(w&&w.ok){
+      mEd=w.mEd.toFixed(1); mRd=w.mRd.toFixed(1); xv=w.X.toFixed(0); util=w.util.toFixed(1)+' %';
+      const pass=w.util<=100;
       verdict=`<span class="verdict-pill ${pass?'ok':'no'}">${pass?t('verdictOk'):t('verdictFail')}</span>`;
       cls=pass?'row-ok':'row-fail';
+      const uu=uniUtil(r);
+      if(uu!==null){
+        uUni=uu.toFixed(1)+' %';
+        const d=w.util-uu;
+        // diferenta se citeste ca "cat adauga biaxialul"; pozitiv = mai solicitat
+        dUni=(d>=0?'+':'')+d.toFixed(1);
+      }
     } else {
       verdict=`<span class="verdict-pill na" title="${esc(statusText(r.res))}">${t('verdictInvalid')}</span>`;
       cls='row-invalid';
     }
   }
-  return {mRd,xv,util,verdict,cls};
+  return {mEd,mRd,xv,util,uUni,dUni,verdict,cls};
 }
 function renderTable(){
   const thead=document.getElementById('theadRow');
+  const cmpOn=isBi()&&compareMode;
   thead.innerHTML=`
     <th></th>
     <th>${t('colStory')}</th><th>${t('colPier')}</th><th>${t('colCase')}</th><th>${t('colLocation')}</th>
     <th class="grp-start">${t('colN')}</th><th>${t('colM2')}</th><th>${t('colM3')}</th><th>${t('colMEd')}</th>
-    <th class="grp-start">${t('colMRd')}</th><th>${t('colX')}</th><th>${t('colUtil')}</th><th>${t('colVerdict')}</th>
+    <th class="grp-start">${t('colMRd')}</th><th>${t('colX')}</th><th>${t('colUtil')}</th>`
+    + (cmpOn?`<th>${t('colUtilUni')}</th><th>${t('colDelta')}</th>`:'')
+    + `<th>${t('colVerdict')}</th>
     <th class="editable-row-actions"></th>`;
   const tbody=document.getElementById('tbodyRows');
   let html='';
@@ -1186,13 +1325,14 @@ function renderTable(){
       <td class="grp-start"><input class="cell-in num-in" type="number" step="1" value="${fmtIn(r.Nraw)}" oninput="editCell(${idx},'Nraw',this.value)"></td>
       <td><input class="cell-in num-in" type="number" step="1" value="${fmtIn(r.M2)}" oninput="editCell(${idx},'M2',this.value)"></td>
       <td><input class="cell-in num-in" type="number" step="1" value="${fmtIn(r.M3)}" oninput="editCell(${idx},'M3',this.value)"></td>
-      <td><b>${fmtIn(r.M)}</b></td>
-      <td class="grp-start">${c.mRd}</td><td>${c.xv}</td><td>${c.util}</td>
-      <td class="verdict-cell" onclick="toggleRowDetail(${idx})" style="cursor:pointer">${c.verdict}</td>
+      <td><b>${c.mEd}</b></td>
+      <td class="grp-start">${c.mRd}</td><td>${c.xv}</td><td>${c.util}</td>`
+      + (cmpOn?`<td>${c.uUni}</td><td>${c.dUni}</td>`:'')
+      + `<td class="verdict-cell" onclick="toggleRowDetail(${idx})" style="cursor:pointer">${c.verdict}</td>
       <td class="editable-row-actions"><button class="row-del" onclick="deleteRow(${idx})" title="Delete">&times;</button></td>
     </tr>`;
     if(r._expanded){
-      html+=`<tr class="detail-row"><td colspan="14"><div class="detail-panel" id="detail-${idx}">${renderDetailPanel(r,idx)}</div></td></tr>`;
+      html+=`<tr class="detail-row"><td colspan="${cmpOn?16:14}"><div class="detail-panel" id="detail-${idx}">${renderDetailPanel(r,idx)}</div></td></tr>`;
     }
   });
   tbody.innerHTML=html;
@@ -1211,11 +1351,16 @@ function updateRowResultCells(idx){
   if(!tr)return;
   const tds=tr.querySelectorAll('td');
   const c=rowCells(r);
-  if(tds[8])tds[8].innerHTML='<b>'+fmtIn(r.M)+'</b>';
+  const cmpOn=isBi()&&compareMode;
+  if(tds[8])tds[8].innerHTML='<b>'+c.mEd+'</b>';
   if(tds[9])tds[9].innerHTML=c.mRd;
   if(tds[10])tds[10].innerHTML=c.xv;
   if(tds[11])tds[11].innerHTML=c.util;
-  if(tds[12])tds[12].innerHTML=c.verdict;
+  if(cmpOn){
+    if(tds[12])tds[12].innerHTML=c.uUni;
+    if(tds[13])tds[13].innerHTML=c.dUni;
+    if(tds[14])tds[14].innerHTML=c.verdict;
+  } else if(tds[12])tds[12].innerHTML=c.verdict;
   tr.className=c.cls;
 }
 let editDebounce=null;
@@ -1225,7 +1370,7 @@ function editCell(idx,field,value){
   if(field==='Nraw'||field==='M2'||field==='M3'){
     const num=parseNum(value);
     r[field]=isFinite(num)?num:0;
-    r.N=convN(r.Nraw); r.M=mapM(r.M2,r.M3);
+    r.N=convN(r.Nraw); r.M=mapM(r.M2,r.M3); r.Mout=mapMout(r.M2,r.M3);
     r.status='pending'; r.res=null;
     clearTimeout(editDebounce);
     editDebounce=setTimeout(()=>{ recomputeRow(idx); saveCurrentPreset(); },250);
@@ -1239,7 +1384,16 @@ function recomputeRow(idx){
   const r=rows[idx];
   if(!r)return;
   if(!currentModel) currentModel=buildModel();
-  r.res=evalCombo(currentModel,r.N,r.M);
+  const bi=isBi();
+  if(bi&&!currentModelBi) currentModelBi=buildModelBi();
+  r.bi=bi;
+  if(bi){
+    r.res=evalBi(currentModelBi,r.N,r.Mout,r.M);
+    r.resUni=compareMode?evalUni(currentModel,r.N,r.M):null;
+  }else{
+    r.res=evalUni(currentModel,r.N,r.M);
+    r.resUni=null;
+  }
   r.status='done';
   if(r._expanded){ renderTable(); return; }
   updateRowResultCells(idx);
@@ -1267,17 +1421,18 @@ function toggleRowDetail(idx){
 function renderSummary(){
   const bar=document.getElementById('summaryBar');
   const done=rows.filter(r=>r.status==='done');
-  const invalid=done.filter(r=>!(r.res&&r.res.ok));
-  const valid=done.filter(r=>r.res&&r.res.ok);
-  const okCount=valid.filter(r=>r.res.value.util<=100).length;
+  const invalid=done.filter(r=>{const w=resultView(r);return !(w&&w.ok);});
+  const valid=done.filter(r=>{const w=resultView(r);return w&&w.ok;});
+  const okCount=valid.filter(r=>resultView(r).util<=100).length;
   const failCount=valid.length-okCount;
-  let worst=null;
-  valid.forEach(r=>{if(!worst||r.res.value.util>worst.res.value.util)worst=r;});
+  let worstU=-Infinity;
+  valid.forEach(r=>{const u=resultView(r).util;if(u>worstU)worstU=u;});
+  const worst=isFinite(worstU)?{u:worstU}:null;
   let html=`
     <div class="sum-chip"><div class="sc-l">${t('sumTotal')}</div><div class="sc-v">${rows.length}</div></div>
     <div class="sum-chip ok"><div class="sc-l">${t('sumOk')}</div><div class="sc-v">${okCount}</div></div>
     <div class="sum-chip no"><div class="sc-l">${t('sumFail')}</div><div class="sc-v">${failCount}</div></div>
-    <div class="sum-chip"><div class="sc-l">${t('sumWorst')}</div><div class="sc-v">${worst?worst.res.value.util.toFixed(1)+' %':'&mdash;'}</div></div>`;
+    <div class="sum-chip"><div class="sc-l">${t('sumWorst')}</div><div class="sc-v">${worst?worst.u.toFixed(1)+' %':'&mdash;'}</div></div>`;
   if(invalid.length>0){
     html+=`<div class="sum-chip"><div class="sc-l">${t('sumInvalid')}</div><div class="sc-v">${invalid.length}</div></div>`;
   }
@@ -1297,8 +1452,9 @@ function buildSummary(){
               worst:null,worstIdx:-1};groups.set(key,g);}
     g.n++;
     if(r.status!=='done'){g.pending++;return;}
-    if(r.res&&r.res.ok){
-      if(!g.worst||r.res.value.util>g.worst.res.value.util){
+    const w=resultView(r);
+    if(w&&w.ok){
+      if(!g.worst||w.util>resultView(g.worst).util){
         g.worst=r; g.worstIdx=idx;
         g.story=r.story||g.story; g.pier=r.pier||g.pier;
       }
@@ -1306,7 +1462,7 @@ function buildSummary(){
   });
   const arr=[...groups.values()];
   arr.sort((a,b)=>{
-    const ua=a.worst?a.worst.res.value.util:-1, ub=b.worst?b.worst.res.value.util:-1;
+    const ua=a.worst?resultView(a.worst).util:-1, ub=b.worst?resultView(b.worst).util:-1;
     if(ub!==ua)return ub-ua;
     return String(a.pier).localeCompare(String(b.pier),undefined,{numeric:true});
   });
@@ -1321,12 +1477,15 @@ function renderSummaryTable(){
   document.getElementById('sumTableTitle').textContent=
     t('sumTableTitleN',groups.length,rows.length);
   const storyHdr=(grouping==='pier')?t('csGovStory'):t('colStory');
+  const cmpOn=isBi()&&compareMode;
   document.getElementById('sumTheadRow').innerHTML=`
     <th>${t('colPier')}</th><th>${storyHdr}</th>
     <th class="grp-start">${t('csNComb')}</th><th>${t('csInvalid')}</th>
     <th class="grp-start">${t('csGovCase')}</th><th>${t('colLocation')}</th>
     <th class="grp-start">${t('colN')}</th><th>${t('colMEd')}</th>
-    <th class="grp-start">${t('colMRd')}</th><th>${t('csUtilMax')}</th><th>${t('colVerdict')}</th>`;
+    <th class="grp-start">${t('colMRd')}</th><th>${t('csUtilMax')}</th>`
+    + (cmpOn?`<th>${t('colUtilUni')}</th><th>${t('colDelta')}</th>`:'')
+    + `<th>${t('colVerdict')}</th>`;
   let html='';
   groups.forEach(g=>{
     const w=g.worst;
@@ -1336,20 +1495,24 @@ function renderSummaryTable(){
         <td class="lbl-col">${esc(g.pier)||'&mdash;'}</td><td class="lbl-col">${esc(g.story)||'&mdash;'}</td>
         <td class="grp-start">${g.n}</td><td>${g.invalid||'&mdash;'}</td>
         <td class="lbl-col grp-start" colspan="5">${esc(msg)}</td>
-        <td>&mdash;</td>
-        <td><span class="verdict-pill na">${t('verdictInvalid')}</span></td></tr>`;
+        <td>&mdash;</td>`
+        + (cmpOn?'<td>&mdash;</td><td>&mdash;</td>':'')
+        + `<td><span class="verdict-pill na">${t('verdictInvalid')}</span></td></tr>`;
       return;
     }
-    const v=w.res.value, pass=v.util<=100;
+    const vw=resultView(w), pass=vw.util<=100;
     const cls=pass?'row-ok':'row-fail';
+    const uu=uniUtil(w);
+    const dTxt=(uu===null)?'&mdash;':((vw.util-uu>=0?'+':'')+(vw.util-uu).toFixed(1));
     html+=`<tr class="sum-row ${cls}" onclick="focusGoverningRow(${g.worstIdx})" title="${esc(t('sumHint'))}">
       <td class="lbl-col">${esc(g.pier)||'&mdash;'}</td><td class="lbl-col">${esc(g.story)||'&mdash;'}</td>
       <td class="grp-start">${g.n}</td><td>${g.invalid?g.invalid:'&mdash;'}</td>
       <td class="lbl-col grp-start">${esc(w.outputCase)||'&mdash;'}</td><td class="lbl-col">${esc(w.location)||'&mdash;'}</td>
-      <td class="grp-start">${fmtIn(w.Nraw)}</td><td>${fmtIn(w.M)}</td>
-      <td class="grp-start">${v.Mrd.toFixed(1)}</td>
-      <td><b>${v.util.toFixed(1)} %</b></td>
-      <td><span class="verdict-pill ${pass?'ok':'no'}">${pass?t('verdictOk'):t('verdictFail')}</span></td></tr>`;
+      <td class="grp-start">${fmtIn(w.Nraw)}</td><td>${vw.mEd.toFixed(1)}</td>
+      <td class="grp-start">${vw.mRd.toFixed(1)}</td>
+      <td><b>${vw.util.toFixed(1)} %</b></td>`
+      + (cmpOn?`<td>${uu===null?'&mdash;':uu.toFixed(1)+' %'}</td><td>${dTxt}</td>`:'')
+      + `<td><span class="verdict-pill ${pass?'ok':'no'}">${pass?t('verdictOk'):t('verdictFail')}</span></td></tr>`;
   });
   document.getElementById('sumTbodyRows').innerHTML=html;
 }
@@ -1364,17 +1527,22 @@ function focusGoverningRow(idx){
 function copySummaryTable(){
   const btn=document.getElementById('copySumBtn');
   const storyHdr=(grouping==='pier')?t('csGovStory'):t('colStory');
+  const cmpOn=isBi()&&compareMode;
   const header=[t('colPier'),storyHdr,t('csNComb'),t('csInvalid'),t('csGovCase'),t('colLocation'),
-    'N (kN)','M_Ed (kNm)','M_Rd (kNm)',t('csUtilMax'),t('colVerdict')];
+    'N (kN)','M_Ed (kNm)','M_Rd (kNm)',t('csUtilMax')]
+    .concat(cmpOn?[t('colUtilUni'),t('colDelta')]:[]).concat([t('colVerdict')]);
   const strip=s=>String(s).replace(/<[^>]*>/g,'').replace(/&mdash;/g,'-').replace(/&amp;/g,'&');
   const lines=[header.join('\t')];
   buildSummary().forEach(g=>{
     const w=g.worst;
-    if(!w){ lines.push([g.pier,g.story,g.n,g.invalid||0,'-','-','-','-','-','-',strip(t('verdictInvalid'))].join('\t')); return; }
-    const v=w.res.value;
+    if(!w){ lines.push([g.pier,g.story,g.n,g.invalid||0,'-','-','-','-','-','-']
+      .concat(cmpOn?['-','-']:[]).concat([strip(t('verdictInvalid'))]).join('\t')); return; }
+    const vw=resultView(w), uu=uniUtil(w);
     lines.push([g.pier,g.story,g.n,g.invalid||0,w.outputCase,w.location,
-      fmtIn(w.Nraw),fmtIn(w.M),v.Mrd.toFixed(1),v.util.toFixed(1)+'%',
-      strip(v.util<=100?t('verdictOk'):t('verdictFail'))].join('\t'));
+      fmtIn(w.Nraw),vw.mEd.toFixed(1),vw.mRd.toFixed(1),vw.util.toFixed(1)+'%']
+      .concat(cmpOn?[uu===null?'-':uu.toFixed(1)+'%',
+                     uu===null?'-':((vw.util-uu>=0?'+':'')+(vw.util-uu).toFixed(1))]:[])
+      .concat([strip(vw.util<=100?t('verdictOk'):t('verdictFail'))]).join('\t'));
   });
   const tsv=lines.join('\n');
   const done=()=>{btn.textContent=t('copiedBtn');btn.disabled=true;
@@ -1394,7 +1562,29 @@ function renderDetailPanel(r,idx){
   const note=okv?'':`<div class="detail-note">${esc(statusText(r.res))}</div>`;
   if(!v) return note||`<div class="detail-empty">${esc(t('detailUnavailable'))}</div>`;
   const dash='&mdash;';
-  const vals=[
+  const bi=!!r.bi;
+  const w=resultView(r);
+  const uu=uniUtil(r);
+  const vals=bi?[
+    [t('dtN'), r.Nraw.toFixed(1)+' kN'],
+    [t('dtMin'), r.M.toFixed(1)+' kNm'],
+    [t('dtMout'), r.Mout.toFixed(1)+' kNm'],
+    [t('dtMEd'), okv?v.MEd.toFixed(1)+' kNm':dash],
+    [t('dtMRd'), okv?v.MRd.toFixed(1)+' kNm':dash],
+    ['M_z,Rd', okv?v.MzRd.toFixed(1)+' kNm':dash],
+    ['M_y,Rd', okv?v.MyRd.toFixed(1)+' kNm':dash],
+    [t('dtX'), okv?v.X.toFixed(1)+' mm':dash],
+    [t('dtTheta'), okv?(((Math.round(v.thetaDeg*10)/10)%360+360)%360).toFixed(1)+' °':dash],
+    [t('dtUtil'), okv?v.util.toFixed(1)+' %':dash],
+    (uu!==null?[t('dtUtilUni'), uu.toFixed(1)+' %']:null),
+    [t('dtNint'), convN(v.Nint).toFixed(1)+' kN'],
+    [t('dtDiff'), convN(v.residual).toFixed(2)+' kN'],
+    [t('dtFb'), v.Fc.toFixed(1)+' kN'],
+    [t('dtFa'), v.Fs.toFixed(1)+' kN'],
+    [t('dtPivot'), okv?pivotLabel(v.pivot):dash],
+    [t('dtNRdc'), convN(v.NRdc).toFixed(0)+' kN'],
+    [t('dtNRdt'), convN(v.NRdt).toFixed(0)+' kN'],
+  ].filter(Boolean):[
     [t('dtN'), r.Nraw.toFixed(1)+' kN'],
     [t('dtMEd'), r.M.toFixed(1)+' kNm'],
     [t('dtMRd'), okv?v.Mrd.toFixed(1)+' kNm':dash],
@@ -1414,7 +1604,7 @@ function renderDetailPanel(r,idx){
   return note+`
     <div class="detail-grid">
       <div class="detail-col">
-        <div class="detail-h">${esc(t('detailDiagram'))}</div>
+        <div class="detail-h">${esc(bi?t('detailDiagramBi'):t('detailDiagram'))}</div>
         <div class="detail-chart-wrap"><canvas id="dtchart-${idx}"></canvas></div>
       </div>
       <div class="detail-col">
@@ -1432,48 +1622,99 @@ const detailCharts={};
    sute de randuri, calculul ei pentru fiecare rand ar bloca pagina. */
 function drawDetail(r,idx){
   if(r.status!=='done'||!r.res||!r.res.ok)return;
-  const m=currentModel, v=r.res.value;
+  const bi=!!r.bi;
+  const m=bi?currentModelBi:currentModel, v=r.res.value;
+  if(!m)return;
   const canvas=document.getElementById('dtchart-'+idx);
   if(canvas && typeof Chart!=='undefined'){
     if(detailCharts[idx]){try{detailCharts[idx].destroy();}catch(e){}}
-    let pts=[];
-    try{
-      const nm=JP.wall.interactionNM(m,v.compFromRef?'pos':'neg');
-      if(nm&&nm.ok) pts=nm.value.map(p=>({x:p.M,y:convN(p.N)}));
-    }catch(e){ pts=[]; }
-    const ds=[
-      {label:'Rd',data:pts,showLine:true,borderColor:'#0066CC',borderWidth:2,pointRadius:0,fill:false,tension:0,order:3},
-      {label:'Ed',data:[{x:Math.abs(r.M),y:r.Nraw}],backgroundColor:'#C0392B',borderColor:'#C0392B',pointRadius:6,pointStyle:'rectRot',order:1},
-      {label:'RdPt',data:[{x:v.Mrd,y:r.Nraw}],backgroundColor:'#2E7D32',borderColor:'#2E7D32',pointRadius:5,order:1}
-    ];
+    let ds;
+    if(bi){
+      /* Biaxial: conturul My-Mz la N-ul randului. Se calculeaza DOAR la
+         deschiderea panoului — pe cateva sute de randuri ar bloca pagina. */
+      let pts=[];
+      try{ pts=JP.poly.traceCurve(r.N,m,24).map(p=>({x:p.My,y:p.Mz})); }catch(e){ pts=[]; }
+      if(pts.length)pts.push(pts[0]);
+      ds=[
+        {label:'Rd',data:pts,showLine:true,borderColor:'#0066CC',borderWidth:2,pointRadius:0,fill:false,tension:0,order:3},
+        {label:'Ed',data:[{x:r.Mout,y:r.M}],backgroundColor:'#C0392B',borderColor:'#C0392B',pointRadius:6,pointStyle:'rectRot',order:1},
+        {label:'RdPt',data:[{x:v.MyRd,y:v.MzRd}],backgroundColor:'#2E7D32',borderColor:'#2E7D32',pointRadius:5,order:1},
+        {label:'ray',data:[{x:0,y:0},{x:v.MyRd,y:v.MzRd}],showLine:true,borderColor:'#AEAEB2',borderWidth:1,borderDash:[4,3],pointRadius:0,order:4}
+      ];
+    } else {
+      let pts=[];
+      try{
+        const nm=JP.wall.interactionNM(m,v.compFromRef?'pos':'neg');
+        if(nm&&nm.ok) pts=nm.value.map(p=>({x:p.M,y:convN(p.N)}));
+      }catch(e){ pts=[]; }
+      ds=[
+        {label:'Rd',data:pts,showLine:true,borderColor:'#0066CC',borderWidth:2,pointRadius:0,fill:false,tension:0,order:3},
+        {label:'Ed',data:[{x:Math.abs(r.M),y:r.Nraw}],backgroundColor:'#C0392B',borderColor:'#C0392B',pointRadius:6,pointStyle:'rectRot',order:1},
+        {label:'RdPt',data:[{x:v.Mrd,y:r.Nraw}],backgroundColor:'#2E7D32',borderColor:'#2E7D32',pointRadius:5,order:1}
+      ];
+    }
+    const xl=bi?'My (kNm)':'M (kNm)', yl=bi?'Mz (kNm)':'N (kN)';
     detailCharts[idx]=new Chart(canvas,{type:'scatter',data:{datasets:ds},
       options:{responsive:true,maintainAspectRatio:false,animation:false,
-        plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`M=${c.parsed.x.toFixed(0)} kNm, N=${c.parsed.y.toFixed(0)} kN`}}},
+        plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`${bi?'My':'M'}=${c.parsed.x.toFixed(0)}, ${bi?'Mz':'N'}=${c.parsed.y.toFixed(0)}`}}},
         scales:{
-          x:{type:'linear',title:{display:true,text:'M (kNm)',font:{size:11}},grid:{color:'rgba(0,0,0,0.05)'},ticks:{font:{size:10}}},
-          y:{type:'linear',title:{display:true,text:'N (kN)',font:{size:11}},grid:{color:'rgba(0,0,0,0.05)'},ticks:{font:{size:10}}}
+          x:{type:'linear',title:{display:true,text:xl,font:{size:11}},grid:{color:'rgba(0,0,0,0.05)'},ticks:{font:{size:10}}},
+          y:{type:'linear',title:{display:true,text:yl,font:{size:11}},grid:{color:'rgba(0,0,0,0.05)'},ticks:{font:{size:10}}}
         }}});
   }
   const svg=document.getElementById('dtsketch-'+idx);
-  if(svg) drawSketch(m,v.X,v.compFromRef,svg);
+  if(!svg)return;
+  if(bi) drawSketchBi(m,v,svg); else drawSketch(m,v.X,v.compFromRef,svg);
+}
+
+/* Sectiunea in mod biaxial: celulele comprimate hasurate si axa neutra
+   INCLINATA. Desenul uniaxial nu poate arata inclinarea, deci ar minti. */
+function drawSketchBi(m,v,svg){
+  if(!m||!(m.nC>0)){svg.innerHTML='';return;}
+  const VW=460,VH=220,PAD=26;
+  const bb=m.bbox, spanY=bb.ymax-bb.ymin, spanZ=bb.zmax-bb.zmin;
+  const scl=Math.min((VW-2*PAD)/spanY,(VH-2*PAD)/Math.max(spanZ,spanY*0.20));
+  const cx=VW/2, cy=VH/2;
+  const X2=(y)=>cx+y*scl, Y2=(z)=>cy-z*scl;
+  const p=JP.poly.project(v.theta,m), na=p.dmax-v.X;
+  const fw=m.hy*scl, fh=m.hz*scl;
+  let o='';
+  const MATCOL=['#E8E8ED','#DDEEFF','#E4F3E6'];
+  for(let i=0;i<m.nC;i++){
+    const on=(p.dC[i]-na)>0;
+    o+=`<rect x="${(X2(m.cy[i])-fw/2).toFixed(2)}" y="${(Y2(m.cz[i])-fh/2).toFixed(2)}" width="${(fw+0.4).toFixed(2)}" height="${(fh+0.4).toFixed(2)}" fill="${on?'#8EBCF0':(MATCOL[m.cMat[i]]||'#E8E8ED')}"/>`;
+  }
+  m.rects.forEach(rc=>{
+    o+=`<rect x="${X2(rc.y0-m.cgY)}" y="${Y2(rc.z0-m.cgZ+rc.wz)}" width="${rc.wy*scl}" height="${rc.wz*scl}" fill="none" stroke="#1C1C1E" stroke-width="1"/>`;
+  });
+  const cxx=Math.cos(v.theta), czz=Math.sin(v.theta);
+  const px=na*cxx, pz=na*czz, dx=-czz, dz=cxx, L=Math.max(spanY,spanZ)*1.2;
+  o+=`<line x1="${X2(px-dx*L)}" y1="${Y2(pz-dz*L)}" x2="${X2(px+dx*L)}" y2="${Y2(pz+dz*L)}" stroke="#C0392B" stroke-width="1.4" stroke-dasharray="6,4"/>`;
+  m.steelFibers.forEach(f=>{
+    o+=`<circle cx="${X2(f.y)}" cy="${Y2(f.z)}" r="${Math.max(1.3,Math.sqrt(f.A/Math.PI)*scl).toFixed(2)}" fill="#1C1C1E"/>`;
+  });
+  svg.innerHTML=o;
 }
 
 // ═══════════════════ Copy detailed table ═══════════════════
 function copyTable(){
   const btn=document.getElementById('copyBtn');
+  const cmpOn=isBi()&&compareMode;
   const header=[t('colStory'),t('colPier'),t('colCase'),t('colLocation'),
-    'N (kN)','M2 (kNm)','M3 (kNm)','M_Ed (kNm)','M_Rd (kNm)','X (mm)',t('colUtil'),t('colVerdict')];
+    'N (kN)','M2 (kNm)','M3 (kNm)','M_Ed (kNm)','M_Rd (kNm)','X (mm)',t('colUtil')]
+    .concat(cmpOn?[t('colUtilUni'),t('colDelta')]:[]).concat([t('colVerdict')]);
   const strip=s=>String(s).replace(/<[^>]*>/g,'').replace(/&mdash;/g,'-').replace(/&amp;/g,'&');
   const lines=[header.join('\t')];
   rows.forEach(r=>{
-    const okv=r.status==='done'&&r.res&&r.res.ok;
-    const v=okv?r.res.value:null;
+    const w=resultView(r), okv=!!(w&&w.ok), uu=uniUtil(r);
     lines.push([r.story,r.pier,r.outputCase,r.location,
-      fmtIn(r.Nraw),fmtIn(r.M2),fmtIn(r.M3),fmtIn(r.M),
-      okv?v.Mrd.toFixed(1):'-',okv?v.X.toFixed(0):'-',
-      okv?v.util.toFixed(1)+'%':'-',
-      okv?(v.util<=100?strip(t('verdictOk')):strip(t('verdictFail')))
-         :(r.status==='done'?strip(t('verdictInvalid')):'-')].join('\t'));
+      fmtIn(r.Nraw),fmtIn(r.M2),fmtIn(r.M3),okv?w.mEd.toFixed(1):fmtIn(r.M),
+      okv?w.mRd.toFixed(1):'-',okv?w.X.toFixed(0):'-',
+      okv?w.util.toFixed(1)+'%':'-']
+      .concat(cmpOn?[uu===null?'-':uu.toFixed(1)+'%',
+                     (okv&&uu!==null)?((w.util-uu>=0?'+':'')+(w.util-uu).toFixed(1)):'-']:[])
+      .concat([okv?(w.util<=100?strip(t('verdictOk')):strip(t('verdictFail')))
+         :(r.status==='done'?strip(t('verdictInvalid')):'-')]).join('\t'));
   });
   const tsv=lines.join('\n');
   const done=()=>{btn.textContent=t('copiedBtn');btn.disabled=true;
@@ -1552,6 +1793,7 @@ function buildPdfDoc(){
       [t('pdfNRdt'),lim?convN(lim.NRdt).toFixed(0)+' kN':'-'],
       [t('pdfInSignConv'),(signConv==='pos')?t('pdfSignPos'):t('pdfSignNeg')],
       [t('pdfInMomAxis'),momAxis],
+      [t('pdfInSolver'),isBi()?t('pdfSolvBi'):t('pdfSolvUni')],
       [t('pdfInConvention'),m.deductSteel?t('pdfConvNet'):t('pdfConvGross')],
       [t('pdfInNfibres'),''+m.NF],
     ],
@@ -1571,28 +1813,36 @@ function buildPdfDoc(){
   doc.text(t('pdfSumNote',rows.length),ml,yS+4);doc.setTextColor(0,0,0);
   const groups=buildSummary();
   const storyHdr=(grouping==='pier')?t('csGovStory'):t('colStory');
+  const cmpOn=isBi()&&compareMode;
   const sumBody=groups.map(g=>{
     const w=g.worst;
-    if(!w) return [g.pier,g.story,String(g.n),String(g.invalid||0),'-','-','-','-','-','-',t('pdfInvalidCell')];
-    const v=w.res.value;
+    if(!w) return [g.pier,g.story,String(g.n),String(g.invalid||0),'-','-','-','-','-','-']
+      .concat(cmpOn?['-','-']:[]).concat([t('pdfInvalidCell')]);
+    const vw=resultView(w), uu=uniUtil(w);
     return [g.pier,g.story,String(g.n),g.invalid?String(g.invalid):'-',
-      w.outputCase,w.location,String(fmtIn(w.Nraw)),String(fmtIn(w.M)),
-      v.Mrd.toFixed(1),v.util.toFixed(1)+'%',
-      (v.util<=100?t('verdictOk'):t('verdictFail'))];
+      w.outputCase,w.location,String(fmtIn(w.Nraw)),vw.mEd.toFixed(1),
+      vw.mRd.toFixed(1),vw.util.toFixed(1)+'%']
+      .concat(cmpOn?[uu===null?'-':uu.toFixed(1)+'%',
+                     uu===null?'-':((vw.util-uu>=0?'+':'')+(vw.util-uu).toFixed(1))]:[])
+      .concat([(vw.util<=100?t('verdictOk'):t('verdictFail'))]);
   });
   doc.autoTable({
     startY:yS+7,
     head:[[t('colPier'),storyHdr,t('csNComb'),t('csInvalid'),t('csGovCase'),t('colLocation'),
-           t('colN'),t('colMEd'),t('colMRd'),t('csUtilMax'),t('colVerdict')]],
+           t('colN'),t('colMEd'),t('colMRd'),t('csUtilMax')]
+           .concat(cmpOn?[t('colUtilUni'),t('colDelta')]:[]).concat([t('colVerdict')])],
     body:sumBody,
     margin:{left:ml,right:mr},tableWidth:cw,theme:'grid',
     styles:{lineColor:[180,200,220],lineWidth:0.25,fontSize:7.5,textColor:[0,0,0],cellPadding:1.6},
     headStyles:{fillColor:[200,215,235],textColor:[0,0,0],fontStyle:'bold',lineColor:[200,215,235],fontSize:7.5},
-    columnStyles:{2:{halign:'right'},3:{halign:'right'},6:{halign:'right'},7:{halign:'right'},
-                  8:{halign:'right'},9:{halign:'right',fontStyle:'bold'},10:{halign:'center',fontStyle:'bold'}},
+    columnStyles:Object.assign({2:{halign:'right'},3:{halign:'right'},6:{halign:'right'},7:{halign:'right'},
+                  8:{halign:'right'},9:{halign:'right',fontStyle:'bold'}},
+                  cmpOn?{10:{halign:'right'},11:{halign:'right'},12:{halign:'center',fontStyle:'bold'}}
+                       :{10:{halign:'center',fontStyle:'bold'}}),
     didParseCell:function(data){
-      if(data.section==='body'&&data.column.index===10){
-        const vt=sumBody[data.row.index][10];
+      const vIdx=cmpOn?12:10;
+      if(data.section==='body'&&data.column.index===vIdx){
+        const vt=sumBody[data.row.index][vIdx];
         if(vt===t('verdictOk')) data.cell.styles.textColor=[46,125,50];
         else if(vt===t('verdictFail')) data.cell.styles.textColor=[192,57,43];
         else data.cell.styles.textColor=[108,108,112];
@@ -1605,17 +1855,21 @@ function buildPdfDoc(){
   // ── Rezultate pe combinatii (optional) ──
   const obs=[];
   const body=rows.map((r,i)=>{
-    const okv=r.status==='done'&&r.res&&r.res.ok;
-    const v=okv?r.res.value:null;
+    const vw=resultView(r);
+    const okv=!!(vw&&vw.ok);
     let verdict;
     if(!okv){
       verdict=r.status==='done'?t('pdfInvalidCell'):'-';
       if(r.status==='done') obs.push((i+1)+'. '+[r.story,r.pier,r.outputCase,r.location].filter(Boolean).join(' / ')+' — '+statusText(r.res));
-    } else verdict=(v.util<=100?t('verdictOk'):t('verdictFail'));
+    } else verdict=(vw.util<=100?t('verdictOk'):t('verdictFail'));
+    const uu=uniUtil(r);
+    const dTxt=(!okv||uu===null)?'-':((vw.util-uu>=0?'+':'')+(vw.util-uu).toFixed(1));
     return [r.story,r.pier,r.outputCase,r.location,
-      fmtIn(r.Nraw),fmtIn(r.M2),fmtIn(r.M3),fmtIn(r.M),
-      okv?v.Mrd.toFixed(1):'-',okv?v.X.toFixed(0):'-',
-      okv?v.util.toFixed(1)+'%':'-',verdict];
+      fmtIn(r.Nraw),fmtIn(r.M2),fmtIn(r.M3),okv?vw.mEd.toFixed(1):fmtIn(r.M),
+      okv?vw.mRd.toFixed(1):'-',okv?vw.X.toFixed(0):'-',
+      okv?vw.util.toFixed(1)+'%':'-']
+      .concat(cmpOn?[uu===null?'-':uu.toFixed(1)+'%',dTxt]:[])
+      .concat([verdict]);
   });
   if(pdfScope==='full'){
     let y2=lastY+8;
@@ -1625,16 +1879,20 @@ function buildPdfDoc(){
     doc.autoTable({
       startY:y2+4,
       head:[[t('colStory'),t('colPier'),t('colCase'),t('colLocation'),t('colN'),t('colM2'),t('colM3'),
-             t('colMEd'),t('colMRd'),t('colX'),t('colUtil'),t('colVerdict')]],
+             t('colMEd'),t('colMRd'),t('colX'),t('colUtil')]
+             .concat(cmpOn?[t('colUtilUni'),t('colDelta')]:[]).concat([t('colVerdict')])],
       body,
       margin:{left:ml,right:mr},tableWidth:cw,theme:'grid',
       styles:{lineColor:[180,200,220],lineWidth:0.25,fontSize:7.5,textColor:[0,0,0],cellPadding:1.6},
       headStyles:{fillColor:[200,215,235],textColor:[0,0,0],fontStyle:'bold',lineColor:[200,215,235],fontSize:7.5},
-      columnStyles:{4:{halign:'right'},5:{halign:'right'},6:{halign:'right'},7:{halign:'right'},
-                    8:{halign:'right'},9:{halign:'right'},10:{halign:'right'},11:{halign:'center',fontStyle:'bold'}},
+      columnStyles:Object.assign({4:{halign:'right'},5:{halign:'right'},6:{halign:'right'},7:{halign:'right'},
+                    8:{halign:'right'},9:{halign:'right'},10:{halign:'right'}},
+                    cmpOn?{11:{halign:'right'},12:{halign:'right'},13:{halign:'center',fontStyle:'bold'}}
+                         :{11:{halign:'center',fontStyle:'bold'}}),
       didParseCell:function(data){
-        if(data.section==='body'&&data.column.index===11){
-          const vt=body[data.row.index][11];
+        const vIdx2=cmpOn?13:11;
+        if(data.section==='body'&&data.column.index===vIdx2){
+          const vt=body[data.row.index][vIdx2];
           if(vt===t('verdictOk')) data.cell.styles.textColor=[46,125,50];
           else if(vt===t('verdictFail')) data.cell.styles.textColor=[192,57,43];
           else data.cell.styles.textColor=[108,108,112];
@@ -1751,6 +2009,11 @@ function syncToggleUI(){
   document.getElementById('seg-fmt-etabs').classList.toggle('on',importFmt==='etabs');
   document.getElementById('seg-grp-storypier').classList.toggle('on',grouping==='storypier');
   document.getElementById('seg-grp-pier').classList.toggle('on',grouping==='pier');
+  document.getElementById('seg-solv-uni').classList.toggle('on',solverMode!=='bi');
+  document.getElementById('seg-solv-bi').classList.toggle('on',solverMode==='bi');
+  document.getElementById('seg-cmp-off').classList.toggle('on',!compareMode);
+  document.getElementById('seg-cmp-on').classList.toggle('on',compareMode);
+  document.getElementById('cmpRow').style.display=(solverMode==='bi')?'':'none';
   document.getElementById('seg-pdf-sum').classList.toggle('on',pdfScope==='sum');
   document.getElementById('seg-pdf-full').classList.toggle('on',pdfScope==='full');
 }
@@ -1784,8 +2047,10 @@ if(typeof JP!=='undefined'){
     if(st) applyState(st);
   })();
 }
+if(solverMode==='bi'&&!polyReady()) solverMode='uni';
 syncToggleUI();
 applyStaticLang();
+updSolverNote();
 if(typeof JP!=='undefined'){
   updMat();
   showPanels();
