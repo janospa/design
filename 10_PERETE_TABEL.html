@@ -1,0 +1,1799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#F5F5F7">
+<meta name="description" content="Perete — moment capabil in tabel: import combinatii din ETABS (Pier Forces) sau Excel, verificare in lot pentru o sectiune de perete fixa, tabel centralizator">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='2' y='4' width='8' height='24' rx='1.5' fill='%238E8E93'/><rect x='10' y='11' width='12' height='10' rx='1' fill='%23C7C7CC'/><rect x='22' y='4' width='8' height='24' rx='1.5' fill='%238E8E93'/></svg>">
+<title>Perete — moment capabil batch — JP Design</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1C1E}
+.wrap{max-width:1240px;margin:0 auto;padding:20px 16px}
+.slabel{font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:#1C1C1E;padding:0 0 7px;margin-top:14px}
+.slabel:first-child{margin-top:0}
+.ip{background:#EFEFEF;border:1px solid #DCDCE0;border-radius:12px;overflow:hidden;margin-bottom:13px}
+.op{background:#fff;border:1px solid #DCDCE0;border-radius:12px;overflow:hidden;margin-bottom:13px}
+.ph{padding:12px 15px;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:#1C1C1E;display:flex;align-items:center;gap:6px;cursor:pointer;user-select:none}
+.ph .chev{margin-left:auto;width:9px;height:9px;border-right:1.6px solid #8E8E93;border-bottom:1.6px solid #8E8E93;transform:rotate(45deg);transition:transform .15s;flex-shrink:0}
+.ip.collapsed .ph .chev{transform:rotate(-45deg)}
+.ip.collapsed .pb-outer{display:none}
+.info-wrap{position:relative;display:inline-flex;flex-shrink:0}
+.info-btn{width:16px;height:16px;border-radius:50%;border:1.3px solid #AEAEB2;background:transparent;color:transparent;font-size:0;line-height:1;cursor:pointer;padding:0;position:relative;transition:all .12s}
+.info-btn::before{content:'';position:absolute;left:50%;top:3.5px;width:1.6px;height:1.6px;background:#8E8E93;border-radius:50%;transform:translateX(-50%)}
+.info-btn::after{content:'';position:absolute;left:50%;top:6.3px;width:1.6px;height:5.2px;background:#8E8E93;border-radius:.8px;transform:translateX(-50%)}
+.info-btn:hover,.info-btn.on{border-color:#007AFF;background:#EBF3FF}
+.info-btn:hover::before,.info-btn:hover::after,.info-btn.on::before,.info-btn.on::after{background:#007AFF}
+.info-pop{display:none;position:fixed;z-index:1200;width:260px;max-width:78vw;background:#fff;border:1px solid #DCDCE0;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.18);padding:10px 12px;font-size:12px;font-weight:400;color:#6C6C70;line-height:1.5;text-transform:none;letter-spacing:0;cursor:default}
+.info-pop.wide{max-width:92vw}
+.info-pop.show{display:block}
+.info-pop::before{content:'';position:fixed;width:9px;height:9px;background:#fff;border-left:1px solid #DCDCE0;border-top:1px solid #DCDCE0;left:var(--arrow-left);top:var(--arrow-top);transform:var(--arrow-rot)}
+.pb{padding:8px 15px 14px}
+.row{display:flex;align-items:center;padding:7px 0;border-bottom:1px solid #E0E0E5;gap:8px}
+.row:last-child{border-bottom:none}
+.rl{flex:1;font-size:13px;color:#1C1C1E;min-width:0}
+.rn{font-size:12px;color:#8E8E93;margin-left:4px}
+.rc{display:flex;align-items:center;gap:5px;flex-shrink:0}
+.rc input[type=number]{width:78px;padding:5px 8px;font-size:13px;border:1px solid #C7C7CC;border-radius:7px;background:#fff;color:#1C1C1E;font-family:'Inter',sans-serif;-moz-appearance:textfield;appearance:textfield;text-align:right}
+.rc input[type=number]::-webkit-inner-spin-button,.rc input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.rc input:focus{outline:none;box-shadow:0 0 0 2px rgba(0,122,255,.2);border-color:#007AFF}
+.rc input.warn{border-color:#C0392B}
+.ru{font-size:12px;color:#8E8E93;min-width:30px}
+.sel-field{margin-bottom:10px}
+.sel-field label{display:block;font-size:12px;color:#8E8E93;margin-bottom:5px;font-weight:500}
+.sel-wrap{position:relative}
+.sel-wrap::after{content:'';position:absolute;right:13px;top:50%;width:7px;height:7px;border-right:2px solid #8E8E93;border-bottom:2px solid #8E8E93;transform:translateY(-65%) rotate(45deg);pointer-events:none}
+.sel-field select{width:100%;padding:8px 34px 8px 11px;font-size:13px;border:1px solid #C7C7CC;border-radius:8px;background:#fff;color:#1C1C1E;font-family:'Inter',sans-serif;cursor:pointer;-webkit-appearance:none;appearance:none}
+.sel-field select:focus{outline:none;box-shadow:0 0 0 2px rgba(0,122,255,.2);border-color:#007AFF}
+.mat-vals{display:flex;gap:6px;padding:6px 0 2px;flex-wrap:wrap}
+.mv{flex:1;min-width:60px;text-align:center;background:#E8E8ED;border-radius:7px;padding:8px 4px}
+.mvl{font-size:11px;color:#8E8E93;margin-bottom:2px}
+.mvv{font-size:14px;font-weight:500;color:#1C1C1E}
+.mvu{font-size:10px;color:#8E8E93}
+.sub{font-size:11px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;color:#8E8E93;padding:9px 0 5px}
+.toggle-row{display:flex;align-items:center;gap:10px;padding:4px 0 10px}
+.toggle-row span{font-size:13px;color:#1C1C1E;flex:1}
+.seg{display:inline-flex;background:#E0E0E5;border-radius:8px;padding:2px;gap:2px}
+.seg button{padding:6px 13px;font-size:12px;font-weight:500;border:none;border-radius:6px;background:transparent;color:#8E8E93;cursor:pointer;font-family:'Inter',sans-serif;transition:all .12s}
+.seg button.on{background:#fff;color:#1C1C1E;box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.count-box{background:#EBF3FF;border:1px solid #B8D4F8;border-radius:8px;padding:8px 12px;margin-top:6px;display:flex;justify-content:space-between;font-size:12px}
+.count-box span{color:#0066CC;font-weight:500}
+.note{font-size:12px;color:#8E8E93;line-height:1.5}
+.conf-fields{display:none;background:#EAF6EC;border-radius:8px;padding:4px 11px;margin-top:8px}
+.conf-fields.on{display:block}
+.conf-web-fields{display:none}
+.conf-web-fields.on{display:block}
+/* panoul de sectiune curge pe 2-3 coloane pe laptop, o coloana pe mobil */
+.sec-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0 18px;align-items:start}
+.sec-grid>.sec-col{min-width:0}
+@media(max-width:1000px){.sec-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:680px){.sec-grid{grid-template-columns:1fr}}
+.status-strip{display:none;align-items:flex-start;gap:8px;padding:9px 11px;border-radius:8px;font-size:12px;line-height:1.45;margin-top:10px;background:#FDECEC;color:#C0392B;border:1px solid #F2C2C2}
+.status-strip.on{display:flex}
+.status-strip.warn{background:#FFF6E5;color:#8A5A00;border-color:#F5DCA8}
+.status-strip .sico{font-weight:600;flex-shrink:0}
+.status-strip ul{margin:0;padding-left:15px}
+
+/* ── paste / table section ── */
+.paste-zone{border:2px dashed #B8D4F8;border-radius:12px;background:#F5F9FF;padding:22px 16px;text-align:center;cursor:text;transition:all .15s}
+.paste-zone:hover,.paste-zone.focus{border-color:#007AFF;background:#EBF3FF}
+.paste-zone .pz-icon{width:30px;height:30px;margin:0 auto 8px;opacity:.55}
+.paste-zone .pz-title{font-size:14px;font-weight:500;color:#1C1C1E;margin-bottom:3px}
+.paste-zone .pz-sub{font-size:12px;color:#8E8E93}
+.paste-input{position:absolute;opacity:0;pointer-events:none;width:1px;height:1px}
+.table-toolbar{display:flex;align-items:center;gap:10px;padding:12px 15px;flex-wrap:wrap;border-bottom:1px solid #E0E0E5}
+.table-toolbar .ttl{font-size:13px;font-weight:500;color:#1C1C1E;margin-right:auto}
+.btn-sm{padding:8px 14px;font-size:13px;font-weight:500;font-family:'Inter',sans-serif;border:1px solid #C7C7CC;border-radius:8px;background:#fff;color:#1C1C1E;cursor:pointer;transition:all .12s}
+.btn-sm:hover{background:#F5F5F7}
+.btn-sm.primary{background:#1C1C1E;color:#fff;border-color:#1C1C1E}
+.btn-sm.primary:hover{opacity:.85}
+.btn-sm.danger{color:#C0392B;border-color:#F2C2C2}
+.btn-sm.danger:hover{background:#FCECEC}
+.btn-sm:disabled{opacity:.4;cursor:default}
+.summary-bar{display:flex;gap:10px;padding:12px 15px;flex-wrap:wrap;border-bottom:1px solid #E0E0E5}
+.sum-chip{flex:1;min-width:110px;background:#F2F2F7;border-radius:8px;padding:8px 12px}
+.sum-chip.ok{background:#EAF6EC}
+.sum-chip.no{background:#FCECEC}
+.sum-chip .sc-l{font-size:11px;color:#8E8E93;margin-bottom:2px}
+.sum-chip .sc-v{font-size:17px;font-weight:500;color:#1C1C1E}
+.sum-chip.ok .sc-v{color:#2E7D32}
+.sum-chip.no .sc-v{color:#C0392B}
+.tbl-wrap{overflow-x:auto}
+table.results{width:100%;border-collapse:collapse;font-size:12.5px;white-space:nowrap}
+table.results th{background:#F2F2F7;color:#6C6C70;font-weight:500;font-size:10.5px;letter-spacing:.03em;text-transform:uppercase;padding:8px 10px;text-align:right;position:sticky;top:0;border-bottom:1px solid #DCDCE0}
+table.results th:first-child,table.results td:first-child{text-align:left;position:sticky;left:0;background:#F2F2F7;z-index:2}
+table.results td:first-child{background:#fff}
+table.results td.lbl-col,table.results th:nth-child(-n+4){text-align:left}
+.lbl-col{color:#1C1C1E;max-width:150px;overflow:hidden;text-overflow:ellipsis}
+table.results th.grp-start{border-left:1px solid #DCDCE0}
+table.results td.grp-start{border-left:1px solid #E0E0E5}
+table.results td{padding:7px 10px;text-align:right;border-bottom:1px solid #EFEFEF;color:#1C1C1E;font-feature-settings:"tnum" 1}
+table.results tr:hover td{background:#FAFAFB}
+table.results tr:hover td:first-child{background:#F5F5F7}
+table.results tr.row-ok td{background:#F3FAF4}
+table.results tr.row-ok td:first-child{background:#EDF7EE}
+table.results tr.row-fail td{background:#FDF1F1}
+table.results tr.row-fail td:first-child{background:#FBE8E8}
+table.results tr.row-invalid td{background:#F7F7F9;color:#6C6C70}
+table.results tr.row-invalid td:first-child{background:#F2F2F5}
+table.results tr.row-pending td{color:#AEAEB2}
+.verdict-pill{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600}
+.verdict-pill.ok{background:#D9F0DB;color:#1E6B26}
+.verdict-pill.no{background:#F7D6D6;color:#A32626}
+.verdict-pill.na{background:#E4E4E9;color:#6C6C70;cursor:help}
+.verdict-pill.pending{background:#EEEEEE;color:#AEAEB2}
+.editable-row-actions{text-align:center!important}
+.row-del{width:20px;height:20px;border-radius:6px;border:none;background:transparent;color:#C7C7CC;cursor:pointer;font-size:14px;line-height:1;display:inline-flex;align-items:center;justify-content:center}
+.row-del:hover{background:#FCECEC;color:#C0392B}
+.cell-in{width:100%;border:1px solid transparent;border-radius:5px;background:transparent;font-family:'Inter',sans-serif;font-size:12.5px;color:#1C1C1E;padding:3px 5px;-moz-appearance:textfield;appearance:textfield}
+.cell-in::-webkit-inner-spin-button,.cell-in::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.cell-in:hover{border-color:#E0E0E5;background:#fff}
+.cell-in:focus{outline:none;border-color:#007AFF;background:#fff;box-shadow:0 0 0 2px rgba(0,122,255,.15)}
+.num-in{text-align:right;font-feature-settings:"tnum" 1;min-width:66px}
+.lbl-in{text-align:left;min-width:70px;color:#1C1C1E}
+.lbl-in::placeholder{color:#C7C7CC}
+.exp-cell{text-align:center!important;width:26px;padding:0!important}
+.row-exp{width:22px;height:22px;border:none;background:transparent;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:0}
+.chev-r{width:6px;height:6px;border-right:1.6px solid #8E8E93;border-bottom:1.6px solid #8E8E93;transform:rotate(-45deg);transition:transform .15s;margin-left:-2px}
+.row-exp.expanded .chev-r{transform:rotate(45deg)}
+.row-exp:hover .chev-r{border-color:#007AFF}
+.detail-row td{padding:0!important;background:#F7F9FC!important;border-bottom:1px solid #E0E0E5}
+.detail-panel{padding:16px 18px}
+.detail-grid{display:grid;grid-template-columns:1.2fr 1fr 0.9fr;gap:20px;align-items:start}
+.detail-col{min-width:0}
+.detail-h{font-size:10.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#8E8E93;margin-bottom:8px}
+.detail-chart-wrap{position:relative;width:100%;height:250px}
+.detail-vals{font-size:12.5px}
+.dt-row{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #ECECF0;gap:10px}
+.dt-row:last-child{border-bottom:none}
+.dt-k{color:#6C6C70}
+.dt-v{font-weight:500;color:#1C1C1E;font-feature-settings:"tnum" 1;text-align:right}
+.detail-empty{padding:16px;text-align:center;color:#8E8E93;font-size:12.5px}
+.detail-note{margin-bottom:10px;padding:8px 11px;border-radius:8px;background:#FDECEC;color:#C0392B;border:1px solid #F2C2C2;font-size:12px;line-height:1.45}
+@media(max-width:820px){.detail-grid{grid-template-columns:1fr}}
+.empty-state{padding:40px 20px;text-align:center;color:#8E8E93;font-size:13px}
+.progress-bar{height:3px;background:#E0E0E5;overflow:hidden}
+.progress-fill{height:100%;background:#007AFF;width:0%;transition:width .15s}
+table.results tr.sum-row{cursor:pointer}
+table.results tr.sum-row:hover td{background:#EFF5FF}
+table.results tr.sum-row:hover td:first-child{background:#E6EFFC}
+.sum-hint{font-size:12px;color:#8E8E93;padding:10px 15px 0;line-height:1.5}
+@media(max-width:680px){.wrap{padding:14px 10px}.rc input[type=number],.sel-field select{font-size:16px}.rl{font-size:14px}.ph{font-size:12px}table.results{font-size:11.5px}}
+.back-btn{display:inline-flex;align-items:center;gap:5px;font-family:'Inter',sans-serif;font-size:14px;font-weight:500;color:#8E8E93;background:transparent;border:none;cursor:pointer;padding:12px 16px;text-decoration:none;line-height:1}
+.back-btn svg{width:16px;height:16px;stroke:#8E8E93;stroke-width:2.5;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.back-btn:hover{color:#1C1C1E}
+.back-btn:hover svg{stroke:#1C1C1E}
+.lang-seg{display:inline-flex;background:#E0E0E5;border-radius:8px;padding:2px;gap:2px;margin-left:auto}
+.lang-seg button{padding:5px 11px;font-size:12px;font-weight:600;border:none;border-radius:6px;background:transparent;color:#8E8E93;cursor:pointer;font-family:'Inter',sans-serif;transition:all .12s;letter-spacing:.02em}
+.lang-seg button.on{background:#fff;color:#1C1C1E;box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.topbar{display:flex;align-items:center;gap:8px;padding-right:12px}
+.author-footer{text-align:center;font-size:11px;font-weight:500;color:#8E8E93;padding:16px 16px 4px;letter-spacing:.02em}
+.version-footer{text-align:center;font-size:10px;color:#AEAEB2;padding:0 16px 24px;letter-spacing:.02em;font-feature-settings:"tnum" 1}
+.preset-bar{display:flex;align-items:center;gap:10px;padding:0 16px 10px;max-width:1240px;margin:0 auto}
+.preset-bar label{font-size:14px;font-weight:500;color:#8E8E93}
+.preset-bar select{padding:6px 28px 6px 10px;font-size:14px;border:1px solid #C7C7CC;border-radius:8px;background:#fff;color:#1C1C1E;font-family:'Inter',sans-serif;-webkit-appearance:none;appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238E8E93'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
+.preset-bar select:focus{outline:none;box-shadow:0 0 0 2px rgba(0,122,255,.2);border-color:#007AFF}
+@media(max-width:680px){.preset-bar select{font-size:16px}}
+.report-bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:12px 15px}
+.report-lbl{font-size:13px;color:#1C1C1E;flex:1;min-width:120px}
+.report-btn{padding:11px 18px;font-size:14px;font-weight:500;font-family:'Inter',sans-serif;border:none;border-radius:10px;background:#1C1C1E;color:#fff;cursor:pointer;transition:opacity .15s}
+.report-btn:active{opacity:.7}
+.report-btn:disabled{opacity:.4}
+.report-status{font-size:12px;color:#8E8E93;text-align:center;padding:0 15px 10px;min-height:16px}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+<a href="index.html" class="back-btn"><svg viewBox="0 0 16 16"><polyline points="10,3 4,8 10,13"/></svg><span data-i18n="backAll">Toate modulele</span></a>
+<div class="lang-seg" id="langSeg"><button data-lang="ro">RO</button><button data-lang="en">EN</button></div>
+</div>
+<div class="preset-bar">
+  <label data-i18n="wallLabel">Perete:</label>
+  <select id="presetSel" onchange="switchPreset(this.value)">
+    <option value="P1">P1</option>
+    <option value="P2">P2</option>
+    <option value="P3">P3</option>
+    <option value="P4">P4</option>
+    <option value="P5">P5</option>
+  </select>
+</div>
+
+<div class="wrap">
+  <div class="slabel" data-i18n="pageLabel">Moment capabil perete — verificare in tabel</div>
+
+  <!-- ═══ SECTION DEFINITION (collapsible) ═══ -->
+  <div class="ip" id="sectionPanel">
+    <div class="ph" onclick="toggleSectionPanel()"><span data-i18n="secDefTitle">Sectiune, materiale &amp; armare (comuna pentru tot tabelul)</span><span class="chev"></span></div>
+    <div class="pb-outer">
+    <div class="pb">
+      <div class="sec-grid">
+
+        <!-- col 1: geometrie -->
+        <div class="sec-col">
+          <div class="sub" style="padding-top:0" data-i18n="s1geom">Geometrie perete</div>
+          <div class="row"><div class="rl"><span data-i18n="wallLen">Lungimea peretelui</span> <span class="rn">(l<sub>w</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="lw" value="2750" step="50" oninput="onSectionChange()"><span class="ru">mm</span></div></div>
+          <div class="row"><div class="rl"><span data-i18n="webThick">Grosimea inimii</span> <span class="rn">(b<sub>w0</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="bw0" value="400" step="10" oninput="onSectionChange()"><span class="ru">mm</span></div></div>
+          <div class="sub" data-i18n="be1left">Bulb 1 (stanga)</div>
+          <div class="row"><div class="rl"><span data-i18n="beLen">Lungimea bulbului</span> <span class="rn">(b<sub>f</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="bf1" value="650" step="10" oninput="onSectionChange()"><span class="ru">mm</span></div></div>
+          <div class="row"><div class="rl"><span data-i18n="beWidth">Latimea bulbului</span> <span class="rn">(l<sub>f</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="lf1" value="400" step="10" oninput="onSectionChange()"><span class="ru">mm</span></div></div>
+          <div class="sub" data-i18n="be2right">Bulb 2 (dreapta) &mdash; punct referinta</div>
+          <div class="row"><div class="rl"><span data-i18n="beLen">Lungimea bulbului</span> <span class="rn">(b<sub>f</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="bf2" value="650" step="10" oninput="onSectionChange()"><span class="ru">mm</span></div></div>
+          <div class="row"><div class="rl"><span data-i18n="beWidth">Latimea bulbului</span> <span class="rn">(l<sub>f</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="lf2" value="400" step="10" oninput="onSectionChange()"><span class="ru">mm</span></div></div>
+          <div class="sub" data-i18n="s4coverStirrups">Acoperire &amp; etrieri</div>
+          <div class="row"><div class="rl"><span data-i18n="cover">Acoperire</span> <span class="rn">(c<sub>nom</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="cnom" value="35" step="5" oninput="onSectionChange()"><span class="ru">mm</span></div></div>
+          <div class="row"><div class="rl"><span data-i18n="stirrupDia">Diametru etrier</span> <span class="rn">(&Oslash;<sub>etr</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="detr" value="10" step="2" oninput="onSectionChange()"><span class="ru">mm</span></div></div>
+        </div>
+
+        <!-- col 2: materiale -->
+        <div class="sec-col">
+          <div class="sub" style="padding-top:0" data-i18n="s2materials">Materiale</div>
+          <div class="sel-field"><label data-i18n="concClass">Clasa beton</label><div class="sel-wrap">
+            <select id="cp" onchange="curC=this.value;updMat();onSectionChange()"></select></div></div>
+          <div class="sel-field"><label data-i18n="steelClass">Clasa otel</label><div class="sel-wrap">
+            <select id="sp" onchange="curS=this.value;updMat();onSectionChange()"></select></div></div>
+          <div class="mat-vals">
+            <div class="mv"><div class="mvl">f<sub>cd</sub></div><div class="mvv" id="fcd_d">33.33</div><div class="mvu">MPa</div></div>
+            <div class="mv"><div class="mvl">f<sub>yd</sub></div><div class="mvv" id="fyd_d">434.8</div><div class="mvu">MPa</div></div>
+          </div>
+          <div class="mat-vals">
+            <div class="mv"><div class="mvl">&epsilon;<sub>cu2</sub></div><div class="mvv" id="ecu_d">3.50</div><div class="mvu">&permil;</div></div>
+            <div class="mv"><div class="mvl">&epsilon;<sub>c2</sub></div><div class="mvv" id="ec2_d">2.00</div><div class="mvu">&permil;</div></div>
+          </div>
+          <div class="toggle-row" style="margin-top:8px;border-top:1px solid #E0E0E5;padding-top:12px">
+            <span data-i18n="confinedConc">Beton confinat</span>
+          </div>
+          <div class="seg" style="margin-bottom:4px">
+            <button id="seg-nc" class="on" data-v="none" onclick="setConf('none')" data-i18n="unconfined">Neconfinat</button>
+            <button id="seg-cb" data-v="bulb" onclick="setConf('bulb')" data-i18n="bulbsOpt">Bulbi</button>
+            <button id="seg-ca" data-v="all" onclick="setConf('all')" data-i18n="bulbsWebOpt">Bulbi+inimă</button>
+          </div>
+          <div class="conf-fields" id="conf-fields">
+            <div class="sub" data-i18n="confinedBEs">Bulbi confinati</div>
+            <div class="row"><div class="rl"><span data-i18n="charConfStr">Rez. caract. confinata</span> <span class="rn">(f<sub>ck,c</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="fckc" value="59.31" step="0.1" oninput="onSectionChange()"><span class="ru">MPa</span></div></div>
+            <div class="row"><div class="rl"><span data-i18n="strainPeak">Def. la efort max</span> <span class="rn">(&epsilon;<sub>c2,c</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="ec2c" value="2.81" step="0.01" oninput="onSectionChange()"><span class="ru">&permil;</span></div></div>
+            <div class="row"><div class="rl"><span data-i18n="strainUlt">Def. ultima</span> <span class="rn">(&epsilon;<sub>cu2,c</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="ecu2c" value="10.95" step="0.1" oninput="onSectionChange()"><span class="ru">&permil;</span></div></div>
+            <div class="conf-web-fields" id="conf-web-fields">
+              <div class="sub" data-i18n="confinedWeb">Inima confinata</div>
+              <div class="row"><div class="rl"><span data-i18n="charConfStr">Rez. caract. confinata</span> <span class="rn">(f<sub>ck,c,w</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="fckcw" value="55" step="0.1" oninput="onSectionChange()"><span class="ru">MPa</span></div></div>
+              <div class="row"><div class="rl"><span data-i18n="strainPeak">Def. la efort max</span> <span class="rn">(&epsilon;<sub>c2,c,w</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="ec2cw" value="2.48" step="0.01" oninput="onSectionChange()"><span class="ru">&permil;</span></div></div>
+              <div class="row"><div class="rl"><span data-i18n="strainUlt">Def. ultima</span> <span class="rn">(&epsilon;<sub>cu2,c,w</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="ecu2cw" value="8.08" step="0.1" oninput="onSectionChange()"><span class="ru">&permil;</span></div></div>
+            </div>
+            <div class="note" id="confNote" style="padding:4px 0 6px"></div>
+          </div>
+        </div>
+
+        <!-- col 3: armare -->
+        <div class="sec-col">
+          <div class="sub" style="padding-top:0" data-i18n="be1bars">Bulb 1 &mdash; bare</div>
+          <div class="row"><div class="rl"><span data-i18n="atCorners">La colturi</span> <span class="rn">(<span data-i18n="pcsDia">buc / &Oslash;</span>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="b1c_n" value="4" step="4" min="0" oninput="onSectionChange()" style="width:48px"><input type="number" inputmode="numeric" id="b1c_d" value="25" step="1" oninput="onSectionChange()" style="width:48px"><span class="ru">mm</span></div></div>
+          <div class="row"><div class="rl"><span data-i18n="lateralShort">Lateral, latura scurta</span> <span class="rn">(<span data-i18n="pcsDia">buc / &Oslash;</span>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="b1s_n" value="2" step="1" oninput="onSectionChange()" style="width:48px"><input type="number" inputmode="numeric" id="b1s_d" value="25" step="1" oninput="onSectionChange()" style="width:48px"><span class="ru">mm</span></div></div>
+          <div class="row"><div class="rl"><span data-i18n="lateralLong">Lateral, latura lunga</span> <span class="rn">(<span data-i18n="pcsDiaRow">buc / &Oslash; / rand</span>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="b1l_n" value="9" step="1" oninput="onSectionChange()" style="width:40px"><input type="number" inputmode="numeric" id="b1l_d" value="25" step="1" oninput="onSectionChange()" style="width:40px"><input type="number" inputmode="numeric" id="b1l_r" value="3" step="1" oninput="onSectionChange()" style="width:40px"></div></div>
+          <div class="count-box"><span data-i18n="totalBarsBE1">Total bare Bulb 1</span><span id="cnt_b1">&mdash;</span></div>
+          <div class="sub" data-i18n="be2bars">Bulb 2 &mdash; bare</div>
+          <div class="row"><div class="rl"><span data-i18n="atCorners">La colturi</span> <span class="rn">(<span data-i18n="pcsDia">buc / &Oslash;</span>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="b2c_n" value="4" step="4" min="0" oninput="onSectionChange()" style="width:48px"><input type="number" inputmode="numeric" id="b2c_d" value="25" step="1" oninput="onSectionChange()" style="width:48px"><span class="ru">mm</span></div></div>
+          <div class="row"><div class="rl"><span data-i18n="lateralShort">Lateral, latura scurta</span> <span class="rn">(<span data-i18n="pcsDia">buc / &Oslash;</span>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="b2s_n" value="2" step="1" oninput="onSectionChange()" style="width:48px"><input type="number" inputmode="numeric" id="b2s_d" value="25" step="1" oninput="onSectionChange()" style="width:48px"><span class="ru">mm</span></div></div>
+          <div class="row"><div class="rl"><span data-i18n="lateralLong">Lateral, latura lunga</span> <span class="rn">(<span data-i18n="pcsDiaRow">buc / &Oslash; / rand</span>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="b2l_n" value="9" step="1" oninput="onSectionChange()" style="width:40px"><input type="number" inputmode="numeric" id="b2l_d" value="25" step="1" oninput="onSectionChange()" style="width:40px"><input type="number" inputmode="numeric" id="b2l_r" value="3" step="1" oninput="onSectionChange()" style="width:40px"></div></div>
+          <div class="count-box"><span data-i18n="totalBarsBE2">Total bare Bulb 2</span><span id="cnt_b2">&mdash;</span></div>
+          <div class="sub" data-i18n="webLongBars">Inima &mdash; bare longitudinale</div>
+          <div class="row"><div class="rl"><span data-i18n="longBars">Bare long.</span> <span class="rn">(<span data-i18n="diaSpacingRow">&Oslash; / s / rand</span>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="in_d" value="12" step="1" oninput="onSectionChange()" style="width:40px"><input type="number" inputmode="numeric" id="in_s" value="150" step="10" oninput="onSectionChange()" style="width:40px"><input type="number" inputmode="numeric" id="in_r" value="2" step="1" oninput="onSectionChange()" style="width:40px"></div></div>
+          <div class="count-box"><span data-i18n="totalBarsWeb">Total bare Inima</span><span id="cnt_web">&mdash;</span></div>
+          <div class="note" style="padding:8px 0 0" data-i18n="barRuleNote">Barele „la colturi” se numara pe toate cele 4 colturi ale bulbului: un pachet de bare la fiecare colt da 4, 8, 12 … Barele de pe latura lunga trebuie sa se imparta exact in numarul de randuri.</div>
+        </div>
+      </div>
+
+      <div class="note" id="sectionSummaryNote" style="padding-top:10px"></div>
+      <div class="status-strip" id="statusStrip"><span class="sico" id="statusIco">!</span><span id="statusMsg"></span></div>
+      <div style="margin-top:6px;background:#fff;border:1px solid #E0E0E5;border-radius:10px;padding:8px">
+        <svg id="sketch" viewBox="0 0 460 220" width="100%" style="display:block;max-width:560px;margin:0 auto"></svg>
+      </div>
+    </div>
+    </div>
+  </div>
+
+  <!-- ═══ PASTE ZONE ═══ -->
+  <div class="op">
+    <div class="ph"><span data-i18n="pasteTitle">Import combinatii de incarcare</span><span class="info-wrap"><button class="info-btn" type="button" onclick="toggleInfo(this,event)">i</button><div class="info-pop wide" id="pasteInfoPop" onclick="event.stopPropagation()">&mdash;</div></span></div>
+    <div class="pb" style="padding-top:4px">
+      <div class="toggle-row" data-nopreset="1" style="padding-bottom:10px">
+        <span data-i18n="importFmtLabel">Format import</span>
+        <div class="seg" data-nopreset="1">
+          <button id="seg-fmt-simple" class="on" data-v="simple" onclick="setImportFmt('simple')" data-i18n="fmtSimple">Simplu (7 coloane)</button>
+          <button id="seg-fmt-etabs" data-v="etabs" onclick="setImportFmt('etabs')" data-i18n="fmtEtabs">Tabel ETABS brut</button>
+        </div>
+      </div>
+      <div class="toggle-row" style="padding-bottom:10px">
+        <span data-i18n="momAxisLabel">Moment in planul peretelui</span>
+        <div class="seg">
+          <button id="seg-mom-m3" class="on" data-v="M3" onclick="setMomAxis('M3')">M3</button>
+          <button id="seg-mom-m2" data-v="M2" onclick="setMomAxis('M2')">M2</button>
+        </div>
+      </div>
+      <div class="toggle-row" data-nopreset="1" style="padding-bottom:12px;border-bottom:1px solid #E0E0E5;margin-bottom:14px">
+        <span data-i18n="signLabel">Convenție semn N</span>
+        <div class="seg" data-nopreset="1">
+          <button id="seg-sign-neg" class="on" data-v="neg" onclick="setSignConv('neg')" data-i18n="signNeg">N&lt;0 compresiune</button>
+          <button id="seg-sign-pos" data-v="pos" onclick="setSignConv('pos')" data-i18n="signPos">N&gt;0 compresiune</button>
+        </div>
+      </div>
+      <div class="paste-zone" id="pasteZone" onclick="focusPasteInput()" tabindex="0">
+        <svg class="pz-icon" viewBox="0 0 24 24" fill="none" stroke="#0066CC" stroke-width="1.4"><rect x="4" y="3" width="13" height="17" rx="1.5"/><path d="M8 8h5M8 11.5h5M8 15h3"/><path d="M15 3v3a1 1 0 0 0 1 1h3"/></svg>
+        <div class="pz-title" data-i18n="pasteZoneTitle">Click aici, apoi Ctrl+V</div>
+        <div class="pz-sub" id="pzSub">&mdash;</div>
+      </div>
+      <textarea class="paste-input" id="pasteInput" onpaste="handlePaste(event)"></textarea>
+    </div>
+  </div>
+
+  <!-- ═══ TABEL CENTRALIZATOR ═══ -->
+  <div class="op" id="summaryPanel" style="display:none">
+    <div class="table-toolbar">
+      <span class="ttl" id="sumTableTitle" data-i18n="sumTableTitle">Tabel centralizator</span>
+      <div class="seg" data-nopreset="1">
+        <button id="seg-grp-storypier" class="on" data-v="storypier" onclick="setGrouping('storypier')" data-i18n="grpStoryPier">Nivel + perete</button>
+        <button id="seg-grp-pier" data-v="pier" onclick="setGrouping('pier')" data-i18n="grpPier">Doar perete</button>
+      </div>
+      <button class="btn-sm" id="copySumBtn" onclick="copySummaryTable()" data-i18n="copyBtn">Copiaza tabelul</button>
+    </div>
+    <div class="tbl-wrap">
+      <table class="results" id="summaryTable">
+        <thead><tr id="sumTheadRow"></tr></thead>
+        <tbody id="sumTbodyRows"></tbody>
+      </table>
+    </div>
+    <div class="sum-hint" data-i18n="sumHint">Click pe un rând pentru a deschide combinația determinantă în tabelul detaliat.</div>
+    <div style="height:12px"></div>
+  </div>
+
+  <!-- ═══ RESULTS TABLE ═══ -->
+  <div class="op" id="resultsPanel" style="display:none">
+    <div class="summary-bar" id="summaryBar"></div>
+    <div class="table-toolbar">
+      <span class="ttl" id="tableTitle"></span>
+      <button class="btn-sm primary" id="addRowBtn" onclick="addManualRow()" data-i18n="addRowBtn">+ Adauga rand</button>
+      <button class="btn-sm" id="recalcBtn" onclick="recalcAll()" data-i18n="recalcAllBtn">Recalculeaza tot</button>
+      <button class="btn-sm" id="copyBtn" onclick="copyTable()" data-i18n="copyBtn">Copiaza tabelul</button>
+      <button class="btn-sm danger" onclick="clearTable()" data-i18n="clearBtn">Sterge tabelul</button>
+    </div>
+    <div class="progress-bar" id="progressBar" style="display:none"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="tbl-wrap">
+      <table class="results" id="resultsTable">
+        <thead><tr id="theadRow"></tr></thead>
+        <tbody id="tbodyRows"></tbody>
+      </table>
+    </div>
+    <div class="report-bar">
+      <span class="report-lbl" data-i18n="exportCalcReport">Export raport de calcul (PDF)</span>
+      <div class="seg" data-nopreset="1">
+        <button id="seg-pdf-sum" class="on" data-v="sum" onclick="setPdfScope('sum')" data-i18n="pdfScopeSum">Doar centralizator</button>
+        <button id="seg-pdf-full" data-v="full" onclick="setPdfScope('full')" data-i18n="pdfScopeFull">Complet</button>
+      </div>
+      <button class="report-btn" id="rptBtn" onclick="generatePdf()" data-i18n="downloadPdf">Descarca PDF</button>
+    </div>
+    <div class="report-status" id="rptStatus"></div>
+  </div>
+
+  <div class="op" id="emptyPanel">
+    <div class="empty-state" data-i18n="emptyStateMsg">Nicio combinatie importata inca. Defineste peretele mai sus, apoi lipeste datele din ETABS/Excel.</div>
+    <div style="text-align:center;padding:0 20px 24px"><button class="btn-sm primary" onclick="addManualRow()" data-i18n="addRowBtn">+ Adauga rand</button></div>
+  </div>
+
+</div>
+<div class="author-footer" data-i18n="footer">Lucrare de disertație — Janos Patrik · UTCN · Facultatea de Construcții · 2026</div>
+<div class="version-footer" id="versionFooter">&mdash;</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
+
+<!-- ═══ nucleu de calcul comun — trebuie incarcat INAINTE de scriptul modulului ═══ -->
+<script src="engine.js"></script>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════════════════
+   MODULUL 10 — PERETE, MOMENT CAPABIL IN LOT (TABEL)
+
+   Versiunea in lot a modulului 03. Tot calculul este acelasi nucleu
+   (JP.wall.buildModel / solve / interactionNM), deci un rand din tabelul de
+   aici si modulul 03 pe aceleasi date TREBUIE sa dea acelasi M_Rd. Aici raman
+   doar: interfata, importul, tabelul, centralizatorul si exportul PDF.
+
+   Sectiunea de perete este COMUNA pentru tot tabelul, ca la modulul 07: un
+   lot de combinatii apartine unui perete. Peretii diferiti stau in presetari
+   diferite (P1..P5), fiecare cu combinatiile lui.
+
+   Doua formate de import, comutabile:
+     - simplu, 7 coloane fara antet (cand datele nu vin din ETABS);
+     - tabelul ETABS brut "Pier Forces", citit DUPA ANTET.
+   ═══════════════════════════════════════════════════════════════════════════ */
+const MODULE_ID='10', MODULE_VERSION='1.0.0';
+
+let curC='C50/60',curS='S 500',confMode='none';
+let rows=[];      // {story,pier,outputCase,location,Nraw,M2,M3,N,M,res,status,_expanded}
+let currentModel=null;
+
+/* ─── Care moment lucreaza in planul peretelui ───────────────────────────────
+   La Pier Forces, momentul din planul peretelui este de regula M3, iar M2 este
+   incovoierea in afara planului (valori mici). Nu este insa universal: depinde
+   de orientarea axelor locale ale pier-ului. Valorile brute M2 si M3 se
+   pastreaza pe fiecare rand, deci comutarea RE-MAPEAZA datele existente, fara
+   relipire. Este o proprietate a modelului -> intra in presetare. */
+let momAxis=(function(){try{return localStorage.getItem('sw_wall_momaxis')||'M3';}catch(e){return 'M3';}})();
+function mapM(M2,M3){return momAxis==='M2'?M2:M3;}
+
+/* ─── Conventia de semn pentru N (comuna cu modulele 03 / 06 / 07) ───────────
+   Nucleul lucreaza intern cu COMPRESIUNEA POZITIVA. Conversia se face numai la
+   granita cu interfata. Preferinta de utilizator -> cheie globala comuna. */
+let signConv=(function(){try{return localStorage.getItem('sw_signconv')||'neg';}catch(e){return 'neg';}})();
+function sgnN(){return signConv==='neg'?-1:1;}
+function convN(v){return sgnN()*v;}
+
+let importFmt=(function(){try{return localStorage.getItem('sw_wall_importfmt')||'simple';}catch(e){return 'simple';}})();
+let grouping=(function(){try{return localStorage.getItem('sw_wall_grouping')||'storypier';}catch(e){return 'storypier';}})();
+let pdfScope=(function(){try{return localStorage.getItem('sw_wall_pdfscope')||'sum';}catch(e){return 'sum';}})();
+
+if(typeof JP==='undefined'){
+  document.getElementById('statusStrip').className='status-strip on';
+  document.getElementById('statusMsg').textContent=
+    'engine.js nu s-a incarcat. Verificati ca fisierul este in acelasi folder cu aceasta pagina.';
+}
+
+// ═══════════════════ i18n ═══════════════════
+let LANG=(function(){try{return localStorage.getItem('sw_lang')||'en';}catch(e){return 'en';}})();
+const T={
+  backAll:{ro:'Toate modulele',en:'All modules'},
+  pageLabel:{ro:'Moment capabil perete — verificare in tabel',en:'Wall moment resistance — table check'},
+  wallLabel:{ro:'Perete:',en:'Wall:'},
+  secDefTitle:{ro:'Sectiune, materiale &amp; armare (comuna pentru tot tabelul)',en:'Section, materials &amp; reinforcement (shared by the whole table)'},
+  s1geom:{ro:'Geometrie perete',en:'Wall geometry'},
+  s2materials:{ro:'Materiale',en:'Materials'},
+  s4coverStirrups:{ro:'Acoperire &amp; etrieri',en:'Cover &amp; stirrups'},
+  wallLen:{ro:'Lungimea peretelui',en:'Wall length'},
+  webThick:{ro:'Grosimea inimii',en:'Web thickness'},
+  be1left:{ro:'Bulb 1 (stanga)',en:'BE 1 (left)'},
+  be2right:{ro:'Bulb 2 (dreapta) &mdash; punct referinta',en:'BE 2 (right) &mdash; reference point'},
+  beLen:{ro:'Lungimea bulbului',en:'BE length'},
+  beWidth:{ro:'Latimea bulbului',en:'BE width'},
+  concClass:{ro:'Clasa beton',en:'Concrete class'},
+  steelClass:{ro:'Clasa otel',en:'Steel class'},
+  confinedConc:{ro:'Beton confinat',en:'Confined concrete'},
+  unconfined:{ro:'Neconfinat',en:'Unconfined'},
+  bulbsOpt:{ro:'Bulbi',en:'BEs'},
+  bulbsWebOpt:{ro:'Bulbi+inimă',en:'BEs+web'},
+  confinedBEs:{ro:'Bulbi confinati',en:'Confined boundary elements'},
+  confinedWeb:{ro:'Inima confinata',en:'Confined web'},
+  charConfStr:{ro:'Rez. caract. confinata',en:'Char. confined strength'},
+  strainPeak:{ro:'Def. la efort max',en:'Strain at peak stress'},
+  strainUlt:{ro:'Def. ultima',en:'Ultimate strain'},
+  confNoteBulb:{ro:'f<sub>cd,c</sub> = f<sub>ck,c</sub> / 1.5. Lege parabola-dreptunghi. La „Bulbi” se confineaza numai bulbii. Valorile se preiau din Modulul 02.',en:'f<sub>cd,c</sub> = f<sub>ck,c</sub> / 1.5. Parabola-rectangle law. Under “BEs” only the boundary elements are confined. Values are taken from Module 02.'},
+  confNoteAll:{ro:'f<sub>cd,c</sub> = f<sub>ck,c</sub> / 1.5. Lege parabola-dreptunghi. La „Bulbi+inimă” se confineaza si inima, cu proprietati separate. Valorile se preiau din Modulul 02.',en:'f<sub>cd,c</sub> = f<sub>ck,c</sub> / 1.5. Parabola-rectangle law. Under “BEs+web” the web is also confined, with separate properties. Values are taken from Module 02.'},
+  be1bars:{ro:'Bulb 1 &mdash; bare',en:'BE 1 &mdash; bars'},
+  be2bars:{ro:'Bulb 2 &mdash; bare',en:'BE 2 &mdash; bars'},
+  atCorners:{ro:'La colturi',en:'At corners'},
+  lateralShort:{ro:'Lateral, latura scurta',en:'Lateral, short side'},
+  lateralLong:{ro:'Lateral, latura lunga',en:'Lateral, long side'},
+  pcsDia:{ro:'buc / &Oslash;',en:'pcs / &Oslash;'},
+  pcsDiaRow:{ro:'buc / &Oslash; / rand',en:'pcs / &Oslash; / row'},
+  diaSpacingRow:{ro:'&Oslash; / s / rand',en:'&Oslash; / s / row'},
+  totalBarsBE1:{ro:'Total bare Bulb 1',en:'Total bars BE 1'},
+  totalBarsBE2:{ro:'Total bare Bulb 2',en:'Total bars BE 2'},
+  totalBarsWeb:{ro:'Total bare Inima',en:'Total bars Web'},
+  webLongBars:{ro:'Inima &mdash; bare longitudinale',en:'Web &mdash; longitudinal bars'},
+  longBars:{ro:'Bare long.',en:'Long. bars'},
+  barRuleNote:{ro:'Barele „la colturi” se numara pe toate cele 4 colturi ale bulbului: un pachet de bare la fiecare colt da 4, 8, 12 … Barele de pe latura lunga trebuie sa se imparta exact in numarul de randuri.',
+               en:'The “at corners” bars are counted over all 4 corners of the boundary element: one bundle at each corner gives 4, 8, 12 … The long-side bars must divide exactly into the number of rows.'},
+  cover:{ro:'Acoperire',en:'Cover'},
+  stirrupDia:{ro:'Diametru etrier',en:'Stirrup diameter'},
+  barsWord:{ro:'bare',en:'bars'},
+  // import
+  importFmtLabel:{ro:'Format import',en:'Import format'},
+  fmtSimple:{ro:'Simplu (7 coloane)',en:'Simple (7 columns)'},
+  fmtEtabs:{ro:'Tabel ETABS brut',en:'Raw ETABS table'},
+  momAxisLabel:{ro:'Moment in planul peretelui',en:'In-plane moment'},
+  signLabel:{ro:'Conventie semn N',en:'N sign convention'},
+  signPos:{ro:'N&gt;0 compresiune',en:'N&gt;0 compression'},
+  signNeg:{ro:'N&lt;0 compresiune',en:'N&lt;0 compression'},
+  pasteTitle:{ro:'Import combinatii de incarcare',en:'Import load combinations'},
+  pasteInfoSimple:{
+    ro:'<b>Format simplu (7 coloane).</b> Copiaza un bloc de date FARA antet, cu coloanele exact in aceasta ordine: Story, Pier, Output Case, Location, N, M2, M3. Valori separate prin Tab. Foloseste acest format cand datele NU vin din ETABS.<br><br>Se pastreaza atat M2 cat si M3; comutatorul de mai sus alege care lucreaza in planul peretelui. Semnul lui N se stabileste din comutatorul de semn. Zecimalele pot fi cu punct sau cu virgula.',
+    en:'<b>Simple format (7 columns).</b> Copy a block of data WITHOUT a header row, columns in exactly this order: Story, Pier, Output Case, Location, N, M2, M3. Tab-separated. Use this when the data does NOT come from ETABS.<br><br>Both M2 and M3 are kept; the toggle above picks which one acts in the wall plane. The sign of N is set by the sign toggle. Decimals may use a dot or a comma.'},
+  pasteInfoEtabs:{
+    ro:'<b>Tabel ETABS brut — <i>Pier Forces</i>.</b> Copiaza tabelul asa cum este, CU randul de antet. Banner-ul „TABLE: ...”, randul de unitati si randurile goale sunt ignorate automat.<br><br>Coloanele sunt citite dupa <b>numele din antet</b>, nu dupa pozitie: poti ascunde sau reordona coloane in Excel fara sa strici importul. Sunt necesare: Story, Pier, Output Case, Location, P, M2, M3. <i>Step Type</i> (Max/Min) se adauga la numele combinatiei, iar <i>Location</i> (Top/Bottom) se pastreaza ca atare.<br><br>P se preia ca N in conventia de semn aleasa mai sus. Momentul care lucreaza in planul peretelui se alege din comutatorul M3/M2.',
+    en:'<b>Raw ETABS table — <i>Pier Forces</i>.</b> Copy the table as it is, WITH its header row. The "TABLE: ..." banner, the units row and blank lines are skipped automatically.<br><br>Columns are read by <b>header name</b>, not by position: you can hide or reorder columns in Excel without breaking the import. Required: Story, Pier, Output Case, Location, P, M2, M3. <i>Step Type</i> (Max/Min) is appended to the combination name, and <i>Location</i> (Top/Bottom) is kept as it is.<br><br>P is taken as N in the sign convention chosen above. Which moment acts in the wall plane is set by the M3/M2 toggle.'},
+  pasteZoneTitle:{ro:'Click aici, apoi Ctrl+V',en:'Click here, then Ctrl+V'},
+  pasteZoneSub:{ro:'Story &middot; Pier &middot; Output Case &middot; Location &middot; N &middot; M2 &middot; M3 (fara antet, separate prin Tab)',en:'Story &middot; Pier &middot; Output Case &middot; Location &middot; N &middot; M2 &middot; M3 (no header, Tab-separated)'},
+  pasteZoneSubEtabs:{ro:'Tabelul ETABS <i>Pier Forces</i>, cu antet (banner-ul si randul de unitati se ignora)',en:'The ETABS <i>Pier Forces</i> table, with its header (banner and units row are skipped)'},
+  pasteParseError:{ro:n=>`${n} rand(uri) nu au putut fi interpretate si au fost ignorate (verifica formatul: Story, Pier, Output Case, Location, N, M2, M3).`,en:n=>`${n} row(s) could not be parsed and were skipped (check the format: Story, Pier, Output Case, Location, N, M2, M3).`},
+  pasteNoHeader:{ro:'Nu am gasit randul de antet al tabelului ETABS si nici asezarea standard a coloanelor. Copiaza tabelul „Pier Forces” impreuna cu antetul, sau comuta pe formatul simplu (7 coloane).',
+                 en:'No ETABS header row was found, and the columns do not match the standard layout either. Copy the "Pier Forces" table together with its header row, or switch to the simple 7-column format.'},
+  // table
+  recalcAllBtn:{ro:'Recalculeaza tot',en:'Recalculate all'},
+  copyBtn:{ro:'Copiaza tabelul',en:'Copy table'},
+  copiedBtn:{ro:'Copiat ✓',en:'Copied ✓'},
+  addRowBtn:{ro:'+ Adaugă rând',en:'+ Add row'},
+  clearBtn:{ro:'Sterge tabelul',en:'Clear table'},
+  emptyStateMsg:{ro:'Nicio combinatie importata inca. Defineste peretele mai sus, apoi lipeste datele din ETABS/Excel.',en:'No combinations imported yet. Define the wall above, then paste data from ETABS/Excel.'},
+  confirmClear:{ro:'Sigur vrei sa stergi toate combinatiile importate?',en:'Are you sure you want to clear all imported combinations?'},
+  tableTitleN:{ro:n=>`${n} combinatii importate`,en:n=>`${n} combinations imported`},
+  sectionSummary:{ro:(lw,bw,b1,b2,w)=>`Perete curent: l_w = ${lw} mm, b_w0 = ${bw} mm, ${b1}+${b2} bare in bulbi, ${w} bare in inima. Se aplica identic tuturor rândurilor din tabel.`,
+                  en:(lw,bw,b1,b2,w)=>`Current wall: l_w = ${lw} mm, b_w0 = ${bw} mm, ${b1}+${b2} bars in the BEs, ${w} bars in the web. Applied identically to every row in the table.`},
+  colStory:{ro:'Nivel',en:'Story'},
+  colPier:{ro:'Perete',en:'Pier'},
+  colCase:{ro:'Combinatie',en:'Case'},
+  colLocation:{ro:'Locatie',en:'Location'},
+  colN:{ro:'N (kN)',en:'N (kN)'},
+  colM2:{ro:'M2 (kNm)',en:'M2 (kNm)'},
+  colM3:{ro:'M3 (kNm)',en:'M3 (kNm)'},
+  colMEd:{ro:'M_Ed (kNm)',en:'M_Ed (kNm)'},
+  colMRd:{ro:'M_Rd (kNm)',en:'M_Rd (kNm)'},
+  colX:{ro:'X (mm)',en:'X (mm)'},
+  colUtil:{ro:'Utilizare',en:'Utilization'},
+  colVerdict:{ro:'Verdict',en:'Verdict'},
+  verdictOk:{ro:'VERIFICA',en:'PASS'},
+  verdictFail:{ro:'NU VERIFICA',en:'FAIL'},
+  verdictInvalid:{ro:'INVALID',en:'INVALID'},
+  verdictPending:{ro:'&mdash;',en:'&mdash;'},
+  sumTotal:{ro:'Total combinatii',en:'Total combinations'},
+  sumOk:{ro:'Verifica',en:'Pass'},
+  sumFail:{ro:'Nu verifica',en:'Fail'},
+  sumWorst:{ro:'Cea mai defavorabila',en:'Governing (worst)'},
+  sumInvalid:{ro:'Rezultat invalid',en:'Invalid result'},
+  // centralizator
+  sumTableTitle:{ro:'Tabel centralizator',en:'Summary table'},
+  sumTableTitleN:{ro:(g,n)=>`Tabel centralizator — ${g} elemente din ${n} combinatii`,en:(g,n)=>`Summary table — ${g} elements from ${n} combinations`},
+  grpStoryPier:{ro:'Nivel + perete',en:'Story + pier'},
+  grpPier:{ro:'Doar perete',en:'Pier only'},
+  sumHint:{ro:'Click pe un rând pentru a deschide combinația determinantă în tabelul detaliat.',en:'Click a row to open its governing combination in the detailed table.'},
+  csGovStory:{ro:'Nivel det.',en:'Gov. story'},
+  csNComb:{ro:'Nr. comb.',en:'No. comb.'},
+  csInvalid:{ro:'Invalide',en:'Invalid'},
+  csGovCase:{ro:'Combinatie determinanta',en:'Governing combination'},
+  csUtilMax:{ro:'Utilizare max.',en:'Max utilization'},
+  sumEmptyPending:{ro:'Se calculeaza...',en:'Calculating...'},
+  // detail
+  detailToggle:{ro:'Arată/ascunde detalii de calcul',en:'Show/hide calculation details'},
+  detailUnavailable:{ro:'Detaliile apar după calcul.',en:'Details appear after calculation.'},
+  detailDiagram:{ro:'Diagramă de interacțiune N–M',en:'N–M interaction diagram'},
+  detailSection:{ro:'Secțiune — zonă comprimată',en:'Section — compression zone'},
+  detailValues:{ro:'Valori',en:'Values'},
+  dtN:{ro:'N_Ed',en:'N_Ed'},
+  dtMEd:{ro:'M_Ed',en:'M_Ed'},
+  dtMRd:{ro:'M_Rd',en:'M_Rd'},
+  dtX:{ro:'X (zonă comprimată)',en:'X (compression zone)'},
+  dtNint:{ro:'N_int',en:'N_int'},
+  dtDiff:{ro:'Diferență echilibru',en:'Equilibrium difference'},
+  dtFb:{ro:'ΣF_beton',en:'ΣF_concrete'},
+  dtFa:{ro:'ΣF_oțel',en:'ΣF_steel'},
+  dtUtil:{ro:'Utilizare',en:'Utilization'},
+  dtPivot:{ro:'Limita care guvernează',en:'Governing limit'},
+  dtNRdc:{ro:'N_Rd,c (compresiune)',en:'N_Rd,c (compression)'},
+  dtNRdt:{ro:'N_Rd,t (întindere)',en:'N_Rd,t (tension)'},
+  dtCompSide:{ro:'Bulb comprimat',en:'Compressed BE'},
+  dtBE1:{ro:'Bulb 1 (stânga)',en:'BE 1 (left)'},
+  dtBE2:{ro:'Bulb 2 (dreapta)',en:'BE 2 (right)'},
+  pivotConc:{ro:'beton (eps_cu)',en:'concrete (eps_cu)'},
+  pivotSteel:{ro:'otel (eps_ud)',en:'steel (eps_ud)'},
+  pivotSquash:{ro:'sectiune integral comprimata (pivot C, eps_c2)',en:'fully compressed section (pivot C, eps_c2)'},
+  // status
+  stNoBracket:{ro:'N_Ed este in afara capacitatii axiale a sectiunii. Rezultatul nu este valabil.',en:'N_Ed lies outside the section axial capacity. The result is not valid.'},
+  stResidual:{ro:'Echilibrul nu a fost satisfacut exact. Rezultatul este aproximativ.',en:'Equilibrium was not satisfied exactly. The result is approximate.'},
+  stDegenerate:{ro:'Sectiune degenerata: aria de beton sau de armatura este nula.',en:'Degenerate section: zero concrete or reinforcement area.'},
+  stInvalid:{ro:'Date de intrare invalide: verificati geometria si materialele.',en:'Invalid input: check geometry and materials.'},
+  stExceeds:{ro:(l,v)=>` ${l} = ${v} kN.`,en:(l,v)=>` ${l} = ${v} kN.`},
+  // export
+  exportCalcReport:{ro:'Export raport de calcul (PDF)',en:'Export calculation report (PDF)'},
+  downloadPdf:{ro:'Descarca PDF',en:'Download PDF'},
+  pdfScopeSum:{ro:'Doar centralizator',en:'Summary only'},
+  pdfScopeFull:{ro:'Complet',en:'Full'},
+  generating:{ro:'Se genereaza...',en:'Generating...'},
+  pdfLoading:{ro:'Libraria PDF se incarca...',en:'PDF library is loading...'},
+  statusDownloaded:{ro:'Raport descarcat.',en:'Report downloaded.'},
+  footer:{ro:'Lucrare de disertație — Janos Patrik · UTCN · Facultatea de Construcții · 2026',en:'Dissertation — Janos Patrik · UTCN · Faculty of Civil Engineering · 2026'},
+  pdfTitle:{ro:'VERIFICARE PERETE IN TABEL — MOMENT CAPABIL',en:'WALL TABLE CHECK — MOMENT RESISTANCE'},
+  pdfSub:{ro:'Metoda fibrelor - CR 2-2022 / SR EN 1992-1-1',en:'Fibre method - CR 2-2022 / SR EN 1992-1-1'},
+  pdfDate:{ro:'Data: ',en:'Date: '},
+  pdfWall:{ro:'Perete: ',en:'Wall: '},
+  pdfSecTitle:{ro:'PERETE (comun pentru toate combinatiile)',en:'WALL (shared by all combinations)'},
+  pdfSumTitle:{ro:'TABEL CENTRALIZATOR — UTILIZARE MAXIMA PE ELEMENT',en:'SUMMARY TABLE — MAXIMUM UTILIZATION PER ELEMENT'},
+  pdfSumNote:{ro:(n)=>'Selectat din '+n+' combinatii. Pentru fiecare element se retine combinatia cu utilizarea maxima.',en:(n)=>'Selected out of '+n+' combinations. For each element the combination with the highest utilization is kept.'},
+  pdfResultsTitle:{ro:'REZULTATE PE COMBINATII',en:'RESULTS PER COMBINATION'},
+  pdfObsTitle:{ro:'OBSERVATII',en:'NOTES'},
+  pdfLimTitle:{ro:'CONVENTII SI LIMITARI',en:'CONVENTIONS AND LIMITATIONS'},
+  pdfInWallLen:{ro:'Lungimea peretelui l_w',en:'Wall length l_w'},
+  pdfInWebThick:{ro:'Grosimea inimii b_w0',en:'Web thickness b_w0'},
+  pdfInBE1:{ro:'Bulb 1: lungime / latime',en:'BE 1: length / width'},
+  pdfInBE2:{ro:'Bulb 2: lungime / latime',en:'BE 2: length / width'},
+  pdfInTotBarsBE1:{ro:'Total bare Bulb 1',en:'Total bars BE 1'},
+  pdfInTotBarsBE2:{ro:'Total bare Bulb 2',en:'Total bars BE 2'},
+  pdfInTotBarsWeb:{ro:'Total bare inima',en:'Total bars web'},
+  pdfInCover:{ro:'Acoperire / etrier',en:'Cover / stirrup'},
+  pdfInConcClass:{ro:'Clasa beton',en:'Concrete class'},
+  pdfInSteelClass:{ro:'Clasa otel',en:'Steel class'},
+  pdfConfBulb:{ro:' (bulbi confinati)',en:' (BEs confined)'},
+  pdfConfAll:{ro:' (confinat integral)',en:' (fully confined)'},
+  pdfNRdc:{ro:'Compresiune centrica N_Rd,c',en:'Centric compression N_Rd,c'},
+  pdfNRdt:{ro:'Intindere centrica N_Rd,t',en:'Centric tension N_Rd,t'},
+  pdfInSignConv:{ro:'Conventie semn N',en:'N sign convention'},
+  pdfSignNeg:{ro:'N < 0 compresiune (ETABS)',en:'N < 0 compression (ETABS)'},
+  pdfSignPos:{ro:'N > 0 compresiune',en:'N > 0 compression'},
+  pdfInMomAxis:{ro:'Moment in planul peretelui',en:'In-plane moment'},
+  pdfInNfibres:{ro:'Numar fibre beton',en:'No. concrete fibres'},
+  pdfInConvention:{ro:'Conventie aria de beton',en:'Concrete area convention'},
+  pdfConvGross:{ro:'brut (A_c integral)',en:'gross (full A_c)'},
+  pdfConvNet:{ro:'net (A_c - A_s)',en:'net (A_c - A_s)'},
+  pdfInvalidCell:{ro:'INVALID — VEZI OBS.',en:'INVALID — SEE NOTES'},
+  pdfLim1:{ro:e=>'- Curbura este limitata de prima limita atinsa: eps_cu (beton) sau eps_ud = '+e+' permil (otel).',en:e=>'- Curvature limited by whichever is reached first: eps_cu (concrete) or eps_ud = '+e+' per mille (steel).'},
+  pdfLim2:{ro:'- Betonul se integreaza pe aria bruta; armatura se adauga peste (conventie fib).',en:'- Concrete integrated over the gross area; reinforcement added on top (fib convention).'},
+  pdfLim3:{ro:'- Barele sunt grupate in fibre echivalente, cu centrul la c_nom + D_etrier + D_bara/2 de fata.',en:'- Bars are lumped into equivalent fibres, their centre at c_nom + D_stirrup + D_bar/2 from the face.'},
+  pdfLim4:{ro:'- M_Rd se raporteaza la centrul de greutate geometric al betonului.',en:'- M_Rd is referred to the geometric centroid of the concrete.'},
+  pdfLim5:{ro:'- Semnul lui M_Ed decide ce bulb este comprimat; sectiunea asimetrica da M_Rd diferit pe cele doua sensuri.',en:'- The sign of M_Ed decides which BE is compressed; an asymmetric section gives a different M_Rd in each direction.'},
+  pdfLim6:{ro:'- Valorile axiale sunt raportate in conventia de semn declarata mai sus.',en:'- Axial values are reported in the sign convention stated above.'},
+  pdfError:{ro:'Eroare la generare:',en:'Generation error:'},
+  pdfGenerated:{ro:'Generat: ',en:'Generated: '},
+  pdfPage:{ro:(i,n)=>'Pagina '+i+' din '+n,en:(i,n)=>'Page '+i+' of '+n},
+  pdfDisc1:{ro:'Responsabilitatea pentru rezultatele obtinute revine in exclusivitate utilizatorului.',en:'Responsibility for the obtained results rests solely with the user.'},
+  pdfDisc2:{ro:'Toate valorile trebuie verificate inainte de utilizare.',en:'All values must be verified before use.'},
+  pdfFname:{ro:'Raport_perete_batch.pdf',en:'Report_wall_batch.pdf'},
+  skBE1:{ro:(n)=>`Bulb 1 (${n} bare)`,en:(n)=>`BE 1 (${n} bars)`},
+  skBE2ref:{ro:(n)=>`Bulb 2 ref (${n} bare)`,en:(n)=>`BE 2 ref (${n} bars)`}
+};
+function t(key,...args){
+  const e=T[key];
+  if(!e)return key;
+  const v=e[LANG]!==undefined?e[LANG]:e.ro;
+  return typeof v==='function'?v(...args):v;
+}
+function applyStaticLang(){
+  document.documentElement.lang=LANG;
+  document.querySelectorAll('[data-i18n],[data-i18n-sym]').forEach(el=>{
+    const k=el.getAttribute('data-i18n')||el.getAttribute('data-i18n-sym');
+    if(T[k]){const v=T[k][LANG];if(v!==undefined&&typeof v!=='function')el.innerHTML=v;}
+  });
+  document.querySelectorAll('#langSeg button').forEach(b=>b.classList.toggle('on',b.dataset.lang===LANG));
+  updatePasteHint();
+  updConfNote();
+  stampVersion();
+}
+function setLang(l){LANG=l;try{localStorage.setItem('sw_lang',l);}catch(e){}applyStaticLang();renderTable();updSectionSummary();showSectionStatus();}
+function stampVersion(){
+  const eng=(typeof JP!=='undefined')?JP.VERSION:'?';
+  document.getElementById('versionFooter').textContent=
+    'JP Design · M'+MODULE_ID+' v'+MODULE_VERSION+' · engine v'+eng+' · CR 2-1-1.1/2022';
+}
+
+// ═══════════════════ info popovers ═══════════════════
+function toggleInfo(btn,ev){
+  ev.stopPropagation();
+  const pop=btn.nextElementSibling;
+  const wasOpen=pop.classList.contains('show');
+  closeAllInfo();
+  if(!wasOpen){positionInfoPop(btn,pop);pop.classList.add('show');btn.classList.add('on');}
+}
+function positionInfoPop(btn,pop){
+  const r=btn.getBoundingClientRect();
+  const vw=window.innerWidth, vh=window.innerHeight;
+  const isWide=pop.classList.contains('wide');
+  const popW=Math.min(isWide?420:260,vw*(isWide?0.92:0.78));
+  let left=r.left+r.width/2-popW/2;
+  left=Math.max(10,Math.min(left,vw-popW-10));
+  pop.style.width=popW+'px';pop.style.left=left+'px';
+  pop.style.visibility='hidden';pop.style.display='block';
+  const popH=pop.offsetHeight;
+  pop.style.display='';pop.style.visibility='';
+  let top=r.bottom+8, arrowTop, arrowRot, popTopFinal;
+  if(top+popH>vh-10 && r.top-popH-8>10){
+    popTopFinal=r.top-popH-8; arrowTop=r.top-8-1; arrowRot='rotate(225deg)';
+  } else { popTopFinal=top; arrowTop=r.bottom+3; arrowRot='rotate(45deg)'; }
+  pop.style.top=popTopFinal+'px';
+  const arrowLeft=Math.max(left+10,Math.min(r.left+r.width/2-4.5,left+popW-18));
+  pop.style.setProperty('--arrow-left',arrowLeft+'px');
+  pop.style.setProperty('--arrow-top',arrowTop+'px');
+  pop.style.setProperty('--arrow-rot',arrowRot);
+}
+function closeAllInfo(){
+  document.querySelectorAll('.info-pop.show').forEach(p=>p.classList.remove('show'));
+  document.querySelectorAll('.info-btn.on').forEach(b=>b.classList.remove('on'));
+}
+document.addEventListener('click',closeAllInfo);
+window.addEventListener('scroll',closeAllInfo,true);
+window.addEventListener('resize',closeAllInfo);
+
+function toggleSectionPanel(){document.getElementById('sectionPanel').classList.toggle('collapsed');}
+function gv(id){const e=document.getElementById(id);return e?(parseFloat(e.value)||0):0;}
+function esc(s){return (s===undefined||s===null?'':String(s)).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+
+function fillMaterialSelects(){
+  const cp=document.getElementById('cp'), sp=document.getElementById('sp');
+  cp.innerHTML=Object.keys(JP.CONC).map(k=>`<option${k===curC?' selected':''}>${k}</option>`).join('');
+  sp.innerHTML=Object.keys(JP.STEEL).map(k=>`<option${k===curS?' selected':''}>${k}</option>`).join('');
+}
+function GAMMA_C(){return (JP.DEFAULTS&&JP.DEFAULTS.GAMMA_C)||1.5;}
+function GAMMA_S(){return (JP.DEFAULTS&&JP.DEFAULTS.GAMMA_S)||1.15;}
+function updMat(){
+  const c=JP.CONC[curC], s=JP.STEEL[curS];
+  document.getElementById('fcd_d').textContent=((c?c.fck:0)/GAMMA_C()).toFixed(2);
+  document.getElementById('fyd_d').textContent=((s?s.fyk:0)/GAMMA_S()).toFixed(1);
+  const bulbConf=(confMode==='bulb'||confMode==='all');
+  const ECU=(JP.DEFAULTS&&JP.DEFAULTS.ECU_NC)||0.0035;
+  const EC2=(JP.DEFAULTS&&JP.DEFAULTS.EC2_NC)||0.002;
+  document.getElementById('ecu_d').textContent=(bulbConf?gv('ecu2c'):ECU*1000).toFixed(2);
+  document.getElementById('ec2_d').textContent=(bulbConf?gv('ec2c'):EC2*1000).toFixed(2);
+}
+function setConfUI(mode){
+  confMode=mode;
+  document.getElementById('seg-nc').classList.toggle('on',mode==='none');
+  document.getElementById('seg-cb').classList.toggle('on',mode==='bulb');
+  document.getElementById('seg-ca').classList.toggle('on',mode==='all');
+  document.getElementById('conf-fields').classList.toggle('on',mode!=='none');
+  document.getElementById('conf-web-fields').classList.toggle('on',mode==='all');
+  updConfNote();
+}
+function updConfNote(){
+  const note=document.getElementById('confNote');
+  if(!note)return;
+  note.innerHTML=(confMode==='none')?'':(confMode==='bulb'?t('confNoteBulb'):t('confNoteAll'));
+}
+function setConf(mode){ setConfUI(mode); updMat(); onSectionChange(); saveCurrentPreset(); }
+
+/* Comutarea axei de moment re-mapeaza randurile existente: M2/M3 raman brute
+   pe rand, deci nu se pierde nimic si nu trebuie relipit din Excel. */
+function setMomAxis(mode){
+  if(mode===momAxis)return;
+  momAxis=mode;
+  try{localStorage.setItem('sw_wall_momaxis',mode);}catch(e){}
+  document.getElementById('seg-mom-m3').classList.toggle('on',mode==='M3');
+  document.getElementById('seg-mom-m2').classList.toggle('on',mode==='M2');
+  if(rows.length){
+    rows.forEach(r=>{r.M=mapM(r.M2,r.M3);r.status='pending';r.res=null;});
+    recalcAll();
+  }
+  saveCurrentPreset();
+}
+/* Schimbarea conventiei de semn NEGEAZA valorile N, exact ca la modulele 03/07:
+   altfel un perete comprimat ar deveni, in tacere, intins. */
+function setSignConv(mode){
+  if(mode===signConv)return;
+  signConv=mode;
+  try{localStorage.setItem('sw_signconv',mode);}catch(e){}
+  document.getElementById('seg-sign-neg').classList.toggle('on',mode==='neg');
+  document.getElementById('seg-sign-pos').classList.toggle('on',mode==='pos');
+  if(rows.length){
+    rows.forEach(r=>{
+      if(isFinite(r.Nraw)&&r.Nraw!==0)r.Nraw=-r.Nraw;
+      r.N=convN(r.Nraw); r.status='pending'; r.res=null;
+    });
+    renderTable();
+    recalcAll();
+  }
+  saveCurrentPreset();
+}
+function setImportFmt(mode){
+  importFmt=mode;
+  try{localStorage.setItem('sw_wall_importfmt',mode);}catch(e){}
+  document.getElementById('seg-fmt-simple').classList.toggle('on',mode==='simple');
+  document.getElementById('seg-fmt-etabs').classList.toggle('on',mode==='etabs');
+  updatePasteHint();
+}
+function updatePasteHint(){
+  const sub=document.getElementById('pzSub');
+  if(sub) sub.innerHTML=(importFmt==='etabs')?t('pasteZoneSubEtabs'):t('pasteZoneSub');
+  const pop=document.getElementById('pasteInfoPop');
+  if(pop) pop.innerHTML=(importFmt==='etabs')?t('pasteInfoEtabs'):t('pasteInfoSimple');
+}
+function setGrouping(mode){
+  grouping=mode;
+  try{localStorage.setItem('sw_wall_grouping',mode);}catch(e){}
+  document.getElementById('seg-grp-storypier').classList.toggle('on',mode==='storypier');
+  document.getElementById('seg-grp-pier').classList.toggle('on',mode==='pier');
+  renderSummaryTable();
+}
+function setPdfScope(mode){
+  pdfScope=mode;
+  try{localStorage.setItem('sw_wall_pdfscope',mode);}catch(e){}
+  document.getElementById('seg-pdf-sum').classList.toggle('on',mode==='sum');
+  document.getElementById('seg-pdf-full').classList.toggle('on',mode==='full');
+}
+
+// ═══════════════════ Model (nucleu comun) ═══════════════════
+function readInputs(){
+  return {
+    lw:gv('lw'), bw0:gv('bw0'),
+    bf1:gv('bf1'), lf1:gv('lf1'), li1:0,
+    bf2:gv('bf2'), lf2:gv('lf2'), li2:0,
+    cnom:gv('cnom'), detr:gv('detr'),
+    concrete:curC, steel:curS, confMode:confMode,
+    fckc:gv('fckc'), ec2c:gv('ec2c'), ecu2c:gv('ecu2c'),
+    fckcw:gv('fckcw'), ec2cw:gv('ec2cw'), ecu2cw:gv('ecu2cw'),
+    bars:{
+      b1c_n:gv('b1c_n'), b1c_d:gv('b1c_d'), b1s_n:gv('b1s_n'), b1s_d:gv('b1s_d'),
+      b1l_n:gv('b1l_n'), b1l_d:gv('b1l_d'), b1l_r:Math.max(1,gv('b1l_r')),
+      b2c_n:gv('b2c_n'), b2c_d:gv('b2c_d'), b2s_n:gv('b2s_n'), b2s_d:gv('b2s_d'),
+      b2l_n:gv('b2l_n'), b2l_d:gv('b2l_d'), b2l_r:Math.max(1,gv('b2l_r')),
+      in_d:gv('in_d'), in_s:gv('in_s'), in_r:Math.max(0,gv('in_r'))
+    }
+  };
+}
+function buildModel(){ return JP.wall.buildModel(readInputs()); }
+function evalCombo(m,Ned,Med){
+  try{ return JP.wall.solve(m,Ned,Med,LANG); }
+  catch(e){ return {ok:false,code:'EXCEPTION',message:String((e&&e.message)||e),value:null,partial:null}; }
+}
+function statusText(res){
+  if(!res)return '';
+  if(res.ok)return '';
+  if(res.code===JP.CODES.NO_BRACKET){
+    let s=t('stNoBracket');
+    if(res.partial&&res.partial.exceeded)
+      s+=t('stExceeds',res.partial.exceeded.limit,convN(res.partial.exceeded.value).toFixed(0));
+    return s;
+  }
+  if(res.code===JP.CODES.RESIDUAL_HIGH)return t('stResidual');
+  if(res.code===JP.CODES.DEGENERATE)   return t('stDegenerate');
+  // Nucleul compune deja mesajul pentru numarul de bare imposibil.
+  if(JP.CODES.BAR_COUNT&&res.code===JP.CODES.BAR_COUNT) return res.message;
+  if(res.code===JP.CODES.INVALID_INPUT)return t('stInvalid');
+  return res.message||t('stInvalid');
+}
+function pivotLabel(p){
+  return p==='steel'?t('pivotSteel'):(p==='squash'?t('pivotSquash'):t('pivotConc'));
+}
+
+// ═══════════════════ Section status ═══════════════════
+/* Un numar de bare imposibil ar face fiecare combinatie sa esueze cu acelasi
+   motiv; se spune o data, aici, si se coloreaza campul vinovat. */
+function markBarFields(m){
+  const map={cornerB1:'b1c_n',cornerB2:'b2c_n',longB1:'b1l_n',longB2:'b2l_n'};
+  const bad={};
+  ((m&&m.barIssues)||[]).forEach(function(i){bad[map[i.key]]=true;});
+  Object.keys(map).forEach(function(k){
+    const el=document.getElementById(map[k]);
+    if(el)el.classList.toggle('warn',!!bad[map[k]]);
+  });
+}
+function showSectionStatus(){
+  const strip=document.getElementById('statusStrip');
+  const msg=document.getElementById('statusMsg');
+  const ico=document.getElementById('statusIco');
+  if(typeof JP==='undefined')return;
+  const items=[]; let fatal=false;
+  const m=currentModel;
+  markBarFields(m);
+  if(m){
+    if(m.barIssues&&m.barIssues.length){
+      items.push(JP.barMessage?JP.barMessage(m.barIssues,LANG):t('stInvalid'));fatal=true;
+    }
+    if(!(m.fcd>0)||!(m.fyd>0)){items.push(t('stInvalid'));fatal=true;}
+  }
+  if(!items.length){strip.className='status-strip';msg.innerHTML='';return;}
+  msg.innerHTML=items.length===1?items[0]:'<ul><li>'+items.join('</li><li>')+'</li></ul>';
+  ico.textContent=fatal?'!':'~';
+  strip.className='status-strip on'+(fatal?'':' warn');
+}
+
+function onSectionChange(){
+  if(typeof JP==='undefined')return;
+  currentModel=buildModel();
+  const m=currentModel;
+  document.getElementById('cnt_b1').textContent=m.cntB1+' '+t('barsWord');
+  document.getElementById('cnt_b2').textContent=m.cntB2+' '+t('barsWord');
+  document.getElementById('cnt_web').textContent=m.cntWeb+' '+t('barsWord');
+  updSectionSummary();
+  drawSketch(m,0,true);
+  showSectionStatus();
+  if(rows.length) recalcAll();   // peretele s-a schimbat -> rezultatele sunt expirate
+}
+function updSectionSummary(){
+  if(!currentModel)return;
+  const m=currentModel;
+  document.getElementById('sectionSummaryNote').textContent=
+    t('sectionSummary',m.lw,m.bw0,m.cntB1,m.cntB2,m.cntWeb);
+}
+
+/* ─── Desenul sectiunii (preluat din modulul 03, cu aceeasi acoperire
+   mecanica pentru pozitia barelor, ca desenul sa arate exact ce s-a calculat) */
+function drawSketch(m,X,compFromRef,svgEl){
+  const svg=svgEl||document.getElementById('sketch');
+  if(!svg||!(m.lw>0)||!(m.bw0>0))return;
+  const VW=460,VH=220,PL=20,PR=20,PT=46,PB=44;
+  const totL=m.lw;
+  const maxH=Math.max(m.lf1,m.lf2,m.bw0);
+  const scl=Math.min((VW-PL-PR)/totL,(VH-PT-PB)/maxH);
+  const blue='#0066CC',dark='#1C1C1E',dim='#AEAEB2',lbl='#6C6C70';
+  const ox=PL,oyC=VH/2;
+  function X2(l){return ox+l*scl;}
+  let o='';
+  const webY=oyC-(m.bw0*scl)/2;
+  const webConfFill=(m.confMode==='all')?'#DDEEFF':'#E8E8ED';
+  const bulbConfFill=(m.confMode==='bulb'||m.confMode==='all')?'#DDEEFF':'#E8E8ED';
+  o+=`<rect x="${X2(m.bf1+m.li1)}" y="${webY}" width="${(m.lw-m.bf1-m.li1-m.bf2-m.li2)*scl}" height="${m.bw0*scl}" fill="${webConfFill}" stroke="#C7C7CC" stroke-width="0.8"/>`;
+  const b1Y=oyC-(m.lf1*scl)/2, b2Y=oyC-(m.lf2*scl)/2;
+  o+=`<rect x="${X2(0)}" y="${b1Y}" width="${m.bf1*scl}" height="${m.lf1*scl}" fill="${bulbConfFill}" stroke="${dark}" stroke-width="1.2"/>`;
+  o+=`<rect x="${X2(m.lw-m.bf2)}" y="${b2Y}" width="${m.bf2*scl}" height="${m.lf2*scl}" fill="${bulbConfFill}" stroke="${dark}" stroke-width="1.2"/>`;
+  const compW=X*scl;
+  if(X>0){
+    if(compFromRef){
+      o+=`<rect x="${X2(m.lw)-compW}" y="${oyC-maxH*scl/2-3}" width="${compW}" height="${maxH*scl+6}" fill="#0066CC" opacity="0.10"/>`;
+      o+=`<text x="${X2(m.lw)-compW/2}" y="${oyC-maxH*scl/2-18}" text-anchor="middle" font-size="8" fill="${blue}" font-family="Inter,sans-serif">X=${X.toFixed(0)}</text>`;
+    } else {
+      o+=`<rect x="${X2(0)}" y="${oyC-maxH*scl/2-3}" width="${compW}" height="${maxH*scl+6}" fill="#0066CC" opacity="0.10"/>`;
+      o+=`<text x="${X2(0)+compW/2}" y="${oyC-maxH*scl/2-18}" text-anchor="middle" font-size="8" fill="${blue}" font-family="Inter,sans-serif">X=${X.toFixed(0)}</text>`;
+    }
+  }
+  const bk=m.bars;
+  const cmec=d=>(m.cnom+m.detr+(d||0)/2)*scl;
+  function drawBulb(xLeft,bulbLen,bulbWid,bars,isB1){
+    const cd=bars[isB1?'b1c_d':'b2c_d'];
+    const sn=bars[isB1?'b1s_n':'b2s_n'];
+    const sd=bars[isB1?'b1s_d':'b2s_d'];
+    const ln=bars[isB1?'b1l_n':'b2l_n'];
+    const ld=bars[isB1?'b1l_d':'b2l_d'];
+    const lr=Math.max(1,bars[isB1?'b1l_r':'b2l_r']);
+    const iC=cmec(cd), iS=cmec(sd), iL=cmec(ld);
+    const x0=X2(xLeft)+iC, x1=X2(xLeft+bulbLen)-iC;
+    const yTop=oyC-(bulbWid*scl)/2+iC, yBot=oyC+(bulbWid*scl)/2-iC;
+    const yTopL=oyC-(bulbWid*scl)/2+iL, yBotL=oyC+(bulbWid*scl)/2-iL;
+    let s='';
+    const R=2.0;
+    const ys=[];
+    for(let r=0;r<lr;r++){ ys.push(lr===1? (yTopL+yBotL)/2 : yTopL+(yBotL-yTopL)*r/(lr-1)); }
+    const barsPerRow=Math.max(0,Math.round(ln/lr));
+    ys.forEach(yy=>{
+      for(let k=0;k<barsPerRow;k++){
+        const xx = x0+(x1-x0)*(k+1)/(barsPerRow+1);
+        s+=`<circle cx="${xx}" cy="${yy}" r="${R}" fill="${dark}"/>`;
+      }
+    });
+    s+=`<circle cx="${x0}" cy="${yTop}" r="${R}" fill="${dark}"/>`;
+    s+=`<circle cx="${x1}" cy="${yTop}" r="${R}" fill="${dark}"/>`;
+    s+=`<circle cx="${x0}" cy="${yBot}" r="${R}" fill="${dark}"/>`;
+    s+=`<circle cx="${x1}" cy="${yBot}" r="${R}" fill="${dark}"/>`;
+    const perShort=Math.max(0,Math.round(sn/2));
+    const x0s=X2(xLeft)+iS, x1s=X2(xLeft+bulbLen)-iS;
+    for(let e=0;e<2;e++){
+      const xx=e===0?x0s:x1s;
+      for(let k=1;k<=perShort;k++){
+        const yy=yTop+(yBot-yTop)*k/(perShort+1);
+        s+=`<circle cx="${xx}" cy="${yy}" r="${R}" fill="${dark}"/>`;
+      }
+    }
+    return s;
+  }
+  o+=drawBulb(0,m.bf1,m.lf1,bk,true);
+  o+=drawBulb(m.lw-m.bf2,m.bf2,m.lf2,bk,false);
+  const wx0=X2(m.bf1+m.li1), wx1=X2(m.lw-m.bf2-m.li2);
+  const insetW=(m.cnom+m.detr)*scl;
+  const wyTop=webY+insetW*0.6, wyBot=webY+m.bw0*scl-insetW*0.6;
+  const nW=m.nWeb;
+  const webRows=Math.max(0,bk.in_r);
+  if(nW>0 && webRows>0){
+    const ys=[];
+    if(webRows===1){ys.push((wyTop+wyBot)/2);}
+    else{for(let r=0;r<webRows;r++){ys.push(wyTop+(wyBot-wyTop)*r/(webRows-1));}}
+    for(let i=0;i<nW;i++){
+      const xx=wx0+(wx1-wx0)*(i+0.5)/nW;
+      ys.forEach(yy=>{o+=`<circle cx="${xx}" cy="${yy}" r="1.6" fill="${dark}"/>`;});
+    }
+  }
+  o+=`<text x="${X2(m.bf1/2)}" y="${b1Y-5}" text-anchor="middle" font-size="8" fill="${lbl}" font-family="Inter,sans-serif">${t('skBE1',m.cntB1)}</text>`;
+  o+=`<text x="${X2(m.lw-m.bf2/2)}" y="${b2Y-5}" text-anchor="middle" font-size="8" fill="${lbl}" font-family="Inter,sans-serif">${t('skBE2ref',m.cntB2)}</text>`;
+  const dy=oyC+maxH*scl/2+20;
+  o+=`<line x1="${X2(0)}" y1="${dy}" x2="${X2(m.lw)}" y2="${dy}" stroke="${dim}" stroke-width="0.7"/>`;
+  o+=`<line x1="${X2(0)}" y1="${dy-3}" x2="${X2(0)}" y2="${dy+3}" stroke="${dim}" stroke-width="0.7"/>`;
+  o+=`<line x1="${X2(m.lw)}" y1="${dy-3}" x2="${X2(m.lw)}" y2="${dy+3}" stroke="${dim}" stroke-width="0.7"/>`;
+  o+=`<text x="${X2(m.lw/2)}" y="${dy+12}" text-anchor="middle" font-size="8" fill="${lbl}" font-family="Inter,sans-serif">l_w = ${m.lw} mm</text>`;
+  svg.innerHTML=o;
+}
+
+// ═══════════════════ Paste handling ═══════════════════
+function focusPasteInput(){document.getElementById('pasteInput').focus();}
+function handlePaste(ev){
+  ev.preventDefault();
+  const text=(ev.clipboardData||window.clipboardData).getData('text');
+  parseAndAppend(text);
+  ev.target.value='';
+}
+function newRow(o){
+  return {story:o.story||'',pier:o.pier||'',outputCase:o.outputCase||'',location:o.location||'',
+    Nraw:o.Nraw,M2:o.M2,M3:o.M3,
+    N:convN(o.Nraw),M:mapM(o.M2,o.M3),
+    res:null,status:'pending',_expanded:false};
+}
+/* Zecimala cu punct SAU cu virgula; separator de mii in ambele conventii. */
+function parseNum(s){
+  if(s===undefined||s===null)return NaN;
+  let x=String(s).trim().replace(/[\s  ]/g,'');
+  if(!x)return NaN;
+  const hasDot=x.indexOf('.')>=0, hasCom=x.indexOf(',')>=0;
+  if(hasDot&&hasCom){
+    if(x.lastIndexOf(',')>x.lastIndexOf('.')) x=x.replace(/\./g,'').replace(',','.');
+    else x=x.replace(/,/g,'');
+  } else if(hasCom){
+    x=((x.split(',').length-1)===1)?x.replace(',','.'):x.replace(/,/g,'');
+  }
+  const v=parseFloat(x);
+  return isFinite(v)?v:NaN;
+}
+/* ─── Tabelul ETABS "Pier Forces": citire DUPA ANTET ────────────────────────
+   Antetul: Story | Pier | Output Case | Case Type | Step Type | Location |
+            P | V2 | V3 | T | M2 | M3
+   Randul "TABLE: ...", randul de unitati si randurile goale nu au numar in
+   coloana P, deci sunt sarite automat. */
+function normHdr(s){return String(s||'').trim().toLowerCase().replace(/\s+/g,' ');}
+const HDR_MAP={
+  'story':'story','nivel':'story','etaj':'story',
+  'pier':'pier','wall':'pier','perete':'pier','pier name':'pier','spandrel':'pier',
+  'output case':'case','case':'case','combo':'case','load case/combo':'case','combination':'case',
+  'case type':'casetype',
+  'step type':'step','step':'step',
+  'location':'location','loc':'location','station':'location',
+  'p':'P','v2':'V2','v3':'V3','t':'T','m2':'M2','m3':'M3'
+};
+// Asezarea standard a tabelului "Pier Forces", pentru cazul in care se lipesc
+// numai randurile de date, fara antet.
+const ETABS_STD={story:0,pier:1,case:2,casetype:3,step:4,location:5,
+                 P:6,V2:7,V3:8,T:9,M2:10,M3:11};
+function findEtabsHeader(cellsArr){
+  for(let i=0;i<Math.min(cellsArr.length,12);i++){
+    const map={};
+    cellsArr[i].forEach((c,j)=>{const k=HDR_MAP[normHdr(c)];if(k&&map[k]===undefined)map[k]=j;});
+    if(map.P!==undefined&&map.M2!==undefined&&map.M3!==undefined&&
+       (map.pier!==undefined||map.story!==undefined)) return {idx:i,map:map};
+  }
+  return null;
+}
+function parseEtabsTable(text){
+  const lines=text.split(/\r\n|\n|\r/).filter(l=>l.trim().length>0);
+  const cells=lines.map(l=>l.split('\t'));
+  const hdr=findEtabsHeader(cells);
+  let map,start;
+  if(hdr){ map=hdr.map; start=hdr.idx+1; }
+  else {
+    map=ETABS_STD; start=0;
+    const plausible=cells.some(c=>c.length>=12&&isFinite(parseNum(c[6]))&&
+                                 isFinite(parseNum(c[10]))&&isFinite(parseNum(c[11])));
+    if(!plausible) return {rows:[],skipped:0,err:'noheader'};
+  }
+  const out=[]; let skipped=0;
+  const g=(c,k)=>(map[k]!==undefined?String(c[map[k]]||'').trim():'');
+  for(let i=start;i<cells.length;i++){
+    const c=cells[i];
+    const P=parseNum(c[map.P]),M2=parseNum(c[map.M2]),M3=parseNum(c[map.M3]);
+    if(!isFinite(P)||!isFinite(M2)||!isFinite(M3)){
+      const pRaw=String(c[map.P]||'').trim();
+      if(c.length>=7 && pRaw && !/^[a-z\-\/ ]+$/i.test(pRaw)) skipped++;
+      continue;
+    }
+    const stepRaw=g(c,'step');
+    const step=/^(single value|none)?$/i.test(stepRaw)?'':stepRaw;
+    let cs=g(c,'case');
+    cs=step?(cs?cs+' ('+step+')':step):cs;
+    out.push(newRow({story:g(c,'story'),pier:g(c,'pier'),outputCase:cs,
+                     location:g(c,'location'),Nraw:P,M2:M2,M3:M3}));
+  }
+  return {rows:out,skipped:skipped};
+}
+function parseSimpleTable(text){
+  const lines=text.split(/\r\n|\n|\r/).map(l=>l.trim()).filter(l=>l.length>0);
+  const out=[]; let skipped=0;
+  for(const line of lines){
+    const c=line.split('\t');
+    if(c.length<7){skipped++;continue;}
+    const N=parseNum(c[4]),M2=parseNum(c[5]),M3=parseNum(c[6]);
+    if(!isFinite(N)||!isFinite(M2)||!isFinite(M3)){skipped++;continue;}
+    out.push(newRow({story:c[0],pier:c[1],outputCase:c[2],location:c[3],Nraw:N,M2:M2,M3:M3}));
+  }
+  return {rows:out,skipped:skipped};
+}
+function parseAndAppend(text){
+  const res=(importFmt==='etabs')?parseEtabsTable(text):parseSimpleTable(text);
+  if(res.err==='noheader'){ alert(t('pasteNoHeader')); return; }
+  const newRows=res.rows, errCount=res.skipped||0;
+  if(newRows.length===0){ alert(t('pasteParseError',errCount)); return; }
+  rows=rows.concat(newRows);
+  if(errCount>0) setTimeout(()=>alert(t('pasteParseError',errCount)),50);
+  showPanels();
+  recalcPending();
+  saveCurrentPreset();
+}
+function clearTable(){
+  if(rows.length && !confirm(t('confirmClear')))return;
+  clearTableSilent();
+  saveCurrentPreset();
+}
+function clearTableSilent(){ rows=[]; showPanels(); }
+function deleteRow(idx){
+  rows.splice(idx,1);
+  if(rows.length===0){clearTableSilent();saveCurrentPreset();return;}
+  renderTable();
+  saveCurrentPreset();
+}
+
+// ═══════════════════ Batch ═══════════════════
+function recalcAll(){ runBatch(false); }
+function recalcPending(){ runBatch(true); }
+function runBatch(pendingOnly){
+  if(typeof JP==='undefined')return;
+  if(!currentModel) currentModel=buildModel();
+  if(!pendingOnly) rows.forEach(r=>{r.status='pending';r.res=null;});
+  const todo=[];
+  rows.forEach((r,idx)=>{ if(r.status!=='done') todo.push(idx); });
+  renderTable();
+  const btn=document.getElementById('recalcBtn');
+  const progBar=document.getElementById('progressBar'), progFill=document.getElementById('progressFill');
+  if(todo.length===0){ renderSummary(); renderSummaryTable(); btn.disabled=false; progBar.style.display='none'; return; }
+  btn.disabled=true;
+  progBar.style.display=''; progFill.style.width='0%';
+  let k=0;
+  const m=currentModel;
+  const now=(typeof performance!=='undefined'&&performance.now)?()=>performance.now():()=>Date.now();
+  function step(){
+    const t0=now();
+    while(k<todo.length && (now()-t0)<30){
+      const idx=todo[k];
+      const row=rows[idx];
+      row.res=evalCombo(m,row.N,row.M);
+      row.status='done';
+      updateRowResultCells(idx);
+      k++;
+    }
+    progFill.style.width=(todo.length?(100*k/todo.length):100).toFixed(0)+'%';
+    if(k<todo.length) requestAnimationFrame(step);
+    else { renderSummary(); renderSummaryTable(); btn.disabled=false; setTimeout(()=>{progBar.style.display='none';},400); }
+  }
+  requestAnimationFrame(step);
+}
+
+// ═══════════════════ Table rendering ═══════════════════
+function rowCells(r){
+  let mRd='&mdash;',xv='&mdash;',util='&mdash;',
+      verdict=`<span class="verdict-pill pending">${t('verdictPending')}</span>`,cls='row-pending';
+  if(r.status==='done'){
+    if(r.res&&r.res.ok){
+      const v=r.res.value;
+      mRd=v.Mrd.toFixed(1); xv=v.X.toFixed(0); util=v.util.toFixed(1)+' %';
+      const pass=v.util<=100;
+      verdict=`<span class="verdict-pill ${pass?'ok':'no'}">${pass?t('verdictOk'):t('verdictFail')}</span>`;
+      cls=pass?'row-ok':'row-fail';
+    } else {
+      verdict=`<span class="verdict-pill na" title="${esc(statusText(r.res))}">${t('verdictInvalid')}</span>`;
+      cls='row-invalid';
+    }
+  }
+  return {mRd,xv,util,verdict,cls};
+}
+function renderTable(){
+  const thead=document.getElementById('theadRow');
+  thead.innerHTML=`
+    <th></th>
+    <th>${t('colStory')}</th><th>${t('colPier')}</th><th>${t('colCase')}</th><th>${t('colLocation')}</th>
+    <th class="grp-start">${t('colN')}</th><th>${t('colM2')}</th><th>${t('colM3')}</th><th>${t('colMEd')}</th>
+    <th class="grp-start">${t('colMRd')}</th><th>${t('colX')}</th><th>${t('colUtil')}</th><th>${t('colVerdict')}</th>
+    <th class="editable-row-actions"></th>`;
+  const tbody=document.getElementById('tbodyRows');
+  let html='';
+  rows.forEach((r,idx)=>{
+    const c=rowCells(r);
+    const expanded=(r._expanded)?' expanded':'';
+    const chevBtn=`<button class="row-exp${expanded}" onclick="toggleRowDetail(${idx})" title="${esc(t('detailToggle'))}"><span class="chev-r"></span></button>`;
+    html+=`<tr class="${c.cls}" id="row-${idx}">
+      <td class="exp-cell">${chevBtn}</td>
+      <td class="lbl-col"><input class="cell-in lbl-in" type="text" value="${esc(r.story)}" oninput="editCell(${idx},'story',this.value)" placeholder="&mdash;"></td>
+      <td class="lbl-col"><input class="cell-in lbl-in" type="text" value="${esc(r.pier)}" oninput="editCell(${idx},'pier',this.value)" placeholder="&mdash;"></td>
+      <td class="lbl-col"><input class="cell-in lbl-in" type="text" value="${esc(r.outputCase)}" oninput="editCell(${idx},'outputCase',this.value)" placeholder="&mdash;"></td>
+      <td class="lbl-col"><input class="cell-in lbl-in" type="text" value="${esc(r.location)}" oninput="editCell(${idx},'location',this.value)" placeholder="&mdash;"></td>
+      <td class="grp-start"><input class="cell-in num-in" type="number" step="1" value="${fmtIn(r.Nraw)}" oninput="editCell(${idx},'Nraw',this.value)"></td>
+      <td><input class="cell-in num-in" type="number" step="1" value="${fmtIn(r.M2)}" oninput="editCell(${idx},'M2',this.value)"></td>
+      <td><input class="cell-in num-in" type="number" step="1" value="${fmtIn(r.M3)}" oninput="editCell(${idx},'M3',this.value)"></td>
+      <td><b>${fmtIn(r.M)}</b></td>
+      <td class="grp-start">${c.mRd}</td><td>${c.xv}</td><td>${c.util}</td>
+      <td class="verdict-cell" onclick="toggleRowDetail(${idx})" style="cursor:pointer">${c.verdict}</td>
+      <td class="editable-row-actions"><button class="row-del" onclick="deleteRow(${idx})" title="Delete">&times;</button></td>
+    </tr>`;
+    if(r._expanded){
+      html+=`<tr class="detail-row"><td colspan="14"><div class="detail-panel" id="detail-${idx}">${renderDetailPanel(r,idx)}</div></td></tr>`;
+    }
+  });
+  tbody.innerHTML=html;
+  rows.forEach((r,idx)=>{ if(r._expanded) drawDetail(r,idx); });
+  document.getElementById('tableTitle').textContent=t('tableTitleN',rows.length);
+  renderSummary();
+  renderSummaryTable();
+}
+function fmtIn(v){ if(v===undefined||v===null||!isFinite(v))return ''; return (Math.round(v*100)/100); }
+function updateRowResultCells(idx){
+  const r=rows[idx];
+  const tbody=document.getElementById('tbodyRows');
+  if(!tbody)return;
+  const trs=[...tbody.querySelectorAll('tr')].filter(tr=>!tr.classList.contains('detail-row'));
+  const tr=trs[idx];
+  if(!tr)return;
+  const tds=tr.querySelectorAll('td');
+  const c=rowCells(r);
+  if(tds[8])tds[8].innerHTML='<b>'+fmtIn(r.M)+'</b>';
+  if(tds[9])tds[9].innerHTML=c.mRd;
+  if(tds[10])tds[10].innerHTML=c.xv;
+  if(tds[11])tds[11].innerHTML=c.util;
+  if(tds[12])tds[12].innerHTML=c.verdict;
+  tr.className=c.cls;
+}
+let editDebounce=null;
+function editCell(idx,field,value){
+  const r=rows[idx];
+  if(!r)return;
+  if(field==='Nraw'||field==='M2'||field==='M3'){
+    const num=parseNum(value);
+    r[field]=isFinite(num)?num:0;
+    r.N=convN(r.Nraw); r.M=mapM(r.M2,r.M3);
+    r.status='pending'; r.res=null;
+    clearTimeout(editDebounce);
+    editDebounce=setTimeout(()=>{ recomputeRow(idx); saveCurrentPreset(); },250);
+  } else {
+    r[field]=value;
+    renderSummaryTable();
+    saveCurrentPreset();
+  }
+}
+function recomputeRow(idx){
+  const r=rows[idx];
+  if(!r)return;
+  if(!currentModel) currentModel=buildModel();
+  r.res=evalCombo(currentModel,r.N,r.M);
+  r.status='done';
+  if(r._expanded){ renderTable(); return; }
+  updateRowResultCells(idx);
+  renderSummary();
+  renderSummaryTable();
+}
+function addManualRow(){
+  rows.push(newRow({Nraw:0,M2:0,M3:0}));
+  showPanels();
+  renderTable();
+  saveCurrentPreset();
+  setTimeout(()=>{
+    const trs=document.querySelectorAll('#tbodyRows tr:not(.detail-row)');
+    const last=trs[trs.length-1];
+    if(last){const nCell=last.querySelector('.num-in');if(nCell)nCell.focus();}
+  },30);
+}
+function toggleRowDetail(idx){
+  const r=rows[idx];
+  if(!r)return;
+  r._expanded=!r._expanded;
+  if(r._expanded && r.status!=='done') recomputeRow(idx);
+  else renderTable();
+}
+function renderSummary(){
+  const bar=document.getElementById('summaryBar');
+  const done=rows.filter(r=>r.status==='done');
+  const invalid=done.filter(r=>!(r.res&&r.res.ok));
+  const valid=done.filter(r=>r.res&&r.res.ok);
+  const okCount=valid.filter(r=>r.res.value.util<=100).length;
+  const failCount=valid.length-okCount;
+  let worst=null;
+  valid.forEach(r=>{if(!worst||r.res.value.util>worst.res.value.util)worst=r;});
+  let html=`
+    <div class="sum-chip"><div class="sc-l">${t('sumTotal')}</div><div class="sc-v">${rows.length}</div></div>
+    <div class="sum-chip ok"><div class="sc-l">${t('sumOk')}</div><div class="sc-v">${okCount}</div></div>
+    <div class="sum-chip no"><div class="sc-l">${t('sumFail')}</div><div class="sc-v">${failCount}</div></div>
+    <div class="sum-chip"><div class="sc-l">${t('sumWorst')}</div><div class="sc-v">${worst?worst.res.value.util.toFixed(1)+' %':'&mdash;'}</div></div>`;
+  if(invalid.length>0){
+    html+=`<div class="sum-chip"><div class="sc-l">${t('sumInvalid')}</div><div class="sc-v">${invalid.length}</div></div>`;
+  }
+  bar.innerHTML=html;
+}
+
+/* ═══════════════════ TABEL CENTRALIZATOR ═══════════════════
+   Pentru fiecare element se retine combinatia cu utilizarea maxima. Randurile
+   fara rezultat valabil NU pot intra in maxim — se numara separat. */
+function buildSummary(){
+  const groups=new Map();
+  rows.forEach((r,idx)=>{
+    const key=(grouping==='pier')?(r.pier||'—')
+                                 :((r.story||'—')+'\u0000'+(r.pier||'—'));
+    let g=groups.get(key);
+    if(!g){g={story:r.story||'',pier:r.pier||'',n:0,invalid:0,pending:0,
+              worst:null,worstIdx:-1};groups.set(key,g);}
+    g.n++;
+    if(r.status!=='done'){g.pending++;return;}
+    if(r.res&&r.res.ok){
+      if(!g.worst||r.res.value.util>g.worst.res.value.util){
+        g.worst=r; g.worstIdx=idx;
+        g.story=r.story||g.story; g.pier=r.pier||g.pier;
+      }
+    } else g.invalid++;
+  });
+  const arr=[...groups.values()];
+  arr.sort((a,b)=>{
+    const ua=a.worst?a.worst.res.value.util:-1, ub=b.worst?b.worst.res.value.util:-1;
+    if(ub!==ua)return ub-ua;
+    return String(a.pier).localeCompare(String(b.pier),undefined,{numeric:true});
+  });
+  return arr;
+}
+function renderSummaryTable(){
+  const panel=document.getElementById('summaryPanel');
+  if(!panel)return;
+  if(!rows.length){panel.style.display='none';return;}
+  panel.style.display='';
+  const groups=buildSummary();
+  document.getElementById('sumTableTitle').textContent=
+    t('sumTableTitleN',groups.length,rows.length);
+  const storyHdr=(grouping==='pier')?t('csGovStory'):t('colStory');
+  document.getElementById('sumTheadRow').innerHTML=`
+    <th>${t('colPier')}</th><th>${storyHdr}</th>
+    <th class="grp-start">${t('csNComb')}</th><th>${t('csInvalid')}</th>
+    <th class="grp-start">${t('csGovCase')}</th><th>${t('colLocation')}</th>
+    <th class="grp-start">${t('colN')}</th><th>${t('colMEd')}</th>
+    <th class="grp-start">${t('colMRd')}</th><th>${t('csUtilMax')}</th><th>${t('colVerdict')}</th>`;
+  let html='';
+  groups.forEach(g=>{
+    const w=g.worst;
+    if(!w){
+      const msg=g.pending?t('sumEmptyPending'):t('verdictInvalid');
+      html+=`<tr class="row-invalid">
+        <td class="lbl-col">${esc(g.pier)||'&mdash;'}</td><td class="lbl-col">${esc(g.story)||'&mdash;'}</td>
+        <td class="grp-start">${g.n}</td><td>${g.invalid||'&mdash;'}</td>
+        <td class="lbl-col grp-start" colspan="5">${esc(msg)}</td>
+        <td>&mdash;</td>
+        <td><span class="verdict-pill na">${t('verdictInvalid')}</span></td></tr>`;
+      return;
+    }
+    const v=w.res.value, pass=v.util<=100;
+    const cls=pass?'row-ok':'row-fail';
+    html+=`<tr class="sum-row ${cls}" onclick="focusGoverningRow(${g.worstIdx})" title="${esc(t('sumHint'))}">
+      <td class="lbl-col">${esc(g.pier)||'&mdash;'}</td><td class="lbl-col">${esc(g.story)||'&mdash;'}</td>
+      <td class="grp-start">${g.n}</td><td>${g.invalid?g.invalid:'&mdash;'}</td>
+      <td class="lbl-col grp-start">${esc(w.outputCase)||'&mdash;'}</td><td class="lbl-col">${esc(w.location)||'&mdash;'}</td>
+      <td class="grp-start">${fmtIn(w.Nraw)}</td><td>${fmtIn(w.M)}</td>
+      <td class="grp-start">${v.Mrd.toFixed(1)}</td>
+      <td><b>${v.util.toFixed(1)} %</b></td>
+      <td><span class="verdict-pill ${pass?'ok':'no'}">${pass?t('verdictOk'):t('verdictFail')}</span></td></tr>`;
+  });
+  document.getElementById('sumTbodyRows').innerHTML=html;
+}
+function focusGoverningRow(idx){
+  if(idx<0||!rows[idx])return;
+  if(!rows[idx]._expanded) toggleRowDetail(idx);
+  setTimeout(()=>{
+    const tr=document.getElementById('row-'+idx);
+    if(tr&&tr.scrollIntoView) tr.scrollIntoView({behavior:'smooth',block:'center'});
+  },60);
+}
+function copySummaryTable(){
+  const btn=document.getElementById('copySumBtn');
+  const storyHdr=(grouping==='pier')?t('csGovStory'):t('colStory');
+  const header=[t('colPier'),storyHdr,t('csNComb'),t('csInvalid'),t('csGovCase'),t('colLocation'),
+    'N (kN)','M_Ed (kNm)','M_Rd (kNm)',t('csUtilMax'),t('colVerdict')];
+  const strip=s=>String(s).replace(/<[^>]*>/g,'').replace(/&mdash;/g,'-').replace(/&amp;/g,'&');
+  const lines=[header.join('\t')];
+  buildSummary().forEach(g=>{
+    const w=g.worst;
+    if(!w){ lines.push([g.pier,g.story,g.n,g.invalid||0,'-','-','-','-','-','-',strip(t('verdictInvalid'))].join('\t')); return; }
+    const v=w.res.value;
+    lines.push([g.pier,g.story,g.n,g.invalid||0,w.outputCase,w.location,
+      fmtIn(w.Nraw),fmtIn(w.M),v.Mrd.toFixed(1),v.util.toFixed(1)+'%',
+      strip(v.util<=100?t('verdictOk'):t('verdictFail'))].join('\t'));
+  });
+  const tsv=lines.join('\n');
+  const done=()=>{btn.textContent=t('copiedBtn');btn.disabled=true;
+    setTimeout(()=>{btn.textContent=t('copyBtn');btn.disabled=false;},1600);};
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(tsv).then(done).catch(()=>fallbackCopy(tsv,done));
+  } else fallbackCopy(tsv,done);
+}
+
+// ─── Panoul de detaliu ───
+function renderDetailPanel(r,idx){
+  if(r.status!=='done'||!r.res){
+    return `<div class="detail-empty">${esc(t('detailUnavailable'))}</div>`;
+  }
+  const v=r.res.value||r.res.partial;
+  const okv=r.res.ok;
+  const note=okv?'':`<div class="detail-note">${esc(statusText(r.res))}</div>`;
+  if(!v) return note||`<div class="detail-empty">${esc(t('detailUnavailable'))}</div>`;
+  const dash='&mdash;';
+  const vals=[
+    [t('dtN'), r.Nraw.toFixed(1)+' kN'],
+    [t('dtMEd'), r.M.toFixed(1)+' kNm'],
+    [t('dtMRd'), okv?v.Mrd.toFixed(1)+' kNm':dash],
+    [t('dtX'), okv?v.X.toFixed(1)+' mm':dash],
+    [t('dtUtil'), okv?v.util.toFixed(1)+' %':dash],
+    [t('dtCompSide'), v.compFromRef?t('dtBE2'):t('dtBE1')],
+    [t('dtNint'), convN(v.Nint).toFixed(1)+' kN'],
+    [t('dtDiff'), convN(v.residual).toFixed(2)+' kN'],
+    [t('dtFb'), v.Fb.toFixed(1)+' kN'],
+    [t('dtFa'), v.Fa.toFixed(1)+' kN'],
+    [t('dtPivot'), okv?pivotLabel(v.pivot):dash],
+    [t('dtNRdc'), convN(v.NRdc).toFixed(0)+' kN'],
+    [t('dtNRdt'), convN(v.NRdt).toFixed(0)+' kN'],
+  ];
+  const valRows=vals.map(([k,val])=>`<div class="dt-row"><span class="dt-k">${k}</span><span class="dt-v">${val}</span></div>`).join('');
+  if(!okv) return note+`<div class="detail-vals" style="max-width:420px">${valRows}</div>`;
+  return note+`
+    <div class="detail-grid">
+      <div class="detail-col">
+        <div class="detail-h">${esc(t('detailDiagram'))}</div>
+        <div class="detail-chart-wrap"><canvas id="dtchart-${idx}"></canvas></div>
+      </div>
+      <div class="detail-col">
+        <div class="detail-h">${esc(t('detailSection'))}</div>
+        <svg id="dtsketch-${idx}" viewBox="0 0 460 220" width="100%" style="display:block;margin:0 auto"></svg>
+      </div>
+      <div class="detail-col detail-vals">
+        <div class="detail-h">${esc(t('detailValues'))}</div>
+        ${valRows}
+      </div>
+    </div>`;
+}
+const detailCharts={};
+/* Curba de interactiune se calculeaza DOAR la deschiderea panoului: pe cateva
+   sute de randuri, calculul ei pentru fiecare rand ar bloca pagina. */
+function drawDetail(r,idx){
+  if(r.status!=='done'||!r.res||!r.res.ok)return;
+  const m=currentModel, v=r.res.value;
+  const canvas=document.getElementById('dtchart-'+idx);
+  if(canvas && typeof Chart!=='undefined'){
+    if(detailCharts[idx]){try{detailCharts[idx].destroy();}catch(e){}}
+    let pts=[];
+    try{
+      const nm=JP.wall.interactionNM(m,v.compFromRef?'pos':'neg');
+      if(nm&&nm.ok) pts=nm.value.map(p=>({x:p.M,y:convN(p.N)}));
+    }catch(e){ pts=[]; }
+    const ds=[
+      {label:'Rd',data:pts,showLine:true,borderColor:'#0066CC',borderWidth:2,pointRadius:0,fill:false,tension:0,order:3},
+      {label:'Ed',data:[{x:Math.abs(r.M),y:r.Nraw}],backgroundColor:'#C0392B',borderColor:'#C0392B',pointRadius:6,pointStyle:'rectRot',order:1},
+      {label:'RdPt',data:[{x:v.Mrd,y:r.Nraw}],backgroundColor:'#2E7D32',borderColor:'#2E7D32',pointRadius:5,order:1}
+    ];
+    detailCharts[idx]=new Chart(canvas,{type:'scatter',data:{datasets:ds},
+      options:{responsive:true,maintainAspectRatio:false,animation:false,
+        plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`M=${c.parsed.x.toFixed(0)} kNm, N=${c.parsed.y.toFixed(0)} kN`}}},
+        scales:{
+          x:{type:'linear',title:{display:true,text:'M (kNm)',font:{size:11}},grid:{color:'rgba(0,0,0,0.05)'},ticks:{font:{size:10}}},
+          y:{type:'linear',title:{display:true,text:'N (kN)',font:{size:11}},grid:{color:'rgba(0,0,0,0.05)'},ticks:{font:{size:10}}}
+        }}});
+  }
+  const svg=document.getElementById('dtsketch-'+idx);
+  if(svg) drawSketch(m,v.X,v.compFromRef,svg);
+}
+
+// ═══════════════════ Copy detailed table ═══════════════════
+function copyTable(){
+  const btn=document.getElementById('copyBtn');
+  const header=[t('colStory'),t('colPier'),t('colCase'),t('colLocation'),
+    'N (kN)','M2 (kNm)','M3 (kNm)','M_Ed (kNm)','M_Rd (kNm)','X (mm)',t('colUtil'),t('colVerdict')];
+  const strip=s=>String(s).replace(/<[^>]*>/g,'').replace(/&mdash;/g,'-').replace(/&amp;/g,'&');
+  const lines=[header.join('\t')];
+  rows.forEach(r=>{
+    const okv=r.status==='done'&&r.res&&r.res.ok;
+    const v=okv?r.res.value:null;
+    lines.push([r.story,r.pier,r.outputCase,r.location,
+      fmtIn(r.Nraw),fmtIn(r.M2),fmtIn(r.M3),fmtIn(r.M),
+      okv?v.Mrd.toFixed(1):'-',okv?v.X.toFixed(0):'-',
+      okv?v.util.toFixed(1)+'%':'-',
+      okv?(v.util<=100?strip(t('verdictOk')):strip(t('verdictFail')))
+         :(r.status==='done'?strip(t('verdictInvalid')):'-')].join('\t'));
+  });
+  const tsv=lines.join('\n');
+  const done=()=>{btn.textContent=t('copiedBtn');btn.disabled=true;
+    setTimeout(()=>{btn.textContent=t('copyBtn');btn.disabled=false;},1600);};
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(tsv).then(done).catch(()=>fallbackCopy(tsv,done));
+  } else fallbackCopy(tsv,done);
+}
+function fallbackCopy(text,cb){
+  const ta=document.createElement('textarea');
+  ta.value=text;ta.style.position='fixed';ta.style.left='-9999px';
+  document.body.appendChild(ta);ta.focus();ta.select();
+  try{document.execCommand('copy');cb&&cb();}catch(e){}
+  document.body.removeChild(ta);
+}
+
+// ═══════════════════ PDF export ═══════════════════
+function generatePdf(){
+  const btn=document.getElementById('rptBtn'),status=document.getElementById('rptStatus');
+  if(typeof window.jspdf==='undefined'){status.textContent=t('pdfLoading');return;}
+  if(!currentModel||!rows.length)return;
+  btn.disabled=true;btn.textContent=t('generating');
+  setTimeout(()=>{
+    try{
+      buildPdfDoc();
+      status.textContent=t('statusDownloaded');
+      setTimeout(()=>status.textContent='',4000);
+    }catch(err){
+      console.error('PDF generation failed:',err);
+      status.textContent=t('pdfError')+' '+((err&&err.message)||err);
+    }finally{
+      btn.disabled=false;btn.textContent=t('downloadPdf');
+    }
+  },30);
+}
+function buildPdfDoc(){
+  const{jsPDF}=window.jspdf;
+  const doc=new jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
+  const pW=297,pH=210,ml=12,mr=12,cw=pW-ml-mr;
+  const ds=new Date().toLocaleDateString(LANG==='en'?'en-GB':'ro-RO');
+  const m=currentModel;
+  function hdr(){
+    doc.setFillColor(40,80,140);doc.rect(0,0,pW,13,'F');
+    doc.setTextColor(255,255,255);doc.setFontSize(10);doc.setFont('helvetica','bold');
+    doc.text(t('pdfTitle'),ml,8);
+    doc.setFontSize(7.5);doc.setFont('helvetica','normal');
+    doc.text(t('pdfSub'),ml,12);
+    doc.text(t('pdfWall')+currentPreset+'  |  '+t('pdfDate')+ds,pW-mr,8,{align:'right'});
+    doc.setTextColor(0,0,0);
+  }
+  hdr();
+  let y=19;
+  doc.setFontSize(9);doc.setFont('helvetica','bold');doc.setTextColor(0,102,204);
+  doc.text(t('pdfSecTitle'),ml,y);doc.setTextColor(0,0,0);doc.setFont('helvetica','normal');
+  y+=5;
+  const leftW=132;
+  // N_Rd,c / N_Rd,t sunt proprietati ale sectiunii; se iau dintr-un rand valabil.
+  let lim=null;
+  for(const r of rows){ if(r.status==='done'&&r.res&&(r.res.value||r.res.partial)){ const vv=r.res.value||r.res.partial; if(isFinite(vv.NRdc)){lim=vv;break;} } }
+  doc.autoTable({
+    startY:y,
+    body:[
+      [t('pdfInWallLen'),m.lw+' mm'],
+      [t('pdfInWebThick'),m.bw0+' mm'],
+      [t('pdfInBE1'),m.bf1+' / '+m.lf1+' mm'],
+      [t('pdfInBE2'),m.bf2+' / '+m.lf2+' mm'],
+      [t('pdfInTotBarsBE1'),m.cntB1+' '+t('barsWord')],
+      [t('pdfInTotBarsBE2'),m.cntB2+' '+t('barsWord')],
+      [t('pdfInTotBarsWeb'),m.cntWeb+' '+t('barsWord')],
+      [t('pdfInCover'),m.cnom+' / '+m.detr+' mm'],
+      [t('pdfInConcClass'),curC+(confMode==='bulb'?t('pdfConfBulb'):confMode==='all'?t('pdfConfAll'):'')],
+      [t('pdfInSteelClass'),curS],
+      ['f_cd',m.fcd.toFixed(2)+' MPa'],
+      ['f_yd',m.fyd.toFixed(1)+' MPa'],
+      [t('pdfNRdc'),lim?convN(lim.NRdc).toFixed(0)+' kN':'-'],
+      [t('pdfNRdt'),lim?convN(lim.NRdt).toFixed(0)+' kN':'-'],
+      [t('pdfInSignConv'),(signConv==='pos')?t('pdfSignPos'):t('pdfSignNeg')],
+      [t('pdfInMomAxis'),momAxis],
+      [t('pdfInConvention'),m.deductSteel?t('pdfConvNet'):t('pdfConvGross')],
+      [t('pdfInNfibres'),''+m.NF],
+    ],
+    margin:{left:ml},tableWidth:leftW,theme:'grid',
+    styles:{lineColor:[180,200,220],lineWidth:0.25,fontSize:8,textColor:[0,0,0],cellPadding:1.3},
+    columnStyles:{0:{cellWidth:72},1:{halign:'right',fontStyle:'bold'}},
+  });
+  const secEndY=doc.lastAutoTable.finalY;
+  drawWallInPdf(doc,m,ml+leftW+10,y,pW-mr-(ml+leftW+10));
+
+  // ── Centralizator ──
+  let yS=secEndY+8;
+  if(yS>pH-50){doc.addPage();hdr();yS=19;}
+  doc.setFontSize(9);doc.setFont('helvetica','bold');doc.setTextColor(0,102,204);
+  doc.text(t('pdfSumTitle'),ml,yS);doc.setTextColor(0,0,0);doc.setFont('helvetica','normal');
+  doc.setFontSize(7);doc.setTextColor(108,108,112);
+  doc.text(t('pdfSumNote',rows.length),ml,yS+4);doc.setTextColor(0,0,0);
+  const groups=buildSummary();
+  const storyHdr=(grouping==='pier')?t('csGovStory'):t('colStory');
+  const sumBody=groups.map(g=>{
+    const w=g.worst;
+    if(!w) return [g.pier,g.story,String(g.n),String(g.invalid||0),'-','-','-','-','-','-',t('pdfInvalidCell')];
+    const v=w.res.value;
+    return [g.pier,g.story,String(g.n),g.invalid?String(g.invalid):'-',
+      w.outputCase,w.location,String(fmtIn(w.Nraw)),String(fmtIn(w.M)),
+      v.Mrd.toFixed(1),v.util.toFixed(1)+'%',
+      (v.util<=100?t('verdictOk'):t('verdictFail'))];
+  });
+  doc.autoTable({
+    startY:yS+7,
+    head:[[t('colPier'),storyHdr,t('csNComb'),t('csInvalid'),t('csGovCase'),t('colLocation'),
+           t('colN'),t('colMEd'),t('colMRd'),t('csUtilMax'),t('colVerdict')]],
+    body:sumBody,
+    margin:{left:ml,right:mr},tableWidth:cw,theme:'grid',
+    styles:{lineColor:[180,200,220],lineWidth:0.25,fontSize:7.5,textColor:[0,0,0],cellPadding:1.6},
+    headStyles:{fillColor:[200,215,235],textColor:[0,0,0],fontStyle:'bold',lineColor:[200,215,235],fontSize:7.5},
+    columnStyles:{2:{halign:'right'},3:{halign:'right'},6:{halign:'right'},7:{halign:'right'},
+                  8:{halign:'right'},9:{halign:'right',fontStyle:'bold'},10:{halign:'center',fontStyle:'bold'}},
+    didParseCell:function(data){
+      if(data.section==='body'&&data.column.index===10){
+        const vt=sumBody[data.row.index][10];
+        if(vt===t('verdictOk')) data.cell.styles.textColor=[46,125,50];
+        else if(vt===t('verdictFail')) data.cell.styles.textColor=[192,57,43];
+        else data.cell.styles.textColor=[108,108,112];
+      }
+    },
+    didDrawPage:function(){hdr();}
+  });
+  let lastY=doc.lastAutoTable.finalY;
+
+  // ── Rezultate pe combinatii (optional) ──
+  const obs=[];
+  const body=rows.map((r,i)=>{
+    const okv=r.status==='done'&&r.res&&r.res.ok;
+    const v=okv?r.res.value:null;
+    let verdict;
+    if(!okv){
+      verdict=r.status==='done'?t('pdfInvalidCell'):'-';
+      if(r.status==='done') obs.push((i+1)+'. '+[r.story,r.pier,r.outputCase,r.location].filter(Boolean).join(' / ')+' — '+statusText(r.res));
+    } else verdict=(v.util<=100?t('verdictOk'):t('verdictFail'));
+    return [r.story,r.pier,r.outputCase,r.location,
+      fmtIn(r.Nraw),fmtIn(r.M2),fmtIn(r.M3),fmtIn(r.M),
+      okv?v.Mrd.toFixed(1):'-',okv?v.X.toFixed(0):'-',
+      okv?v.util.toFixed(1)+'%':'-',verdict];
+  });
+  if(pdfScope==='full'){
+    let y2=lastY+8;
+    if(y2>pH-45){doc.addPage();hdr();y2=19;}
+    doc.setFontSize(9);doc.setFont('helvetica','bold');doc.setTextColor(0,102,204);
+    doc.text(t('pdfResultsTitle'),ml,y2);doc.setTextColor(0,0,0);doc.setFont('helvetica','normal');
+    doc.autoTable({
+      startY:y2+4,
+      head:[[t('colStory'),t('colPier'),t('colCase'),t('colLocation'),t('colN'),t('colM2'),t('colM3'),
+             t('colMEd'),t('colMRd'),t('colX'),t('colUtil'),t('colVerdict')]],
+      body,
+      margin:{left:ml,right:mr},tableWidth:cw,theme:'grid',
+      styles:{lineColor:[180,200,220],lineWidth:0.25,fontSize:7.5,textColor:[0,0,0],cellPadding:1.6},
+      headStyles:{fillColor:[200,215,235],textColor:[0,0,0],fontStyle:'bold',lineColor:[200,215,235],fontSize:7.5},
+      columnStyles:{4:{halign:'right'},5:{halign:'right'},6:{halign:'right'},7:{halign:'right'},
+                    8:{halign:'right'},9:{halign:'right'},10:{halign:'right'},11:{halign:'center',fontStyle:'bold'}},
+      didParseCell:function(data){
+        if(data.section==='body'&&data.column.index===11){
+          const vt=body[data.row.index][11];
+          if(vt===t('verdictOk')) data.cell.styles.textColor=[46,125,50];
+          else if(vt===t('verdictFail')) data.cell.styles.textColor=[192,57,43];
+          else data.cell.styles.textColor=[108,108,112];
+        }
+      },
+      didDrawPage:function(){hdr();}
+    });
+    lastY=doc.lastAutoTable.finalY;
+  }
+  let y3=lastY+7;
+  function need(n){ if(y3+n>pH-14){doc.addPage();hdr();y3=19;} }
+  if(obs.length){
+    need(12);
+    doc.setFontSize(9);doc.setFont('helvetica','bold');doc.setTextColor(0,102,204);
+    doc.text(t('pdfObsTitle'),ml,y3);doc.setTextColor(0,0,0);doc.setFont('helvetica','normal');y3+=5;
+    doc.setFontSize(7.5);
+    obs.forEach(function(line){ need(5); doc.text(line,ml,y3,{maxWidth:cw}); y3+=4.2; });
+    y3+=3;
+  }
+  need(30);
+  doc.setFontSize(9);doc.setFont('helvetica','bold');doc.setTextColor(0,102,204);
+  doc.text(t('pdfLimTitle'),ml,y3);doc.setTextColor(0,0,0);doc.setFont('helvetica','normal');y3+=5;
+  doc.setFontSize(7.5);
+  [t('pdfLim1',(m.eud*1000).toFixed(1)),t('pdfLim2'),t('pdfLim3'),t('pdfLim4'),t('pdfLim5'),t('pdfLim6')]
+    .forEach(function(line){ need(5); doc.text(line,ml,y3,{maxWidth:cw}); y3+=4.2; });
+
+  const tp=doc.internal.getNumberOfPages();
+  const stamp='CR 2-1-1.1/2022 / SR EN 1992-1-1  |  M'+MODULE_ID+' v'+MODULE_VERSION+' / engine v'+JP.VERSION;
+  for(let i=1;i<=tp;i++){
+    doc.setPage(i);
+    doc.setFontSize(7);doc.setTextColor(0,0,0);doc.setFont('helvetica','italic');
+    doc.text(t('pdfDisc1')+'  '+t('pdfDisc2'),ml,pH-5);
+    doc.setFont('helvetica','normal');
+    doc.text(stamp,ml,pH-1.5);
+    doc.text(t('pdfPage',i,tp),pW-mr,pH-1.5,{align:'right'});
+    doc.text(t('pdfGenerated')+ds,pW/2,pH-1.5,{align:'center'});
+  }
+  doc.save(t('pdfFname'));
+}
+// Peretele se deseneaza vectorial in PDF (bulbi + inima + bare).
+function drawWallInPdf(doc,m,x0,y0,availW){
+  if(!(m.lw>0)||!(m.bw0>0))return;
+  const maxW=availW, maxH=42;
+  const maxDim=Math.max(m.lf1,m.lf2,m.bw0);
+  const scl=Math.min(maxW/m.lw,maxH/maxDim)*0.92;
+  const cx=x0+maxW/2, cy=y0+maxH/2;
+  const ox=cx-(m.lw*scl)/2;
+  const X2=l=>ox+l*scl;
+  doc.setDrawColor(199,199,204);doc.setLineWidth(0.25);
+  doc.setFillColor(232,232,237);
+  doc.rect(X2(m.bf1),cy-(m.bw0*scl)/2,(m.lw-m.bf1-m.bf2)*scl,m.bw0*scl,'FD');
+  doc.setDrawColor(28,28,30);doc.setLineWidth(0.4);
+  if(confMode==='bulb'||confMode==='all')doc.setFillColor(221,238,255);else doc.setFillColor(232,232,237);
+  doc.rect(X2(0),cy-(m.lf1*scl)/2,m.bf1*scl,m.lf1*scl,'FD');
+  doc.rect(X2(m.lw-m.bf2),cy-(m.lf2*scl)/2,m.bf2*scl,m.lf2*scl,'FD');
+  doc.setFontSize(6.5);doc.setTextColor(108,108,112);doc.setFont('helvetica','normal');
+  doc.text('l_w = '+m.lw+' mm  |  b_w0 = '+m.bw0+' mm',cx,cy+maxH/2+3.5,{align:'center'});
+  doc.setTextColor(0,0,0);
+}
+
+// ═══════════════════ Presetari de perete P1..P5 ═══════════════════
+// Fiecare presetare tine intreaga definitie a peretelui SI combinatiile lui.
+let currentPreset='P1';
+function getKey(p){return 'sw_mod10_'+p;}
+function captureState(){
+  const st={inputs:{},segs:{}};
+  document.querySelectorAll('#sectionPanel input[id], #sectionPanel select[id]').forEach(el=>{st.inputs[el.id]=el.value;});
+  st.segs.conf=confMode;
+  st.segs.momAxis=momAxis;
+  st.segs.signConv=signConv;   // eticheta, nu setare
+  st.rows=rows.map(r=>({story:r.story,pier:r.pier,outputCase:r.outputCase,location:r.location,
+                        Nraw:r.Nraw,M2:r.M2,M3:r.M3}));
+  return st;
+}
+function applyState(st){
+  st=st||{};
+  if(st.inputs){
+    Object.keys(st.inputs).forEach(id=>{const el=document.getElementById(id);if(el)el.value=st.inputs[id];});
+  } else {
+    const defs={lw:'2750',bw0:'400',bf1:'650',lf1:'400',bf2:'650',lf2:'400',
+                cp:'C50/60',sp:'S 500',fckc:'59.31',ec2c:'2.81',ecu2c:'10.95',
+                fckcw:'55',ec2cw:'2.48',ecu2cw:'8.08',
+                b1c_n:'4',b1c_d:'25',b1s_n:'2',b1s_d:'25',b1l_n:'9',b1l_d:'25',b1l_r:'3',
+                b2c_n:'4',b2c_d:'25',b2s_n:'2',b2s_d:'25',b2l_n:'9',b2l_d:'25',b2l_r:'3',
+                in_d:'12',in_s:'150',in_r:'2',cnom:'35',detr:'10'};
+    Object.keys(defs).forEach(id=>{const el=document.getElementById(id);if(el)el.value=defs[id];});
+  }
+  curC=document.getElementById('cp').value;
+  curS=document.getElementById('sp').value;
+  confMode=(st.segs&&st.segs.conf)||'none';
+  momAxis=(st.segs&&st.segs.momAxis)||'M3';
+  // Presetarile salvate sub alta conventie de semn se reinterpreteaza, ca un
+  // perete comprimat sa nu devina in tacere intins.
+  const savedSign=(st.segs&&st.segs.signConv)||'neg';
+  const flip=(savedSign!==signConv);
+  rows=(st.rows||[]).map(r=>newRow({
+    story:r.story,pier:r.pier,outputCase:r.outputCase,location:r.location,
+    Nraw:(flip&&isFinite(r.Nraw)&&r.Nraw!==0)?-r.Nraw:r.Nraw, M2:r.M2, M3:r.M3
+  }));
+}
+function saveCurrentPreset(){
+  try{localStorage.setItem(getKey(currentPreset),JSON.stringify(captureState()));}catch(e){}
+}
+function loadPreset(p){
+  try{const s=localStorage.getItem(getKey(p));return s?JSON.parse(s):null;}catch(e){return null;}
+}
+function syncToggleUI(){
+  setConfUI(confMode);
+  document.getElementById('seg-mom-m3').classList.toggle('on',momAxis==='M3');
+  document.getElementById('seg-mom-m2').classList.toggle('on',momAxis==='M2');
+  document.getElementById('seg-sign-neg').classList.toggle('on',signConv==='neg');
+  document.getElementById('seg-sign-pos').classList.toggle('on',signConv==='pos');
+  document.getElementById('seg-fmt-simple').classList.toggle('on',importFmt==='simple');
+  document.getElementById('seg-fmt-etabs').classList.toggle('on',importFmt==='etabs');
+  document.getElementById('seg-grp-storypier').classList.toggle('on',grouping==='storypier');
+  document.getElementById('seg-grp-pier').classList.toggle('on',grouping==='pier');
+  document.getElementById('seg-pdf-sum').classList.toggle('on',pdfScope==='sum');
+  document.getElementById('seg-pdf-full').classList.toggle('on',pdfScope==='full');
+}
+function showPanels(){
+  const has=rows.length>0;
+  document.getElementById('resultsPanel').style.display=has?'':'none';
+  document.getElementById('summaryPanel').style.display=has?'':'none';
+  document.getElementById('emptyPanel').style.display=has?'none':'';
+}
+function switchPreset(p){
+  saveCurrentPreset();
+  currentPreset=p;
+  try{localStorage.setItem('sw_mod10_active',p);}catch(e){}
+  document.getElementById('presetSel').value=p;
+  applyState(loadPreset(p));
+  syncToggleUI();
+  updMat();
+  showPanels();
+  onSectionChange();
+  saveCurrentPreset();
+}
+
+// ═══════════════════ Init ═══════════════════
+document.querySelectorAll('#langSeg button').forEach(b=>b.addEventListener('click',()=>setLang(b.dataset.lang)));
+if(typeof JP!=='undefined'){
+  fillMaterialSelects();
+  (function(){
+    try{const ap=localStorage.getItem('sw_mod10_active');if(ap)currentPreset=ap;}catch(e){}
+    document.getElementById('presetSel').value=currentPreset;
+    const st=loadPreset(currentPreset);
+    if(st) applyState(st);
+  })();
+}
+syncToggleUI();
+applyStaticLang();
+if(typeof JP!=='undefined'){
+  updMat();
+  showPanels();
+  onSectionChange();
+}
+document.querySelectorAll('#sectionPanel input, #sectionPanel select').forEach(el=>{
+  el.addEventListener('change',saveCurrentPreset);
+});
+</script>
+</body>
+</html>

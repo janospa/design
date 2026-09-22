@@ -123,27 +123,34 @@ body{font-family:'Inter',sans-serif;background:#F5F5F7;color:#1C1C1E;min-height:
       <span class="mod-arrow"><svg viewBox="0 0 16 16"><polyline points="5,3 11,8 5,13"/></svg></span>
     </a>
 
-    <!-- 03 Moment capabil -->
-    <a class="mod" href="3_MOMENT_CAPABIL.html">
-      <span class="mod-num">03</span>
-      <div class="mod-icon">
-        <svg width="52" height="40" viewBox="0 0 52 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <line x1="7" y1="37" x2="7" y2="2"  stroke="#C7C7CC" stroke-width="1.1" stroke-linecap="round"/>
-          <line x1="5" y1="37" x2="50" y2="37" stroke="#C7C7CC" stroke-width="1.1" stroke-linecap="round"/>
-          <polyline points="5,5 7,2 9,5"   stroke="#C7C7CC" stroke-width="1.1" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-          <polyline points="47,35 50,37 47,39" stroke="#C7C7CC" stroke-width="1.1" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="M7,4 C10,4 20,4 35,14 C42,18 46,20 46,22 C46,24 42,26 35,30 C20,36 10,37 7,37"
-                stroke="#7B2FBE" stroke-width="1.8" fill="none" stroke-linecap="round"/>
-          <path d="M7,4 C10,4 20,4 35,14 C42,18 46,20 46,22 C46,24 42,26 35,30 C20,36 10,37 7,37 Z"
-                fill="#F3EEFF" opacity="0.55"/>
-        </svg>
-      </div>
-      <div class="mod-text">
-        <span class="mod-title" data-i18n-sym="m3title">Momentul capabil M<sub>Rd</sub></span>
-        <div class="mod-desc" data-i18n="m3desc">Diagramă de interacțiune N-M — metoda fibrelor</div>
-      </div>
-      <span class="mod-arrow"><svg viewBox="0 0 16 16"><polyline points="5,3 11,8 5,13"/></svg></span>
-    </a>
+    <!-- 03 Moment capabil (+ 10 batch) -->
+    <div class="mod-pair">
+      <a class="mod mod-main" href="3_MOMENT_CAPABIL.html">
+        <span class="mod-num">03</span>
+        <div class="mod-icon">
+          <svg width="52" height="40" viewBox="0 0 52 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <line x1="7" y1="37" x2="7" y2="2"  stroke="#C7C7CC" stroke-width="1.1" stroke-linecap="round"/>
+            <line x1="5" y1="37" x2="50" y2="37" stroke="#C7C7CC" stroke-width="1.1" stroke-linecap="round"/>
+            <polyline points="5,5 7,2 9,5"   stroke="#C7C7CC" stroke-width="1.1" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <polyline points="47,35 50,37 47,39" stroke="#C7C7CC" stroke-width="1.1" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M7,4 C10,4 20,4 35,14 C42,18 46,20 46,22 C46,24 42,26 35,30 C20,36 10,37 7,37"
+                  stroke="#7B2FBE" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+            <path d="M7,4 C10,4 20,4 35,14 C42,18 46,20 46,22 C46,24 42,26 35,30 C20,36 10,37 7,37 Z"
+                  fill="#F3EEFF" opacity="0.55"/>
+          </svg>
+        </div>
+        <div class="mod-text">
+          <span class="mod-title" data-i18n-sym="m3title">Momentul capabil M<sub>Rd</sub></span>
+          <div class="mod-desc" data-i18n="m3desc">Diagramă de interacțiune N-M — metoda fibrelor</div>
+        </div>
+        <span class="mod-arrow"><svg viewBox="0 0 16 16"><polyline points="5,3 11,8 5,13"/></svg></span>
+      </a>
+      <a class="mod mod-batch" href="10_PERETE_TABEL.html" data-i18n-title="m10tip" title="Import combinatii din ETABS (Pier Forces)/Excel, verificare in lot">
+        <span class="batch-num">10</span>
+        <span class="batch-ico"><svg width="26" height="20" viewBox="0 0 26 20" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="1" y="1" width="24" height="18" rx="2" fill="#fff" stroke="#7B2FBE" stroke-width="1.2"/><line x1="1" y1="6.6" x2="25" y2="6.6" stroke="#7B2FBE" stroke-width="1"/><line x1="1" y1="12.4" x2="25" y2="12.4" stroke="#7B2FBE" stroke-width="1"/><line x1="9.5" y1="1" x2="9.5" y2="19" stroke="#7B2FBE" stroke-width="1" opacity="0.55"/></svg></span>
+        <span class="batch-lbl" data-i18n="batchLbl">Batch</span>
+      </a>
+    </div>
 
     <!-- 04 Forta taietoare -->
     <a class="mod" href="4_FORTA_TAIETOARE.html">
@@ -163,7 +170,7 @@ body{font-family:'Inter',sans-serif;background:#F5F5F7;color:#1C1C1E;min-height:
       </div>
       <div class="mod-text">
         <span class="mod-title" data-i18n-sym="m4title">Forța tăietoare capabilă V<sub>Rd</sub></span>
-        <div class="mod-desc" data-i18n="m4desc">V<sub>Rd,max</sub>, V<sub>Rd,s</sub>, V<sub>Rd,i</sub> — zone critice și non-critice</div>
+        <div class="mod-desc" data-i18n-sym="m4desc">V<sub>Rd,max</sub>, V<sub>Rd,s</sub>, V<sub>Rd,i</sub> — zone critice și non-critice</div>
       </div>
       <span class="mod-arrow"><svg viewBox="0 0 16 16"><polyline points="5,3 11,8 5,13"/></svg></span>
     </a>
@@ -283,11 +290,14 @@ const I18N={
   m7desc:{ro:'Import combinații de încărcare din Excel/ETABS, verificare în lot', en:'Import load combinations from Excel/ETABS, batch check'},
   m8title:{ro:'Nod de cadru &mdash; verificare', en:'Beam-column joint &mdash; check'},
   m8desc:{ro:'Suprarezistență, forță tăietoare în nod, armătură transversală &mdash; P 100-1/2013', en:'Overstrength, joint shear, transverse reinforcement &mdash; P 100-1/2013'},
+  m10title:{ro:'Perete &mdash; moment capabil (batch)', en:'Wall &mdash; moment resistance (batch)'},
+  m10desc:{ro:'Import combinații din ETABS (Pier Forces)/Excel, verificare în lot', en:'Import combinations from ETABS (Pier Forces)/Excel, batch check'},
   groupWalls:{ro:'Pereți', en:'Walls'},
   groupColumns:{ro:'Stâlpi', en:'Columns'},
   batchLbl:{ro:'Batch', en:'Batch'},
   m7tip:{ro:'Import combinații de încărcare din Excel/ETABS, verificare în lot', en:'Import load combinations from Excel/ETABS, batch check'},
   m9tip:{ro:'Un rând pe nivel, pe o linie de stâlp, cu seturi de armare', en:'One row per storey up a column line, with reinforcement sets'},
+  m10tip:{ro:'Import combinații din ETABS (Pier Forces)/Excel, verificare în lot cu tabel centralizator', en:'Import combinations from ETABS (Pier Forces)/Excel, batch check with summary table'},
   badgeNew:{ro:'Nou', en:'New'},
   badgeSoon:{ro:'În curând', en:'Coming soon'},
   author:{ro:'Lucrare de disertație — Janos Patrik · UTCN · Facultatea de Construcții · 2026', en:'Dissertation — Janos Patrik · UTCN · Faculty of Civil Engineering · 2026'},
