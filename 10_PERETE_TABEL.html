@@ -457,7 +457,7 @@ table.results tr.sum-row:hover td:first-child{background:#E6EFFC}
      - simplu, 7 coloane fara antet (cand datele nu vin din ETABS);
      - tabelul ETABS brut "Pier Forces", citit DUPA ANTET.
    ═══════════════════════════════════════════════════════════════════════════ */
-const MODULE_ID='10', MODULE_VERSION='2.0.0';
+const MODULE_ID='10', MODULE_VERSION='2.1.0';
 
 let curS='S 500',confMode='none';
 let rows=[];      // {story,pier,outputCase,location,Nraw,M2,M3,N,M,res,status,_expanded,_set}
@@ -654,10 +654,18 @@ const T={
   colMEd:{ro:'M_Ed (kNm)',en:'M_Ed (kNm)'},
   colMRd:{ro:'M_Rd (kNm)',en:'M_Rd (kNm)'},
   colX:{ro:'X (mm)',en:'X (mm)'},
-  colUtil:{ro:'Utilizare',en:'Utilization'},
+  colUtil:{ro:'Util.',en:'Util.'},
   colVerdict:{ro:'Verdict',en:'Verdict'},
-  colUtilUni:{ro:'Utilizare uniax.',en:'Util. uniaxial'},
-  colDelta:{ro:'Δ biax.',en:'Δ biaxial'},
+  colUtilUni:{ro:'Util. uniax.',en:'Uniax. util.'},
+  colOm2:{ro:'&Omega; M2',en:'&Omega; M2'},
+  colOm3:{ro:'&Omega; M3',en:'&Omega; M3'},
+  omTip:{ro:'Factor de suprarezistenta pe directie, raportat la momentele ETABS: Ω M3 = M_Rd / |M3|, Ω M2 = M_Rd / |M2|, cu M_Rd capabil UNIAXIAL pe acea directie, la N_Ed al combinatiei si in sensul momentului. In planul peretelui M_Rd este cel al modulului 03; in afara planului este capacitatea sectiunii 2D (engine-poly). Nu include γ_Rd si nu este plafonat la q — pentru fundatii (P 100-1): E_Fd = E_F,G + γ_Rd·Ω·E_F,E, cu Ω ≤ q. „—” cand |M| < 1 kNm.',
+         en:'Overstrength factor per direction, referred to the ETABS moments: Ω M3 = M_Rd / |M3|, Ω M2 = M_Rd / |M2|, with M_Rd the UNIAXIAL resistance in that direction, at the combination N_Ed and in the sense of the moment. In the wall plane M_Rd is the Module 03 value; out of plane it is the 2D section capacity (engine-poly). Not multiplied by γ_Rd and not capped at q — for foundations (P 100-1): E_Fd = E_F,G + γ_Rd·Ω·E_F,E, with Ω ≤ q. “—” when |M| < 1 kNm.'},
+  dtOm2:{ro:'Ω M2 = M_Rd(uniax) / |M2|',en:'Ω M2 = M_Rd(uniax) / |M2|'},
+  dtOm3:{ro:'Ω M3 = M_Rd(uniax) / |M3|',en:'Ω M3 = M_Rd(uniax) / |M3|'},
+  pdfOmNote:{ro:'Ω M2, Ω M3 = M_Rd uniaxial pe directia momentului ETABS (la N_Ed, in sensul lui) / |M|; fara γ_Rd, neplafonat la q.',
+             en:'Ω M2, Ω M3 = uniaxial M_Rd in the direction of the ETABS moment (at N_Ed, in its sense) / |M|; without γ_Rd, not capped at q.'},
+  colDelta:{ro:'Δ biax.',en:'Δ biax.'},
   verdictOk:{ro:'VERIFICA',en:'PASS'},
   verdictFail:{ro:'NU VERIFICA',en:'FAIL'},
   verdictInvalid:{ro:'INVALID',en:'INVALID'},
@@ -693,8 +701,8 @@ const T={
   csGovStory:{ro:'Nivel det.',en:'Gov. story'},
   csNComb:{ro:'Nr. comb.',en:'No. comb.'},
   csInvalid:{ro:'Invalide',en:'Invalid'},
-  csGovCase:{ro:'Combinatie determinanta',en:'Governing combination'},
-  csUtilMax:{ro:'Utilizare max.',en:'Max utilization'},
+  csGovCase:{ro:'Comb. det.',en:'Gov. comb.'},
+  csUtilMax:{ro:'Util. max',en:'Max util.'},
   sumEmptyPending:{ro:'Se calculeaza...',en:'Calculating...'},
   // detail
   detailToggle:{ro:'Arată/ascunde detalii de calcul',en:'Show/hide calculation details'},
@@ -1628,8 +1636,35 @@ function evalRow(row){
     row.res=evalUni(modelUniOf(id),row.N,row.M);
     row.resUni=null;
   }
+  row.om=(id&&row.res&&row.res.ok)?omegaOf(id,row):null;
   row.status='done';
 }
+/* ─── Factorul de suprarezistenta Ω, pe directiile momentelor ETABS ─────────
+   Ω = M_Rd / |M_Ed|, cu M_Rd capabil UNIAXIAL pe directia respectiva, la N_Ed
+   al combinatiei si in SENSUL momentului:
+     - in planul peretelui: M_Rd din JP.wall (modulul 03, integrare 1D);
+     - in afara planului: capacitatea sectiunii 2D (JP.poly) pe directia pura.
+   Se raporteaza la M2 / M3 (coloanele ETABS din tabel), dupa comutatorul
+   "moment in planul peretelui". NU contine γ_Rd si NU este plafonat la q
+   (P 100-1: E_Fd = E_F,G + γ_Rd·Ω·E_F,E, Ω ≤ q). Sub 1 kNm -> null. */
+const OM_MIN=1.0;
+function omegaOf(id,row){
+  const out={inp:null,oop:null};
+  try{
+    if(Math.abs(row.M)>=OM_MIN){
+      const r=JP.wall.solve(modelUniOf(id),row.N,row.M,LANG);
+      if(r.ok) out.inp=r.value.Mrd/Math.abs(row.M);
+    }
+    if(Math.abs(row.Mout)>=OM_MIN&&polyReady()){
+      const r=JP.poly.solve(modelBiOf(id),row.N,row.Mout,0,LANG);
+      if(r.ok) out.oop=r.value.MRd/Math.abs(row.Mout);
+    }
+  }catch(e){}
+  // pe coloanele ETABS: momAxis spune care dintre M2 / M3 este in plan
+  return momAxis==='M2'?{m2:out.inp,m3:out.oop}:{m2:out.oop,m3:out.inp};
+}
+function fmtOm(v){ return (v===null||v===undefined||!isFinite(v))?'&mdash;':v.toFixed(2); }
+function txtOm(v){ return (v===null||v===undefined||!isFinite(v))?'-':v.toFixed(2); }
 function runBatch(pendingOnly){
   if(typeof JP==='undefined')return;
   const gen=++batchGen;
@@ -1666,12 +1701,13 @@ function uniUtil(r){
   return (r&&r.resUni&&r.resUni.ok&&r.resUni.value)?r.resUni.value.util:null;
 }
 function rowCells(r){
-  let mEd='&mdash;',mRd='&mdash;',xv='&mdash;',util='&mdash;',uUni='&mdash;',dUni='&mdash;',
+  let mEd='&mdash;',mRd='&mdash;',xv='&mdash;',util='&mdash;',uUni='&mdash;',dUni='&mdash;',om2='&mdash;',om3='&mdash;',
       verdict=`<span class="verdict-pill pending">${t('verdictPending')}</span>`,cls='row-pending';
   if(r.status==='done'){
     const w=resultView(r);
     if(w&&w.ok){
       mEd=w.mEd.toFixed(1); mRd=w.mRd.toFixed(1); xv=w.X.toFixed(0); util=w.util.toFixed(1)+' %';
+      if(r.om){ om2=fmtOm(r.om.m2); om3=fmtOm(r.om.m3); }
       const pass=w.util<=100;
       verdict=`<span class="verdict-pill ${pass?'ok':'no'}">${pass?t('verdictOk'):t('verdictFail')}</span>`;
       cls=pass?'row-ok':'row-fail';
@@ -1687,7 +1723,7 @@ function rowCells(r){
       cls='row-invalid';
     }
   }
-  return {mEd,mRd,xv,util,uUni,dUni,verdict,cls};
+  return {mEd,mRd,xv,util,uUni,dUni,om2,om3,verdict,cls};
 }
 function renderTable(){
   const thead=document.getElementById('theadRow');
@@ -1696,7 +1732,7 @@ function renderTable(){
     <th></th>
     <th>${t('colStory')}</th><th>${t('colPier')}</th><th>${t('colCase')}</th><th>${t('colLocation')}</th><th>${t('colSet')}</th>
     <th class="grp-start">${t('colN')}</th><th>${t('colM2')}</th><th>${t('colM3')}</th><th>${t('colMEd')}</th>
-    <th class="grp-start">${t('colMRd')}</th><th>${t('colX')}</th><th>${t('colUtil')}</th>`
+    <th class="grp-start">${t('colMRd')}</th><th>${t('colX')}</th><th>${t('colUtil')}</th><th class="grp-start" title="${esc(t('omTip'))}" style="cursor:help">${t('colOm2')}</th><th title="${esc(t('omTip'))}" style="cursor:help">${t('colOm3')}</th>`
     + (cmpOn?`<th>${t('colUtilUni')}</th><th>${t('colDelta')}</th>`:'')
     + `<th>${t('colVerdict')}</th>
     <th class="editable-row-actions"></th>`;
@@ -1717,13 +1753,14 @@ function renderTable(){
       <td><input class="cell-in num-in" type="number" step="1" value="${fmtIn(r.M2)}" oninput="editCell(${idx},'M2',this.value)"></td>
       <td><input class="cell-in num-in" type="number" step="1" value="${fmtIn(r.M3)}" oninput="editCell(${idx},'M3',this.value)"></td>
       <td><b>${c.mEd}</b></td>
-      <td class="grp-start">${c.mRd}</td><td>${c.xv}</td><td>${c.util}</td>`
+      <td class="grp-start">${c.mRd}</td><td>${c.xv}</td><td>${c.util}</td>
+      <td class="grp-start">${c.om2}</td><td>${c.om3}</td>`
       + (cmpOn?`<td>${c.uUni}</td><td>${c.dUni}</td>`:'')
       + `<td class="verdict-cell" onclick="toggleRowDetail(${idx})" style="cursor:pointer">${c.verdict}</td>
       <td class="editable-row-actions"><button class="row-del" onclick="deleteRow(${idx})" title="Delete">&times;</button></td>
     </tr>`;
     if(r._expanded){
-      html+=`<tr class="detail-row"><td colspan="${cmpOn?17:15}"><div class="detail-panel" id="detail-${idx}">${renderDetailPanel(r,idx)}</div></td></tr>`;
+      html+=`<tr class="detail-row"><td colspan="${cmpOn?19:17}"><div class="detail-panel" id="detail-${idx}">${renderDetailPanel(r,idx)}</div></td></tr>`;
     }
   });
   tbody.innerHTML=html;
@@ -1747,11 +1784,13 @@ function updateRowResultCells(idx){
   if(tds[10])tds[10].innerHTML=c.mRd;
   if(tds[11])tds[11].innerHTML=c.xv;
   if(tds[12])tds[12].innerHTML=c.util;
+  if(tds[13])tds[13].innerHTML=c.om2;
+  if(tds[14])tds[14].innerHTML=c.om3;
   if(cmpOn){
-    if(tds[13])tds[13].innerHTML=c.uUni;
-    if(tds[14])tds[14].innerHTML=c.dUni;
-    if(tds[15])tds[15].innerHTML=c.verdict;
-  } else if(tds[13])tds[13].innerHTML=c.verdict;
+    if(tds[15])tds[15].innerHTML=c.uUni;
+    if(tds[16])tds[16].innerHTML=c.dUni;
+    if(tds[17])tds[17].innerHTML=c.verdict;
+  } else if(tds[15])tds[15].innerHTML=c.verdict;
   tr.className=c.cls;
 }
 /* Un temporizator PE RAND (vezi M09 v1.1.0). */
@@ -1871,7 +1910,7 @@ function renderSummaryTable(){
     <th class="grp-start">${t('csNComb')}</th><th>${t('csInvalid')}</th>
     <th class="grp-start">${t('csGovCase')}</th><th>${t('colLocation')}</th>
     <th class="grp-start">${t('colN')}</th><th>${t('colMEd')}</th>
-    <th class="grp-start">${t('colMRd')}</th><th>${t('csUtilMax')}</th>`
+    <th class="grp-start">${t('colMRd')}</th><th>${t('csUtilMax')}</th><th class="grp-start" title="${esc(t('omTip'))}" style="cursor:help">${t('colOm2')}</th><th title="${esc(t('omTip'))}" style="cursor:help">${t('colOm3')}</th>`
     + (cmpOn?`<th>${t('colUtilUni')}</th><th>${t('colDelta')}</th>`:'')
     + `<th>${t('colVerdict')}</th>`;
   let html='';
@@ -1885,7 +1924,7 @@ function renderSummaryTable(){
         <td class="lbl-col">${esc(g.pier)||'&mdash;'}</td><td class="lbl-col">${esc(g.story)||'&mdash;'}</td><td>${pick}</td>
         <td class="grp-start">${g.n}</td><td>${g.invalid||'&mdash;'}</td>
         <td class="lbl-col grp-start" colspan="5">${esc(msg)}</td>
-        <td>&mdash;</td>`
+        <td>&mdash;</td><td class="grp-start">&mdash;</td><td>&mdash;</td>`
         + (cmpOn?'<td>&mdash;</td><td>&mdash;</td>':'')
         + `<td><span class="verdict-pill na">${t('verdictInvalid')}</span></td></tr>`;
       return;
@@ -1900,7 +1939,8 @@ function renderSummaryTable(){
       <td class="lbl-col grp-start">${esc(w.outputCase)||'&mdash;'}</td><td class="lbl-col">${esc(w.location)||'&mdash;'}</td>
       <td class="grp-start">${fmtIn(w.Nraw)}</td><td>${vw.mEd.toFixed(1)}</td>
       <td class="grp-start">${vw.mRd.toFixed(1)}</td>
-      <td><b>${vw.util.toFixed(1)} %</b></td>`
+      <td><b>${vw.util.toFixed(1)} %</b></td>
+      <td class="grp-start">${w.om?fmtOm(w.om.m2):'&mdash;'}</td><td>${w.om?fmtOm(w.om.m3):'&mdash;'}</td>`
       + (cmpOn?`<td>${uu===null?'&mdash;':uu.toFixed(1)+' %'}</td><td>${dTxt}</td>`:'')
       + `<td><span class="verdict-pill ${pass?'ok':'no'}">${pass?t('verdictOk'):t('verdictFail')}</span></td></tr>`;
   });
@@ -1941,17 +1981,18 @@ function copySummaryTable(){
   const storyHdr=(grouping==='pier')?t('csGovStory'):t('colStory');
   const cmpOn=isBi()&&compareMode;
   const header=[t('colPier'),storyHdr,t('colSet'),t('csNComb'),t('csInvalid'),t('csGovCase'),t('colLocation'),
-    'N (kN)','M_Ed (kNm)','M_Rd (kNm)',t('csUtilMax')]
+    'N (kN)','M_Ed (kNm)','M_Rd (kNm)',t('csUtilMax'),'Omega M2','Omega M3']
     .concat(cmpOn?[t('colUtilUni'),t('colDelta')]:[]).concat([t('colVerdict')]);
   const strip=s=>String(s).replace(/<[^>]*>/g,'').replace(/&mdash;/g,'-').replace(/&amp;/g,'&');
   const lines=[header.join('\t')];
   buildSummary().forEach(g=>{
     const w=g.worst;
-    if(!w){ lines.push([g.pier,g.story,groupSetName(g),g.n,g.invalid||0,'-','-','-','-','-','-']
+    if(!w){ lines.push([g.pier,g.story,groupSetName(g),g.n,g.invalid||0,'-','-','-','-','-','-','-','-']
       .concat(cmpOn?['-','-']:[]).concat([strip(t('verdictInvalid'))]).join('\t')); return; }
     const vw=resultView(w), uu=uniUtil(w);
     lines.push([g.pier,g.story,groupSetName(g),g.n,g.invalid||0,w.outputCase,w.location,
-      fmtIn(w.Nraw),vw.mEd.toFixed(1),vw.mRd.toFixed(1),vw.util.toFixed(1)+'%']
+      fmtIn(w.Nraw),vw.mEd.toFixed(1),vw.mRd.toFixed(1),vw.util.toFixed(1)+'%',
+      txtOm(w.om&&w.om.m2),txtOm(w.om&&w.om.m3)]
       .concat(cmpOn?[uu===null?'-':uu.toFixed(1)+'%',
                      uu===null?'-':((vw.util-uu>=0?'+':'')+(vw.util-uu).toFixed(1))]:[])
       .concat([strip(vw.util<=100?t('verdictOk'):t('verdictFail'))]).join('\t'));
@@ -1990,6 +2031,8 @@ function renderDetailPanel(r,idx){
     [t('dtX'), okv?v.X.toFixed(1)+' mm':dash],
     [t('dtTheta'), okv?(((Math.round(v.thetaDeg*10)/10)%360+360)%360).toFixed(1)+' °':dash],
     [t('dtUtil'), okv?v.util.toFixed(1)+' %':dash],
+    [t('dtOm2'), okv&&r.om?fmtOm(r.om.m2):dash],
+    [t('dtOm3'), okv&&r.om?fmtOm(r.om.m3):dash],
     (uu!==null?[t('dtUtilUni'), uu.toFixed(1)+' %']:null),
     [t('dtNint'), convN(v.Nint).toFixed(1)+' kN'],
     [t('dtDiff'), convN(v.residual).toFixed(2)+' kN'],
@@ -2004,6 +2047,8 @@ function renderDetailPanel(r,idx){
     [t('dtMRd'), okv?v.Mrd.toFixed(1)+' kNm':dash],
     [t('dtX'), okv?v.X.toFixed(1)+' mm':dash],
     [t('dtUtil'), okv?v.util.toFixed(1)+' %':dash],
+    [t('dtOm2'), okv&&r.om?fmtOm(r.om.m2):dash],
+    [t('dtOm3'), okv&&r.om?fmtOm(r.om.m3):dash],
     [t('dtCompSide'), v.compFromRef?t('dtBE2'):t('dtBE1')],
     [t('dtNint'), convN(v.Nint).toFixed(1)+' kN'],
     [t('dtDiff'), convN(v.residual).toFixed(2)+' kN'],
@@ -2116,7 +2161,7 @@ function copyTable(){
   const btn=document.getElementById('copyBtn');
   const cmpOn=isBi()&&compareMode;
   const header=[t('colStory'),t('colPier'),t('colCase'),t('colLocation'),t('colSet'),
-    'N (kN)','M2 (kNm)','M3 (kNm)','M_Ed (kNm)','M_Rd (kNm)','X (mm)',t('colUtil')]
+    'N (kN)','M2 (kNm)','M3 (kNm)','M_Ed (kNm)','M_Rd (kNm)','X (mm)',t('colUtil'),'Omega M2','Omega M3']
     .concat(cmpOn?[t('colUtilUni'),t('colDelta')]:[]).concat([t('colVerdict')]);
   const strip=s=>String(s).replace(/<[^>]*>/g,'').replace(/&mdash;/g,'-').replace(/&amp;/g,'&');
   const lines=[header.join('\t')];
@@ -2125,7 +2170,8 @@ function copyTable(){
     lines.push([r.story,r.pier,r.outputCase,r.location,(getSet(setIdOf(r))||{}).name||'-',
       fmtIn(r.Nraw),fmtIn(r.M2),fmtIn(r.M3),okv?w.mEd.toFixed(1):fmtIn(r.M),
       okv?w.mRd.toFixed(1):'-',okv?w.X.toFixed(0):'-',
-      okv?w.util.toFixed(1)+'%':'-']
+      okv?w.util.toFixed(1)+'%':'-',
+      okv?txtOm(r.om&&r.om.m2):'-',okv?txtOm(r.om&&r.om.m3):'-']
       .concat(cmpOn?[uu===null?'-':uu.toFixed(1)+'%',
                      (okv&&uu!==null)?((w.util-uu>=0?'+':'')+(w.util-uu).toFixed(1)):'-']:[])
       .concat([okv?(w.util<=100?strip(t('verdictOk')):strip(t('verdictFail')))
@@ -2249,12 +2295,12 @@ function buildPdfDoc(){
   const cmpOn=isBi()&&compareMode;
   const sumBody=groups.map(g=>{
     const w=g.worst;
-    if(!w) return [g.pier,g.story,groupSetName(g),String(g.n),String(g.invalid||0),'-','-','-','-','-','-']
+    if(!w) return [g.pier,g.story,groupSetName(g),String(g.n),String(g.invalid||0),'-','-','-','-','-','-','-','-']
       .concat(cmpOn?['-','-']:[]).concat([t('pdfInvalidCell')]);
     const vw=resultView(w), uu=uniUtil(w);
     return [g.pier,g.story,groupSetName(g),String(g.n),g.invalid?String(g.invalid):'-',
       w.outputCase,w.location,String(fmtIn(w.Nraw)),vw.mEd.toFixed(1),
-      vw.mRd.toFixed(1),vw.util.toFixed(1)+'%']
+      vw.mRd.toFixed(1),vw.util.toFixed(1)+'%',txtOm(w.om&&w.om.m2),txtOm(w.om&&w.om.m3)]
       .concat(cmpOn?[uu===null?'-':uu.toFixed(1)+'%',
                      uu===null?'-':((vw.util-uu>=0?'+':'')+(vw.util-uu).toFixed(1))]:[])
       .concat([(vw.util<=100?t('verdictOk'):t('verdictFail'))]);
@@ -2262,18 +2308,18 @@ function buildPdfDoc(){
   doc.autoTable({
     startY:yS+7,
     head:[[t('colPier'),storyHdr,t('colSet'),t('csNComb'),t('csInvalid'),t('csGovCase'),t('colLocation'),
-           t('colN'),t('colMEd'),t('colMRd'),t('csUtilMax')]
-           .concat(cmpOn?[t('colUtilUni'),t('colDelta')]:[]).concat([t('colVerdict')])],
+           t('colN'),t('colMEd'),t('colMRd'),t('csUtilMax'),'Om M2','Om M3']
+           .concat(cmpOn?[t('colUtilUni'),t('colDelta').replace('Δ','Delta')]:[]).concat([t('colVerdict')])],
     body:sumBody,
     margin:{left:ml,right:mr},tableWidth:cw,theme:'grid',
     styles:{lineColor:[180,200,220],lineWidth:0.25,fontSize:7.5,textColor:[0,0,0],cellPadding:1.6},
     headStyles:{fillColor:[200,215,235],textColor:[0,0,0],fontStyle:'bold',lineColor:[200,215,235],fontSize:7.5},
     columnStyles:Object.assign({3:{halign:'right'},4:{halign:'right'},7:{halign:'right'},8:{halign:'right'},
-                  9:{halign:'right'},10:{halign:'right',fontStyle:'bold'}},
-                  cmpOn?{11:{halign:'right'},12:{halign:'right'},13:{halign:'center',fontStyle:'bold'}}
-                       :{11:{halign:'center',fontStyle:'bold'}}),
+                  9:{halign:'right'},10:{halign:'right',fontStyle:'bold'},11:{halign:'right'},12:{halign:'right'}},
+                  cmpOn?{13:{halign:'right'},14:{halign:'right'},15:{halign:'center',fontStyle:'bold'}}
+                       :{13:{halign:'center',fontStyle:'bold'}}),
     didParseCell:function(data){
-      const vIdx=cmpOn?13:11;
+      const vIdx=cmpOn?15:13;
       if(data.section==='body'&&data.column.index===vIdx){
         const vt=sumBody[data.row.index][vIdx];
         if(vt===t('verdictOk')) data.cell.styles.textColor=[46,125,50];
@@ -2300,7 +2346,8 @@ function buildPdfDoc(){
     return [r.story,r.pier,r.outputCase,r.location,(getSet(r._set||setIdOf(r))||{}).name||'-',
       fmtIn(r.Nraw),fmtIn(r.M2),fmtIn(r.M3),okv?vw.mEd.toFixed(1):fmtIn(r.M),
       okv?vw.mRd.toFixed(1):'-',okv?vw.X.toFixed(0):'-',
-      okv?vw.util.toFixed(1)+'%':'-']
+      okv?vw.util.toFixed(1)+'%':'-',
+      okv?txtOm(r.om&&r.om.m2):'-',okv?txtOm(r.om&&r.om.m3):'-']
       .concat(cmpOn?[uu===null?'-':uu.toFixed(1)+'%',dTxt]:[])
       .concat([verdict]);
   });
@@ -2312,18 +2359,18 @@ function buildPdfDoc(){
     doc.autoTable({
       startY:y2+4,
       head:[[t('colStory'),t('colPier'),t('colCase'),t('colLocation'),t('colSet'),t('colN'),t('colM2'),t('colM3'),
-             t('colMEd'),t('colMRd'),t('colX'),t('colUtil')]
-             .concat(cmpOn?[t('colUtilUni'),t('colDelta')]:[]).concat([t('colVerdict')])],
+             t('colMEd'),t('colMRd'),t('colX'),t('colUtil'),'Om M2','Om M3']
+             .concat(cmpOn?[t('colUtilUni'),t('colDelta').replace('Δ','Delta')]:[]).concat([t('colVerdict')])],
       body,
       margin:{left:ml,right:mr},tableWidth:cw,theme:'grid',
       styles:{lineColor:[180,200,220],lineWidth:0.25,fontSize:7.5,textColor:[0,0,0],cellPadding:1.6},
       headStyles:{fillColor:[200,215,235],textColor:[0,0,0],fontStyle:'bold',lineColor:[200,215,235],fontSize:7.5},
       columnStyles:Object.assign({5:{halign:'right'},6:{halign:'right'},7:{halign:'right'},8:{halign:'right'},
-                    9:{halign:'right'},10:{halign:'right'},11:{halign:'right'}},
-                    cmpOn?{12:{halign:'right'},13:{halign:'right'},14:{halign:'center',fontStyle:'bold'}}
-                         :{12:{halign:'center',fontStyle:'bold'}}),
+                    9:{halign:'right'},10:{halign:'right'},11:{halign:'right'},12:{halign:'right'},13:{halign:'right'}},
+                    cmpOn?{14:{halign:'right'},15:{halign:'right'},16:{halign:'center',fontStyle:'bold'}}
+                         :{14:{halign:'center',fontStyle:'bold'}}),
       didParseCell:function(data){
-        const vIdx2=cmpOn?14:12;
+        const vIdx2=cmpOn?16:14;
         if(data.section==='body'&&data.column.index===vIdx2){
           const vt=body[data.row.index][vIdx2];
           if(vt===t('verdictOk')) data.cell.styles.textColor=[46,125,50];
@@ -2349,7 +2396,7 @@ function buildPdfDoc(){
   doc.setFontSize(9);doc.setFont('helvetica','bold');doc.setTextColor(0,102,204);
   doc.text(t('pdfLimTitle'),ml,y3);doc.setTextColor(0,0,0);doc.setFont('helvetica','normal');y3+=5;
   doc.setFontSize(7.5);
-  [t('pdfLim1',(m.eud*1000).toFixed(1)),t('pdfLim2'),t('pdfLim3'),t('pdfLim4'),t('pdfLim5'),t('pdfLim6')]
+  [t('pdfLim1',(m.eud*1000).toFixed(1)),t('pdfLim2'),t('pdfLim3'),t('pdfLim4'),t('pdfLim5'),t('pdfLim6'),'- '+t('pdfOmNote')]
     .forEach(function(line){ need(5); doc.text(line,ml,y3,{maxWidth:cw}); y3+=4.2; });
 
   const tp=doc.internal.getNumberOfPages();
