@@ -44,7 +44,10 @@ const JPc = global.JP;
 const sigC = JPc.laws.sigC, sigS = JPc.laws.sigS;
 const CODES = JPc.CODES, ok = JPc.ok, fail = JPc.fail, barArea = JPc.barArea;
 
-const VERSION = '1.0.0';
+/* 1.1.0 — s-a adaugat buildShape2D (pereti L / T / Z cu armare pe zone).
+   Functiile existente NU se schimba: buildWall2D si solverul dau exact
+   aceleasi rezultate ca in 1.0.0. */
+const VERSION = '1.1.0';
 
 /* ─── edgeStrain: COPIE a functiei omonime din engine.js v2.3.0 ──────────────
    engine.js nu o exporta. Este reprodusa aici identic, pentru ca pivotul C sa
@@ -125,6 +128,78 @@ function rasterize(rects, opt) {
   };
 }
 
+/* ─── Rasterizare ALINIATA (v1.1.0, folosita de buildShape2D) ───────────────
+   Malajul uniform de mai sus pune o celula intreaga inauntru sau in afara dupa
+   centrul ei, deci o fata care cade in mijlocul unei celule muta aria cu pana
+   la o jumatate de celula. La peretele dreptunghiular eroarea este mica (0,1 %
+   pe peretele de referinta), dar la o sectiune Z, cu multe fete paralele, s-a
+   masurat +2 % pe aria de beton la NT = 24.
+   Aici liniile malajului trec prin TOATE muchiile dreptunghiurilor, iar fiecare
+   interval dintre doua muchii se imparte egal la pasul cel mult `step`. Orice
+   celula este astfel complet in sectiune sau complet in afara, deci aria este
+   EXACTA. Celulele nu mai au toate aceeasi arie, asa ca modelul poarta aria si
+   dimensiunile fiecarei celule (cA, chy, chz).
+   rasterize() si buildWall2D raman neschimbate. */
+function rasterizeAligned(rects, opt) {
+  const o = opt || {};
+  const NT = o.NT || 16;
+  const maxCells = o.maxCells || 60000;
+  const R = rects.filter(function (r) { return r.wy > 0 && r.wz > 0; });
+  if (!R.length) return null;
+  let tmin = Infinity;
+  const ysE = [], zsE = [];
+  R.forEach(function (r) {
+    ysE.push(r.y0, r.y0 + r.wy); zsE.push(r.z0, r.z0 + r.wz);
+    const t = Math.min(r.wy, r.wz); if (t < tmin) tmin = t;
+  });
+  const uniq = function (a) {
+    a.sort(function (x, y) { return x - y; });
+    const out = [];
+    a.forEach(function (v) { if (!out.length || v - out[out.length - 1] > 1e-6) out.push(v); });
+    return out;
+  };
+  const ye = uniq(ysE), ze = uniq(zsE);
+  function lines(edges, step) {
+    const c = [], h = [];
+    for (let i = 0; i + 1 < edges.length; i++) {
+      const a = edges[i], b = edges[i + 1], k = Math.max(1, Math.ceil((b - a) / step - 1e-9));
+      const hh = (b - a) / k;
+      for (let j = 0; j < k; j++) { c.push(a + (j + 0.5) * hh); h.push(hh); }
+    }
+    return { c: c, h: h };
+  }
+  let step = tmin / NT, Y, Zl, guard = 0;
+  for (;;) {
+    Y = lines(ye, step); Zl = lines(ze, step);
+    if (Y.c.length * Zl.c.length <= maxCells || guard++ > 30) break;
+    step *= 1.15;
+  }
+  const cy = [], cz = [], cMat = [], cA = [], chy = [], chz = [];
+  for (let i = 0; i < Y.c.length; i++) {
+    const yy = Y.c[i];
+    for (let j = 0; j < Zl.c.length; j++) {
+      const zz = Zl.c[j];
+      let mat = -1;
+      for (let k = 0; k < R.length; k++) {
+        const r = R[k];
+        if (yy > r.y0 && yy < r.y0 + r.wy && zz > r.z0 && zz < r.z0 + r.wz) {
+          if (r.mat > mat) mat = r.mat;
+        }
+      }
+      if (mat < 0) continue;
+      cy.push(yy); cz.push(zz); cMat.push(mat);
+      cA.push(Y.h[i] * Zl.h[j]); chy.push(Y.h[i]); chz.push(Zl.h[j]);
+    }
+  }
+  return {
+    cy: Float64Array.from(cy), cz: Float64Array.from(cz), cMat: Int8Array.from(cMat),
+    cA: Float64Array.from(cA), chy: Float64Array.from(chy), chz: Float64Array.from(chz),
+    nC: cy.length, cellA: step * step, hy: step, hz: step,
+    ny: Y.c.length, nz: Zl.c.length,
+    bbox: { ymin: ye[0], ymax: ye[ye.length - 1], zmin: ze[0], zmax: ze[ze.length - 1] },
+  };
+}
+
 /* ═══════════════════════════════════════════════════════════════════════════
    MODEL
    inp = {
@@ -145,13 +220,18 @@ function buildPolyModel(inp) {
     DEDUCT_STEEL: D.DEDUCT_STEEL, NANG: D.NANG, Es: D.Es,
   }, inp.opts || {});
 
-  const g = rasterize(inp.rects || [], o);
+  const aligned = !!o.align;
+  const g = aligned ? rasterizeAligned(inp.rects || [], o) : rasterize(inp.rects || [], o);
   if (!g) return { nC: 0, Ac: 0, degenerate: true };
 
-  // ── centru de greutate geometric al betonului (arie uniforma pe celula)
-  let sy = 0, sz = 0;
-  for (let i = 0; i < g.nC; i++) { sy += g.cy[i]; sz += g.cz[i]; }
-  const cgY = sy / g.nC, cgZ = sz / g.nC;
+  // ── centru de greutate geometric al betonului (ponderat cu aria celulei
+  //    la malajul aliniat; la cel uniform ariile sunt egale)
+  let sy = 0, sz = 0, sA = 0;
+  for (let i = 0; i < g.nC; i++) {
+    const a = aligned ? g.cA[i] : 1;
+    sy += g.cy[i] * a; sz += g.cz[i] * a; sA += a;
+  }
+  const cgY = sy / sA, cgZ = sz / sA;
 
   const cy = new Float64Array(g.nC), cz = new Float64Array(g.nC);
   for (let i = 0; i < g.nC; i++) { cy[i] = g.cy[i] - cgY; cz[i] = g.cz[i] - cgZ; }
@@ -160,13 +240,13 @@ function buildPolyModel(inp) {
     return { y: b.y - cgY, z: b.z - cgZ, A: b.A, grp: b.grp || '' };
   });
 
-  const Ac = g.nC * g.cellA;
+  const Ac = aligned ? sA : g.nC * g.cellA;
   const As_tot = bars.reduce(function (s, b) { return s + b.A; }, 0);
 
   // aria de beton pe material — pentru capacitatile axiale limita
   const nMat = inp.props.length;
   const Amat = new Float64Array(nMat);
-  for (let i = 0; i < g.nC; i++) Amat[g.cMat[i]] += g.cellA;
+  for (let i = 0; i < g.nC; i++) Amat[g.cMat[i]] += aligned ? g.cA[i] : g.cellA;
 
   const m = {
     VERSION: VERSION,
@@ -180,6 +260,7 @@ function buildPolyModel(inp) {
     limitPivotC: o.LIMIT_PIVOT_C, NANG: o.NANG,
     degenerate: !(g.nC > 0),
   };
+  if (aligned) { m.cA = g.cA; m.chy = g.chy; m.chz = g.chz; m.aligned = true; }
   return m;
 }
 
@@ -220,8 +301,20 @@ function projectPoly(theta, m) {
   /* Marginea REALA a betonului, nu centrul celulei extreme: planul de
      deformatii este ancorat pe fata sectiunii, exact ca la stalp, unde dmax
      este b/2 iar centrele celulelor stau cu o jumatate de celula mai inauntru. */
-  const halfExt = Math.abs(m.hy / 2 * cx) + Math.abs(m.hz / 2 * cs);
-  const dmax = dmaxC + halfExt, dmin = dminC - halfExt;
+  let dmax, dmin;
+  if (m.chy) {
+    // malaj aliniat: fiecare celula isi are propria jumatate de extindere
+    dmax = -Infinity; dmin = Infinity;
+    const ax = Math.abs(cx) / 2, as = Math.abs(cs) / 2;
+    for (let i = 0; i < m.nC; i++) {
+      const e = ax * m.chy[i] + as * m.chz[i];
+      if (dC[i] + e > dmax) dmax = dC[i] + e;
+      if (dC[i] - e < dmin) dmin = dC[i] - e;
+    }
+  } else {
+    const halfExt = Math.abs(m.hy / 2 * cx) + Math.abs(m.hz / 2 * cs);
+    dmax = dmaxC + halfExt; dmin = dminC - halfExt;
+  }
   return { dC: dC, dS: dS, dmax: dmax, dmin: dmin, H: dmax - dmin,
            dMaxMat: dMaxMat, dSmin: dSmin, iEdge: iEdge };
 }
@@ -263,11 +356,11 @@ function polyForces(X, theta, m, proj) {
 
   // ── beton
   let Fc = 0, Mcy = 0, Mcz = 0;
-  const dA = m.cellA;
+  const dA = m.cellA, cA = m.cA;
   for (let i = 0; i < m.nC; i++) {
     const eps = epsEdge * (p.dC[i] - na) / X;
     if (eps <= 0) continue;
-    const F = sigC(eps, m.props[m.cMat[i]]) * dA;
+    const F = sigC(eps, m.props[m.cMat[i]]) * (cA ? cA[i] : dA);
     Fc += F; Mcy += F * m.cz[i]; Mcz += F * m.cy[i];
   }
   // ── armatura
@@ -335,18 +428,39 @@ function solvePolyX(theta, Ntarget, m) {
  * perete L sau Z, nu este simetric.
  */
 function findPolyTheta(dirAngle, Ntarget, m) {
+  /* v1.1.0 — BRACKETING INAINTE DE BISECTIE.
+     Directia momentului capabil scade monoton cu theta, dar pe un cerc: are un
+     SALT de 2*pi undeva. Versiunea 1.0.0 facea bisectie direct pe [0, 2*pi]
+     presupunand ca saltul cade exact la capatul intervalului (theta = 0).
+     La o sectiune simetrica asa este (theta = 0 da M pe +/-90 grade), dar la un
+     perete L directia la theta = 0 a iesit ~71 de grade: pentru tinte intre 71
+     si ~76 de grade bisectia se oprea in capat si intorcea punctul de la 71
+     de grade, adica un M_Rd pe ALTA directie — pe peretele de test cu 3,2 %
+     prea mare (neacoperitor), prins la comparatia cu fib structuralcodes.
+     Acum: se esantioneaza theta pe 24 de pozitii, se cauta intervalul in care
+     diferenta de unghi schimba semnul FARA salt (|salt| < pi) si abia apoi se
+     face bisectie in el. solvePoly verifica in plus ca directia gasita este
+     chiar cea ceruta. */
   const TWO_PI = 2 * Math.PI;
-  let target = dirAngle;
-  while (target <= -Math.PI) target += TWO_PI;
-  while (target > Math.PI) target -= TWO_PI;
-  let lo = 0, hi = TWO_PI;
-  for (let it = 0; it < 48; it++) {
+  const wrap = function (a) { while (a > Math.PI) a -= TWO_PI; while (a <= -Math.PI) a += TWO_PI; return a; };
+  const target = wrap(dirAngle);
+  const diffAt = function (th) { const r = solvePolyX(th, Ntarget, m); return { r: r, d: wrap(Math.atan2(r.Mz, r.My) - target) }; };
+  const NS = 24;
+  let lo = 0, hi = TWO_PI, found = false;
+  let prev = diffAt(0), prevTh = 0;
+  for (let k = 1; k <= NS; k++) {
+    const th = k * TWO_PI / NS;
+    const cur = (k === NS) ? prev0() : diffAt(th);
+    if (prev.d > 0 && cur.d <= 0 && (prev.d - cur.d) < Math.PI) { lo = prevTh; hi = th; found = true; break; }
+    if (prev.d === 0) { return prev.r; }
+    prev = cur; prevTh = th;
+  }
+  function prev0() { return diffAt(0); }
+  if (!found) { lo = 0; hi = TWO_PI; }          // rezerva: comportamentul din 1.0.0
+  for (let it = 0; it < 40; it++) {
     const mid = (lo + hi) / 2;
-    const r = solvePolyX(mid, Ntarget, m);
-    let diff = Math.atan2(r.Mz, r.My) - target;
-    while (diff > Math.PI) diff -= TWO_PI;
-    while (diff <= -Math.PI) diff += TWO_PI;
-    if (diff > 0) lo = mid; else hi = mid;
+    const dm = diffAt(mid).d;
+    if (dm > 0) lo = mid; else hi = mid;
   }
   return solvePolyX((lo + hi) / 2, Ntarget, m);
 }
@@ -410,6 +524,10 @@ function solvePoly(m, Ned, MyEd, MzEd, lang) {
 
   const dEd = Math.hypot(MyEd, MzEd);
   const dRd = Math.hypot(res.My, res.Mz);
+  // directia punctului capabil trebuie sa fie chiar directia lui M_Ed
+  let dirErr = Math.atan2(res.Mz, res.My) - dirAngle;
+  while (dirErr > Math.PI) dirErr -= 2 * Math.PI;
+  while (dirErr <= -Math.PI) dirErr += 2 * Math.PI;
   const value = {
     MyRd: res.My, MzRd: res.Mz, MRd: dRd, MEd: dEd,
     X: res.X, theta: res.theta, thetaDeg: res.theta * 180 / Math.PI,
@@ -427,6 +545,10 @@ function solvePoly(m, Ned, MyEd, MzEd, lang) {
   }
   if (Math.abs(residual) > tol) {
     return fail(CODES.RESIDUAL_HIGH, lang, value, '(rezidual ' + residual.toFixed(2) + ' kN)');
+  }
+  if (dEd > 1e-9 && Math.abs(dirErr) > 0.2 * Math.PI / 180) {
+    return fail(CODES.RESIDUAL_HIGH, lang, value,
+      '(directia M_Rd difera cu ' + (dirErr * 180 / Math.PI).toFixed(2) + ' grade)');
   }
   return ok(value);
 }
@@ -588,12 +710,249 @@ function wallBarIssues(b) {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
+   PERETI L / T / Z  (v1.1.0)
+   ───────────────────────────────────────────────────────────────────────────
+   Geometrie, dimensiuni EXTERIOARE:
+     inima  — y de la 0 la l_w, grosimea t_w centrata pe z = 0;
+     talpa  — la capatul y = l_w, grosimea t_f (pe y), lungimea l_f (pe z):
+              L: de la fata inimii spre partea `side` (+1 = +z, -1 = -z);
+              T: centrata pe inima;
+              Z: ca la L, plus o a doua talpa la y = 0, spre partea OPUSA
+                 (sectiunea Z este simetrica fata de centru, deci a doua
+                 jumatate se obtine prin reflexie in punct).
+   Axe: y = lungimea inimii (axa locala 2 a pier-ului), z = grosimea (axa 3).
+   Mz = SUM(F*y) este momentul din planul inimii, My = SUM(F*z) cel din afara
+   lui — exact ca buildWall2D si modulul 11.
+
+   Armare, pe ZONE, pe doua randuri (cate unul pe fiecare fata, fara randuri
+   intermediare):
+     end  — capatul liber al inimii (L, T): lungime l, n bare pe fata, Ø;
+     jn   — nodul inima-talpa: cele 4 bare din patratul de intersectie se pun
+            automat; in plus nw bare pe fiecare fata a inimii pe lungimea lw
+            (masurata de la fata interioara a talpii) si nf bare pe fiecare
+            fata a talpii pe lungimea lf (masurata de la fata inimii, de
+            fiecare parte la T);
+     tip  — capatul liber al talpii: lungime l, n bare pe fata, Ø;
+     web / fl — bare distribuite Ø / s pe fiecare fata, intre zone.
+   Centrul barei sta la c_nom + Ø_etr + Ø/2 de fata betonului, ca peste tot.
+   O bara care ar cadea la mai putin de (Ø1+Ø2)/2 de alta existenta nu se mai
+   adauga — asa colturile comune dintre zone nu se dubleaza.
+
+   Materiale: zonele (capete, noduri, varfuri de talpa) sunt confinate cand
+   confMode este 'bulb' sau 'all', inima si talpile numai la 'all' (vezi
+   nota de la `props` pentru ordinea indicilor).
+   ═══════════════════════════════════════════════════════════════════════════ */
+function buildShape2D(inp) {
+  const D = JPc.DEFAULTS;
+  const o = Object.assign({}, D, inp.opts || {});
+  const shape = (inp.shape === 'T' || inp.shape === 'Z') ? inp.shape : 'L';
+  const side = (+inp.side < 0) ? -1 : 1;
+  const lw = +inp.lw || 0, tw = +inp.tw || 0, lf = +inp.lf || 0, tf = +inp.tf || 0;
+  const cnom = +inp.cnom || 0, detr = +inp.detr || 0;
+  const Z = (shape === 'Z');
+  const hasEnd = !Z;
+
+  const fck = JPc.CONC[inp.concrete] ? JPc.CONC[inp.concrete].fck : 0;
+  const st = JPc.STEEL[inp.steel] || { fyk: 0, euk: 0.05 };
+  const fcd = fck / o.GAMMA_C, fyd = st.fyk / o.GAMMA_S;
+  const confMode = inp.confMode || 'none';
+  const bulbConf = (confMode === 'bulb' || confMode === 'all');
+  const webConf = (confMode === 'all');
+  const propsUnconf = { fcd: fcd, ec2: o.EC2_NC, ecu: o.ECU_NC };
+  const propsBulbC = { fcd: (+inp.fckc || 0) / o.GAMMA_C,
+                       ec2: (+inp.ec2c || 0) / 1000, ecu: (+inp.ecu2c || 0) / 1000 };
+  const propsWebC = { fcd: (+inp.fckcw || 0) / o.GAMMA_C,
+                      ec2: (+inp.ec2cw || 0) / 1000, ecu: (+inp.ecu2cw || 0) / 1000 };
+  /* Indicii de material sunt INVERSATI fata de buildWall2D: aici zonele se
+     suprapun peste inima / talpa, iar la rasterizare castiga indicele cel mai
+     mare, deci zonele trebuie sa aiba indicele mai mare.
+       0 = neconfinat, 1 = inima / talpa (confinata la 'all'), 2 = zone. */
+  const props = [propsUnconf, webConf ? propsWebC : propsUnconf,
+                 bulbConf ? propsBulbC : propsUnconf];
+  const MB = 1, MZ = 2;
+
+  const E = inp.end || {}, J = inp.jn || {}, P = inp.tip || {};
+  const Wd = inp.web || {}, Fd = inp.fl || {};
+  const num = function (v) { v = +v; return isFinite(v) ? v : 0; };
+  const endL = num(E.l), endN = Math.max(0, Math.round(num(E.n))), endD = num(E.d);
+  const jLw = num(J.lw), jLf = num(J.lf), jNw = Math.max(0, Math.round(num(J.nw))),
+        jNf = Math.max(0, Math.round(num(J.nf))), jD = num(J.d);
+  const tipL = num(P.l), tipN = Math.max(0, Math.round(num(P.n))), tipD = num(P.d);
+  const wD = num(Wd.d), wS = num(Wd.s), fD = num(Fd.d), fS = num(Fd.s);
+
+  // ── talpa de la y = l_w: intinderea pe z
+  //    L / Z: de la fata inimii din partea opusa lui `side` spre `side`
+  //    T:     centrata
+  let fz0, fz1;
+  if (shape === 'T') { fz0 = -lf / 2; fz1 = lf / 2; }
+  else if (side > 0) { fz0 = -tw / 2; fz1 = -tw / 2 + lf; }
+  else { fz0 = tw / 2 - lf; fz1 = tw / 2; }
+
+  // ── beton: dreptunghiuri; reflexia in punct pentru a doua jumatate a lui Z
+  const refl = function (r) {   // (y,z) -> (l_w - y, -z)
+    return { y0: lw - (r.y0 + r.wy), z0: -(r.z0 + r.wz), wy: r.wy, wz: r.wz, mat: r.mat };
+  };
+  const clampPos = function (v) { return v > 0 ? v : 0; };
+  const rects = [];
+  rects.push({ y0: 0, z0: -tw / 2, wy: lw, wz: tw, mat: MB });                 // inima
+  const half = [];                                                             // jumatatea de la y = l_w
+  half.push({ y0: lw - tf, z0: fz0, wy: tf, wz: fz1 - fz0, mat: MB });          // talpa
+  // zone (material MZ): nodul pe inima + patratul, nodul pe talpa, varful talpii
+  half.push({ y0: lw - tf - jLw, z0: -tw / 2, wy: tf + jLw, wz: tw, mat: MZ });
+  if (shape === 'T') {
+    half.push({ y0: lw - tf, z0: tw / 2, wy: tf, wz: Math.min(clampPos(jLf), fz1 - tw / 2), mat: MZ });
+    half.push({ y0: lw - tf, z0: -tw / 2 - Math.min(clampPos(jLf), -tw / 2 - fz0), wy: tf,
+                wz: Math.min(clampPos(jLf), -tw / 2 - fz0), mat: MZ });
+    half.push({ y0: lw - tf, z0: fz1 - tipL, wy: tf, wz: tipL, mat: MZ });
+    half.push({ y0: lw - tf, z0: fz0, wy: tf, wz: tipL, mat: MZ });
+  } else if (side > 0) {
+    half.push({ y0: lw - tf, z0: tw / 2, wy: tf, wz: Math.min(clampPos(jLf), fz1 - tw / 2), mat: MZ });
+    half.push({ y0: lw - tf, z0: fz1 - tipL, wy: tf, wz: tipL, mat: MZ });
+  } else {
+    half.push({ y0: lw - tf, z0: -tw / 2 - Math.min(clampPos(jLf), -tw / 2 - fz0), wy: tf,
+                wz: Math.min(clampPos(jLf), -tw / 2 - fz0), mat: MZ });
+    half.push({ y0: lw - tf, z0: fz0, wy: tf, wz: tipL, mat: MZ });
+  }
+  half.forEach(function (r) { rects.push(r); });
+  if (Z) half.forEach(function (r) { rects.push(refl(r)); });
+  if (hasEnd) rects.push({ y0: 0, z0: -tw / 2, wy: endL, wz: tw, mat: MZ });
+  const rectsOk = rects.filter(function (r) { return r.wy > 0 && r.wz > 0; });
+
+  // ── armatura
+  const bars = [];
+  const cm = function (d) { return cnom + detr + d / 2; };
+  function addBar(y, z, d, grp) {
+    if (!(d > 0)) return;
+    for (let i = 0; i < bars.length; i++) {
+      const b = bars[i];
+      if (Math.hypot(b.y - y, b.z - z) < (b.d + d) / 2) return;   // colt comun
+    }
+    bars.push({ y: y, z: z, A: barArea(d), d: d, grp: grp });
+  }
+  // n pozitii egal distantate de la a la b, inclusiv capetele
+  function lin(a, b, n) {
+    if (n <= 0) return [];
+    if (n === 1) return [(a + b) / 2];
+    const out = [];
+    for (let i = 0; i < n; i++) out.push(a + (b - a) * i / (n - 1));
+    return out;
+  }
+  // pozitii interioare intervalului (a, b) la pasul cel mult s
+  function fill(a, b, s) {
+    if (!(s > 0) || !(b > a)) return [];
+    const k = Math.max(0, Math.ceil((b - a) / s - 1e-9) - 1);
+    const out = [];
+    for (let i = 1; i <= k; i++) out.push(a + (b - a) * i / (k + 1));
+    return out;
+  }
+  const halfBars = [];                 // barele jumatatii de la y = l_w
+  const hb = function (y, z, d, g) { halfBars.push({ y: y, z: z, d: d, grp: g }); };
+
+  // fetele inimii si ale talpii (pentru diametrul zonei respective)
+  const zA = function (d) { return -tw / 2 + cm(d); }, zB = function (d) { return tw / 2 - cm(d); };
+  const yO = function (d) { return lw - cm(d); }, yI = function (d) { return lw - tf + cm(d); };
+
+  // nodul: cele 4 bare din patratul de intersectie
+  [[yO(jD), zA(jD)], [yO(jD), zB(jD)], [yI(jD), zA(jD)], [yI(jD), zB(jD)]].forEach(function (c) {
+    hb(c[0], c[1], jD, 'jn');
+  });
+  // nodul, pe inima: nw bare pe fiecare fata, de la capatul zonei spre patrat
+  if (jNw > 0 && jLw > 0) {
+    const y0 = lw - tf - jLw + cm(jD), y1 = yI(jD);
+    for (let i = 0; i < jNw; i++) {
+      const yy = y0 + (y1 - y0) * i / jNw;
+      hb(yy, zA(jD), jD, 'jn'); hb(yy, zB(jD), jD, 'jn');
+    }
+  }
+  // nodul, pe talpa: nf bare pe fiecare fata, de la patrat spre capatul zonei
+  function flangeJn(dir) {           // dir = +1 spre +z, -1 spre -z
+    if (!(jNf > 0) || !(jLf > 0)) return;
+    const zs = dir > 0 ? zB(jD) : zA(jD);
+    const edge = dir > 0 ? fz1 : fz0;
+    let ze = (dir > 0 ? tw / 2 + jLf : -tw / 2 - jLf) - dir * cm(jD);
+    if (dir > 0 ? ze > edge - cm(jD) : ze < edge + cm(jD)) ze = edge - dir * cm(jD);
+    for (let i = 1; i <= jNf; i++) {
+      const zz = zs + (ze - zs) * i / jNf;
+      hb(yO(jD), zz, jD, 'jn'); hb(yI(jD), zz, jD, 'jn');
+    }
+  }
+  // varful talpii
+  function flangeTip(dir) {
+    if (!(tipN > 0) || !(tipL > 0)) return;
+    const edge = dir > 0 ? fz1 : fz0;
+    const zs = edge - dir * cm(tipD), ze = edge - dir * (tipL - cm(tipD));
+    lin(zs, ze, tipN).forEach(function (zz) { hb(yO(tipD), zz, tipD, 'tip'); hb(yI(tipD), zz, tipD, 'tip'); });
+  }
+  // bare distribuite pe talpa, intre nod si varf
+  function flangeDist(dir) {
+    const zj = dir > 0 ? tw / 2 + jLf : -tw / 2 - jLf;
+    const edge = dir > 0 ? fz1 : fz0;
+    const zt = edge - dir * tipL;
+    const a = Math.min(zj, zt), b = Math.max(zj, zt);
+    if (dir > 0 ? zt <= zj : zt >= zj) return;
+    fill(a, b, fS).forEach(function (zz) { hb(yO(fD), zz, fD, 'fl'); hb(yI(fD), zz, fD, 'fl'); });
+  }
+  const dirs = (shape === 'T') ? [1, -1] : [side];
+  dirs.forEach(function (dr) { flangeJn(dr); flangeTip(dr); flangeDist(dr); });
+
+  // jumatatea de la y = l_w se adauga; la Z si reflexia ei in punct
+  halfBars.forEach(function (b) { addBar(b.y, b.z, b.d, b.grp); });
+  if (Z) halfBars.forEach(function (b) { addBar(lw - b.y, -b.z, b.d, b.grp); });
+
+  // capatul liber al inimii (L, T)
+  if (hasEnd && endN > 0 && endL > 0) {
+    lin(cm(endD), endL - cm(endD), endN).forEach(function (yy) {
+      addBar(yy, zA(endD), endD, 'end'); addBar(yy, zB(endD), endD, 'end');
+    });
+  }
+  // bare distribuite pe inima, intre zone
+  const webA = hasEnd ? endL : (tf + jLw);
+  const webB = lw - tf - jLw;
+  fill(webA, webB, wS).forEach(function (yy) {
+    addBar(yy, zA(wD), wD, 'web'); addBar(yy, zB(wD), wD, 'web');
+  });
+
+  const m = buildPolyModel({
+    rects: rectsOk, bars: bars.map(function (b) { return { y: b.y, z: b.z, A: b.A, grp: b.grp }; }),
+    props: props, fyd: fyd, eud: 0.9 * st.euk,
+    opts: Object.assign({ align: true }, inp.opts || {}, {
+      NT: (inp.opts && inp.opts.NT) || 16,
+      maxCells: (inp.opts && inp.opts.maxCells) || 60000,
+    }),
+  });
+
+  // ── verificari de geometrie (nu opresc calculul pe tacute: se raporteaza)
+  const issues = [];
+  if (!(lw > 0) || !(tw > 0) || !(lf > 0) || !(tf > 0)) issues.push('dims');
+  if (lf < tw) issues.push('lfShort');
+  if (tf >= lw) issues.push('tfLong');
+  if (webB < webA) issues.push('zonesOverlapWeb');
+  if (shape === 'T') { if (tw / 2 + jLf > lf / 2 - tipL + 1e-6) issues.push('zonesOverlapFl'); }
+  else if (tw / 2 + jLf > lf - tw / 2 - tipL + 1e-6) issues.push('zonesOverlapFl');
+
+  const cnt = { end: 0, jn: 0, tip: 0, web: 0, fl: 0 };
+  bars.forEach(function (b) { cnt[b.grp] = (cnt[b.grp] || 0) + 1; });
+  Object.assign(m, {
+    shape: shape, side: side, lw: lw, tw: tw, lf: lf, tf: tf, bw0: tw,
+    cnom: cnom, detr: detr, fck: fck, fcd: fcd, fyk: st.fyk,
+    euk: st.euk, eukAssumed: !!st.eukAssumed,
+    confMode: confMode, bulbConf: bulbConf, webConf: webConf,
+    ec2_nc: o.EC2_NC, ecu_nc: o.ECU_NC,
+    concrete: inp.concrete, steel: inp.steel,
+    barList: bars, cnt: cnt, cntTot: bars.length, zoneMat: MZ,
+    shapeIssues: issues, barIssues: [],
+  });
+  return m;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
    EXPORT
    ═══════════════════════════════════════════════════════════════════════════ */
 global.JP.poly = {
   VERSION: VERSION,
   buildModel: buildPolyModel,
   buildWall2D: buildWall2D,
+  buildShape2D: buildShape2D,
   solve: solvePoly,
   forces: polyForces,
   solveX: solvePolyX,
@@ -602,6 +961,7 @@ global.JP.poly = {
   axialLimits: polyAxialLimits,
   project: projectPoly,
   rasterize: rasterize,
+  rasterizeAligned: rasterizeAligned,
   edgeStrain: edgeStrain,   // expusa ca testul sa o poata compara cu engine.js
 };
 

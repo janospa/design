@@ -129,6 +129,30 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
   <div class="ip">
     <div class="ph" data-i18n="s1geom">1. Geometrie perete</div>
     <div class="pb">
+      <div class="toggle-row" style="padding-bottom:8px;border-bottom:1px solid #E0E0E5;margin-bottom:4px">
+        <span data-i18n="shapeLabel">Forma sectiunii</span>
+        <div class="seg" id="shapeSeg">
+          <button data-v="rect" class="on" onclick="setShape('rect')" data-i18n="shRect">Dreptunghi</button>
+          <button data-v="L" onclick="setShape('L')">L</button>
+          <button data-v="T" onclick="setShape('T')">T</button>
+          <button data-v="Z" onclick="setShape('Z')">Z</button>
+        </div>
+      </div>
+      <div id="geomShape" style="display:none">
+        <div class="row"><div class="rl"><span data-i18n="webLenSh">Inima, lungime exterioara</span> <span class="rn">(l<sub>w</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="sh_lw" value="2500" oninput="calc()"><span class="ru">mm</span></div></div>
+        <div class="row"><div class="rl"><span data-i18n="webThickSh">Inima, grosime</span> <span class="rn">(t<sub>w</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="sh_tw" value="250" oninput="calc()"><span class="ru">mm</span></div></div>
+        <div class="row"><div class="rl"><span data-i18n="flLen">Talpa, lungime exterioara</span> <span class="rn">(l<sub>f</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="sh_lf" value="1200" oninput="calc()"><span class="ru">mm</span></div></div>
+        <div class="row"><div class="rl"><span data-i18n="flThick">Talpa, grosime</span> <span class="rn">(t<sub>f</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="sh_tf" value="250" oninput="calc()"><span class="ru">mm</span></div></div>
+        <div class="toggle-row" id="sideRow" style="padding-top:8px">
+          <span data-i18n="sideLabel">Talpa spre</span>
+          <div class="seg" id="sideSeg">
+            <button data-v="1" class="on" onclick="setSide(1)">+z</button>
+            <button data-v="-1" onclick="setSide(-1)">&minus;z</button>
+          </div>
+        </div>
+        <div class="note" style="padding-top:4px" data-i18n="shapeGeomNote">&mdash;</div>
+      </div>
+      <div id="geomRect">
       <div class="row"><div class="rl"><span data-i18n="wallLen">Lungimea peretelui</span> <span class="rn">(l<sub>w</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="lw" value="2750" step="50" oninput="calc()"><span class="ru">mm</span></div></div>
       <div class="row"><div class="rl"><span data-i18n="webThick">Grosimea inimii</span> <span class="rn">(b<sub>w0</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="bw0" value="400" step="10" oninput="calc()"><span class="ru">mm</span></div></div>
       <div class="sub" data-i18n="be1left">Bulb 1 (stanga)</div>
@@ -137,7 +161,8 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
       <div class="sub" data-i18n="be2right">Bulb 2 (dreapta)</div>
       <div class="row"><div class="rl"><span data-i18n="beLen">Lungimea bulbului</span> <span class="rn">(b<sub>f</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="bf2" value="650" step="10" oninput="calc()"><span class="ru">mm</span></div></div>
       <div class="row"><div class="rl"><span data-i18n="beWidth">Latimea bulbului</span> <span class="rn">(l<sub>f</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="lf2" value="400" step="10" oninput="calc()"><span class="ru">mm</span></div></div>
-      <div class="note" style="padding-top:8px" data-i18n="geomNote">Deocamdata geometria este cea a modulului 03 (inima + doi bulbi). Nucleul de calcul lucreaza deja pe o sectiune oarecare, deci peretii L / Z / T / U se vor adauga numai ca introducere de geometrie, fara a schimba solverul.</div>
+      </div>
+      <div class="note" style="padding-top:8px" id="geomNoteEl" data-i18n="geomNote">Deocamdata geometria este cea a modulului 03 (inima + doi bulbi). Nucleul de calcul lucreaza deja pe o sectiune oarecare, deci peretii L / Z / T / U se vor adauga numai ca introducere de geometrie, fara a schimba solverul.</div>
     </div>
   </div>
 
@@ -178,6 +203,28 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
   <div class="ip">
     <div class="ph" data-i18n="s3longReinf">3. Armare longitudinala</div>
     <div class="pb">
+      <div id="barsShape" style="display:none">
+        <div id="zEndBox">
+        <div class="sub" data-i18n="zEnd">Capatul liber al inimii</div>
+        <div class="row"><div class="rl"><span data-i18n="zLen">Lungimea zonei</span> <span class="rn">(l)</span></div><div class="rc"><input type="number" inputmode="numeric" id="z_el" value="500" oninput="calc()"><span class="ru">mm</span></div></div>
+        <div class="row"><div class="rl"><span data-i18n="zBarsFace">Bare pe fata / &Oslash;</span> <span class="rn"></span></div><div class="rc"><input type="number" inputmode="numeric" id="z_en" value="4" oninput="calc()" style="width:48px"><input type="number" inputmode="numeric" id="z_ed" value="16" oninput="calc()" style="width:48px"><span class="ru">mm</span></div></div>
+        </div>
+        <div class="sub" data-i18n="zJn">Nodul inima &ndash; talpa</div>
+        <div class="row"><div class="rl"><span data-i18n="zJlw">Pe inima, dincolo de talpa</span> <span class="rn">(l<sub>w,j</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="z_jlw" value="300" oninput="calc()"><span class="ru">mm</span></div></div>
+        <div class="row"><div class="rl"><span data-i18n="zJnw">Bare pe fata inimii</span> <span class="rn">(n<sub>w</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="z_jnw" value="2" oninput="calc()"><span class="ru">buc</span></div></div>
+        <div class="row"><div class="rl"><span data-i18n="zJlf">Pe talpa, dincolo de inima</span> <span class="rn">(l<sub>f,j</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="z_jlf" value="300" oninput="calc()"><span class="ru">mm</span></div></div>
+        <div class="row"><div class="rl"><span data-i18n="zJnf">Bare pe fata talpii</span> <span class="rn">(n<sub>f</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="z_jnf" value="2" oninput="calc()"><span class="ru">buc</span></div></div>
+        <div class="row"><div class="rl"><span data-i18n="zJd">Diametru</span> <span class="rn">(&Oslash;)</span></div><div class="rc"><input type="number" inputmode="numeric" id="z_jd" value="16" oninput="calc()"><span class="ru">mm</span></div></div>
+        <div class="sub" data-i18n="zTip">Capatul liber al talpii</div>
+        <div class="row"><div class="rl"><span data-i18n="zLen">Lungimea zonei</span> <span class="rn">(l)</span></div><div class="rc"><input type="number" inputmode="numeric" id="z_tl" value="400" oninput="calc()"><span class="ru">mm</span></div></div>
+        <div class="row"><div class="rl"><span data-i18n="zBarsFace">Bare pe fata / &Oslash;</span> <span class="rn"></span></div><div class="rc"><input type="number" inputmode="numeric" id="z_tn" value="3" oninput="calc()" style="width:48px"><input type="number" inputmode="numeric" id="z_td" value="14" oninput="calc()" style="width:48px"><span class="ru">mm</span></div></div>
+        <div class="sub" data-i18n="zDist">Bare distribuite, pe fiecare fata</div>
+        <div class="row"><div class="rl"><span data-i18n="zDistWeb">Inima (&Oslash; / s)</span> <span class="rn"></span></div><div class="rc"><input type="number" inputmode="numeric" id="z_wd" value="10" oninput="calc()" style="width:48px"><input type="number" inputmode="numeric" id="z_ws" value="200" oninput="calc()" style="width:48px"><span class="ru">mm</span></div></div>
+        <div class="row"><div class="rl"><span data-i18n="zDistFl">Talpa (&Oslash; / s)</span> <span class="rn"></span></div><div class="rc"><input type="number" inputmode="numeric" id="z_fd" value="10" oninput="calc()" style="width:48px"><input type="number" inputmode="numeric" id="z_fs" value="200" oninput="calc()" style="width:48px"><span class="ru">mm</span></div></div>
+        <div class="count-box"><span data-i18n="zTotal">Total bare</span><span id="cnt_sh">&mdash;</span></div>
+        <div class="note" style="padding:8px 0 0" data-i18n="zNote">&mdash;</div>
+      </div>
+      <div id="barsRect">
       <div class="sub" data-i18n="be1bars">Bulb 1 &mdash; bare</div>
       <div class="row"><div class="rl"><span data-i18n="atCorners">La colturi</span> <span class="rn">(<span data-i18n="pcsDia">buc / &Oslash;</span>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="b1c_n" value="4" step="4" min="0" oninput="calc()" style="width:48px"><input type="number" inputmode="numeric" id="b1c_d" value="25" step="1" oninput="calc()" style="width:48px"><span class="ru">mm</span></div></div>
       <div class="row"><div class="rl"><span data-i18n="lateralShort">Lateral, latura scurta</span> <span class="rn">(<span data-i18n="pcsDia">buc / &Oslash;</span>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="b1s_n" value="2" step="1" oninput="calc()" style="width:48px"><input type="number" inputmode="numeric" id="b1s_d" value="25" step="1" oninput="calc()" style="width:48px"><span class="ru">mm</span></div></div>
@@ -191,7 +238,8 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
       <div class="sub" data-i18n="webLongBars">Inima &mdash; bare longitudinale</div>
       <div class="row"><div class="rl"><span data-i18n="longBars">Bare long.</span> <span class="rn">(<span data-i18n="diaSpacingRow">&Oslash; / s / rand</span>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="in_d" value="12" step="1" oninput="calc()" style="width:40px"><input type="number" inputmode="numeric" id="in_s" value="150" step="10" oninput="calc()" style="width:40px"><input type="number" inputmode="numeric" id="in_r" value="2" step="1" oninput="calc()" style="width:40px"></div></div>
       <div class="count-box"><span data-i18n="totalBarsWeb">Total bare Inima</span><span id="cnt_web">&mdash;</span></div>
-      <div class="note" style="padding:8px 0 0" data-i18n="barPosNote">Spre deosebire de modulul 03, barele nu mai sunt lumpate pe lungime: fiecare bara are pozitia ei si pe grosime. La incovoiere strict in plan asta nu schimba nimic (testul de validare o arata), dar in afara planului bratul de parghie real conteaza.</div>
+      </div>
+      <div class="note" style="padding:8px 0 0" id="barPosNoteEl" data-i18n="barPosNote">Spre deosebire de modulul 03, barele nu mai sunt lumpate pe lungime: fiecare bara are pozitia ei si pe grosime. La incovoiere strict in plan asta nu schimba nimic (testul de validare o arata), dar in afara planului bratul de parghie real conteaza.</div>
     </div>
   </div>
 
@@ -329,13 +377,22 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
        intervalul 0..360 grade — scurtatura algebrica nu merge la sectiuni
        nesimetrice.
 
+   v2.0 — PERETI L / T / Z (JP.poly.buildShape2D), cu armare pe zone: capatul
+   liber al inimii, nodul inima-talpa (cele 4 bare din patrat automat), capatul
+   liber al talpii si bare distribuite. Validare: fata de fib structuralcodes
+   v0.7.2 (integrator marin), pe L / T / Z, 4 niveluri de N x 24 de directii,
+   diferenta maxima 0,35 %. Peretele dreptunghiular ramane neschimbat.
+
    Validare: la M_y = 0 rezultatul trebuie sa coincida cu modulul 03, pentru ca
    atunci coordonata pe grosime nu mai intervine. Pe peretele de referinta
    diferenta masurata este de 0,10 % (malaj 24), din discretizare.
    ═══════════════════════════════════════════════════════════════════════════ */
-const MODULE_ID='11', MODULE_VERSION='1.0.0';
+const MODULE_ID='11', MODULE_VERSION='2.0.0';
 
 let curC='C50/60',curS='S 500',confMode='none',mmchart=null,lastCalc={},NT=24;
+/* Forma sectiunii (v2.0): 'rect' = geometria modulului 03 (inima + doi bulbi),
+   'L' / 'T' / 'Z' = pereti compusi, construiti cu JP.poly.buildShape2D. */
+let shape='rect', side=1;
 
 if(typeof JP==='undefined'||!JP.poly){
   document.getElementById('statusStrip').className='status-strip on';
@@ -371,6 +428,46 @@ let LANG=(function(){try{return localStorage.getItem('sw_lang')||'ro';}catch(e){
 const T={
   backAll:{ro:'Toate modulele',en:'All modules'},
   wallLabel:{ro:'Perete:',en:'Wall:'},
+  shapeLabel:{ro:'Forma sectiunii',en:'Section shape'},
+  shRect:{ro:'Dreptunghi',en:'Rectangle'},
+  webLenSh:{ro:'Inima, lungime exterioara',en:'Web, outer length'},
+  webThickSh:{ro:'Inima, grosime',en:'Web, thickness'},
+  flLen:{ro:'Talpa, lungime exterioara',en:'Flange, outer length'},
+  flThick:{ro:'Talpa, grosime',en:'Flange, thickness'},
+  sideLabel:{ro:'Talpa spre',en:'Flange towards'},
+  shapeGeomNote:{ro:'Dimensiuni EXTERIOARE. Inima este pe axa y (axa locala 2 a pier-ului), grosimea pe z (axa 3). Talpa este la capatul y = l<sub>w</sub>; la Z a doua talpa este la y = 0, spre partea opusa. M<sub>z</sub> este momentul din planul inimii (M3), M<sub>y</sub> cel din afara lui (M2). M<sub>z</sub> &gt; 0 comprima capatul cu talpa, M<sub>y</sub> &gt; 0 comprima partea +z.',
+                 en:'OUTER dimensions. The web runs along y (pier local axis 2), the thickness along z (axis 3). The flange is at the end y = l<sub>w</sub>; for Z the second flange is at y = 0, on the opposite side. M<sub>z</sub> is the in-plane moment of the web (M3), M<sub>y</sub> the out-of-plane one (M2). M<sub>z</sub> &gt; 0 compresses the flange end, M<sub>y</sub> &gt; 0 compresses the +z side.'},
+  zEnd:{ro:'Capatul liber al inimii',en:'Free end of the web'},
+  zJn:{ro:'Nodul inima &ndash; talpa',en:'Web &ndash; flange junction'},
+  zTip:{ro:'Capatul liber al talpii',en:'Free end of the flange'},
+  zDist:{ro:'Bare distribuite, pe fiecare fata',en:'Distributed bars, on each face'},
+  zLen:{ro:'Lungimea zonei',en:'Zone length'},
+  zBarsFace:{ro:'Bare pe fata / &Oslash;',en:'Bars per face / &Oslash;'},
+  zJlw:{ro:'Pe inima, dincolo de talpa',en:'Along the web, beyond the flange'},
+  zJnw:{ro:'Bare pe fata inimii',en:'Bars per web face'},
+  zJlf:{ro:'Pe talpa, dincolo de inima',en:'Along the flange, beyond the web'},
+  zJnf:{ro:'Bare pe fata talpii',en:'Bars per flange face'},
+  zJd:{ro:'Diametru',en:'Diameter'},
+  zDistWeb:{ro:'Inima (&Oslash; / s)',en:'Web (&Oslash; / s)'},
+  zDistFl:{ro:'Talpa (&Oslash; / s)',en:'Flange (&Oslash; / s)'},
+  zTotal:{ro:'Total bare',en:'Total bars'},
+  zNote:{ro:'Armare pe doua randuri, cate unul pe fiecare fata. In nod, cele 4 bare din patratul de intersectie se pun automat; n<sub>w</sub> si n<sub>f</sub> sunt barele SUPLIMENTARE pe fiecare fata, pe lungimile l<sub>w,j</sub> (de la fata interioara a talpii) si l<sub>f,j</sub> (de la fata inimii; la T de fiecare parte). La Z ambele noduri si ambele capete de talpa au aceeasi armare. Barele distribuite umplu golurile dintre zone la pasul cel mult s. Zonele sunt confinate cand confinarea este pe „Bulbi”.',
+          en:'Two layers, one on each face. At the junction the 4 bars of the intersection square are placed automatically; n<sub>w</sub> and n<sub>f</sub> are the ADDITIONAL bars per face over l<sub>w,j</sub> (from the inner face of the flange) and l<sub>f,j</sub> (from the web face; on each side for T). For Z both junctions and both flange tips get the same bars. Distributed bars fill the gaps between zones at spacing at most s. The zones are confined when confinement is set to “BEs”.'},
+  shIssues:{ro:'Verifica geometria si zonele: ',en:'Check the geometry and zones: '},
+  shIss_dims:{ro:'dimensiuni lipsa sau nule',en:'missing or zero dimensions'},
+  shIss_lfShort:{ro:'talpa este mai scurta decat grosimea inimii',en:'the flange is shorter than the web thickness'},
+  shIss_tfLong:{ro:'grosimea talpii depaseste lungimea inimii',en:'the flange thickness exceeds the web length'},
+  shIss_zonesOverlapWeb:{ro:'zonele de pe inima se suprapun (capat + nod mai lungi decat inima)',en:'the web zones overlap (end + junction longer than the web)'},
+  shIss_zonesOverlapFl:{ro:'zonele de pe talpa se suprapun (nod + capat mai lungi decat talpa)',en:'the flange zones overlap (junction + tip longer than the flange)'},
+  pdfShape:{ro:'Forma sectiunii',en:'Section shape'},
+  pdfShWeb:{ro:'Inima: l_w / t_w',en:'Web: l_w / t_w'},
+  pdfShFl:{ro:'Talpa: l_f / t_f',en:'Flange: l_f / t_f'},
+  pdfShSide:{ro:'Talpa spre',en:'Flange towards'},
+  pdfShEnd:{ro:'Capat inima: l / bare pe fata x O',en:'Web end: l / bars per face x D'},
+  pdfShJn:{ro:'Nod: l_w,j / n_w ; l_f,j / n_f ; O',en:'Junction: l_w,j / n_w ; l_f,j / n_f ; D'},
+  pdfShTip:{ro:'Capat talpa: l / bare pe fata x O',en:'Flange tip: l / bars per face x D'},
+  pdfShDist:{ro:'Distribuite inima ; talpa (O / s)',en:'Distributed web ; flange (D / s)'},
+  pdfShTot:{ro:'Total bare / A_s / rho',en:'Total bars / A_s / rho'},
   inputs:{ro:'Intrari',en:'Inputs'},
   results:{ro:'Rezultate',en:'Results'},
   s1geom:{ro:'1. Geometrie perete',en:'1. Wall geometry'},
@@ -450,6 +547,10 @@ const T={
   costTitle:{ro:'Costul incovoierii in afara planului',en:'Cost of the out-of-plane moment'},
   costLine:{ro:(u,b,p)=>`M<sub>z,Rd</sub> ar fi <b>${u}</b> kNm daca M<sub>y,Ed</sub> = 0. Cu M<sub>y,Ed</sub> aplicat scade la <b>${b}</b> kNm, adica <b>&minus;${p} %</b>.`,
             en:(u,b,p)=>`M<sub>z,Rd</sub> would be <b>${u}</b> kNm with M<sub>y,Ed</sub> = 0. With the applied M<sub>y,Ed</sub> it drops to <b>${b}</b> kNm, i.e. <b>&minus;${p} %</b>.`},
+  costLineUp:{ro:(u,b,p)=>`M<sub>z,Rd</sub> ar fi <b>${u}</b> kNm daca M<sub>y,Ed</sub> = 0. Cu M<sub>y,Ed</sub> aplicat creste la <b>${b}</b> kNm, adica <b>+${p} %</b> &mdash; la o sectiune nesimetrica (L, Z) momentul din afara planului poate ajuta, in functie de semn.`,
+            en:(u,b,p)=>`M<sub>z,Rd</sub> would be <b>${u}</b> kNm with M<sub>y,Ed</sub> = 0. With the applied M<sub>y,Ed</sub> it rises to <b>${b}</b> kNm, i.e. <b>+${p} %</b> &mdash; on an asymmetric section (L, Z) the out-of-plane moment can help, depending on its sign.`},
+  forcesNoteShape:{ro:'M<sub>z,Ed</sub> = momentul din planul inimii (de regula M3), M<sub>y,Ed</sub> = cel din afara lui (M2). M<sub>z</sub> &gt; 0 comprima capatul cu talpa (y = l<sub>w</sub>), M<sub>y</sub> &gt; 0 comprima partea +z. Semnele si orientarea talpii trebuie verificate pe axele locale ale pier-ului; comutatorul „Talpa spre” intoarce talpa.',
+                   en:'M<sub>z,Ed</sub> = in-plane moment of the web (usually M3), M<sub>y,Ed</sub> = the out-of-plane one (M2). M<sub>z</sub> &gt; 0 compresses the flange end (y = l<sub>w</sub>), M<sub>y</sub> &gt; 0 compresses the +z side. Signs and flange orientation must be checked against the pier local axes; the “Flange towards” switch flips the flange.'},
   costNone:{ro:'M<sub>y,Ed</sub> = 0, deci verificarea este practic uniaxiala.',en:'M<sub>y,Ed</sub> = 0, so the check is effectively uniaxial.'},
   barsWord:{ro:'bare',en:'bars'},
   skBE1:{ro:(n)=>`Bulb 1 (${n} bare)`,en:(n)=>`BE 1 (${n} bars)`},
@@ -508,7 +609,7 @@ const T={
   pdfMEd:{ro:'Moment exterior rezultant',en:'Resultant external moment'},
   pdfUtil:{ro:'Utilizare',en:'Utilization'},
   pdfCost:{ro:'M_z,Rd fara M_y (uniaxial)',en:'M_z,Rd without M_y (uniaxial)'},
-  pdfCostDrop:{ro:'Reducere din cauza lui M_y',en:'Reduction caused by M_y'},
+  pdfCostDrop:{ro:'Variatia lui M_z,Rd din cauza lui M_y',en:'Change of M_z,Rd caused by M_y'},
   pdfError:{ro:'Eroare la generare:',en:'Generation error:'},
   pdfGenerated:{ro:'Generat: ',en:'Generated: '},
   pdfPage:{ro:(i,n)=>'Pagina '+i+' din '+n,en:(i,n)=>'Page '+i+' of '+n},
@@ -534,7 +635,7 @@ function applyStaticLang(){
 function setLang(l){LANG=l;try{localStorage.setItem('sw_lang',l);}catch(e){}applyStaticLang();calc();}
 function updSignNote(){
   const el=document.getElementById('forcesNote');
-  if(el)el.innerHTML=t(signConv==='neg'?'forcesNoteNeg':'forcesNotePos');
+  if(el)el.innerHTML=t(signConv==='neg'?'forcesNoteNeg':'forcesNotePos')+(shape!=='rect'?'<br>'+t('forcesNoteShape'):'');
 }
 function stampVersion(){
   const eng=(typeof JP!=='undefined')?JP.VERSION:'?';
@@ -569,6 +670,25 @@ function setConfUI(mode){
   document.getElementById('conf-web-fields').classList.toggle('on',mode==='all');
 }
 function setConf(mode){setConfUI(mode);updMat();calc();saveCurrentPreset();}
+function setShapeUI(v){
+  shape=v;
+  document.querySelectorAll('#shapeSeg button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));
+  const isR=(v==='rect');
+  document.getElementById('geomRect').style.display=isR?'':'none';
+  document.getElementById('geomShape').style.display=isR?'none':'';
+  document.getElementById('barsRect').style.display=isR?'':'none';
+  document.getElementById('barsShape').style.display=isR?'none':'';
+  document.getElementById('geomNoteEl').style.display=isR?'':'none';
+  document.getElementById('barPosNoteEl').style.display=isR?'':'none';
+  document.getElementById('sideRow').style.display=(v==='T')?'none':'';
+  document.getElementById('zEndBox').style.display=(v==='Z')?'none':'';
+}
+function setShape(v){ setShapeUI(v); updSignNote(); calc(); saveCurrentPreset(); }
+function setSideUI(v){
+  side=(v<0)?-1:1;
+  document.querySelectorAll('#sideSeg button').forEach(b=>b.classList.toggle('on',+b.dataset.v===side));
+}
+function setSide(v){ setSideUI(v); calc(); saveCurrentPreset(); }
 
 function readInputs(){
   return {
@@ -589,6 +709,24 @@ function readInputs(){
   };
 }
 
+function readShapeInputs(){
+  return {
+    shape:shape, side:side,
+    lw:gv('sh_lw'), tw:gv('sh_tw'), lf:gv('sh_lf'), tf:gv('sh_tf'),
+    cnom:gv('cnom'), detr:gv('detr'),
+    concrete:curC, steel:curS, confMode:confMode,
+    fckc:gv('fckc'), ec2c:gv('ec2c'), ecu2c:gv('ecu2c'),
+    fckcw:gv('fckcw'), ec2cw:gv('ec2cw'), ecu2cw:gv('ecu2cw'),
+    end:{l:gv('z_el'),n:gv('z_en'),d:gv('z_ed')},
+    jn:{lw:gv('z_jlw'),nw:gv('z_jnw'),lf:gv('z_jlf'),nf:gv('z_jnf'),d:gv('z_jd')},
+    tip:{l:gv('z_tl'),n:gv('z_tn'),d:gv('z_td')},
+    web:{d:gv('z_wd'),s:gv('z_ws')}, fl:{d:gv('z_fd'),s:gv('z_fs')},
+    opts:{NT:NT}
+  };
+}
+function buildSection(){
+  return (shape==='rect')?JP.poly.buildWall2D(readInputs()):JP.poly.buildShape2D(readShapeInputs());
+}
 function statusText(r){
   if(!r||r.ok)return '';
   if(r.code===JP.CODES.NO_BRACKET){
@@ -635,11 +773,14 @@ function blankResults(){
 // ═══════════════ calcul ═══════════════
 function calc(){
   if(typeof JP==='undefined'||!JP.poly)return;
-  const inp=readInputs();
-  const m=JP.poly.buildWall2D(inp);
-  setTxt('cnt_b1',m.cntB1+' '+t('barsWord'));
-  setTxt('cnt_b2',m.cntB2+' '+t('barsWord'));
-  setTxt('cnt_web',m.cntWeb+' '+t('barsWord'));
+  const m=buildSection();
+  if(shape==='rect'){
+    setTxt('cnt_b1',m.cntB1+' '+t('barsWord'));
+    setTxt('cnt_b2',m.cntB2+' '+t('barsWord'));
+    setTxt('cnt_web',m.cntWeb+' '+t('barsWord'));
+  } else {
+    setTxt('cnt_sh',m.cntTot+' '+t('barsWord')+' · '+(m.As_tot||0).toFixed(0)+' mm² · '+(m.Ac>0?(100*m.As_tot/m.Ac).toFixed(2):'—')+' %');
+  }
   setTxt('cells_r',m.nC||0);
   const mn=document.getElementById('meshNote');
   if(mn)mn.innerHTML=t('meshNote',NT,m.nC||0);
@@ -649,6 +790,12 @@ function calc(){
     showStatus(t('stBarCount'),'err');blankResults();drawSketch(m,null);drawChart([],null,null);return;
   }
   if(!(m.Ac>0)){showStatus(t('stDegenerate'),'err');blankResults();drawSketch(m,null);drawChart([],null,null);return;}
+  // la L / T / Z problemele de geometrie si de zone se spun, nu se ascund
+  const shWarn=(m.shapeIssues&&m.shapeIssues.length)
+    ? t('shIssues')+m.shapeIssues.map(k=>t('shIss_'+k)).join('; ')+'.' : '';
+  if(m.shapeIssues&&m.shapeIssues.indexOf('dims')>=0){
+    showStatus(shWarn,'err');blankResults();drawSketch(m,null);drawChart([],null,null);return;
+  }
 
   const NedUser=gv('ned'), MzEd=gv('mz'), MyEd=gv('my');
   const Ned=convN(NedUser);
@@ -658,7 +805,7 @@ function calc(){
 
   const r=JP.poly.solve(m,Ned,MyEd,MzEd,LANG);
   const v=r.value||r.partial;
-  showStatus(r.ok?'':statusText(r),(r.code===JP.CODES.RESIDUAL_HIGH)?'warn':'err');
+  showStatus(r.ok?shWarn:statusText(r),(r.ok||r.code===JP.CODES.RESIDUAL_HIGH)?'warn':'err');
   if(!v){blankResults();drawSketch(m,null);drawChart([],null,null);return;}
 
   setTxt('mrd_r',r.ok?v.MRd.toFixed(1):'—');
@@ -704,7 +851,8 @@ function calc(){
         const uni=Math.abs(ru.value.MzRd), bi=Math.abs(v.MzRd);
         const drop=uni>0?(1-bi/uni)*100:0;
         cb.style.display='';
-        cb.innerHTML='<b>'+t('costTitle')+'</b><br>'+t('costLine',uni.toFixed(0),bi.toFixed(0),drop.toFixed(1));
+        cb.innerHTML='<b>'+t('costTitle')+'</b><br>'+(drop>=0?t('costLine',uni.toFixed(0),bi.toFixed(0),drop.toFixed(1))
+                                                               :t('costLineUp',uni.toFixed(0),bi.toFixed(0),(-drop).toFixed(1)));
         lastCalc.uni=uni;lastCalc.drop=drop;
       } else { cb.style.display='none'; }
     }
@@ -714,7 +862,8 @@ function calc(){
   const pts=r.ok?JP.poly.traceCurve(Ned,m,48):[];
   drawChart(pts,{My:MyEd,Mz:MzEd},r.ok?{My:v.MyRd,Mz:v.MzRd}:null);
 
-  lastCalc=Object.assign(lastCalc,{m:m,Ned:NedUser,MyEd:MyEd,MzEd:MzEd,v:v,ok:r.ok,
+  lastCalc=Object.assign(lastCalc,{m:m,shape:shape,side:side,shInp:(shape==='rect'?null:readShapeInputs()),
+    Ned:NedUser,MyEd:MyEd,MzEd:MzEd,v:v,ok:r.ok,
     status:{ok:r.ok,code:r.code,message:statusText(r)},concrete:curC,steel:curS,
     confMode:confMode,signConv:signConv,NT:NT});
 }
@@ -728,8 +877,11 @@ function drawSketch(m,v){
   const bb=m.bbox;
   const spanY=bb.ymax-bb.ymin, spanZ=bb.zmax-bb.zmin;
   const scl=Math.min((VW-2*PAD)/spanY,(VH-2*PAD)/Math.max(spanZ,spanY*0.18));
-  const cx=VW/2, cy=VH/2;
-  // coordonate centroidale -> ecran
+  const isShape=!!m.shape;
+  // coordonate centroidale -> ecran; desenul se centreaza pe mijlocul
+  // conturului, nu pe centrul de greutate (la L acesta este excentric)
+  const oy=(bb.ymin+bb.ymax)/2-m.cgY, oz=(bb.zmin+bb.zmax)/2-m.cgZ;
+  const cx=VW/2-oy*scl, cy=VH/2+oz*scl;
   const X2=(y)=>cx+y*scl, Y2=(z)=>cy-z*scl;
   let o='';
   // celule
@@ -741,14 +893,17 @@ function drawSketch(m,v){
     comp=new Uint8Array(m.nC);
     for(let i=0;i<m.nC;i++) comp[i]=((p.dC[i]-na)>0)?1:0;
   }
-  const MATCOL=['#E8E8ED','#DDEEFF','#E4F3E6'];
+  // la L / T / Z indicii sunt 1 = inima/talpa, 2 = zone (vezi buildShape2D)
+  const MATCOL=m.shape?['#E8E8ED','#E4F3E6','#DDEEFF']:['#E8E8ED','#DDEEFF','#E4F3E6'];
   for(let i=0;i<m.nC;i++){
     const on=comp&&comp[i];
     const fill=on?'#8EBCF0':MATCOL[m.cMat[i]]||'#E8E8ED';
-    o+=`<rect x="${(X2(m.cy[i])-fw/2).toFixed(2)}" y="${(Y2(m.cz[i])-fh/2).toFixed(2)}" width="${(fw+0.4).toFixed(2)}" height="${(fh+0.4).toFixed(2)}" fill="${fill}"/>`;
+    // malajul aliniat (L / T / Z) are celule de marimi diferite
+    const w=m.chy?m.chy[i]*scl:fw, h=m.chz?m.chz[i]*scl:fh;
+    o+=`<rect x="${(X2(m.cy[i])-w/2).toFixed(2)}" y="${(Y2(m.cz[i])-h/2).toFixed(2)}" width="${(w+0.4).toFixed(2)}" height="${(h+0.4).toFixed(2)}" fill="${fill}"/>`;
   }
-  // contur dreptunghiurilor
-  m.rects.forEach(rc=>{
+  // contur dreptunghiurilor (la L / T / Z numai inima si talpile, nu si zonele)
+  m.rects.filter(rc=>!isShape||rc.mat!==m.zoneMat).forEach(rc=>{
     o+=`<rect x="${X2(rc.y0-m.cgY)}" y="${Y2(rc.z0-m.cgZ+rc.wz)}" width="${rc.wy*scl}" height="${rc.wz*scl}" fill="none" stroke="#1C1C1E" stroke-width="1.1"/>`;
   });
   // axa neutra
@@ -769,6 +924,7 @@ function drawSketch(m,v){
   const ax0=PAD-16, ay0=VH-14;
   o+=`<line x1="${ax0}" y1="${ay0}" x2="${ax0+18}" y2="${ay0}" stroke="#0066CC" stroke-width="1.2"/><text x="${ax0+21}" y="${ay0+3}" font-size="9" fill="#0066CC" font-family="Inter,sans-serif">y</text>`;
   o+=`<line x1="${ax0}" y1="${ay0}" x2="${ax0}" y2="${ay0-18}" stroke="#0066CC" stroke-width="1.2"/><text x="${ax0-4}" y="${ay0-21}" font-size="9" fill="#0066CC" font-family="Inter,sans-serif">z</text>`;
+  if(isShape){ svg.innerHTML=o; return; }
   // etichete bulbi
   o+=`<text x="${X2(-spanY/2+m.bf1/2)}" y="18" text-anchor="middle" font-size="9" fill="#6C6C70" font-family="Inter,sans-serif">${t('skBE1',m.cntB1)}</text>`;
   o+=`<text x="${X2(spanY/2-m.bf2/2)}" y="18" text-anchor="middle" font-size="9" fill="#6C6C70" font-family="Inter,sans-serif">${t('skBE2',m.cntB2)}</text>`;
@@ -861,12 +1017,26 @@ function buildPdf(chartImg,skImg){
   }
 
   sT(t('pdfSec1'));
-  doc.autoTable({startY:y,head:[[t('pdfColParam'),t('pdfColNot'),t('pdfColVal')]],body:[
+  const S=d.shInp;
+  const geomRows=(d.shape==='rect')?[
     [t('pdfInWallLen'),'l_w',m.lw+' mm'],
     [t('pdfInWebThick'),'b_w0',m.bw0+' mm'],
     [t('pdfInBE1'),'bf / lf',m.bf1+' / '+m.lf1+' mm'],
     [t('pdfInBE2'),'bf / lf',m.bf2+' / '+m.lf2+' mm'],
     [t('pdfInBars'),'-',m.cntB1+' / '+m.cntB2+' / '+m.cntWeb],
+  ]:[
+    [t('pdfShape'),'-',d.shape],
+    [t('pdfShWeb'),'l_w / t_w',S.lw+' / '+S.tw+' mm'],
+    [t('pdfShFl'),'l_f / t_f',S.lf+' / '+S.tf+' mm'],
+  ].concat(d.shape==='T'?[]:[[t('pdfShSide'),'-',(d.side>0?'+z':'-z')]])
+   .concat(d.shape==='Z'?[]:[[t('pdfShEnd'),'-',S.end.l+' mm / '+S.end.n+' x O'+S.end.d]])
+   .concat([
+    [t('pdfShJn'),'-',S.jn.lw+' / '+S.jn.nw+' ; '+S.jn.lf+' / '+S.jn.nf+' ; O'+S.jn.d],
+    [t('pdfShTip'),'-',S.tip.l+' mm / '+S.tip.n+' x O'+S.tip.d],
+    [t('pdfShDist'),'-','O'+S.web.d+'/'+S.web.s+' ; O'+S.fl.d+'/'+S.fl.s],
+    [t('pdfShTot'),'-',m.cntTot+' / '+m.As_tot.toFixed(0)+' mm2 / '+(100*m.As_tot/m.Ac).toFixed(2)+' %'],
+  ]);
+  doc.autoTable({startY:y,head:[[t('pdfColParam'),t('pdfColNot'),t('pdfColVal')]],body:geomRows.concat([
     [t('pdfInCover'),'c_nom / D_etr',m.cnom+' / '+m.detr+' mm'],
     [t('pdfInConc'),'-',d.concrete+(d.confMode==='bulb'?t('pdfConfBulb'):d.confMode==='all'?t('pdfConfAll'):'')],
     [t('pdfInSteel'),'-',d.steel],
@@ -877,7 +1047,7 @@ function buildPdf(chartImg,skImg){
     ['M_y,Ed','-',d.MyEd.toFixed(1)+' kNm'],
     [t('pdfInSign'),'-',(d.signConv==='pos')?t('pdfSignPos'):t('pdfSignNeg')],
     [t('pdfInMesh'),'-',d.NT+' / '+m.nC],
-  ],margin:{left:ml,right:mr},tableWidth:cw,theme:'grid',
+  ]),margin:{left:ml,right:mr},tableWidth:cw,theme:'grid',
    styles:{lineColor:[180,200,220],lineWidth:0.3,fontSize:8.5,textColor:[0,0,0]},
    headStyles:{fillColor:[200,215,235],textColor:[0,0,0],fontStyle:'bold',lineColor:[200,215,235]},
    alternateRowStyles:{fillColor:[240,245,252]},
@@ -892,7 +1062,7 @@ function buildPdf(chartImg,skImg){
   row(t('pdfUtil'),'M_Ed/M_Rd',valid?v.util.toFixed(1)+' %':'-',true);
   if(valid&&isFinite(d.uni)&&d.uni>0){
     row(t('pdfCost'),'-',d.uni.toFixed(1)+' kNm');
-    row(t('pdfCostDrop'),'-','-'+(d.drop||0).toFixed(1)+' %');
+    { const dd=-(d.drop||0); row(t('pdfCostDrop'),'-',(dd>0?'+':'')+dd.toFixed(1)+' %'); }
   }
   const verdict=!valid?t('pdfVerdictNA'):(v.util<=100?t('pdfVerdictPass'):t('pdfVerdictFail'));
   cy(7);doc.setFontSize(9);doc.setFont('helvetica','bold');
@@ -930,8 +1100,8 @@ function buildPdf(chartImg,skImg){
     doc.text(t('pdfDisc1')+'  '+t('pdfDisc2'),ml,281);
     doc.setFont('helvetica','normal');doc.setDrawColor(40,80,140);doc.line(ml,285,ml+cw,285);
     doc.text(stamp,ml,289);
-    doc.text(t('pdfPage',i,tp),pW-mr,289,{align:'right'});
-    doc.text(t('pdfGenerated')+ds,pW/2,289,{align:'center'});
+    // data si pagina in dreapta: la centru se suprapuneau cu stampila lunga
+    doc.text(t('pdfGenerated')+ds+'   '+t('pdfPage',i,tp),pW-mr,289,{align:'right'});
   }
   doc.save(t('pdfFname'));
 }
@@ -943,6 +1113,7 @@ function captureState(){
   const st={};
   document.querySelectorAll('input[id],select[id]').forEach(el=>{if(el.id!=='presetSel')st[el.id]=el.value;});
   st._conf=confMode;
+  st._shape=shape; st._side=side;
   st._signconv=signConv;   // eticheta, nu setare
   return st;
 }
@@ -954,6 +1125,8 @@ function applyState(st){
   curC=document.getElementById('cp').value;
   curS=document.getElementById('sp').value;
   setConfUI(st._conf||'none');
+  // presetarile v1 nu au forma: sunt pereti dreptunghiulari
+  setShapeUI(st._shape||'rect'); setSideUI(st._side||1);
   // Presetarile salvate sub alta conventie de semn se reinterpreteaza, ca un
   // perete comprimat sa nu devina in tacere intins.
   const savedSign=st._signconv||'neg';
@@ -999,5 +1172,6 @@ if(typeof JP!=='undefined'&&JP.poly){updMat();calc();}
 document.addEventListener('input',saveCurrentPreset);
 document.addEventListener('change',saveCurrentPreset);
 </script>
+<script src="presets-io.js" data-mod="11"></script>
 </body>
 </html>
