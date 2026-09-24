@@ -52,8 +52,11 @@
    (c) s-a expus JP.barMessage(issues, lang), ca modulele in lot sa poata
    semnala o sectiune imposibila O SINGURA DATA, nu pe fiecare rand.
    Nu schimba niciun rezultat.
+   2.4.0 — s-a adaugat JP.column.secondOrder(): efectele de ordinul 2 la stalp
+   dupa SR EN 1992-1-1 §5.8 (metoda curburii nominale, 5.8.8). Functie noua,
+   apelata numai cand modulul o cere; niciun rezultat existent nu se schimba.
    ═══════════════════════════════════════════════════════════════════════════ */
-const VERSION = '2.3.0';
+const VERSION = '2.4.0';
 
 /* ═══════════════════════════════════════════════════════════════════════════
    CONVENTII DE CALCUL
@@ -1092,6 +1095,104 @@ function solveColumn(m, Ned, MyEd, MzEd, lang) {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
+   STALP — EFECTE DE ORDINUL 2, SR EN 1992-1-1 §5.8 (metoda curburii nominale)
+   ───────────────────────────────────────────────────────────────────────────
+   Pe O directie. `dir` = 'y' pentru M_y (bratul pe inaltimea h) sau 'z' pentru
+   M_z (bratul pe latimea b). Unitati: N [kN, compresiune pozitiva], momente
+   [kNm, eforturi interne, cu semn], lungimi [mm].
+
+   M01, M02 — momentele de ordinul 1 de la capete, cu |M02| >= |M01|; au acelasi
+   semn cand intind aceeasi fata (curbura simpla) — exact conventia eforturilor
+   interne din ETABS, deci valorile de la cele doua statii se pot folosi direct.
+
+     l0 = beta*l;  i = dim/sqrt(12);  lambda = l0/i                     5.8.3.2
+     n = N_Ed/(A_c f_cd);  omega = A_s f_yd/(A_c f_cd)
+     lambda_lim = 20*A*B*C/sqrt(n)                                      (5.13N)
+       A = 1/(1+0,2 phi_ef),  B = sqrt(1+2 omega),  C = 1,7 - r_m
+       r_m = M01/M02 la stalp contravantuit; r_m = 1 (C = 0,7) la stalp
+       necontravantuit si cand momentele de capat sunt nule
+     e_i = l0/400                                              5.2(7), 5.2(9)
+     M0e = max(0,6 M02 + 0,4 M01 ; 0,4 M02)  (contravantuit)            (5.32)
+     M0e = M02                                (necontravantuit)
+     1/r = K_r K_phi eps_yd/(0,45 d)                                    (5.34)
+       K_r = (n_u - n)/(n_u - n_bal) <= 1, n_u = 1 + omega, n_bal = 0,4  (5.36)
+       K_phi = 1 + beta_phi*phi_ef >= 1,
+       beta_phi = 0,35 + f_ck/200 - lambda/150                          (5.37)
+     e2 = (1/r) l0^2/c, c = 10                                          (5.33)
+     M_Ed = M0e + N e_i + N e2 ; la contravantuit si >= M02, >= M01 + 0,5 M2
+                                                                   5.8.8.2(3)
+     M_Ed >= N e0, e0 = max(dim/30 ; 20 mm)                              6.1(4)
+   d = inaltimea utila pe directia respectiva: centrul barelor de colt.
+   Constantele A, B, C (cand nu se calculeaza) si c = 10 sunt valorile
+   recomandate; imperfectiunea si e0 se aplica numai daca withImperf = true
+   (la flexiune oblica imperfectiunea se ia pe O SINGURA directie, cea mai
+   defavorabila — 5.8.9(2) — iar modulul incearca ambele variante).
+   ═══════════════════════════════════════════════════════════════════════════ */
+function secondOrderEC2(m, p) {
+  const dir = (p.dir === 'z') ? 'z' : 'y';
+  const dim = (dir === 'y') ? m.h : m.b;
+  const half = (dir === 'y') ? m.halfZ : m.halfY;         // centrul barelor de colt
+  const N = +p.N || 0;
+  const M01in = +p.M01 || 0, M02in = +p.M02 || 0;
+  const l0 = Math.max(0, +p.l0 || 0);
+  const phiEf = Math.max(0, +p.phiEf || 0);
+  const braced = !!p.braced;
+  const withImp = (p.withImperf !== false);
+  const o = { dir: dir, N: N, M01: M01in, M02: M02in, l0: l0, phiEf: phiEf, braced: braced,
+              withImperf: withImp, dim: dim };
+
+  const s = (M02in >= 0) ? 1 : -1;
+  const m02 = Math.abs(M02in), m01 = M01in * s;           // M01 relativ la semnul lui M02
+  o.i = dim / Math.sqrt(12);
+  o.lambda = o.i > 0 ? l0 / o.i : 0;
+  const fcd = m.fcd, Ac = m.Ac;
+  o.n = (Ac > 0 && fcd > 0) ? N * 1e3 / (Ac * fcd) : 0;
+  o.omega = (Ac > 0 && fcd > 0) ? m.As_tot * m.fyd / (Ac * fcd) : 0;
+  o.A = 1 / (1 + 0.2 * phiEf);
+  o.B = Math.sqrt(1 + 2 * o.omega);
+  o.rm = (!braced || m02 < 1e-9) ? 1 : Math.max(-1, Math.min(1, m01 / m02));
+  o.C = 1.7 - o.rm;
+  o.lambdaLim = (o.n > 0) ? 20 * o.A * o.B * o.C / Math.sqrt(o.n) : Infinity;
+  o.slender = (o.n > 0) && (o.lambda > o.lambdaLim);
+
+  if (!(N > 0)) {                                        // intindere: fara ordinul 2
+    o.ei = 0; o.e0 = 0; o.M0e = m02; o.M0Ed = m02; o.M2 = 0; o.e2 = 0;
+    o.MEd = M02in; o.governs = 'first';
+    return o;
+  }
+  o.ei = withImp ? l0 / 400 : 0;
+  o.e0 = withImp ? Math.max(dim / 30, 20) : 0;
+  o.M0e = braced ? Math.max(0.6 * m02 + 0.4 * m01, 0.4 * m02) : m02;
+  o.M0Ed = o.M0e + N * o.ei / 1e3;
+
+  o.M2 = 0; o.e2 = 0;
+  if (o.slender) {
+    o.d = dim / 2 + half;
+    o.epsYd = m.fyd / m.Es;
+    o.nu = 1 + o.omega; o.nBal = 0.4;
+    o.Kr = Math.max(0, Math.min(1, (o.nu - o.n) / (o.nu - o.nBal)));
+    o.betaPhi = 0.35 + m.fck / 200 - o.lambda / 150;
+    o.Kphi = Math.max(1, 1 + o.betaPhi * phiEf);
+    o.curv = o.d > 0 ? o.Kr * o.Kphi * o.epsYd / (0.45 * o.d) : 0;   // 1/mm
+    o.c = 10;
+    o.e2 = o.curv * l0 * l0 / o.c;
+    o.M2 = N * o.e2 / 1e3;
+  }
+  // momentul de calcul, 5.8.8.2 — la stalp contravantuit se compara cu capetele
+  const cand = [{ v: o.M0Ed + o.M2, k: 'mid' }];
+  if (braced) {
+    cand.push({ v: m02, k: 'end2' });
+    cand.push({ v: Math.abs(M01in) + 0.5 * o.M2, k: 'end1' });
+  }
+  cand.push({ v: N * o.e0 / 1e3, k: 'e0' });              // 6.1(4)
+  let best = cand[0];
+  cand.forEach(function (c) { if (c.v > best.v) best = c; });
+  o.MEdAbs = best.v; o.governs = best.k;
+  o.MEd = s * best.v;
+  return o;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
    FORTA TAIETOARE — PERETI (modulul 04)
    CR 2-1-1.1/2022 si SR EN 1992-1-1. Calcul pe formule, fara metoda fibrelor:
    nu foloseste nucleul de integrare, doar materialele si contractul de stare.
@@ -1574,6 +1675,7 @@ global.JP = {
     traceCurve: traceColumnCurve,
     findTheta: findColumnTheta,
     mrdUniaxial: mrdUniaxial,
+    secondOrder: secondOrderEC2,
     axialLimits: columnAxialLimits,
     project: projectColumn,
   },

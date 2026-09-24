@@ -104,6 +104,17 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:#F5F5F7;color:#1C1
 .set-pick.mixed{color:#B26A00;border-color:#F5DCA8}
 .set-pick:focus{outline:none;border-color:#007AFF;box-shadow:0 0 0 2px rgba(0,122,255,.15)}
 .set-tag{font-size:11.5px;color:#6C6C70}
+.buck-only{display:none}
+body.buck .buck-only{display:revert}
+.setsub{font-size:10px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#8E8E93;padding:7px 0 2px}
+.m2-cell{color:#7B2FBE;font-weight:500}
+.slender-tag{display:inline-block;font-size:9.5px;font-weight:600;color:#7B2FBE;background:#F5EEFF;border-radius:4px;padding:0 4px;margin-left:3px}
+.dt-sec{margin:14px 0 2px;max-width:560px}
+.dt-sec .detail-h{color:#7B2FBE}
+.dt-buck{border-collapse:collapse;width:100%;font-size:12px}
+.dt-buck th{font-weight:600;text-align:right;padding:3px 8px;border-bottom:1px solid #e5e5e5;color:#555}
+.dt-buck td{padding:2px 8px;border-bottom:1px solid #f2f2f2}
+.dt-buck td.dt-v{text-align:right;font-variant-numeric:tabular-nums}
 .secimp{margin-bottom:12px}
 .secimp-zone{display:flex;align-items:center;gap:12px;border:1.5px dashed #B8D4F8;border-radius:10px;background:#F5F9FF;padding:11px 14px;cursor:text;transition:all .15s}
 .secimp-zone:hover,.secimp-zone:focus-within{border-color:#007AFF;background:#EBF3FF;outline:none}
@@ -184,7 +195,7 @@ table.results tr.row-pending td{color:#AEAEB2}
 .row-exp:hover .chev-r{border-color:#007AFF}
 /* detail panel */
 .detail-row td{padding:0!important;background:#F7F9FC!important;border-bottom:1px solid #E0E0E5}
-.detail-panel{padding:16px 18px}
+.detail-panel{padding:16px 18px;position:sticky;left:0;box-sizing:border-box;max-width:var(--dpw,none)}
 .detail-grid{display:grid;grid-template-columns:1.2fr 1fr 0.9fr;gap:20px;align-items:start}
 .detail-col{min-width:0}
 .detail-h{font-size:10.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#8E8E93;margin-bottom:8px}
@@ -276,6 +287,13 @@ table.results tr.sum-row:hover td:first-child{background:#E6EFFC}
         <div class="row"><div class="rl"><span data-i18n="strainPeak">Def. la efort max</span> <span class="rn">(&epsilon;<sub>c2,c</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="ec2c" value="2.20" step="0.01" oninput="onCommonChangeDebounced()"><span class="ru">&permil;</span></div></div>
         <div class="row"><div class="rl"><span data-i18n="strainUlt">Def. ultima</span> <span class="rn">(&epsilon;<sub>cu2,c</sub>)</span></div><div class="rc"><input type="number" inputmode="numeric" id="ecu2c" value="5.50" step="0.1" oninput="onCommonChangeDebounced()"><span class="ru">&permil;</span></div></div>
         <div class="note" style="padding:4px 0 2px;font-size:11px" data-i18n="confAllSets">Confinarea se aplica tuturor seturilor.</div>
+      </div>
+      <div class="toggle-row" style="margin-top:8px;border-top:1px solid #E0E0E5;padding-top:12px">
+        <span><span data-i18n="buckLabel">Efecte de ordinul 2 (flambaj, EC2 §5.8)</span> <span class="info-wrap"><button class="info-btn" type="button" onclick="toggleInfo(this,event)">i</button><div class="info-pop wide" onclick="event.stopPropagation()" data-i18n="buckInfo">&mdash;</div></span></span>
+        <div class="seg" id="buckSeg">
+          <button data-v="off" class="on" onclick="setBuck(false)" data-i18n="buckOff">Nu</button>
+          <button data-v="on" onclick="setBuck(true)" data-i18n="buckOnL">Da</button>
+        </div>
       </div>
       <div class="status-strip" id="statusStrip"><span class="sico" id="statusIco">!</span><span id="statusMsg"></span></div>
     </div>
@@ -428,12 +446,22 @@ table.results tr.sum-row:hover td:first-child{background:#E6EFFC}
    in panoul de seturi; se creeaza cate un set pe sectiune (b, h, beton) si
    elementele primesc setul lor. Vezi applyEtabsSections().
 
+   v3.2 — factorii de suprarezistenta Omega_y / Omega_z pe fiecare combinatie.
+
+   v3.3 — EFECTE DE ORDINUL 2 (SR EN 1992-1-1 §5.8.8, curbura nominala), cu
+   comutator pe tabel (intra in presetare). Pe fiecare set: l, beta_y/beta_z,
+   contravantuit/necontravantuit, phi_ef. M01/M02 din statiile extreme ale
+   aceluiasi element si aceleiasi combinatii. Imperfectiunea pe o singura
+   directie (5.8.9(2)): se evalueaza ambele variante, se pastreaza cea cu
+   utilizarea mai mare. La N <= 0 nu se aplica. Omega ramane pe ordinul 1.
+   Cu comutatorul oprit rezultatele sunt identice cu v3.2.
+
    v2.1 adauga: (a) al doilea format de import — tabelul ETABS brut
    "Element Forces - Columns", citit dupa ANTET, nu dupa pozitie, deci merge
    si daca ascunzi sau reordonezi coloane; (b) tabelul centralizator, cu
    utilizarea maxima pe fiecare stalp.
    ═══════════════════════════════════════════════════════════════════════════ */
-const MODULE_ID='07', MODULE_VERSION='3.2.0';
+const MODULE_ID='07', MODULE_VERSION='3.3.0';
 
 /* Captura de ecran cu formatul ETABS, afisata in popover-ul de import.
    Se completeaza cu sirul "data:image/png;base64,..." din versiunea
@@ -454,6 +482,7 @@ let rows=[];            // {story,column,outputCase,station,Nraw,M2,M3,N,My,Mz,r
    `models` tine modelul nucleului pentru fiecare set, construit o singura data
    si refolosit de toate randurile care il folosesc. */
 let sets=[], assign={}, models={};
+let buckOn=false;   // efecte de ordinul 2 (EC2 5.8) — proprietate a tabelului, intra in presetare
 let _sid=1; function sid(){return 'k'+(_sid++);}
 
 /* ─── Conventia axelor ETABS ─────────────────────────────────────────────────
@@ -508,6 +537,30 @@ const T={
   setsInfo:{ro:'Un set = secțiune (b × h), clasa de beton, acoperire și armare longitudinală. Fiecare element din tabel (nivel + stâlp) folosește un set, ales în <b>tabelul centralizator</b>, coloana <b>Set</b>. Elementele noi primesc primul set.<br><br>Lucru tipic: toate elementele pe Set 1; dacă un stâlp nu verifică, <b>duplici</b> setul, mărești armarea și îl atribui doar acelui stâlp. Se recalculează numai rândurile lui.<br><br>La modificarea unui set se recalculează doar elementele care îl folosesc.',
             en:'A set = section (b × h), concrete class, cover and longitudinal reinforcement. Every element in the table (story + column) uses one set, chosen in the <b>summary table</b>, column <b>Set</b>. New elements get the first set.<br><br>Typical use: everything on Set 1; when a column fails, <b>duplicate</b> the set, increase the bars and assign it to that column only. Only its rows are recalculated.<br><br>Editing a set recalculates only the elements that use it.'},
   setDefName:{ro:n=>'Set '+n,en:n=>'Set '+n},
+  buckLabel:{ro:'Efecte de ordinul 2 (flambaj, EC2 §5.8)',en:'Second-order effects (buckling, EC2 §5.8)'},
+  buckOff:{ro:'Nu',en:'No'}, buckOnL:{ro:'Da',en:'Yes'},
+  buckInfo:{ro:'<b>SR EN 1992-1-1 §5.8, metoda curburii nominale (5.8.8).</b> Pe fiecare set introduci lungimea stâlpului l, coeficienții de flambaj &beta;<sub>y</sub> / &beta;<sub>z</sub> (pentru M<sub>y</sub> / M<sub>z</sub>), dacă stâlpul este contravântuit și coeficientul efectiv de curgere lentă &phi;<sub>ef</sub>.<br><br>Momentele de capăt se iau automat din rândurile aceluiași element și aceleiași combinații, de la stațiile extreme, cu semnul din ETABS (același semn = curbură simplă). Cu o singură stație, momentele de capăt sunt egale.<br><br>Pe fiecare direcție se compară zvelteța cu limita din normă; se adaugă imperfecțiunea geometrică și, dacă direcția este zveltă, momentul de ordinul 2. Momentele rezultate pe cele două direcții se verifică <b>împreună</b>, pe secțiunea din fibre. Imperfecțiunea se ia pe o singură direcție (5.8.9(2)): se calculează ambele variante și se păstrează cea defavorabilă. La întindere nu se aplică.<br><br>Formulele sunt în raportul PDF, iar valorile intermediare în panoul de detaliu al fiecărui rând. &Omega; rămâne raportat la momentele de ordinul 1 din ETABS.',
+            en:'<b>EN 1992-1-1 §5.8, nominal curvature method (5.8.8).</b> Per set you enter the column length l, the buckling factors &beta;<sub>y</sub> / &beta;<sub>z</sub> (for M<sub>y</sub> / M<sub>z</sub>), whether the column is braced, and the effective creep ratio &phi;<sub>ef</sub>.<br><br>End moments are taken automatically from the rows of the same element and combination, at the extreme stations, with the ETABS sign (same sign = single curvature). With a single station, both end moments are equal.<br><br>In each direction the slenderness is compared with the code limit; the geometric imperfection is added and, if the direction is slender, the second-order moment. The resulting moments in both directions are checked <b>together</b> on the fibre section. The imperfection is taken in one direction only (5.8.9(2)): both variants are computed and the unfavourable one is kept. Not applied in tension.<br><br>Formulas are in the PDF report, intermediate values in each row\'s detail panel. &Omega; stays referred to the first-order ETABS moments.'},
+  sBuck:{ro:'Flambaj',en:'Buckling'},
+  lblBuckL:{ro:'Lungime l',en:'Length l'},
+  lblBeta:{ro:'&beta;<sub>y</sub> / &beta;<sub>z</sub>',en:'&beta;<sub>y</sub> / &beta;<sub>z</sub>'},
+  lblBraced:{ro:'Stalp',en:'Column'},
+  optBraced:{ro:'contravantuit',en:'braced'}, optUnbraced:{ro:'necontravantuit',en:'unbraced'},
+  lblPhiEf:{ro:'&phi;<sub>ef</sub>',en:'&phi;<sub>ef</sub>'},
+  colMy2:{ro:'My,Ed II',en:'My,Ed II'}, colMz2:{ro:'Mz,Ed II',en:'Mz,Ed II'},
+  m2Tip:{ro:'Momentul de calcul cu efectele de ordinul 2 (EC2 5.8.8), cu care s-a facut verificarea. Eticheta „z” marcheaza directia zvelta (λ > λ_lim).',en:'Design moment including second-order effects (EC2 5.8.8), used for the check. The “s” tag marks a slender direction (λ > λ_lim).'},
+  slTag:{ro:'z',en:'s'},
+  dtBuck:{ro:'Ordinul 2 — EC2 5.8.8',en:'Second order — EC2 5.8.8'},
+  dtBuckVar:{ro:v=>'imperfectiunea pe directia '+v+' (varianta defavorabila)',en:v=>'imperfection in direction '+v+' (unfavourable variant)'},
+  dtGovL:{ro:'Determinant',en:'Governs'},
+  dtBuckTen:{ro:'N ≤ 0 (întindere): fără efecte de ordinul 2, se verifică momentele de ordinul 1.',en:'N ≤ 0 (tension): no second-order effects, the first-order moments are checked.'},
+  dtGov:{ro:{mid:'M0e + N·ei + M2',end2:'M02 (capat)',end1:'M01 + 0,5·M2',e0:'N·e0 (minim)',first:'ordinul 1'},en:{mid:'M0e + N·ei + M2',end2:'M02 (end)',end1:'M01 + 0.5·M2',e0:'N·e0 (minimum)',first:'first order'}},
+  pdfBuckStar:{ro:'* in tabelele de rezultate = directie zvelta (lambda > lambda_lim), cu moment de ordinul 2. M_Ed II = momentul de calcul folosit la verificare.',en:'* in the result tables = slender direction (lambda > lambda_lim), with a second-order moment. M_Ed II = design moment used in the check.'},
+  pdfBuckNote2:{ro:'  M01/M02 din statiile extreme ale aceleiasi combinatii; C = 1,7 - rm (necontravantuit: rm = 1); Kr = (1+omega-n)/(0,6+omega) <= 1; Kphi = 1 + (0,35 + fck/200 - lambda/150)*phi_ef >= 1; la intindere nu se aplica.',
+               en:'  M01/M02 from the extreme stations of the same combination; C = 1.7 - rm (unbraced: rm = 1); Kr = (1+omega-n)/(0.6+omega) <= 1; Kphi = 1 + (0.35 + fck/200 - lambda/150)*phi_ef >= 1; not applied in tension.'},
+  pdfBuckTitle:{ro:'EFECTE DE ORDINUL 2 (SR EN 1992-1-1 §5.8.8, curbura nominala)',en:'SECOND-ORDER EFFECTS (EN 1992-1-1 §5.8.8, nominal curvature)'},
+  pdfBuckNote:{ro:'- Ordinul 2: M_Ed = M0e + N*ei + M2 (>= M02, >= M01+0,5M2 la contravantuit; >= N*e0), ei = l0/400, e2 = (1/r)l0^2/10, 1/r = Kr*Kphi*eps_yd/(0,45d); lambda_lim = 20ABC/sqrt(n). Imperfectiunea pe o singura directie (5.8.9(2)). Valori recomandate.',
+               en:'- Second order: M_Ed = M0e + N*ei + M2 (>= M02, >= M01+0.5M2 when braced; >= N*e0), ei = l0/400, e2 = (1/r)l0^2/10, 1/r = Kr*Kphi*eps_yd/(0.45d); lambda_lim = 20ABC/sqrt(n). Imperfection in one direction only (5.8.9(2)). Recommended values.'},
   secPasteTitle:{ro:'Secțiuni din ETABS — click aici, apoi Ctrl+V',en:'Sections from ETABS — click here, then Ctrl+V'},
   secPasteSub:{ro:'<i>Frame Section Property Definitions - Concrete Rectangular</i> și <i>Frame Assignments - Section Properties</i>, cu antet, pe rând, în orice ordine',en:'<i>Frame Section Property Definitions - Concrete Rectangular</i> and <i>Frame Assignments - Section Properties</i>, with header, one at a time, in any order'},
   secPasteInfo:{ro:'Lipește cele două tabele ETABS, pe rând, cu tot cu antet (banner-ul și rândul de unități sunt recunoscute). Coloanele se citesc după nume.<br><br>Din <b>definiții</b> se iau Depth (t3), Width (t2) și clasa de beton din numele materialului (ex. C25/30_05EI &rarr; C25/30). Din <b>atribuiri</b> se ia secțiunea fiecărui element (Story + Label).<br><br>Pentru fiecare secțiune folosită de elementele din tabel se creează un set cu numele ei; armarea pornește de la primul set și o completezi tu. Elementele primesc automat setul secțiunii lor. O atribuire schimbată manual în centralizator nu mai este suprascrisă.<br><br>Orientare: cu M2&rarr;Mz, M3&rarr;My rezultă h = Depth (t3) și b = Width (t2); cu comutatorul inversat, invers. Seturile din ETABS se rotesc automat la schimbarea comutatorului.',
@@ -653,8 +706,8 @@ const T={
          en:'Overstrength factor per direction: Ω = M_Rd / |M_Ed|, with M_Rd the UNIAXIAL resistance in that direction, at the combination N_Ed and in the sense of the moment. Ω_y uses M_y, Ω_z uses M_z. Not multiplied by γ_Rd and not capped at q — for foundations (P 100-1): E_Fd = E_F,G + γ_Rd·Ω·E_F,E, with Ω ≤ q. Shown as “—” when |M_Ed| < 1 kNm.'},
   dtOmY:{ro:'Ω_y = M_y,Rd(uniax) / |M_y,Ed|',en:'Ω_y = M_y,Rd(uniax) / |M_y,Ed|'},
   dtOmZ:{ro:'Ω_z = M_z,Rd(uniax) / |M_z,Ed|',en:'Ω_z = M_z,Rd(uniax) / |M_z,Ed|'},
-  pdfOmNote:{ro:'Ω_y, Ω_z = M_Rd uniaxial pe directie (la N_Ed, in sensul momentului) / |M_Ed|; fara γ_Rd, neplafonat la q.',
-             en:'Ω_y, Ω_z = uniaxial M_Rd in that direction (at N_Ed, in the sense of the moment) / |M_Ed|; without γ_Rd, not capped at q.'},
+  pdfOmNote:{ro:'Omega_y, Omega_z = M_Rd uniaxial pe directie (la N_Ed, in sensul momentului) / |M_Ed| de ordinul 1; fara gamma_Rd, neplafonat la q.',
+             en:'Omega_y, Omega_z = uniaxial M_Rd in that direction (at N_Ed, in the sense of the moment) / first-order |M_Ed|; without gamma_Rd, not capped at q.'},
   sumEmptyPending:{ro:'Se calculeaza...',en:'Calculating...'},
   // status (contractul {ok, code, message} al nucleului)
   stNoBracket:{ro:'N_Ed este in afara capacitatii axiale a sectiunii. Rezultatul nu este valabil.',en:'N_Ed lies outside the section axial capacity. The result is not valid.'},
@@ -806,6 +859,17 @@ function setConfUI(mode){
 }
 function setConf(mode){ setConfUI(mode); updMat(); onCommonChange(); }
 
+function setBuckUI(on){
+  buckOn=!!on;
+  document.querySelectorAll('#buckSeg button').forEach(b=>b.classList.toggle('on',(b.dataset.v==='on')===buckOn));
+  document.body.classList.toggle('buck',buckOn);
+}
+function setBuck(on){
+  if(!!on===buckOn)return;
+  setBuckUI(on);
+  if(rows.length) recalcAll(); else renderTable();
+  saveCurrentPreset();
+}
 function setAxisMap(mode){
   axisMap=mode;
   try{localStorage.setItem('sw_col_axismap',mode);}catch(e){}
@@ -868,7 +932,8 @@ function setPdfScope(mode){
 // ═══════════════════ Model (nucleu comun) ═══════════════════
 function defSet(name,o){
   return Object.assign({id:sid(),name:name,b:300,h:300,concrete:'C30/37',cnom:30,detr:8,
-    cor_n:4,cor_d:16,topb_n:1,topb_d:16,sidh_n:1,sidh_d:16},o||{});
+    cor_n:4,cor_d:16,topb_n:1,topb_d:16,sidh_n:1,sidh_d:16,
+    buck_l:3000,buck_by:1,buck_bz:1,buck_br:'b',buck_phi:2},o||{});
 }
 function getSet(id){ return sets.find(x=>x.id===id)||null; }
 function elemKey(r){ return (r.story||'')+'\u0000'+(r.column||''); }
@@ -1021,6 +1086,13 @@ function setCardHtml(st){
     <div class="setrow"><span class="sl">${t('lblCor')}</span>${setNum('cor_n',st)}${setNum('cor_d',st)}<span class="su">mm</span></div>
     <div class="setrow"><span class="sl">${t('lblTopb')}</span>${setNum('topb_n',st)}${setNum('topb_d',st)}<span class="su">mm</span></div>
     <div class="setrow"><span class="sl">${t('lblSidh')}</span>${setNum('sidh_n',st)}${setNum('sidh_d',st)}<span class="su">mm</span></div>
+    <div class="buck-only">
+      <div class="setsub">${t('sBuck')}</div>
+      <div class="setrow"><span class="sl">${t('lblBuckL')}</span>${setNum('buck_l',st,60)}<span class="su">mm</span></div>
+      <div class="setrow"><span class="sl">${t('lblBeta')}</span>${setNum('buck_by',st)}${setNum('buck_bz',st)}<span class="su"></span></div>
+      <div class="setrow"><span class="sl">${t('lblBraced')}</span><select onchange="editSet('${st.id}','buck_br',this.value)"><option value="b"${st.buck_br!=='u'?' selected':''}>${t('optBraced')}</option><option value="u"${st.buck_br==='u'?' selected':''}>${t('optUnbraced')}</option></select></div>
+      <div class="setrow"><span class="sl">${t('lblPhiEf')}</span>${setNum('buck_phi',st)}<span class="su"></span></div>
+    </div>
     <div class="setcap" id="cap-${st.id}"></div>
     <div class="seterr" id="err-${st.id}" style="display:none"></div>
     <div class="setuse" id="use-${st.id}">${esc(t('setUsedBy',n))}</div>
@@ -1101,15 +1173,17 @@ function editSet(id,field,val){
     setTimers[id]=setTimeout(()=>{renderSummaryTable();refreshSetTags();saveCurrentPreset();},250);
     return;
   }
-  if(field==='concrete') st.concrete=val;
+  if(field==='concrete'||field==='buck_br') st[field]=val;
   else { const n=parseFloat(String(val).replace(',','.')); st[field]=isFinite(n)?n:0; }
+  // parametrii de flambaj nu schimba sectiunea; conteaza numai cand verificarea e pornita
+  if(field.indexOf('buck_')===0&&!buckOn){ saveCurrentPreset(); return; }
   clearTimeout(setTimers[id]);
   setTimers[id]=setTimeout(()=>{
     rebuildModel(id);
     renderSetCaption(id);
     recalcSet(id);
     saveCurrentPreset();
-  },field==='concrete'?0:300);
+  },(field==='concrete'||field==='buck_br')?0:300);
 }
 /* Numele setului din tabelul detaliat, fara a redesena tabelul. */
 function refreshSetTags(){
@@ -1438,9 +1512,66 @@ function recalcPending(){ runBatch(true); }
 /* Un singur lot activ: un lot nou (de ex. dupa editarea unui set in timp ce
    ruleaza altul) il opreste pe cel vechi si preia toate randurile nefacute. */
 let batchGen=0;
+/* ═══════════════════ Efecte de ordinul 2 (EC2 5.8) ═══════════════════
+   Momentele de capat M01 / M02 ale unei combinatii se iau din randurile
+   aceluiasi element (nivel + stalp) si aceleiasi combinatii: statia cea mai
+   mica si cea mai mare (ETABS da de regula 0 si L, eventual si intermediare).
+   Harta se reconstruieste la cerere, dupa orice schimbare a randurilor. */
+let endCache=null;
+function endKey(r){ return elemKey(r)+'\u0000'+(r.outputCase||''); }
+function endMap(){
+  if(endCache) return endCache;
+  const g=new Map();
+  rows.forEach(r=>{ const k=endKey(r); if(!g.has(k)) g.set(k,[]); g.get(k).push(r); });
+  endCache=new Map();
+  g.forEach((list,k)=>{
+    const st=list.map(r=>({s:parseNum(r.station),r:r})).filter(x=>isFinite(x.s)).sort((a,b)=>a.s-b.s);
+    const ends=st.length?[st[0].r,st[st.length-1].r]:[list[0],list[list.length-1]];
+    endCache.set(k,ends);
+  });
+  return endCache;
+}
+function invalidateEnds(){ endCache=null; }
+/* M01 / M02 pe o directie, din momentele de la cele doua capete (|M02| >= |M01|). */
+function endPair(a,b){ return (Math.abs(a)>=Math.abs(b))?{M02:a,M01:b}:{M02:b,M01:a}; }
+function buckRow(row,m,st){
+  const ends=endMap().get(endKey(row))||[row,row];
+  const py=endPair(ends[0].My,ends[1].My), pz=endPair(ends[0].Mz,ends[1].Mz);
+  const base={N:row.N,phiEf:st.buck_phi,braced:st.buck_br!=='u'};
+  const L=st.buck_l;
+  const y=(imp)=>JP.column.secondOrder(m,Object.assign({},base,{dir:'y',M01:py.M01,M02:py.M02,l0:st.buck_by*L,withImperf:imp}));
+  const z=(imp)=>JP.column.secondOrder(m,Object.assign({},base,{dir:'z',M01:pz.M01,M02:pz.M02,l0:st.buck_bz*L,withImperf:imp}));
+  // 5.8.9(2): imperfectiunea pe o singura directie — se incearca ambele
+  return [{v:'y',y:y(true),z:z(false)},{v:'z',y:y(false),z:z(true)}];
+}
 function evalRow(row){
   const m=modelOf(row);
   row._set=setIdOf(row);
+  row.buck=null;
+  if(m&&buckOn&&!(m.barIssues&&m.barIssues.length)&&!(row.N>0)){
+    // intindere: fara ordinul 2, se verifica momentele proprii ale randului
+    row.res=evalCombo(m,row.N,row.My,row.Mz);
+    row.buck={variant:null,tension:true,y:null,z:null,MyEd:row.My,MzEd:row.Mz};
+    row.om=(row.res&&row.res.ok)?omegaOf(m,row):null;
+    row.status='done';
+    return;
+  }
+  if(m&&buckOn&&!(m.barIssues&&m.barIssues.length)){
+    const st=getSet(row._set);
+    let best=null;
+    // se pastreaza varianta cu utilizarea mai mare; un rezultat invalid are
+    // prioritate (Infinity), ca sa nu fie ascuns de varianta valida
+    buckRow(row,m,st).forEach(vr=>{
+      const r=evalCombo(m,row.N,vr.y.MEd,vr.z.MEd);
+      const u=(r.ok&&r.value)?r.value.util:Infinity;
+      if(!best||u>best.u) best={u:u,r:r,vr:vr};
+    });
+    row.res=best.r;
+    row.buck={variant:best.vr.v,y:best.vr.y,z:best.vr.z,MyEd:best.vr.y.MEd,MzEd:best.vr.z.MEd};
+    row.om=(row.res&&row.res.ok)?omegaOf(m,row):null;
+    row.status='done';
+    return;
+  }
   row.res=m?evalCombo(m,row.N,row.My,row.Mz):{ok:false,code:'INVALID_INPUT',message:t('stInvalid'),value:null,partial:null};
   row.om=(row.res&&row.res.ok)?omegaOf(m,row):null;
   row.status='done';
@@ -1474,6 +1605,7 @@ function txtOm(v){ return (v===null||v===undefined||!isFinite(v))?'-':v.toFixed(
 function runBatch(pendingOnly){
   if(typeof JP==='undefined')return;
   const gen=++batchGen;
+  invalidateEnds();
   if(!pendingOnly) rows.forEach(r=>{r.status='pending';r.res=null;});
   const todo=[];
   rows.forEach((r,idx)=>{ if(r.status!=='done') todo.push(idx); });
@@ -1505,13 +1637,17 @@ function runBatch(pendingOnly){
 
 // ═══════════════════ Table rendering ═══════════════════
 function rowCells(r){
-  let myRd='&mdash;',mzRd='&mdash;',util='&mdash;',omY='&mdash;',omZ='&mdash;',
+  let myRd='&mdash;',mzRd='&mdash;',util='&mdash;',omY='&mdash;',omZ='&mdash;',my2='&mdash;',mz2='&mdash;',
       verdict=`<span class="verdict-pill pending">${t('verdictPending')}</span>`,cls='row-pending';
   if(r.status==='done'){
     if(r.res&&r.res.ok){
       const v=r.res.value;
       myRd=v.MyRd.toFixed(1); mzRd=v.MzRd.toFixed(1); util=v.util.toFixed(1)+' %';
       if(r.om){ omY=fmtOm(r.om.y); omZ=fmtOm(r.om.z); }
+      if(r.buck){
+        my2=r.buck.MyEd.toFixed(1)+(r.buck.y&&r.buck.y.slender?`<span class="slender-tag">${t('slTag')}</span>`:'');
+        mz2=r.buck.MzEd.toFixed(1)+(r.buck.z&&r.buck.z.slender?`<span class="slender-tag">${t('slTag')}</span>`:'');
+      }
       const pass=v.util<=100;
       verdict=`<span class="verdict-pill ${pass?'ok':'no'}">${pass?t('verdictOk'):t('verdictFail')}</span>`;
       cls=pass?'row-ok':'row-fail';
@@ -1521,15 +1657,16 @@ function rowCells(r){
       cls='row-invalid';
     }
   }
-  return {myRd,mzRd,util,omY,omZ,verdict,cls};
+  return {myRd,mzRd,util,omY,omZ,my2,mz2,verdict,cls};
 }
 function renderTable(){
   const thead=document.getElementById('theadRow');
   thead.innerHTML=`
     <th></th>
     <th>${t('colStory')}</th><th>${t('colColumn')}</th><th>${t('colCase')}</th><th>${t('colStation')}</th><th>${t('colSet')}</th>
-    <th class="grp-start">${t('colN')}</th><th>${t('colM2')}</th><th>${t('colM3')}</th>
-    <th class="grp-start">${t('colMyRd')}</th><th>${t('colMzRd')}</th><th>${t('colUtil')}</th>
+    <th class="grp-start">${t('colN')}</th><th>${t('colM2')}</th><th>${t('colM3')}</th>`
+    + (buckOn?`<th class="grp-start" title="${esc(t('m2Tip'))}" style="cursor:help">${t('colMy2')}</th><th title="${esc(t('m2Tip'))}" style="cursor:help">${t('colMz2')}</th>`:'')
+    + `<th class="grp-start">${t('colMyRd')}</th><th>${t('colMzRd')}</th><th>${t('colUtil')}</th>
     <th class="grp-start" title="${esc(t('omTip'))}" style="cursor:help">${t('colOmY')}</th><th title="${esc(t('omTip'))}" style="cursor:help">${t('colOmZ')}</th><th>${t('colVerdict')}</th>
     <th class="editable-row-actions"></th>`;
   const tbody=document.getElementById('tbodyRows');
@@ -1547,17 +1684,21 @@ function renderTable(){
       <td class="lbl-col"><span class="set-tag" data-idx="${idx}">${esc((getSet(setIdOf(r))||{}).name||'—')}</span></td>
       <td class="grp-start"><input class="cell-in num-in" type="number" step="1" value="${fmtIn(r.Nraw)}" oninput="editCell(${idx},'Nraw',this.value)"></td>
       <td><input class="cell-in num-in" type="number" step="1" value="${fmtIn(r.M2)}" oninput="editCell(${idx},'M2',this.value)"></td>
-      <td><input class="cell-in num-in" type="number" step="1" value="${fmtIn(r.M3)}" oninput="editCell(${idx},'M3',this.value)"></td>
-      <td class="grp-start">${c.myRd}</td><td>${c.mzRd}</td><td>${c.util}</td>
-      <td class="grp-start">${c.omY}</td><td>${c.omZ}</td>
-      <td class="verdict-cell" onclick="toggleRowDetail(${idx})" style="cursor:pointer">${c.verdict}</td>
+      <td><input class="cell-in num-in" type="number" step="1" value="${fmtIn(r.M3)}" oninput="editCell(${idx},'M3',this.value)"></td>`
+      + (buckOn?`<td class="grp-start m2-cell c-my2">${c.my2}</td><td class="m2-cell c-mz2">${c.mz2}</td>`:'')
+      + `<td class="grp-start c-myrd">${c.myRd}</td><td class="c-mzrd">${c.mzRd}</td><td class="c-util">${c.util}</td>
+      <td class="grp-start c-omy">${c.omY}</td><td class="c-omz">${c.omZ}</td>
+      <td class="verdict-cell c-verdict" onclick="toggleRowDetail(${idx})" style="cursor:pointer">${c.verdict}</td>
       <td class="editable-row-actions"><button class="row-del" onclick="deleteRow(${idx})" title="Delete">&times;</button></td>
     </tr>`;
     if(r._expanded){
-      html+=`<tr class="detail-row"><td colspan="16"><div class="detail-panel" id="detail-${idx}">${renderDetailPanel(r,idx)}</div></td></tr>`;
+      html+=`<tr class="detail-row"><td colspan="${buckOn?18:16}"><div class="detail-panel" id="detail-${idx}">${renderDetailPanel(r,idx)}</div></td></tr>`;
     }
   });
   tbody.innerHTML=html;
+  // panoul de detaliu ramane in latimea vizibila cand tabelul defileaza orizontal
+  const tw=document.getElementById('theadRow').closest('.tbl-wrap');
+  if(tw) tw.style.setProperty('--dpw',tw.clientWidth+'px');
   rows.forEach((r,idx)=>{ if(r._expanded) drawDetail(r,idx); });
   document.getElementById('tableTitle').textContent=t('tableTitleN',rows.length);
   renderSummary();
@@ -1571,14 +1712,13 @@ function updateRowResultCells(idx){
   const trs=[...tbody.querySelectorAll('tr')].filter(tr=>!tr.classList.contains('detail-row'));
   const tr=trs[idx];
   if(!tr)return;
-  const tds=tr.querySelectorAll('td');
   const c=rowCells(r);
-  if(tds[9])tds[9].innerHTML=c.myRd;
-  if(tds[10])tds[10].innerHTML=c.mzRd;
-  if(tds[11])tds[11].innerHTML=c.util;
-  if(tds[12])tds[12].innerHTML=c.omY;
-  if(tds[13])tds[13].innerHTML=c.omZ;
-  if(tds[14])tds[14].innerHTML=c.verdict;
+  // celulele de rezultat se gasesc dupa clasa, nu dupa pozitie: numarul de
+  // coloane depinde de comutatorul de ordinul 2
+  const set=(cls,v)=>{const e=tr.querySelector('.'+cls); if(e)e.innerHTML=v;};
+  set('c-my2',c.my2); set('c-mz2',c.mz2);
+  set('c-myrd',c.myRd); set('c-mzrd',c.mzRd); set('c-util',c.util);
+  set('c-omy',c.omY); set('c-omz',c.omZ); set('c-verdict',c.verdict);
   tr.className=c.cls;
 }
 // Editarea unei celule. Modificarile numerice re-deriva N/My/Mz cu conventiile
@@ -1594,6 +1734,11 @@ function editCell(idx,field,value){
     r.N=convN(r.Nraw); r.My=mapMy(r.M2,r.M3); r.Mz=mapMz(r.M2,r.M3);
     r.status='pending'; r.res=null;
     clearTimeout(r._timer);
+    if(buckOn){
+      // cu ordinul 2, momentul unei statii schimba M01/M02 pentru toata combinatia
+      const k=endKey(r);
+      r._timer=setTimeout(()=>{ invalidateEnds(); invalidateRows(x=>endKey(x)===k); recalcPending(); saveCurrentPreset(); },250);
+    } else
     r._timer=setTimeout(()=>{ recomputeRow(rows.indexOf(r)); saveCurrentPreset(); },250);
   } else {
     r[field]=value;
@@ -1611,6 +1756,7 @@ function editCell(idx,field,value){
 function recomputeRow(idx){
   const r=rows[idx];
   if(!r)return;
+  invalidateEnds();
   evalRow(r);
   // Se actualizeaza numai celulele de rezultat, ca inputul aflat in editare sa
   // isi pastreze focusul si cursorul. Re-desenare completa doar daca randul
@@ -1706,8 +1852,9 @@ function renderSummaryTable(){
     <th>${t('colColumn')}</th><th>${storyHdr}</th><th>${t('colSet')}</th>
     <th class="grp-start">${t('csNComb')}</th><th>${t('csInvalid')}</th>
     <th class="grp-start">${t('csGovCase')}</th><th>${t('colStation')}</th>
-    <th class="grp-start">${t('colN')}</th><th>${t('colM2')}</th><th>${t('colM3')}</th>
-    <th class="grp-start">${t('colMyRd')}</th><th>${t('colMzRd')}</th>
+    <th class="grp-start">${t('colN')}</th><th>${t('colM2')}</th><th>${t('colM3')}</th>`
+    + (buckOn?`<th class="grp-start" title="${esc(t('m2Tip'))}" style="cursor:help">${t('colMy2')}</th><th title="${esc(t('m2Tip'))}" style="cursor:help">${t('colMz2')}</th>`:'')
+    + `<th class="grp-start">${t('colMyRd')}</th><th>${t('colMzRd')}</th>
     <th>${t('csUtilMax')}</th>
     <th class="grp-start" title="${esc(t('omTip'))}" style="cursor:help">${t('colOmY')}</th><th title="${esc(t('omTip'))}" style="cursor:help">${t('colOmZ')}</th><th>${t('colVerdict')}</th>`;
   let html='';
@@ -1719,7 +1866,7 @@ function renderSummaryTable(){
       html+=`<tr class="row-invalid">
         <td class="lbl-col">${esc(g.column)||'&mdash;'}</td><td class="lbl-col">${esc(g.story)||'&mdash;'}</td><td>${pick}</td>
         <td class="grp-start">${g.n}</td><td>${g.invalid||'&mdash;'}</td>
-        <td class="lbl-col grp-start" colspan="7">${esc(msg)}</td>
+        <td class="lbl-col grp-start" colspan="${buckOn?9:7}">${esc(msg)}</td>
         <td>&mdash;</td><td class="grp-start">&mdash;</td><td>&mdash;</td>
         <td><span class="verdict-pill na">${t('verdictInvalid')}</span></td></tr>`;
       return;
@@ -1730,8 +1877,9 @@ function renderSummaryTable(){
       <td class="lbl-col">${esc(g.column)||'&mdash;'}</td><td class="lbl-col">${esc(g.story)||'&mdash;'}</td><td>${pick}</td>
       <td class="grp-start">${g.n}</td><td>${g.invalid?g.invalid:'&mdash;'}</td>
       <td class="lbl-col grp-start">${esc(w.outputCase)||'&mdash;'}</td><td class="lbl-col">${esc(w.station)||'&mdash;'}</td>
-      <td class="grp-start">${fmtIn(w.Nraw)}</td><td>${fmtIn(w.M2)}</td><td>${fmtIn(w.M3)}</td>
-      <td class="grp-start">${v.MyRd.toFixed(1)}</td><td>${v.MzRd.toFixed(1)}</td>
+      <td class="grp-start">${fmtIn(w.Nraw)}</td><td>${fmtIn(w.M2)}</td><td>${fmtIn(w.M3)}</td>`
+      + (buckOn?(()=>{const cc=rowCells(w);return `<td class="grp-start m2-cell">${cc.my2}</td><td class="m2-cell">${cc.mz2}</td>`;})():'')
+      + `<td class="grp-start">${v.MyRd.toFixed(1)}</td><td>${v.MzRd.toFixed(1)}</td>
       <td><b>${v.util.toFixed(1)} %</b></td>
       <td class="grp-start">${w.om?fmtOm(w.om.y):'&mdash;'}</td><td>${w.om?fmtOm(w.om.z):'&mdash;'}</td>
       <td><span class="verdict-pill ${pass?'ok':'no'}">${pass?t('verdictOk'):t('verdictFail')}</span></td></tr>`;
@@ -1775,17 +1923,17 @@ function copySummaryTable(){
   const btn=document.getElementById('copySumBtn');
   const storyHdr=(grouping==='col')?t('csGovStory'):t('colStory');
   const header=[t('colColumn'),storyHdr,t('colSet'),t('csNComb'),t('csInvalid'),t('csGovCase'),t('colStation'),
-    'N (kN)','M2 (kNm)','M3 (kNm)','My,Rd (kNm)','Mz,Rd (kNm)',t('csUtilMax'),'Omega_y','Omega_z',t('colVerdict')];
+    'N (kN)','M2 (kNm)','M3 (kNm)'].concat(buckOn?['My,Ed II (kNm)','Mz,Ed II (kNm)']:[]).concat(['My,Rd (kNm)','Mz,Rd (kNm)',t('csUtilMax'),'Omega_y','Omega_z',t('colVerdict')]);
   const strip=s=>String(s).replace(/<[^>]*>/g,'').replace(/&mdash;/g,'-').replace(/&amp;/g,'&');
   const lines=[header.join('\t')];
   buildSummary().forEach(g=>{
     const w=g.worst;
-    if(!w){ lines.push([g.column,g.story,groupSetName(g),g.n,g.invalid||0,'-','-','-','-','-','-','-','-','-','-',strip(t('verdictInvalid'))].join('\t')); return; }
+    if(!w){ lines.push([g.column,g.story,groupSetName(g),g.n,g.invalid||0,'-','-','-','-','-'].concat(buckOn?['-','-']:[]).concat(['-','-','-','-','-',strip(t('verdictInvalid'))]).join('\t')); return; }
     const v=w.res.value;
     lines.push([g.column,g.story,groupSetName(g),g.n,g.invalid||0,w.outputCase,w.station,
-      fmtIn(w.Nraw),fmtIn(w.M2),fmtIn(w.M3),v.MyRd.toFixed(1),v.MzRd.toFixed(1),
+      fmtIn(w.Nraw),fmtIn(w.M2),fmtIn(w.M3)].concat(buckOn&&w.buck?[w.buck.MyEd.toFixed(1),w.buck.MzEd.toFixed(1)]:(buckOn?['-','-']:[])).concat([v.MyRd.toFixed(1),v.MzRd.toFixed(1),
       v.util.toFixed(1)+'%',txtOm(w.om&&w.om.y),txtOm(w.om&&w.om.z),
-      strip(v.util<=100?t('verdictOk'):t('verdictFail'))].join('\t'));
+      strip(v.util<=100?t('verdictOk'):t('verdictFail'))]).join('\t'));
   });
   const tsv=lines.join('\n');
   const done=()=>{btn.textContent=t('copiedBtn');btn.disabled=true;
@@ -1811,6 +1959,10 @@ function renderDetailPanel(r,idx){
     [t('dtN'), r.Nraw.toFixed(1)+' kN'],
     [t('dtMyEd'), r.My.toFixed(1)+' kNm'],
     [t('dtMzEd'), r.Mz.toFixed(1)+' kNm'],
+  ].concat(r.buck&&!r.buck.tension?[
+    [t('colMy2'), '<b style="color:#7B2FBE">'+r.buck.MyEd.toFixed(1)+' kNm</b>'],
+    [t('colMz2'), '<b style="color:#7B2FBE">'+r.buck.MzEd.toFixed(1)+' kNm</b>'],
+  ]:[]).concat([
     [t('dtMyRd'), okv?v.MyRd.toFixed(1)+' kNm':dash],
     [t('dtMzRd'), okv?v.MzRd.toFixed(1)+' kNm':dash],
     [t('dtX'), okv?v.X.toFixed(1)+' mm':dash],
@@ -1821,11 +1973,12 @@ function renderDetailPanel(r,idx){
     [t('dtPivot'), okv?pivotLabel(v.pivot):dash],
     [t('dtNRdc'), convN(v.NRdc).toFixed(0)+' kN'],
     [t('dtNRdt'), convN(v.NRdt).toFixed(0)+' kN'],
-  ];
+  ]);
   const valRows=vals.map(([k,val])=>`<div class="dt-row"><span class="dt-k">${k}</span><span class="dt-v">${val}</span></div>`).join('');
+  const buckHtml=buckDetailHtml(r);
   // Rezultat invalid: nu se deseneaza diagrama si sectiunea (nu exista o axa
   // neutra de aratat), se pastreaza doar motivul si datele de intrare.
-  if(!okv) return note+`<div class="detail-vals" style="max-width:420px">${valRows}</div>`;
+  if(!okv) return note+`<div class="detail-vals" style="max-width:420px">${valRows}</div>`+buckHtml;
   return note+`
     <div class="detail-grid">
       <div class="detail-col">
@@ -1840,9 +1993,40 @@ function renderDetailPanel(r,idx){
         <div class="detail-h">${esc(t('detailValues'))}</div>
         ${valRows}
       </div>
-    </div>`;
+    </div>`+buckHtml;
+}
+/* Derivarea ordinului 2 pe cele doua directii (valori, fara formule). */
+function buckDetailHtml(r){
+  if(!buckOn||!r.buck) return '';
+  const b=r.buck;
+  if(b.tension) return `<div class="dt-sec"><div class="detail-h">${esc(t('dtBuck'))}</div><div class="detail-note" style="margin:0">${esc(t('dtBuckTen'))}</div></div>`;
+  const f=(x,d)=>(x===undefined||x===null||!isFinite(x))?'&mdash;':x.toFixed(d);
+  const y=b.y, z=b.z, G=t('dtGov');
+  const lines=[
+    ['l<sub>0</sub> (mm)', f(y.l0,0), f(z.l0,0)],
+    ['i (mm)', f(y.i,1), f(z.i,1)],
+    ['&lambda;', f(y.lambda,1), f(z.lambda,1)],
+    ['&lambda;<sub>lim</sub>', f(y.lambdaLim,1), f(z.lambdaLim,1)],
+    ['n / &omega;', f(y.n,3)+' / '+f(y.omega,3), ''],
+    ['r<sub>m</sub>', f(y.rm,2), f(z.rm,2)],
+    ['M<sub>01</sub> / M<sub>02</sub> (kNm)', f(y.M01,1)+' / '+f(y.M02,1), f(z.M01,1)+' / '+f(z.M02,1)],
+    ['e<sub>i</sub> (mm)', f(y.ei,1), f(z.ei,1)],
+    ['M<sub>0e</sub> (kNm)', f(y.M0e,1), f(z.M0e,1)],
+    ['e<sub>2</sub> (mm)', y.slender?f(y.e2,1):'&mdash;', z.slender?f(z.e2,1):'&mdash;'],
+    ['M<sub>2</sub> (kNm)', y.slender?f(y.M2,1):'&mdash;', z.slender?f(z.M2,1):'&mdash;'],
+    ['M<sub>Ed</sub> (kNm)', '<b>'+f(y.MEd,1)+'</b>', '<b>'+f(z.MEd,1)+'</b>'],
+    [esc(t('dtGovL')), esc(G[y.governs]||''), esc(G[z.governs]||'')],
+  ];
+  const tr=lines.map(l=>l[2]===''?`<tr><td class="dt-k">${l[0]}</td><td class="dt-v" colspan="2" style="text-align:center">${l[1]}</td></tr>`
+                                  :`<tr><td class="dt-k">${l[0]}</td><td class="dt-v">${l[1]}</td><td class="dt-v">${l[2]}</td></tr>`).join('');
+  const slt=d=>d.slender?` <span class="slender-tag">${t('slTag')}</span>`:'';
+  return `<div class="dt-sec"><div class="detail-h">${esc(t('dtBuck'))} &middot; ${esc(t('dtBuckVar',b.variant))}</div>
+    <table class="dt-buck"><thead><tr><th></th><th>M<sub>y</sub>${slt(y)}</th><th>M<sub>z</sub>${slt(z)}</th></tr></thead><tbody>${tr}</tbody></table></div>`;
 }
 const detailCharts={};
+/* Momentele cu care s-a facut verificarea (ordinul 2, daca e activ). */
+function edMy(r){ return (r.buck&&isFinite(r.buck.MyEd))?r.buck.MyEd:r.My; }
+function edMz(r){ return (r.buck&&isFinite(r.buck.MzEd))?r.buck.MzEd:r.Mz; }
 function drawDetail(r,idx){
   if(r.status!=='done'||!r.res||!r.res.ok)return;
   const m=modelOf(r), v=r.res.value;
@@ -1854,7 +2038,7 @@ function drawDetail(r,idx){
     detailCharts[idx]=new Chart(canvas,{type:'scatter',
       data:{datasets:[
         {label:'Rd',data:pts,showLine:true,borderColor:'#0066CC',borderWidth:2,pointRadius:0,fill:false,tension:0,order:3},
-        {label:'Ed',data:[{x:r.My,y:r.Mz}],backgroundColor:'#C0392B',borderColor:'#C0392B',pointRadius:6,pointStyle:'rectRot',order:1},
+        {label:'Ed',data:[{x:edMy(r),y:edMz(r)}],backgroundColor:'#C0392B',borderColor:'#C0392B',pointRadius:6,pointStyle:'rectRot',order:1},
         {label:'RdPt',data:[{x:v.MyRd,y:v.MzRd}],backgroundColor:'#2E7D32',borderColor:'#2E7D32',pointRadius:5,order:1}
       ]},
       options:{responsive:true,maintainAspectRatio:false,animation:false,
@@ -1889,7 +2073,7 @@ function drawDetailSketch(r,idx){
   o+=`<line x1="${X2(px-dx*L)}" y1="${Y2(pz-dz*L)}" x2="${X2(px+dx*L)}" y2="${Y2(pz+dz*L)}" stroke="#C0392B" stroke-width="1.4" stroke-dasharray="5,3"/>`;
   m.steelFibers.forEach(f=>{o+=`<circle cx="${X2(f.y)}" cy="${Y2(f.z)}" r="2.6" fill="#1C1C1E"/>`;});
   const mlen=Math.min(VW,VH)*0.30;
-  const dirAng=Math.atan2(r.Mz,r.My);
+  const dirAng=Math.atan2(edMz(r),edMy(r));
   const ex=Math.cos(dirAng), ez=Math.sin(dirAng);
   o+=`<line x1="${cx0}" y1="${cy0}" x2="${cx0+ex*mlen}" y2="${cy0-ez*mlen}" stroke="#2E7D32" stroke-width="1.8"/>`;
   o+=`<circle cx="${cx0+ex*mlen}" cy="${cy0-ez*mlen}" r="3" fill="#2E7D32"/>`;
@@ -1902,7 +2086,7 @@ function drawDetailSketch(r,idx){
 function copyTable(){
   const btn=document.getElementById('copyBtn');
   const header=[t('colStory'),t('colColumn'),t('colCase'),t('colStation'),t('colSet'),
-    'N (kN)','M2 (kNm)','M3 (kNm)','My,Rd (kNm)','Mz,Rd (kNm)',t('colUtil'),'Omega_y','Omega_z',t('colVerdict')];
+    'N (kN)','M2 (kNm)','M3 (kNm)'].concat(buckOn?['My,Ed II (kNm)','Mz,Ed II (kNm)']:[]).concat(['My,Rd (kNm)','Mz,Rd (kNm)',t('colUtil'),'Omega_y','Omega_z',t('colVerdict')]);
   const strip=s=>String(s).replace(/<[^>]*>/g,'').replace(/&mdash;/g,'-').replace(/&amp;/g,'&');
   const lines=[header.join('\t')];
   rows.forEach(r=>{
@@ -1914,8 +2098,8 @@ function copyTable(){
     const verdict=okv?(v.util<=100?strip(t('verdictOk')):strip(t('verdictFail')))
                     :(r.status==='done'?strip(t('verdictInvalid')):'-');
     lines.push([r.story,r.column,r.outputCase,r.station,(getSet(setIdOf(r))||{}).name||'-',
-      fmtIn(r.Nraw),fmtIn(r.M2),fmtIn(r.M3),myRd,mzRd,util,
-      okv?txtOm(r.om&&r.om.y):'-',okv?txtOm(r.om&&r.om.z):'-',verdict].join('\t'));
+      fmtIn(r.Nraw),fmtIn(r.M2),fmtIn(r.M3)].concat(buckOn?(okv&&r.buck?[r.buck.MyEd.toFixed(1),r.buck.MzEd.toFixed(1)]:['-','-']):[]).concat([myRd,mzRd,util,
+      okv?txtOm(r.om&&r.om.y):'-',okv?txtOm(r.om&&r.om.z):'-',verdict]).join('\t'));
   });
   const tsv=lines.join('\n');
   const done=()=>{btn.textContent=t('copiedBtn');btn.disabled=true;
@@ -2027,7 +2211,39 @@ function buildPdfDoc(){
     columnStyles:{0:{fontStyle:'bold'},3:{halign:'right'},6:{halign:'right'},7:{halign:'right'},8:{halign:'right'},9:{halign:'right'},10:{halign:'right'}},
     didDrawPage:function(){hdr();}
   });
-  const secTableEndY=doc.lastAutoTable.finalY;
+  let secTableEndY=doc.lastAutoTable.finalY;
+  // Coloanele de ordinul 2 se insereaza la indexul k; stilurile de dupa se decaleaza.
+  const insB=(arr,k,vals)=>buckOn?arr.slice(0,k).concat(vals,arr.slice(k)):arr;
+  const shiftSt=(cs,k)=>{ if(!buckOn) return cs; const o={}; Object.keys(cs).forEach(i=>{const n=+i; o[n>=k?n+2:n]=cs[i];});
+    o[k]={halign:'right',textColor:[123,47,190]}; o[k+1]={halign:'right',textColor:[123,47,190]}; return o; };
+  const b2=(r,okv)=>(okv&&r&&r.buck)?[r.buck.MyEd.toFixed(1)+(r.buck.y&&r.buck.y.slender?' *':''),
+                                        r.buck.MzEd.toFixed(1)+(r.buck.z&&r.buck.z.slender?' *':'')]:['-','-'];
+
+  // ── Parametrii de flambaj pe seturi (numai cu ordinul 2 activ) ──
+  if(buckOn){
+    let yB=secTableEndY+7;
+    doc.setFontSize(9);doc.setFont('helvetica','bold');doc.setTextColor(0,102,204);
+    doc.text(t('pdfBuckTitle'),ml,yB);doc.setTextColor(0,0,0);doc.setFont('helvetica','normal');
+    const iy=st=>st.h/Math.sqrt(12), iz=st=>st.b/Math.sqrt(12);
+    const bBody=sets.map(st=>[st.name,String(st.buck_l),String(st.buck_by),String(st.buck_bz),
+      (st.buck_by*st.buck_l).toFixed(0),(st.buck_bz*st.buck_l).toFixed(0),
+      (st.buck_by*st.buck_l/iy(st)).toFixed(1),(st.buck_bz*st.buck_l/iz(st)).toFixed(1),
+      st.buck_br==='u'?t('optUnbraced'):t('optBraced'),String(st.buck_phi)]);
+    doc.autoTable({
+      startY:yB+3,
+      head:[[t('colSet'),'l (mm)','beta_y','beta_z','l0,y (mm)','l0,z (mm)','lambda_y','lambda_z',t('lblBraced'),'phi_ef']],
+      body:bBody,
+      margin:{left:ml,right:mr},tableWidth:cw,theme:'grid',
+      styles:{lineColor:[180,200,220],lineWidth:0.25,fontSize:7.5,textColor:[0,0,0],cellPadding:1.5},
+      headStyles:{fillColor:[200,215,235],textColor:[0,0,0],fontStyle:'bold',lineColor:[200,215,235],fontSize:7.5},
+      columnStyles:{0:{fontStyle:'bold'},1:{halign:'right'},2:{halign:'right'},3:{halign:'right'},4:{halign:'right'},5:{halign:'right'},6:{halign:'right'},7:{halign:'right'},9:{halign:'right'}},
+      didDrawPage:function(){hdr();}
+    });
+    secTableEndY=doc.lastAutoTable.finalY;
+    doc.setFontSize(7);doc.setTextColor(108,108,112);
+    doc.text(t('pdfBuckStar'),ml,secTableEndY+3.5,{maxWidth:cw});doc.setTextColor(0,0,0);
+    secTableEndY+=3;
+  }
 
   // ── Tabel centralizator (mereu prezent — este rezultatul care se citeste) ──
   let yS=secTableEndY+8;
@@ -2039,29 +2255,30 @@ function buildPdfDoc(){
   const storyHdr=(grouping==='col')?t('csGovStory'):t('colStory');
   const sumBody=groups.map(g=>{
     const w=g.worst;
-    if(!w) return [g.column,g.story,groupSetName(g),String(g.n),String(g.invalid||0),'-','-','-','-','-','-','-','-','-','-',t('pdfInvalidCell')];
+    if(!w) return insB([g.column,g.story,groupSetName(g),String(g.n),String(g.invalid||0),'-','-','-','-','-','-','-','-','-','-',t('pdfInvalidCell')],10,['-','-']);
     const v=w.res.value;
-    return [g.column,g.story,groupSetName(g),String(g.n),g.invalid?String(g.invalid):'-',
+    return insB([g.column,g.story,groupSetName(g),String(g.n),g.invalid?String(g.invalid):'-',
       w.outputCase,w.station,
       String(fmtIn(w.Nraw)),String(fmtIn(w.M2)),String(fmtIn(w.M3)),
       v.MyRd.toFixed(1),v.MzRd.toFixed(1),v.util.toFixed(1)+'%',
       txtOm(w.om&&w.om.y),txtOm(w.om&&w.om.z),
-      (v.util<=100?t('verdictOk'):t('verdictFail'))];
+      (v.util<=100?t('verdictOk'):t('verdictFail'))],10,b2(w,true));
   });
   doc.autoTable({
     startY:yS+7,
-    head:[[t('colColumn'),storyHdr,t('colSet'),t('csNComb'),t('csInvalid'),t('csGovCase'),t('colStation'),
-           t('colN'),t('colM2'),t('colM3'),t('colMyRd'),t('colMzRd'),t('csUtilMax'),'Om_y','Om_z',t('colVerdict')]],
+    head:[insB([t('colColumn'),storyHdr,t('colSet'),t('csNComb'),t('csInvalid'),t('csGovCase'),t('colStation'),
+           t('colN'),t('colM2'),t('colM3'),t('colMyRd'),t('colMzRd'),t('csUtilMax'),'Om_y','Om_z',t('colVerdict')],10,['My,Ed II','Mz,Ed II'])],
     body:sumBody,
     margin:{left:ml,right:mr},tableWidth:cw,theme:'grid',
     styles:{lineColor:[180,200,220],lineWidth:0.25,fontSize:7.5,textColor:[0,0,0],cellPadding:1.6},
     headStyles:{fillColor:[200,215,235],textColor:[0,0,0],fontStyle:'bold',lineColor:[200,215,235],fontSize:7.5},
-    columnStyles:{3:{halign:'right'},4:{halign:'right'},7:{halign:'right'},8:{halign:'right'},9:{halign:'right'},
+    columnStyles:shiftSt({3:{halign:'right'},4:{halign:'right'},7:{halign:'right'},8:{halign:'right'},9:{halign:'right'},
                   10:{halign:'right'},11:{halign:'right'},12:{halign:'right',fontStyle:'bold'},13:{halign:'right'},14:{halign:'right'},
-                  15:{halign:'center',fontStyle:'bold'}},
+                  15:{halign:'center',fontStyle:'bold'}},10),
     didParseCell:function(data){
-      if(data.section==='body'&&data.column.index===15){
-        const vt=sumBody[data.row.index][15];
+      const vi=buckOn?17:15;
+      if(data.section==='body'&&data.column.index===vi){
+        const vt=sumBody[data.row.index][vi];
         if(vt===t('verdictOk')) data.cell.styles.textColor=[46,125,50];
         else if(vt===t('verdictFail')) data.cell.styles.textColor=[192,57,43];
         else data.cell.styles.textColor=[108,108,112];
@@ -2081,7 +2298,7 @@ function buildPdfDoc(){
       verdict=r.status==='done'?t('pdfInvalidCell'):'-';
       if(r.status==='done') obs.push((i+1)+'. '+[r.story,r.column,r.outputCase].filter(Boolean).join(' / ')+' — '+statusText(r.res));
     } else verdict=(v.util<=100?t('verdictOk'):t('verdictFail'));
-    return [
+    return insB([
       r.story,r.column,r.outputCase,r.station,(getSet(r._set||setIdOf(r))||{}).name||'-',
       fmtIn(r.Nraw),fmtIn(r.M2),fmtIn(r.M3),
       okv?v.MyRd.toFixed(1):'-',
@@ -2089,7 +2306,7 @@ function buildPdfDoc(){
       okv?v.util.toFixed(1)+'%':'-',
       okv?txtOm(r.om&&r.om.y):'-',okv?txtOm(r.om&&r.om.z):'-',
       verdict
-    ];
+    ],8,b2(r,okv));
   });
   if(pdfScope==='full'){
     let y2=lastY+8;
@@ -2098,16 +2315,17 @@ function buildPdfDoc(){
     doc.text(t('pdfResultsTitle'),ml,y2);doc.setTextColor(0,0,0);doc.setFont('helvetica','normal');
     doc.autoTable({
       startY:y2+4,
-      head:[[t('colStory'),t('colColumn'),t('colCase'),t('colStation'),t('colSet'),t('colN'),t('colM2'),t('colM3'),t('colMyRd'),t('colMzRd'),t('colUtil'),'Om_y','Om_z',t('colVerdict')]],
+      head:[insB([t('colStory'),t('colColumn'),t('colCase'),t('colStation'),t('colSet'),t('colN'),t('colM2'),t('colM3'),t('colMyRd'),t('colMzRd'),t('colUtil'),'Om_y','Om_z',t('colVerdict')],8,['My,Ed II','Mz,Ed II'])],
       body,
       margin:{left:ml,right:mr},tableWidth:cw,theme:'grid',
       styles:{lineColor:[180,200,220],lineWidth:0.25,fontSize:7.5,textColor:[0,0,0],cellPadding:1.6},
       headStyles:{fillColor:[200,215,235],textColor:[0,0,0],fontStyle:'bold',lineColor:[200,215,235],fontSize:7.5},
-      columnStyles:{5:{halign:'right'},6:{halign:'right'},7:{halign:'right'},8:{halign:'right'},9:{halign:'right'},10:{halign:'right'},
-                    11:{halign:'right'},12:{halign:'right'},13:{halign:'center',fontStyle:'bold'}},
+      columnStyles:shiftSt({5:{halign:'right'},6:{halign:'right'},7:{halign:'right'},8:{halign:'right'},9:{halign:'right'},10:{halign:'right'},
+                    11:{halign:'right'},12:{halign:'right'},13:{halign:'center',fontStyle:'bold'}},8),
       didParseCell:function(data){
-        if(data.section==='body'&&data.column.index===13){
-          const vt=body[data.row.index][13];
+        const vi=buckOn?15:13;
+        if(data.section==='body'&&data.column.index===vi){
+          const vt=body[data.row.index][vi];
           if(vt===t('verdictOk')) data.cell.styles.textColor=[46,125,50];
           else if(vt===t('verdictFail')) data.cell.styles.textColor=[192,57,43];
           else if(vt===t('pdfInvalidCell')) data.cell.styles.textColor=[108,108,112];
@@ -2141,8 +2359,8 @@ function buildPdfDoc(){
   doc.setFontSize(9);doc.setFont('helvetica','bold');doc.setTextColor(0,102,204);
   doc.text(t('pdfLimTitle'),ml,y3);doc.setTextColor(0,0,0);doc.setFont('helvetica','normal');y3+=5;
   doc.setFontSize(7.5);
-  [t('pdfLim1',(m0.eud*1000).toFixed(1)),t('pdfLim2'),t('pdfLim3'),t('pdfLim4'),t('pdfLim5'),t('pdfLim5b'),'- '+t('pdfOmNote')]
-    .forEach(function(line){ need(5); doc.text(line,ml,y3,{maxWidth:cw}); y3+=4.2; });
+  [t('pdfLim1',(m0.eud*1000).toFixed(1)),t('pdfLim2'),t('pdfLim3'),t('pdfLim4'),t('pdfLim5'),t('pdfLim5b'),'- '+t('pdfOmNote')].concat(buckOn?[t('pdfBuckNote'),t('pdfBuckNote2')]:[])
+    .forEach(function(line){ const ls=doc.splitTextToSize(line,cw); ls.forEach(function(l){ need(5); doc.text(l,ml,y3); y3+=3.6; }); y3+=0.6; });
 
   // ── subsol pe fiecare pagina ──
   const tp=doc.internal.getNumberOfPages();
@@ -2191,13 +2409,14 @@ function drawSectionInPdf(doc,m,x0,y0,availW,availH,label){
 // sunt identice cu cele din v2.
 let currentPreset='S1';
 function getKey(p){return 'sw_mod7_'+p;}
-const SET_FIELDS=['b','h','concrete','cnom','detr','cor_n','cor_d','topb_n','topb_d','sidh_n','sidh_d'];
+const SET_FIELDS=['b','h','concrete','cnom','detr','cor_n','cor_d','topb_n','topb_d','sidh_n','sidh_d','buck_l','buck_by','buck_bz','buck_br','buck_phi'];
 function captureState(){
   const st={v:3,common:{},segs:{}};
   ['sp','fckc','ec2c','ecu2c'].forEach(id=>{const el=document.getElementById(id);if(el)st.common[id]=el.value;});
   st.segs.conf=confMode;
   st.segs.axisMap=axisMap;
   st.segs.signConv=signConv;   // eticheta, nu setare
+  st.segs.buck=buckOn;         // ordinul 2 activ pe acest tabel
   st.sets=sets.map(x=>{const o={id:x.id,name:x.name};SET_FIELDS.forEach(f=>o[f]=x[f]);
     if(x.src){o.src=x.src;o.t2=x.t2;o.t3=x.t3;} return o;});
   st.etabs=etabs; st.assignSrc=assignSrc;
@@ -2221,6 +2440,8 @@ function applyState(st){
   curS=(com.sp&&JP.STEEL[com.sp])?com.sp:'S 500';
   confMode=(st.segs&&st.segs.conf)||'none';
   axisMap=(st.segs&&st.segs.axisMap)||'std';
+  buckOn=!!(st.segs&&st.segs.buck);
+  invalidateEnds();
   // seturile
   _sid=1; sets=[]; assign={}; models={};
   etabs=(st.etabs&&st.etabs.sec&&st.etabs.asg)?st.etabs:{sec:{},asg:{}};
@@ -2228,7 +2449,7 @@ function applyState(st){
   if(Array.isArray(st.sets)&&st.sets.length){
     st.sets.forEach(x=>{
       const o=defSet(x.name||'Set');
-      SET_FIELDS.forEach(f=>{ if(x[f]!==undefined) o[f]=(f==='concrete')?x[f]:(+x[f]); });
+      SET_FIELDS.forEach(f=>{ if(x[f]!==undefined) o[f]=(f==='concrete'||f==='buck_br')?x[f]:(+x[f]); });
       if(x.id) o.id=x.id;
       if(x.src){ o.src=x.src; o.t2=+x.t2; o.t3=+x.t3; }
       if(!JP.CONC[o.concrete]) o.concrete='C30/37';
@@ -2265,6 +2486,7 @@ function loadPreset(p){
 }
 function syncToggleUI(){
   setConfUI(confMode);
+  setBuckUI(buckOn);
   document.getElementById('seg-map-std').classList.toggle('on',axisMap==='std');
   document.getElementById('seg-map-swap').classList.toggle('on',axisMap==='swap');
   document.getElementById('seg-sign-neg').classList.toggle('on',signConv==='neg');
